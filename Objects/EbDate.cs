@@ -301,49 +301,49 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
             try
             {
                 if (this.EbDateType == EbDateType.Date)
                 {
                     if (this.ShowDateAs_ == DateShowFormat.Year)
-                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
                     else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
-                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
                     else
-                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
                 else
                 {
                     if (this.EbDateType == EbDateType.DateTime)
                     {
-                        DateTime dt = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                        cField.Value = dt.ConvertToUtc(usr.Preference.TimeZone);
+                        DateTime dt = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
                     }
                     else//EbDateType.Time
-                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
                 }
 
-                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.DateTime, cField.Value));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, EbDbTypes.DateTime, args.cField.Value));
             }
             catch (Exception e)
             {
                 if (!this.IsNullable)
-                    Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {cField.Name}\nValue : {cField.Value}\nMessage : {e.Message}"); ;
-                DbParameter p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
+                    Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {args.cField.Name}\nValue : {args.cField.Value}\nMessage : {e.Message}"); ;
+                DbParameter p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
-                param.Add(p);
+                args.param.Add(p);
             }
 
-            if (ins)
+            if (args.ins)
             {
-                _col += string.Concat(cField.Name, ", ");
-                _val += string.Concat("@", cField.Name, "_", i, ", ");
+                args._cols += string.Concat(args.cField.Name, ", ");
+                args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
             }
             else
-                _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
-            i++;
+                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+            args.i++;
             return true;
         }
 

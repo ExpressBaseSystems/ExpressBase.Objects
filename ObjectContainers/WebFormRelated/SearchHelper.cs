@@ -412,7 +412,7 @@ namespace ExpressBase.Objects.WebFormRelated
             else
             {
                 string param = JsonConvert.SerializeObject(new Param[] { new Param() { Name = "id", Type = "7", Value = Convert.ToString(dr[4]) } }).ToBase64();
-                this.Link = $"/WebForm/Index?refid={Convert.ToString(dr[3])}&_params={param}&_mode=1";
+                this.Link = $"/WebForm/Index?_r={Convert.ToString(dr[3])}&_p={param}&_m=1";
             }
             int createdBy = Convert.ToInt32(dr[5]);
             this.CreatedBy = SolutionObj.Users.ContainsKey(createdBy) ? SolutionObj.Users[createdBy] : "No Name";

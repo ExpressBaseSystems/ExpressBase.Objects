@@ -52,20 +52,16 @@ namespace ExpressBase.Objects.WebFormRelated
                 else if (control is EbProvisionUser)
                 {
                     EbProvisionUser ctrl = control as EbProvisionUser;
-                    ctrl.VirtualTable = curTbl;
                     ctrl.FuncParam.First(e => e.Name == "isolution_id").Value = _this.SolutionObj?.SolutionID ?? string.Empty;
                     int idx = _schema.ExtendedControls.FindIndex(e => e is EbProvisionLocation);
                     if (idx >= 0)
                         ctrl.AddLocConstraint = true;
-                    _schema.ExtendedControls.Add(control);
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 else if (control is EbProvisionLocation)
                 {
-                    (control as EbProvisionLocation).VirtualTable = curTbl;
                     foreach (object temp in _schema.ExtendedControls.FindAll(e => e is EbProvisionUser))
                         (temp as EbProvisionUser).AddLocConstraint = true;
-                    _schema.ExtendedControls.Add(control);
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 else if (control is EbDGUserControlColumn)
@@ -90,19 +86,9 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                 }
 
-                if (control is EbDisplayPicture)
+                if (control is IEbExtraQryCtrl)
                 {
-                    (control as EbDisplayPicture).TableName = curTbl;
-                    _schema.ExtendedControls.Add(control);
-                }
-                else if (control is EbSimpleFileUploader)
-                {
-                    (control as EbSimpleFileUploader).TableName = curTbl;
-                    _schema.ExtendedControls.Add(control);
-                }
-                else if (control is EbMeetingPicker)
-                {
-                    (control as EbMeetingPicker).TableName = curTbl;
+                    (control as IEbExtraQryCtrl).TableName = curTbl;
                     _schema.ExtendedControls.Add(control);
                 }
                 else if (control is EbPhone && (control as EbPhone).Sendotp)

@@ -252,7 +252,7 @@ namespace ExpressBase.Objects
 
         public string GetSelectQuery(IDatabase DataDB, string MasterTable)
         {
-            return string.Empty;
+            throw new NotImplementedException();
         }
 
         private string SlotDetailsGetQuery
@@ -390,26 +390,26 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            if (!ins)
+            if (!args.ins)
                 return false;
-            int.TryParse(Convert.ToString(cField.Value), out int ApprovedSlotId);
+            int.TryParse(Convert.ToString(args.cField.Value), out int ApprovedSlotId);
             if (ApprovedSlotId < 1)
                 return false;
 
-            if (cField.Value == null)
+            if (args.cField.Value == null)
             {
-                var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
+                var p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
-                param.Add(p);
+                args.param.Add(p);
             }
             else
-                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
 
-            _col += string.Concat(cField.Name, ", ");
-            _val += string.Concat("@", cField.Name, "_", i, ", ");
-            i++;
+            args._cols += string.Concat(args.cField.Name, ", ");
+            args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
+            args.i++;
 
             List<ScheduledParticipants> ScheduledParticipants = new List<ScheduledParticipants>();
 
@@ -418,7 +418,7 @@ namespace ExpressBase.Objects
             SlotParticipantCount SPC = new SlotParticipantCount(); //SPL Slot Participant Count
             HostInfo HostInfo = new HostInfo(); //if there is no eligible hosts
             String _query = string.Format(this.ValidateQuery, ApprovedSlotId);
-            EbDataSet ds = DataDB.DoQueries(_query);
+            EbDataSet ds = args.DataDB.DoQueries(_query);
             if (ds.Tables[0].Rows.Count == 0)
                 throw new FormException("Requested meeting slot is invalid", (int)HttpStatusCode.BadRequest, "Query returned 0 rows for Meeting slot : " + ApprovedSlotId, "From EbMeetingPicker.ParameterizeControl()");
 
@@ -478,7 +478,7 @@ namespace ExpressBase.Objects
                     query += $@"insert into eb_meetings (eb_meeting_slots_id, eb_created_by)
                             values({MSD[0].SlotId}, 1);
                         insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
-                            values ({usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2); ";
+                            values ({args.usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{args.usr.FullName}', '{args.usr.Email}', 1, 2); ";
                     for (int k = 0; k < SPL.Count; k++)
                         query += $"insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id) values ( eb_currval('eb_meetings_id_seq'),{SPL[k].ParticipantId}); ";
 
@@ -488,29 +488,29 @@ namespace ExpressBase.Objects
                 else if (MSD[0].IsApproved == "T")
                 {
                     query += $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
-                            values ({usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2);
+                            values ({args.usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{args.usr.FullName}', '{args.usr.Email}', 1, 2);
                         insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id) 
                             values({MSD[0].MeetingId}, eb_currval('eb_meeting_slot_participants_id_seq')); ";
                 }
                 else if (MSD[0].IsApproved == "F" && (SPC.SlotAttendeeCount + 1) < MSD[0].MinAttendees)
                 {
                     query += $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
-                            values ({usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2);  ";
+                            values ({args.usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{args.usr.FullName}', '{args.usr.Email}', 1, 2);  ";
                 }
             }
             else
             {
                 query += $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
-                            values ({usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2);";
-                for (i = 0; i < ScheduledParticipants.Count; i++)
+                            values ({args.usr.UserId}, 1, {MSD[0].MeetingScheduleId}, {ApprovedSlotId}, '{args.usr.FullName}', '{args.usr.Email}', 1, 2);";
+                for (int i = 0; i < ScheduledParticipants.Count; i++)
                 {
                     query += $@"insert into eb_my_actions (user_ids,usergroup_id,role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id,
                         is_completed,eb_del)
                         values('{ScheduledParticipants[i].UserId}',{ScheduledParticipants[i].UserGroupId},'{ScheduledParticipants[i].RoleId}',
-                        NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request','{MyActionTypes.Meeting}',{ApprovedSlotId} , 'F','F');";
+                        NOW(),@{args.tbl}_refid, eb_currval('{args.tbl}_id_seq'), 'Meeting Request','{MyActionTypes.Meeting}',{ApprovedSlotId} , 'F','F');";
                 }
             }
-            _extqry += query;
+            args._extqry += query;
             return true;
         }
 

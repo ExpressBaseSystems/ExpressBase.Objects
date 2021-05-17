@@ -17,7 +17,7 @@ namespace ExpressBase.Objects
 {
     //[HideInToolBox]
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbReview : EbControlContainer, IEbSpecialContainer
+    public class EbReview : EbControlContainer, IEbSpecialContainer, IEbExtraQryCtrl
     {
         public EbReview()
         {
@@ -32,10 +32,10 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.EbDbType = this.EbDbType;    
             Controls = new List<EbControl>() {
-                new EbDGStringColumn() { Name = "stage_unique_id", EbDbType = EbDbTypes.String, Label = "Stage"},
-                new EbDGStringColumn() { Name = "action_unique_id", EbDbType = EbDbTypes.String, Label = "Action"},
-                new EbDGNumericColumn() { Name = "eb_my_actions_id", EbDbType = EbDbTypes.Decimal, Label = "My_Action_Id"},
-                new EbDGStringColumn() { Name = "comments", EbDbType = EbDbTypes.String, Label = "Comments"},
+                new EbDGStringColumn() { Name = "stage_unique_id", EbDbType = EbDbTypes.String, Title = "Stage"},
+                new EbDGStringColumn() { Name = "action_unique_id", EbDbType = EbDbTypes.String, Title = "Action"},
+                new EbDGNumericColumn() { Name = "eb_my_actions_id", EbDbType = EbDbTypes.Decimal, Title = "My_Action_Id"},
+                new EbDGStringColumn() { Name = "comments", EbDbType = EbDbTypes.String, Title = "Comments"},
                 new EbDGDateColumn() { Name = "eb_created_at", EbDbType = EbDbTypes.DateTime, EbDateType = EbDateType.DateTime, DoNotPersist = true, IsSysControl = true},
                 new EbDGCreatedByColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.Decimal, DoNotPersist = true, IsSysControl = true}//,
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
@@ -280,11 +280,11 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        public string GetSelectQuery(string RefId, string MasterTable)
+        public string GetSelectQuery(IDatabase DataDB, string MasterTable)
         {
             return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id, A.description
                 FROM eb_my_actions A, eb_stages S
-                WHERE A.form_ref_id = '{RefId}' AND A.form_data_id = @{MasterTable}_id AND 
+                WHERE A.form_ref_id = @{MasterTable}_refid AND A.form_data_id = @{MasterTable}_id AND 
                 COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
         }
 

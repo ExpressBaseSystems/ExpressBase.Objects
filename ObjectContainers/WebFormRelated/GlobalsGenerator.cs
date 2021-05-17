@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using ExpressBase.CoreBase.Globals;
@@ -240,12 +241,13 @@ namespace ExpressBase.Objects.WebFormRelated
                 DelegateTest OutDelObj = new DelegateTest(DataDB, DbCon);
                 fG_DataDB = new FG_DataDB(OutDelObj.ExecuteScalar);
             }
+            FG_Locations fG_Locations = Get_FG_Locations(_this.SolutionObj.Locations);
             FG_WebForm fG_WebForm = new FG_WebForm() { id = _this.TableRowId, eb_loc_id = _this.LocationId, eb_ref_id = _this.RefId, __mode = _this.__mode };
             fG_WebForm.eb_created_by = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
             fG_WebForm.eb_created_at = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
             int mode = _this.FormDataPusherCount > 0 ? 1 : 2;
-            return new FG_Root(fG_WebForm, fG_User, fG_System, mode, fG_DataDB);
+            return new FG_Root(fG_WebForm, fG_User, fG_System, mode, fG_DataDB, fG_Locations);
         }
 
         private static void GetCSharpFormGlobalsRec_NEW(FG_WebForm fG_WebForm, EbControlContainer _container, WebformData _formdata, WebformData _formdataBkUp)
@@ -285,6 +287,30 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                 }
             }
+        }
+
+        private static FG_Locations Get_FG_Locations(Dictionary<int, EbLocation> ebLocs)
+        {
+            FG_Locations fG_Locations = new FG_Locations();
+            foreach (KeyValuePair<int, EbLocation> locEnrty in ebLocs)
+            {
+                EbLocation l = locEnrty.Value;
+                fG_Locations.Add(new FG_Location() 
+                { 
+                    LocId = l.LocId,
+                    IsGroup = l.IsGroup,
+                    Logo = l.Logo,
+                    LongName = l.LongName, 
+                    Meta = l.Meta,
+                    ParentId = l.ParentId,
+                    ShortName = l.ShortName,
+                    TypeId = l.TypeId,
+                    TypeName = l.TypeName,
+                    WeekHoliday1 = l.WeekHoliday1,
+                    WeekHoliday2 = l.WeekHoliday2
+                });
+            }
+            return fG_Locations;
         }
 
         private static FG_DataGrid GetDataGridGlobal(EbDataGrid DG, SingleTable Table, SingleTable TableBkUp)
@@ -354,7 +380,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             List<Param> p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
             string _params = JsonConvert.SerializeObject(p).ToBase64();
-            string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";
+            string link = $"/WebForm/Index?_r={_this.RefId}&_p={_params}&_m=1";
 
             foreach (FG_Notification notification in _globals.system.Notifications)
             {

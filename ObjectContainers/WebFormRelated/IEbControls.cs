@@ -35,4 +35,10 @@ namespace ExpressBase.Objects
 
         void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls);
     }
+
+    public interface IEbExtraQryCtrl
+    {
+        string TableName { get; set; }
+        string GetSelectQuery(IDatabase DataDB, string MasterTbl);
+    }
 }

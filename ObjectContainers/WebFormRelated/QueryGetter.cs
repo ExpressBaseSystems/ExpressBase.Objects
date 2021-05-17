@@ -100,37 +100,17 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     if (!MuCtrlFound)
                     {
-                        extquery += (Ctrl as EbProvisionUser).GetSelectQuery(_this.FormSchema.MasterTable);
+                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
                         MuCtrlFound = true;
                         _qryCount++;
                     }
                     extquery += (Ctrl as EbProvisionUser).GetMappedUserQuery(_this.FormSchema.MasterTable, ebs[SystemColumns.eb_del], ebs.GetBoolFalse(SystemColumns.eb_del));
                     _qryCount++;
                 }
-                else if (Ctrl is EbProvisionLocation)
+                else if (Ctrl is IEbExtraQryCtrl)
                 {
-                    extquery += (Ctrl as EbProvisionLocation).GetSelectQuery(_this.FormSchema.MasterTable);
+                    extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
                     _qryCount++;
-                }
-                else if (Ctrl is EbReview)
-                {
-                    extquery += (Ctrl as EbReview).GetSelectQuery(_this.RefId, _this.FormSchema.MasterTable);
-                    _qryCount++;
-                }
-                else if (Ctrl is EbDisplayPicture)
-                {
-                    extquery += (Ctrl as EbDisplayPicture).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
-                    _qryCount++;
-                }
-                else if (Ctrl is EbSimpleFileUploader)
-                {
-                    extquery += (Ctrl as EbSimpleFileUploader).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
-                    _qryCount++;
-                }
-                else if (Ctrl is EbMeetingPicker)
-                {
-                    extquery += (Ctrl as EbMeetingPicker).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
-                    //_qryCount++;
                 }
             }
             return query + extquery;
@@ -248,7 +228,7 @@ namespace ExpressBase.Objects.WebFormRelated
         //    return query;
         //}
 
-        public static string GetCancelQuery(EbWebForm _this, IDatabase DataDB)
+        public static string GetCancelQuery(EbWebForm _this, IDatabase DataDB, bool Cancel)
         {
             string FullQry = string.Empty;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
@@ -259,35 +239,37 @@ namespace ExpressBase.Objects.WebFormRelated
                 foreach (TableSchema _table in _schema.Tables)
                 {
                     string Qry = string.Format("UPDATE {0} SET {1} = {5}, {2} = @eb_lastmodified_by, {3} = {4} ",
-                        _table.TableName,
-                        ebs[SystemColumns.eb_void],
-                        ebs[SystemColumns.eb_lastmodified_by],
-                        ebs[SystemColumns.eb_lastmodified_at],
-                        DataDB.EB_CURRENT_TIMESTAMP,
-                        ebs.GetBoolTrue(SystemColumns.eb_void));
+                        _table.TableName,//0
+                        ebs[SystemColumns.eb_void],//1
+                        ebs[SystemColumns.eb_lastmodified_by],//2
+                        ebs[SystemColumns.eb_lastmodified_at],//3
+                        DataDB.EB_CURRENT_TIMESTAMP,//4
+                        Cancel ? ebs.GetBoolTrue(SystemColumns.eb_void) : ebs.GetBoolFalse(SystemColumns.eb_void));//5
 
                     if (ebWebForm.DataPusherConfig == null)
-                        Qry += string.Format("WHERE {0} = @{1}_id AND COALESCE({2}, {4}) = {4} AND COALESCE({3}, {5}) = {5};",
-                            _table.TableName == _schema.MasterTable ? "id" : (_schema.MasterTable + "_id"),
-                            _schema.MasterTable,
-                            ebs[SystemColumns.eb_del],
-                            ebs[SystemColumns.eb_void],
-                            ebs.GetBoolFalse(SystemColumns.eb_del),
-                            ebs.GetBoolFalse(SystemColumns.eb_void));
+                        Qry += string.Format("WHERE {0} = @{1}_id AND COALESCE({2}, {4}) = {4} AND COALESCE({3}, {5}) = {6};",
+                            _table.TableName == _schema.MasterTable ? "id" : (_schema.MasterTable + "_id"),//0
+                            _schema.MasterTable,//1
+                            ebs[SystemColumns.eb_del],//2
+                            ebs[SystemColumns.eb_void],//3
+                            ebs.GetBoolFalse(SystemColumns.eb_del),//4
+                            ebs.GetBoolFalse(SystemColumns.eb_void),//5
+                            Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//6
                     else
                     {
                         EbDataPusherConfig _conf = ebWebForm.DataPusherConfig;
                         if (_table.TableName == _schema.MasterTable)
-                            Qry += string.Format("WHERE {0}_id = @{0}_id AND {1} = '{2}' AND COALESCE({3}, {5}) = {5} AND COALESCE({4}, {6}) = {6};",
+                            Qry += string.Format("WHERE {0}_id = @{0}_id AND {1} = '{2}' AND COALESCE({3}, {5}) = {5} AND COALESCE({4}, {6}) = {7};",
                                 _conf.SourceTable,//0
                                 ebs[SystemColumns.eb_push_id],//1
                                 _conf.MultiPushId,//2
                                 ebs[SystemColumns.eb_del],//3
                                 ebs[SystemColumns.eb_void],//4
                                 ebs.GetBoolFalse(SystemColumns.eb_del),//5
-                                ebs.GetBoolFalse(SystemColumns.eb_void));//6
+                                ebs.GetBoolFalse(SystemColumns.eb_void),//6
+                                Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//7
                         else
-                            Qry += string.Format("WHERE {0}_id = (SELECT id FROM {0} WHERE {1}_id = @{1}_id AND {2} = '{3}' AND COALESCE({4}, {6}) = {6} AND COALESCE({5}, {7}) = {7} LIMIT 1) AND COALESCE({4}, {6}) = {6} AND COALESCE({5}, {7}) = {7};",
+                            Qry += string.Format("WHERE {0}_id = (SELECT id FROM {0} WHERE {1}_id = @{1}_id AND {2} = '{3}' AND COALESCE({4}, {6}) = {6} AND COALESCE({5}, {7}) = {8} LIMIT 1) AND COALESCE({4}, {6}) = {6} AND COALESCE({5}, {7}) = {8};",
                                 _schema.MasterTable,//0
                                 _conf.SourceTable,//1
                                 ebs[SystemColumns.eb_push_id],//2
@@ -295,7 +277,8 @@ namespace ExpressBase.Objects.WebFormRelated
                                 ebs[SystemColumns.eb_del],//4
                                 ebs[SystemColumns.eb_void],//5
                                 ebs.GetBoolFalse(SystemColumns.eb_del),//6
-                                ebs.GetBoolFalse(SystemColumns.eb_void));//7
+                                ebs.GetBoolFalse(SystemColumns.eb_void),//7
+                                Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//8
                     }
                     FullQry = Qry + FullQry;
                 }
@@ -315,6 +298,23 @@ namespace ExpressBase.Objects.WebFormRelated
         //    }
         //    return query;
         //}
+
+        public static string GetLockOrUnlockQuery(EbWebForm _this, IDatabase DataDB, bool Lock)
+        {
+            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+
+            string Qry = string.Format("UPDATE {0} SET {1} = {6}, {2} = @eb_lastmodified_by, {3} = {4} WHERE id = @{0}_id AND COALESCE({1}, {5}) = {7};",
+                _this.TableName,
+                ebs[SystemColumns.eb_lock],//1
+                ebs[SystemColumns.eb_lastmodified_by],//2
+                ebs[SystemColumns.eb_lastmodified_at],//3
+                DataDB.EB_CURRENT_TIMESTAMP,//4
+                ebs.GetBoolFalse(SystemColumns.eb_lock),//5
+                Lock ? ebs.GetBoolTrue(SystemColumns.eb_lock) : ebs.GetBoolFalse(SystemColumns.eb_lock),//6
+                Lock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock));//7
+
+            return Qry;
+        }
 
         public static string GetInsertQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
         {

@@ -535,23 +535,23 @@ else if (this.AttendeeConfig === 4)
             }
         }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            if (!ins)
+            if (!args.ins)
                 return false;
             MeetingSchedule Mobj = new MeetingSchedule();
-            Mobj = JsonConvert.DeserializeObject<MeetingSchedule>(cField.Value.ToString());
+            Mobj = JsonConvert.DeserializeObject<MeetingSchedule>(args.cField.Value.ToString());
             //string[] Host = Mobj.Host.Split(',').Select(sValue => sValue.Trim()).ToArray();
 
             string query = "";
             if (Mobj.MeetingType == MeetingType.SingleMeeting)
             {
-                query += AddMeetingSchedule(Mobj, usr);
-                for (i = 0; i < Mobj.SlotList.Count; i++)
+                query += AddMeetingSchedule(Mobj, args.usr);
+                for (int i = 0; i < Mobj.SlotList.Count; i++)
                 {
                     query += $@"
                 insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
-                (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}','{Mobj.SlotList[i].TimeTo}', {usr.UserId},now() );";
+                (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}','{Mobj.SlotList[i].TimeTo}', {args.usr.UserId},now() );";
 
                     int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Users).Count();
                     int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Users).Count();
@@ -560,12 +560,12 @@ else if (this.AttendeeConfig === 4)
                     bool IsFixedAttendee = false;
                     if (Mobj.MaxHost == 0)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB,this.TempSameHost);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, args.usr, ParticipantOpt.Eligible, ParticipantType.Host, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB,this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
                     {
                         IsFixedHost = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, args.usr, ParticipantOpt.Fixed, ParticipantType.Host, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount < Mobj.MinHost)
                     {
@@ -573,26 +573,26 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, args.usr, ParticipantOpt.Eligible, ParticipantType.Host, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameHost);
                     }
                     if (Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact )
                     {
-                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += AddPersons(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Fixed, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB);
                     }
                     else if (Mobj.MaxAttendee == 0)
                     {
                         IsFixedAttendee = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Eligible, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameAttendee);
                     }
                     else if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Fixed, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameAttendee);
                     }
                     else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
-                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += AddPersons(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Fixed, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB);
                     }
                     else if (this.AttendeeConfig == UsersType.Users && HostUserIdsCount < Mobj.MinAttendee)
                     {
@@ -604,21 +604,21 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Eligible, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameAttendee);
                     }
                     query += $@"update eb_meeting_slots set meeting_opts = {SetMeetingOpts(IsFixedHost, IsFixedAttendee)} where id = eb_currval('eb_meeting_slots_id_seq') ;";
                 }
             }
             else if (Mobj.MeetingType == MeetingType.MultipleMeeting)
             {
-                query += AddMeetingSchedule(Mobj, usr);
+                query += AddMeetingSchedule(Mobj, args.usr);
                 this.TempSameHost = false;
                 this.TempSameAttendee = false;
-                for (i = 0; i < Mobj.SlotList.Count; i++)
+                for (int i = 0; i < Mobj.SlotList.Count; i++)
                 {
                     query += $@"
                 insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
-                (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}','{Mobj.SlotList[i].TimeTo}', {usr.UserId},now() );";
+                (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}','{Mobj.SlotList[i].TimeTo}', {args.usr.UserId},now() );";
 
                     int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Users).Count();
                     int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Users).Count();
@@ -627,12 +627,12 @@ else if (this.AttendeeConfig === 4)
                     bool IsFixedAttendee = false;
                     if (Mobj.MaxHost == 0)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB,this.TempSameHost);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, args.usr, ParticipantOpt.Eligible, ParticipantType.Host, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB,this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
                     {
                         IsFixedHost = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, args.usr, ParticipantOpt.Fixed, ParticipantType.Host, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount < Mobj.MinHost)
                     {
@@ -640,27 +640,27 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, args.usr, ParticipantOpt.Eligible, ParticipantType.Host, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameHost);
                     }
                     if (Mobj.MaxAttendee == 0 && this.AttendeeConfig != UsersType.Contact)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Eligible, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameAttendee);
                     }
                     else if(Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact)
                     {
                         IsFixedAttendee = true;
-                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += AddPersons(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Fixed, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB);
 
                     }
                     else if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Fixed, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameAttendee);
                     }
                     else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
-                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += AddPersons(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Fixed, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB);
                     }
                     else if (this.AttendeeConfig == UsersType.Users && HostUserIdsCount < Mobj.MinAttendee)
                     {
@@ -672,7 +672,7 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, args.usr, ParticipantOpt.Eligible, ParticipantType.Attendee, args.tbl, Mobj.SlotList[i], Mobj.Date, args.DataDB, this.TempSameAttendee);
                     }
                     query += $@"update eb_meeting_slots set meeting_opts = {SetMeetingOpts(IsFixedHost, IsFixedAttendee)} where id = eb_currval('eb_meeting_slots_id_seq') ;";
                 if(this.SameHost) { this.TempSameHost = true; }
@@ -824,7 +824,7 @@ else if (this.AttendeeConfig === 4)
             //        '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
             //}
 
-            _extqry += query;
+            args._extqry += query;
             return true;
         }
 
@@ -901,7 +901,7 @@ else if (this.AttendeeConfig === 4)
                 }
                 if (userids != "" && !_temp)
                     query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-                is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                is_completed,eb_del) values('{userids}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                      '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F'); ";              
                 ////if (Roles != "")
                 ////    query += $@"insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
@@ -947,15 +947,15 @@ else if (this.AttendeeConfig === 4)
 
                 if (userids != "" && !_temp)
                     query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
-                    is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    is_completed,eb_del) values('{userids}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
                 if (Roles != "" && ! _temp)
                     query += $@" insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
-                    is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    is_completed,eb_del) values('{Roles}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
                 if (UserGroup > 0 && !_temp)
                     query += $@" insert into eb_my_actions (user_group,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
-                    is_completed,eb_del) values('{UserGroup}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    is_completed,eb_del) values('{UserGroup}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
             }
             if (ExceptUserNames != "")

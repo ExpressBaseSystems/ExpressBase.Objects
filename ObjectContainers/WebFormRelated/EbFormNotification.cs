@@ -94,7 +94,7 @@ else if(this.NotifyBy === 3)
         [HideInPropertyGrid]
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
 
-        public override void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict) 
+        public override void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict)
         {
             if (this.NotifyBy == EbFnSys_NotifyBy.Roles)
             {
@@ -221,7 +221,7 @@ else if(this.NotifyBy === 3)
                         }
                         List<Param> plist = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
                         string _params = JsonConvert.SerializeObject(plist).ToBase64();
-                        string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";
+                        string link = $"/WebForm/Index?_r={_this.RefId}&_p={_params}&_m=1";
 
                         if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Roles)
                         {
@@ -284,7 +284,9 @@ else if(this.NotifyBy === 3)
                                 if (Column?.Control == null)
                                     throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
 
-                                Column.Control.ParameterizeControl(DataDB, _p, null, Column, true, ref _idx, ref t1, ref t2, ref t3, _this.UserObj, null);
+                                ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, _p, Column, _idx, _this.UserObj);
+                                Column.Control.ParameterizeControl(args);
+                                _idx = args.i;
                                 _p[_idx - 1].ParameterName = p.Key;
                             }
                             List<int> uids = new List<int>();
@@ -304,8 +306,8 @@ else if(this.NotifyBy === 3)
                                         Link = link,
                                         Title = message,
                                         UsersID = uid,
-										User_AuthId= _this.UserObj.AuthId
-									});
+                                        User_AuthId = _this.UserObj.AuthId
+                                    });
                                 }
                                 catch (Exception ex)
                                 {
@@ -433,7 +435,7 @@ else if(this.NotifyBy === 3)
                     resp = await client.Send(req);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 resp.Message = ex.Message;
                 Console.WriteLine("Exception in SendMobileNotification: " + ex.Message);

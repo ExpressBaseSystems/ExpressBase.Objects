@@ -663,6 +663,90 @@ namespace ExpressBase.Objects
 
             return Tables;
         }
+
+        public static void InitFromDataBase(EbWebForm WebForm_L, JsonServiceClient ServiceClient, IRedisClient Redis, string WC) 
+        {
+            //foreach (EbControl control in WebForm_L.Controls.FlattenAllEbControls().ToList().FindAll(e => e is EbDataGrid_New))// for old objects
+            //{
+            //	(control as EbDataGrid_New).ProcessDvColumnCollection();
+            //}
+
+            foreach (EbControl control in WebForm_L.Controls.FlattenEbControls())
+            {
+                if (control is EbSimpleSelect)
+                {
+                    (control as EbSimpleSelect).InitFromDataBase(ServiceClient);
+                }
+                if (control is EbChartControl)
+                {
+                    (control as EbChartControl).InitFromDataBase(ServiceClient, Redis);
+                }
+                else if (control is EbTVcontrol)
+                {
+                    (control as EbTVcontrol).InitFromDataBase(ServiceClient, Redis);
+                }
+                else if (control is IEbPowerSelect && (control as IEbPowerSelect).RenderAsSimpleSelect)
+                {
+                    (control as IEbPowerSelect).InitFromDataBase_SS(ServiceClient);
+                }
+                else if (control is EbDGSimpleSelectColumn)
+                {
+                    EbDGSimpleSelectColumn SimpleSelectColumn = (control as EbDGSimpleSelectColumn);
+                    SimpleSelectColumn.EbSimpleSelect.InitFromDataBase(ServiceClient);
+
+                    SimpleSelectColumn.DBareHtml = SimpleSelectColumn.EbSimpleSelect.GetBareHtml();
+                }
+                else if (control is EbUserLocation)
+                {
+                    (control as EbUserLocation).InitFromDataBase(ServiceClient, WebForm_L.UserObj, WebForm_L.SolutionObj, WebForm_L.RefId);
+                }
+                else if ((control is EbRadioButton) && control.Name.Equals("eb_default"))
+                {
+                    if (WC == RoutingConstants.UC)
+                    {
+                        if (!(WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()) || WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionPM.ToString())))
+                            control.IsDisable = true;
+                    }
+                }
+                else if (control is EbUserSelect)
+                {
+                    (control as EbUserSelect).InitOptions(WebForm_L.SolutionObj.Users);
+                }
+                else if (control is EbDGUserSelectColumn)
+                {
+                    (control as EbDGUserSelectColumn).InitOptions(WebForm_L.SolutionObj.Users);
+                }
+                else if (control is EbTextBox)
+                {
+                    (control as EbTextBox).InitFromDataBase(ServiceClient);
+                }
+                else if (control is EbDGStringColumn)
+                {
+                    (control as EbDGStringColumn).InitFromDataBase(ServiceClient);
+                }
+                else if (control is EbMeetingScheduler)
+                {
+                    //(control as EbMeetingScheduler).UsersList = WebForm.SolutionObj.Users;
+                    (control as EbMeetingScheduler).InitParticipantsList(ServiceClient);
+                }
+                else if (control is EbInputGeoLocation)
+                {
+                    (control as EbInputGeoLocation).GetDefaultApikey(ServiceClient);
+                }
+                else if (control is EbTagInput)
+                {
+                    (control as EbTagInput).InitFromDataBase(ServiceClient);
+                }
+                else if (control is EbQuestionnaireConfigurator)
+                {
+                    (control as EbQuestionnaireConfigurator).InitFromDataBase(ServiceClient);
+                }
+                else if (control is EbRenderQuestionsControl)
+                {
+                    (control as EbRenderQuestionsControl).InitFromDataBase(ServiceClient);
+                }
+            }
+        }
     }
 
     public class EbColumnExtra
@@ -692,5 +776,28 @@ namespace ExpressBase.Objects
         public string VerifyPhone { get; set; }
         public string Message { get; set; }
         public string Token { get; set; }
+    }
+
+    public class EbFormAndDataWrapper
+    {
+        public string RefId { get; set; }
+        public int RenderMode { get; set; }
+        public int RowId { get; set; }
+        public int DraftId { get; set; }
+        public string Draft_FormData { get; set; }
+        public string Mode { get; set; }
+        public string FormDataWrap { get; set; }
+        public Dictionary<int, List<int>> FormPermissions { get; set; }
+        public string WebFormHtml { get; set; }
+        public string WebFormObj { get; set; }
+        public Dictionary<string, string> DisableEditButton { get; set; }
+        public bool IsPartial { get; set; }//can avoid last
+
+        public string HtmlHead { get; set; }//
+
+        public string Url { get; set; }
+        public string RedirectUrl { get; set; }
+        public string ErrorMessage { get; set; }
+        public string Message { get; set; }
     }
 }

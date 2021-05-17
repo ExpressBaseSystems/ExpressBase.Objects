@@ -183,6 +183,10 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        public bool MakeEbSidUnique { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableExcelImport { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -674,7 +678,7 @@ namespace ExpressBase.Objects
                     string str_row_num = this.SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
                     for (int i = 0, j = count; i < count; i++, j--)
                     {
-                        
+
                         if (FormData.MultipleTables[dgCtrl.TableName][i].GetColumn(str_row_num) == null)
                             FormData.MultipleTables[dgCtrl.TableName][i].Columns.Add(new SingleColumn
                             {
@@ -936,7 +940,7 @@ namespace ExpressBase.Objects
                     if (_table.TableName.Equals(this.FormSchema.MasterTable))
                     {
                         if (this.FormData != null)
-                        {                            
+                        {
                             this.FormData.FormVersionId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsLocked = ebs.GetBooleanValue(SystemColumns.eb_lock, dataRow[i++]);
                             string[] pushIdParts = dataRow[i++].ToString().Split("_");
@@ -1171,7 +1175,8 @@ namespace ExpressBase.Objects
             DbParameter[] param = new DbParameter[]
             {
                 DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4]),
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._refid, EbDbTypes.String, this.RefId)
             };
             EbDataSet dataset = null;
             if (this.DbConnection == null)
@@ -1255,9 +1260,9 @@ namespace ExpressBase.Objects
             {
                 int tableIndex = _schema.Tables.Count;
                 SingleTable UserTable = null;
-                foreach (EbControl Ctrl in _schema.ExtendedControls)// EbProvisionUser + EbProvisionLocation + EbReview
+                foreach (EbControl Ctrl in _schema.ExtendedControls)
                 {
-                    if (Ctrl is EbProvisionUser || Ctrl is EbProvisionLocation || Ctrl is EbReview || Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader/* || Ctrl is  EbMeetingPicker*/)
+                    if (Ctrl is IEbExtraQryCtrl)
                     {
                         SingleTable Table = new SingleTable();
                         if (!(UserTable != null && Ctrl is EbProvisionUser))
@@ -1266,7 +1271,7 @@ namespace ExpressBase.Objects
                         if (Ctrl is EbProvisionUser)
                         {
                             EbProvisionUser provUser = Ctrl as EbProvisionUser;
-                            SingleColumn Column = _FormData.MultipleTables[provUser.VirtualTable][0].GetColumn(Ctrl.Name);
+                            SingleColumn Column = _FormData.MultipleTables[provUser.TableName][0].GetColumn(Ctrl.Name);
                             if (UserTable == null)
                             {
                                 UserTable = Table;
@@ -1317,7 +1322,7 @@ namespace ExpressBase.Objects
                                 _d.Add(FormConstants.parent_id, Table[0][FormConstants.parent_id]);
                                 _d.Add(FormConstants.eb_location_types_id, Table[0][FormConstants.eb_location_types_id]);
                             }
-                            _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_d);
+                            _FormData.MultipleTables[(Ctrl as EbProvisionLocation).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_d);
                         }
                         else if (Ctrl is EbReview)
                         {
@@ -1392,15 +1397,23 @@ namespace ExpressBase.Objects
                                 if (!_list.Contains(info))
                                     _list.Add(info);
                             }
-                            if (Ctrl is EbDisplayPicture)
-                                _FormData.MultipleTables[(Ctrl as EbDisplayPicture).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
-                            else if (Ctrl is EbSimpleFileUploader)
-                                _FormData.MultipleTables[(Ctrl as EbSimpleFileUploader).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
+                            _FormData.MultipleTables[(Ctrl as IEbExtraQryCtrl).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
                         }
-                        //else if (Ctrl is EbMeetingPicker)
-                        //{
-                        //    //process Table here
-                        //}
+                        else if (Ctrl is EbQuestionnaireConfigurator)
+                        {
+                            List<Ques_Confi> Ques = new List<Ques_Confi>();
+                            foreach (SingleRow dr in Table)
+                            {
+                                Ques_Confi Que = new Ques_Confi()
+                                {
+                                    id = Convert.ToInt32(dr[FormConstants.id]),
+                                    ques_id = Convert.ToInt32(dr["ques_id"]),
+                                    ext_props = JsonConvert.DeserializeObject<Ques_ext_props>(Convert.ToString(dr["ext_props"]))
+                                };
+                                Ques.Add(Que);
+                            }
+                            _FormData.MultipleTables[(Ctrl as IEbExtraQryCtrl).TableName][0][Ctrl.Name] = JsonConvert.SerializeObject(Ques);
+                        }
 
                         tableIndex++;
                     }
@@ -1535,7 +1548,7 @@ namespace ExpressBase.Objects
                 }
 
                 this.PostFormatFormData();
-
+                this.FormGlobals = null;// FormGlobals is a reusing Object, so clear when a data change happens
                 this.ExeDeleteCancelEditScript(DataDB, _FormData);
             }
         }
@@ -1546,6 +1559,7 @@ namespace ExpressBase.Objects
             this.FormData = this.GetEmptyModel();
             Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             List<DbParameter> param = new List<DbParameter>();
+            string DataImportPS = null;
             foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
             {
                 foreach (SingleRow Row in Table.Value)
@@ -1559,17 +1573,29 @@ namespace ExpressBase.Objects
                             Column.Value = NwCol.Value;
                             Column.F = NwCol.F;
                             param.Add(DataDB.GetNewParameter(Column.Name, (EbDbTypes)Column.Type, Column.Value));
-                            if (Column.Control is EbPowerSelect && !(Column.Control as EbPowerSelect).IsDataFromApi)
+                            if (Column.Control is EbPowerSelect)
                             {
-                                string t = (Column.Control as EbPowerSelect).GetSelectQuery(DataDB, service, p.Value);
-                                QrsDict.Add((Column.Control as EbPowerSelect).EbSid, t);
+                                EbPowerSelect psCtrl = Column.Control as EbPowerSelect;
+                                if ((psCtrl.IsImportFromApi || !string.IsNullOrWhiteSpace(psCtrl.DataImportId)) && !psCtrl.MultiSelect && p.ValueTo > 0)
+                                    DataImportPS = psCtrl.Name;
+
+                                if (!psCtrl.IsDataFromApi && DataImportPS == null)
+                                {
+                                    string t = psCtrl.GetSelectQuery(DataDB, service, p.Value);
+                                    QrsDict.Add(psCtrl.EbSid, t);
+                                }
                             }
                         }
                     }
                 }
             }
 
-            if (QrsDict.Count > 0)
+            if (DataImportPS != null)
+            {
+                this.FormDataBackup = this.FormData;
+                this.PsImportData(DataDB, service, DataImportPS);
+            }
+            else if (QrsDict.Count > 0)
             {
                 EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
 
@@ -1644,6 +1670,9 @@ namespace ExpressBase.Objects
                 if (IsUpdate)
                 {
                     this.RefreshFormData(DataDB, service, true, true);
+                    if (this.FormData.IsLocked)
+                        throw new FormException("Unable to continue in locked data entry!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
+
                     if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
@@ -1724,6 +1753,7 @@ namespace ExpressBase.Objects
             fullqry += this.GetDraftTableUpdateQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
@@ -1751,54 +1781,64 @@ namespace ExpressBase.Objects
         }
 
         //pTable => Parent Table, pRow => Parent Row
-        public string InsertUpdateLines(string pTable, SingleRow parentRow, IDatabase DataDB, List<DbParameter> param, ref int i)
+        public string InsertUpdateLines(string pTable, SingleRow parentRow, ParameterizeCtrl_Params args)
         {
             string fullqry = string.Empty;
+            string tempStr = string.Empty;////////////////////warning
+            ParameterizeCtrl_Params inArgs = new ParameterizeCtrl_Params(args.DataDB, args.param, args.i, tempStr);
+            inArgs.SetFormRelated(this.TableName, this.UserObj, this);
+
             if (parentRow.LinesTable.Key != null)// Lines table of the grid
             {
                 foreach (SingleRow _lineRow in parentRow.LinesTable.Value)
                 {
-                    string _cols = string.Empty;
-                    string _values = string.Empty;
-                    string tempStr = string.Empty;////////////////////warning
+                    inArgs.ResetColVals();
+                    inArgs.ResetColsAndVals();
 
                     if (!_lineRow.IsDelete)
                     {
                         foreach (SingleColumn cField in _lineRow.Columns)
                         {
-                            if (cField.Control != null)
-                                cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, _lineRow.RowId <= 0, ref i, ref _cols, ref _values, ref tempStr, this.UserObj, null);
+                            if (_lineRow.RowId <= 0)
+                                inArgs.InsertSet(cField);
                             else
-                                this.ParameterizeUnknown(DataDB, param, cField, _lineRow.RowId <= 0, ref i, ref _cols, ref _values);
+                                inArgs.UpdateSet(cField);
+
+                            if (cField.Control != null)
+                                cField.Control.ParameterizeControl(inArgs);
+                            else
+                                this.ParameterizeUnknown(inArgs);
                         }
                     }
 
                     if (this.TableRowId <= 0 && parentRow.RowId <= 0 && _lineRow.RowId <= 0)//III
                     {
-                        string _qry = QueryGetter.GetInsertQuery(this, DataDB, parentRow.LinesTable.Key, true);
+                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, true);
                         _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} (SELECT eb_currval('{pTable}_id_seq')),");
-                        fullqry += string.Format(_qry, _cols, _values);
+                        fullqry += string.Format(_qry, inArgs._cols, inArgs._vals);
                     }
                     else if (this.TableRowId > 0 && parentRow.RowId <= 0 && _lineRow.RowId <= 0)//EII
                     {
-                        string _qry = QueryGetter.GetInsertQuery(this, DataDB, parentRow.LinesTable.Key, false);
+                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, false);
                         _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} (SELECT eb_currval('{pTable}_id_seq')),");
-                        fullqry += string.Format(_qry, _cols, _values);
+                        fullqry += string.Format(_qry, inArgs._cols, inArgs._vals);
                     }
                     else if (this.TableRowId > 0 && parentRow.RowId > 0 && _lineRow.RowId <= 0)//EEI
                     {
-                        string _qry = QueryGetter.GetInsertQuery(this, DataDB, parentRow.LinesTable.Key, false);
+                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, false);
                         _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} {parentRow.RowId},");
-                        fullqry += string.Format(_qry, _cols, _values);
+                        fullqry += string.Format(_qry, inArgs._cols, inArgs._vals);
                     }
                     else if (this.TableRowId > 0 && parentRow.RowId > 0 && _lineRow.RowId > 0)//EEE
                     {
-                        string _qry = QueryGetter.GetUpdateQuery(this, DataDB, parentRow.LinesTable.Key, _lineRow.IsDelete);
+                        string _qry = QueryGetter.GetUpdateQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, _lineRow.IsDelete);
                         _qry = string.Format(_qry, "{0}", $"{{1}} AND {pTable}_id = {parentRow.RowId} ");
-                        fullqry += string.Format(_qry, _cols, _lineRow.RowId);
+                        fullqry += string.Format(_qry, inArgs._colvals, _lineRow.RowId);
                     }
                 }
             }
+            //args.CopyBack(ref tempStr, ref i);
+            args.i = inArgs.i;
             return fullqry;
         }
 
@@ -1819,6 +1859,7 @@ namespace ExpressBase.Objects
             fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, false, service);
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
@@ -1973,7 +2014,9 @@ namespace ExpressBase.Objects
                         if (Column == null || Column.Control == null)
                             throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
 
-                        Column.Control.ParameterizeControl(DataDB, _params, null, Column, true, ref _idx, ref t1, ref t2, ref t3, this.UserObj, null);
+                        ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, _params, Column, _idx, this.UserObj);
+                        Column.Control.ParameterizeControl(args);
+                        _idx = args.i;
                         _params[_idx - 1].ParameterName = p.Key;
                     }
                     List<int> uids = new List<int>();
@@ -2065,38 +2108,39 @@ namespace ExpressBase.Objects
             return _qry;
         }
 
-        public bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val)
+        //IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val
+        public bool ParameterizeUnknown(ParameterizeCtrl_Params args)
         {
             string cFldName = this.SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
-            if (cFldName == cField.Name)
+            if (cFldName == args.cField.Name)
                 cFldName = SystemColumns.eb_row_num;
             else
-                cFldName = cField.Name;
+                cFldName = args.cField.Name;
 
             if (EbColumnExtra.Params.ContainsKey(cFldName))
             {
-                if (cField.Value == null)
+                if (args.cField.Value == null)
                 {
-                    var p = DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cFldName]);
+                    var p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, EbColumnExtra.Params[cFldName]);
                     p.Value = DBNull.Value;
-                    param.Add(p);
+                    args.param.Add(p);
                 }
                 else
                 {
-                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cFldName], cField.Value));
+                    args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, EbColumnExtra.Params[cFldName], args.cField.Value));
                 }
-                if (ins)
+                if (args.ins)
                 {
-                    _col += string.Concat(cField.Name, ", ");
-                    _val += string.Concat("@", cField.Name, "_", i, ", ");
+                    args._cols += string.Concat(args.cField.Name, ", ");
+                    args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
                 }
                 else
-                    _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
-                i++;
+                    args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+                args.i++;
                 return true;
             }
-            else if (!cField.Name.Equals("id"))
-                Console.WriteLine($"Unknown parameter found in formdata... \nForm RefId : {this.RefId}\tName : {cField.Name}\tType : {cField.Type}\tValue : {cField.Value}");
+            else if (!args.cField.Name.Equals("id"))
+                Console.WriteLine($"Unknown parameter found in formdata... \nForm RefId : {this.RefId}\tName : {args.cField.Name}\tType : {args.cField.Type}\tValue : {args.cField.Value}");
             return false;
         }
 
@@ -2376,9 +2420,9 @@ namespace ExpressBase.Objects
 
                     EbProvisionUser pc = c as EbProvisionUser;
 
-                    if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
+                    if (this.FormData?.MultipleTables.ContainsKey(pc.TableName) == true && this.FormData?.MultipleTables[pc.TableName].Count > 0)
                     {
-                        SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
+                        SingleColumn col = this.FormData.MultipleTables[pc.TableName][0].Columns.Find(e => e.Name == pc.Name);
                         if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.signup_user))// && this.RefId == this.SolutionObj.SolutionSettings.SignupFormRefid
                         {
                             //pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
@@ -2458,7 +2502,7 @@ namespace ExpressBase.Objects
 
                 for (int i = 0; i < ds.Tables.Count; i++)
                 {
-                    if (ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0].Count > 0)
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
                     {
                         if (!this.DisableDelete[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableDelete[i].IsWarningOnly)
                             return false;
@@ -2485,31 +2529,50 @@ namespace ExpressBase.Objects
         //to check whether this form data entry can be cancel by executing DisableCancel sql quries
         private bool CanCancel(IDatabase DataDB)
         {
+            EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
+
+            string LockCheckQry = string.Format("SELECT id FROM {0} WHERE id = @id AND COALESCE({1}, {2}) = {2} AND COALESCE({3}, {4}) = {4};",
+                this.TableName,
+                ebs[SystemColumns.eb_del],
+                ebs.GetBoolFalse(SystemColumns.eb_del),
+                ebs[SystemColumns.eb_lock],
+                ebs.GetBoolFalse(SystemColumns.eb_lock));
+
+            DbParameter[] p = new DbParameter[] {
+                DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
+            };
+
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
                 string q = string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
-                DbParameter[] p = new DbParameter[] {
-                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
-                };
-                EbDataSet ds = DataDB.DoQueries(q, p);
-
-                for (int i = 0; i < ds.Tables.Count; i++)
+                
+                EbDataSet ds = DataDB.DoQueries(q + LockCheckQry, p);
+                int i = 0;
+                for (; i < this.DisableCancel.Count; i++)
                 {
-                    if (ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0].Count > 0)
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
                     {
                         if (!this.DisableCancel[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableCancel[i].IsWarningOnly)
                             return false;
                     }
                 }
+                if (ds.Tables[i].Rows.Count <= 0)
+                    return false;
+            }
+            else
+            {
+                EbDataSet ds = DataDB.DoQueries(LockCheckQry, p);
+                if (ds.Tables[0].Rows.Count <= 0)
+                    return false;
             }
             return true;
         }
 
-        public int Cancel(IDatabase DataDB)
+        public int Cancel(IDatabase DataDB, bool Cancel)
         {
             if (this.CanCancel(DataDB))
             {
-                string query = QueryGetter.GetCancelQuery(this, DataDB);
+                string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
                 DbParameter[] param = new DbParameter[] {
                     DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
@@ -2517,6 +2580,16 @@ namespace ExpressBase.Objects
                 return DataDB.DoNonQuery(query, param);
             }
             return -1;
+        }
+
+        public int LockOrUnlock(IDatabase DataDB, bool Lock)
+        {
+            string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
+            DbParameter[] param = new DbParameter[] {
+                DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+            };
+            return DataDB.DoNonQuery(query, param);
         }
 
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)

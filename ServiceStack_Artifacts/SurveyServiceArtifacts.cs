@@ -70,7 +70,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public int Quesid { set; get; }
     }
-    
+
     public class SaveQuestionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
@@ -330,6 +330,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class GetRenderQuestionsRequest : IReturn<GetSurveyEnqResponse>
+    {
+        public string FormRefid { get; set; }
+        public string ControlId { get; set; }
+    }
+    public class GetRenderQuestionResponse
+    {
+        public List<GetRenderQuestions> GetRenderQuestions { get; set; }
+        public GetRenderQuestionResponse()
+        {
+            this.GetRenderQuestions = new List<GetRenderQuestions>();
+        }
+    }
+    public class GetRenderQuestions
+    {
+        public int id { get; set; }
+        public string FormRefid { get; set; }
+        public string FormDataId { get; set; }
+        public string ControlId { get; set; }
+        public int QuestionID { get; set; }
+        public string ExtProps { get; set; }
+        public string Questions { get;set; }
+
     }
 }
 

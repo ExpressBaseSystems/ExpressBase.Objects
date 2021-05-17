@@ -121,15 +121,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int SourceRowId { get; set; }
 
         [DataMember(Order = 3)]
-        public User UserObj { get; set; }
-
-        [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember(Order = 4)]
         public WebFormRenderModes RenderMode { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember(Order = 5)]
         public string DestRefId { get; set; }
     }
 
@@ -666,6 +663,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool Cancel { get; set; }
     }
 
     [DataContract]
@@ -673,6 +673,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class LockUnlockWebFormDataRequest : EbServiceStackAuthRequest, IReturn<LockUnlockWebFormDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool Lock { get; set; }
+    }
+
+    [DataContract]
+    public class LockUnlockWebFormDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
@@ -844,6 +867,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+
+    //////for question configuration control
+    
+    [DataContract]
+    public class GetQuestionsBankRequest : EbServiceStackAuthRequest, IReturn<GetDistinctValuesResponse>
+    {
+
+    }
+
+    [DataContract]
+    public class GetQuestionsBankResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int,String> Questionlst { get; set; }
+
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     public class GetMyProfileEntryRequest : EbServiceStackAuthRequest, IReturn<GetMyProfileEntryResponse>
     {

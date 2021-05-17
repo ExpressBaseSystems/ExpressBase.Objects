@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+    [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm)]
     [SurveyBuilderRoles(SurveyRoles.QuestionControl, SurveyRoles.AnswerControl)]
     public class EbTextControl : EbLabel
     {

@@ -371,6 +371,13 @@ namespace ExpressBase.Objects
         [UIproperty]
         public string Version { set; get; }
 
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.String)]
+        public string PushJson { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string DataIdParam { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='apiPrcItem dropped' eb-type='FormResource' id='@id'>
