@@ -69,6 +69,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public string WC { get; set; }
+    } 
+    
+    public class SetForgotPWInRedisRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
+    {
+        public string UName { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public string WhichConsole { get; set; }
     }
     
 

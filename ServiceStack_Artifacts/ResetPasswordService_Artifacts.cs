@@ -21,12 +21,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ResetPwResponse
     {
         public bool Status { get; set; }
+
         public string ErrorMessage { get; set; }
     }
 
     public class PwDetails
     {
         public string CurrentPassword { get; set; }
+
         public string NewPassword { get; set; }
+
+        public bool IsForgotPw { get; set; }
     }
 }
