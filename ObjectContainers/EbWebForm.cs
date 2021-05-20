@@ -183,6 +183,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("true")]
         public bool MakeEbSidUnique { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]

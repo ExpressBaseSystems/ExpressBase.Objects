@@ -545,7 +545,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             if (item.Key != i)
                                 item.Value.Control.DrDependents.Add(_dict[i].Path);
                         }
-                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id" && _p.Name != _Form.TableName + "_id")
+                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id" && _p.Name != _Form.TableName + "_id" && _p.Name != _dict[i].Control.Name)
                             throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[i].Control.Name}");
                     }
                 }
