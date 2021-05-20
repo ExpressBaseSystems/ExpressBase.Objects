@@ -67,113 +67,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class DataBaseConfigRequest : IReturn<DataBaseConfigResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 0)]
-        public Dictionary<string, object> Colvalues { get; set; }
-
-        [DataMember(Order = 2)]
-        public int Id { get; set; }
-
-        [DataMember(Order = 3)]
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
-        public string Token { get; set; }
-    }
-
-    [DataContract]
-    public class DataBaseConfigResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public int id { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-        [DataMember(Order = 4)]
-        public string u_token { get; set; }
-    }
-
-    [DataContract]
-    public class EditAccountRequest : IReturn<EditAccountResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 0)]
-        public Dictionary<string, object> Colvalues { get; set; }
-
-        [DataMember(Order = 1)]
-        public string op { get; set; }
-
-        [DataMember(Order = 2)]
-        public int Id { get; set; }
-
-
-        [DataMember(Order = 3)]
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
-        public string Token { get; set; }
-    }
-
-    [DataContract]
-    public class EditAccountResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public Dictionary<string, object> Data { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-        [DataMember(Order = 4)]
-        public string u_token { get; set; }
-    }
-
-    [DataContract]
-    public class EditDBConfigRequest : IReturn<EditDBConfigResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 0)]
-        public Dictionary<string, object> Colvalues { get; set; }
-
-        [DataMember(Order = 1)]
-        public string op { get; set; }
-
-        [DataMember(Order = 2)]
-        public int Id { get; set; }
-
-
-        [DataMember(Order = 3)]
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
-        public string Token { get; set; }
-    }
-
-    [DataContract]
-    public class EditDBConfigResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public Dictionary<string, object> Data { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-        [DataMember(Order = 4)]
-        public string u_token { get; set; }
-    }
-
-    [DataContract]
     public class RegisterRequest : Register
     {
 
@@ -346,6 +239,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
     public class CleanupSolutionRequset : EbServiceStackAuthRequest, IReturn<CleanupSolutionResponse>
     {
         [DataMember(Order = 2)]
@@ -603,20 +497,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string jsonval { get; set; }
     }
 
-    //[DataContract]
-    //public class GetUsersResponse : IEbSSResponse
-    //{
-
-    //    [DataMember(Order = 1)]
-    //    public Dictionary<string, object> Data { get; set; }
-
-    //    [DataMember(Order = 2)]
-    //    public string Token { get; set; }
-
-    //    [DataMember(Order = 3)]
-    //    public ResponseStatus ResponseStatus { get; set; }
-    //}
-
     public class GetVersioning : IEbSSRequest
     {
         public bool res { get; set; }
@@ -638,12 +518,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public solutionChangeColumn ChangeColumn { get; set; }
     }
+
     public enum solutionChangeColumn
     {
         version = 1,
         TwoFa = 2,
         OtpSignin =3
     }
+
     public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse>
     {
         public string ExtSolutionId { get; set; }
@@ -655,14 +537,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    //public class UpdateSidMapMqRequest : EbServiceStackAuthRequest, IReturn<UpdateSidMapMqResponse> { }
-
-    public class UpdateSidMapMqResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public ResponseStatus ResponseStatus { get; set; }
-    }
     public class UpdateRedisConnectionsRequest : EbServiceStackAuthRequest, IReturn<UpdateRedisConnectionsResponse> { }
+
     public class UpdateRedisConnectionsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
