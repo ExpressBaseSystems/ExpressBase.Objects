@@ -372,7 +372,7 @@ namespace ExpressBase.Objects
         public static string GetJsRegex(string r, string n, string p)
         {
             //r=>root, n=>name, p=>path
-            return $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{r}.sum\((.*?)\)\[""{n}""\]|{r}.sum\((.*?)\)\['{n}'\]|{p}";
+            return $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{r}.sum\((""{n}"")\)|{r}.sum\(('{n}')\)|{p}";
         }
 
         //public static bool ContainsAnyDgProperty(string code, string name)

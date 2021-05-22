@@ -418,10 +418,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 string id = Allctrls[i].EbSid;
-                if (id.Contains('_'))
-                    Allctrls[i].EbSid = ts + id.Substring(id.IndexOf('_'));
+                if (id.Contains('-'))
+                    Allctrls[i].EbSid = ts + i + id.Substring(id.IndexOf('-'));
                 else
-                    Allctrls[i].EbSid = ts + '_' + id;
+                    Allctrls[i].EbSid = ts + i + '-' + id;
             }
         }
 

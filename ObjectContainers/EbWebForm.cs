@@ -402,6 +402,10 @@ namespace ExpressBase.Objects
                     if (QrsDict.Count > 0)
                     {
                         List<DbParameter> param = new List<DbParameter>();
+
+                        foreach(Param _p in Param)
+                            param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
+
                         EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
 
                         EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
