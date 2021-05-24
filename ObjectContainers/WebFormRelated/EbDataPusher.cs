@@ -334,7 +334,8 @@ public object fn_{Index}()
 
         private string GetFunctionCall(int Index)
         {
-            string s = $@"try 
+            string s = $@"
+try 
 {{ 
     out_dict.Add({Index}, new object[]{{ 1, fn_{Index}()}}); 
 }} 
@@ -347,8 +348,10 @@ catch (Exception e)
 
         private string GetWrappedFnCall(int Index, bool TrueContinue)
         {
-            string s = $"if (Convert.ToInt32(out_dict[{Index}][0]) == 1 && bool.TryParse(Convert.ToString(out_dict[{Index}][1]), out bool temp_{Index}) && temp_{Index} == {(TrueContinue ? "true" : "false")}) {{ @InnerCode@ }}";
-
+            string s = $@"if (Convert.ToInt32(out_dict[{Index}][0]) == 1 && bool.TryParse(Convert.ToString(out_dict[{Index}][1]), out bool temp_{Index}) && temp_{Index} == {(TrueContinue ? "true" : "false")}) 
+{{
+@InnerCode@ 
+}}";
             return s;
         }
 
@@ -674,7 +677,7 @@ catch (Exception e)
             string resp = string.Empty;
             //try
             //{
-            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon);
+            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon, false);
             EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
             string code = ebDataPushHelper.GetProcessedCode();
             if (code != string.Empty)

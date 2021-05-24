@@ -191,7 +191,7 @@ namespace ExpressBase.Objects
                         {
                             EbWebForm WebForm = args.webForm as EbWebForm;
                             if (WebForm.FormGlobals == null)
-                                WebForm.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(WebForm, WebForm.FormData, WebForm.FormDataBackup, args.DataDB);
+                                WebForm.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(WebForm, WebForm.FormData, WebForm.FormDataBackup, args.DataDB, null, false);
 
                             args.cField.Value = Convert.ToString(WebForm.ExecuteCSharpScriptNew(this.Script.Code, WebForm.FormGlobals));
 

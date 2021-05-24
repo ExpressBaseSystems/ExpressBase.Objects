@@ -1441,7 +1441,7 @@ namespace ExpressBase.Objects
                         if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
                         {
                             if (this.FormGlobals == null)
-                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB);
+                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB, null, false);
                             cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
                         }
 
@@ -1879,7 +1879,7 @@ namespace ExpressBase.Objects
             List<EbControl> ctrls = this.FormSchema.ExtendedControls.FindAll(e => e is EbProvisionUser);
             if (ctrls.Count == 0)
                 return;
-            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, null, null, false);
             foreach (EbProvisionUser provCtrl in ctrls)
             {
                 if (!string.IsNullOrEmpty(provCtrl.CreateOnlyIf?.Code))
@@ -1937,7 +1937,7 @@ namespace ExpressBase.Objects
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
                     //_FG_Root globals = new _FG_Root(global, this, service);
 
-                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB);
+                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
 
                     object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
                     string nxtStName = string.Empty;
@@ -2056,7 +2056,7 @@ namespace ExpressBase.Objects
                 if (!string.IsNullOrEmpty(nextStage.NotificationContent?.Code?.Trim()))
                 {
                     if (globals == null)
-                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB);
+                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
                     object msg = this.ExecuteCSharpScriptNew(nextStage.NotificationContent.Code, globals);
                     description = Convert.ToString(msg);
                     if (!string.IsNullOrEmpty(description))
@@ -2104,7 +2104,7 @@ namespace ExpressBase.Objects
                     if (this.FormData.ExtendedTables.ContainsKey(_c.Name) || (this.FormData.ExtendedTables.ContainsKey(_c.Name + "_add") && this.FormData.ExtendedTables.ContainsKey(_c.Name + "_del")))
                     {
                         if (this.FormGlobals == null)
-                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null, DataDB);
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null, DataDB, null, false);
                         string secCxtGet = null, secCxtSet = null;
                         if (_c.ContextGetExpr != null && !_c.ContextGetExpr.Code.IsNullOrEmpty())
                             secCxtGet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextGetExpr.Code, this.FormGlobals));
@@ -2261,7 +2261,7 @@ namespace ExpressBase.Objects
         //Combined CS script creation and execution// under testing
         private void PrepareWebFormData()
         {
-            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, null, null, true);
             EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(this);
             string code = ebDataPushHelper.GetProcessedSingleCode();
             if (code != string.Empty)
@@ -2674,7 +2674,7 @@ namespace ExpressBase.Objects
                     if (rt.Script.Lang == ScriptingLanguage.CSharp && !string.IsNullOrEmpty(rt.Script.Code))
                     {
                         if (this.FormGlobals == null)
-                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB);
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB, null, false);
                         bool status = Convert.ToBoolean(this.ExecuteCSharpScriptNew(rt.Script.Code, this.FormGlobals));
                         this.FormData.DisableEdit.Add(rt.Name, status);
                     }
