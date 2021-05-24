@@ -133,6 +133,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         public WebFormAfterSaveModes FormModeAfterSave { get; set; }
+        
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public PopupWebFormSize PopupFormSize { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
