@@ -264,6 +264,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
                         throw new FormException("Set numeric value member for " + _label);
+                    if (_ctrl.IsInsertable && string.IsNullOrWhiteSpace(_ctrl.FormRefId))
+                        throw new FormException("Set FormRefId for insertable PowerSelect: " + _label);
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {

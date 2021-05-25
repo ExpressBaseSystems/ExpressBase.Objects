@@ -16,6 +16,8 @@ namespace ExpressBase.Objects
         DVBaseColumn ValueMember { get; set; }
         DVBaseColumn DisplayMember { get; set; }
         DVColumnCollection DisplayMembers { get; set; }
+        bool IsInsertable { get; set; }
+        string FormRefId { get; set; }
 
         bool IsDataFromApi { get; set; }
         string Url { get; set; }
