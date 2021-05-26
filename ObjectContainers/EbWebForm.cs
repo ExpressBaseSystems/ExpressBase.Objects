@@ -614,7 +614,7 @@ namespace ExpressBase.Objects
                 array.Add(o);
                 Obj[_table.TableName] = array;
             }
-            return Obj.ToString();
+            return Obj.ToString().Replace("\"", "'");
         }
 
         //merge formdata and webform object
@@ -2262,6 +2262,8 @@ namespace ExpressBase.Objects
         private void PrepareWebFormData()
         {
             FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, null, null, true);
+            globals.slaveForms = GlobalsGenerator.GetEmptyDestinationModelGlobals(this);
+
             EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(this);
             string code = ebDataPushHelper.GetProcessedSingleCode();
             if (code != string.Empty)
@@ -2523,16 +2525,36 @@ namespace ExpressBase.Objects
 
         public int Delete(IDatabase DataDB)
         {
+            int status = -1;
             if (this.CanDelete(DataDB))
             {
-                string query = QueryGetter.GetDeleteQuery(this, DataDB);
-                DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                    DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-                };
-                return DataDB.DoNonQuery(query, param);
+                try
+                {
+                    this.DbConnection = DataDB.GetNewConnection();
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                    string query = QueryGetter.GetDeleteQuery(this, DataDB);
+                    DbParameter[] param = new DbParameter[] {
+                        DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                        DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                    };
+                    status = DataDB.DoNonQuery(this.DbConnection, query, param);
+                    if (status > 0)
+                    {
+                        EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                        ebAuditTrail.UpdateAuditTrail(DataModificationAction.Deleted);
+                    }
+                    this.DbTransaction.Commit();
+                    this.DbConnection.Close();
+                }
+                catch (Exception ex)
+                {
+                    this.DbTransaction.Rollback();
+                    Console.WriteLine("Exception in Delete/RevokeDelete: " + ex.Message + "\n" + ex.StackTrace);
+                }
             }
-            return -1;
+            return status;
         }
 
         //to check whether this form data entry can be cancel by executing DisableCancel sql quries
@@ -2579,26 +2601,67 @@ namespace ExpressBase.Objects
 
         public int Cancel(IDatabase DataDB, bool Cancel)
         {
+            int status = -1;
             if (this.CanCancel(DataDB))
             {
-                string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
-                DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                    DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-                };
-                return DataDB.DoNonQuery(query, param);
+                try
+                {
+                    this.DbConnection = DataDB.GetNewConnection();
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                    string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
+                    DbParameter[] param = new DbParameter[] {
+                        DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                        DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                    };
+                    status = DataDB.DoNonQuery(this.DbConnection, query, param);
+                    if (status > 0)
+                    {
+                        EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                        ebAuditTrail.UpdateAuditTrail(Cancel ? DataModificationAction.Cancelled : DataModificationAction.CancelReverted);
+                    }
+                    this.DbTransaction.Commit();
+                    this.DbConnection.Close();
+                }
+                catch(Exception ex)
+                {
+                    this.DbTransaction.Rollback();
+                    Console.WriteLine("Exception in Cancel/RevokeCancel: " + ex.Message + "\n" + ex.StackTrace);
+                }
             }
-            return -1;
+            return status;
         }
 
         public int LockOrUnlock(IDatabase DataDB, bool Lock)
         {
-            string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
-            DbParameter[] param = new DbParameter[] {
-                DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-            };
-            return DataDB.DoNonQuery(query, param);
+            int status = -1;
+            try
+            {
+                this.DbConnection = DataDB.GetNewConnection();
+                this.DbConnection.Open();
+                this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
+                DbParameter[] param = new DbParameter[] {
+                        DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                        DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                    };
+                status = DataDB.DoNonQuery(this.DbConnection, query, param);
+                if (status > 0)
+                {
+                    EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                    ebAuditTrail.UpdateAuditTrail(Lock ? DataModificationAction.Locked : DataModificationAction.Unlocked);
+                }
+                this.DbTransaction.Commit();
+                this.DbConnection.Close();
+            }
+            catch (Exception ex)
+            {
+                this.DbTransaction.Rollback();
+                Console.WriteLine("Exception in Lock/Unlock: " + ex.Message + "\n" + ex.StackTrace);
+            }
+            return status;
         }
 
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)

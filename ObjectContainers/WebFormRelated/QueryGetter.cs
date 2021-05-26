@@ -30,7 +30,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_loc_id],
                         ebs[SystemColumns.eb_ver_id],
                         ebs[SystemColumns.eb_lock],
-                        ebs[SystemColumns.eb_push_id],
+                        ebs[SystemColumns.eb_push_id],//need only for slave forms in datapusher
                         ebs[SystemColumns.eb_src_id],
                         ebs[SystemColumns.eb_created_by],
                         ebs[SystemColumns.eb_void],

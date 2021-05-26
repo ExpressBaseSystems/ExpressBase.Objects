@@ -19,7 +19,10 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         Deleted = 3,
         Cancelled = 4,
         DeleteReverted = 5,
-        CancelReverted = 6
+        CancelReverted = 6,
+        Saved = 7, //Updated but no changes to show
+        Locked = 8,
+        Unlocked = 9
     }
 
     class EbAuditTrail
@@ -37,12 +40,32 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             this.Service = service;
         }
 
+        public int UpdateAuditTrail(DataModificationAction action)
+        {
+            //DataPusher not included
+            List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>()
+            {
+                new AuditTrailInsertData
+                {
+                    Action = (int)action,
+                    Fields = new List<AuditTrailEntry>(),
+                    RefId = this.WebForm.RefId,
+                    TableRowId = this.WebForm.TableRowId
+                }
+            };
+            return this.UpdateAuditTrail(auditTrails);
+        }
+
         public int UpdateAuditTrail()
         {
             List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>();
             foreach (EbWebForm _webForm in this.WebForm.FormCollection)
             {
-                if (_webForm.FormDataBackup == null || (_webForm.DataPusherConfig == null && _webForm.FormDataBackup.MultipleTables.Count == 0))// Created
+                if (_webForm.TableRowId <= 0)
+                    continue;
+
+                if (_webForm.FormDataBackup == null ||
+                    (_webForm.DataPusherConfig != null && _webForm.FormDataBackup.MultipleTables[_webForm.TableName].Count == 0))// Created
                 {
                     auditTrails.Add(new AuditTrailInsertData
                     {
@@ -52,7 +75,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         TableRowId = _webForm.TableRowId
                     });
                 }
-                else if (_webForm.FormData.MultipleTables.Count == 0 && _webForm.DataPusherConfig != null)
+                else if (_webForm.DataPusherConfig != null && _webForm.FormData.MultipleTables[_webForm.TableName].Count == 0)
                 {
                     auditTrails.Add(new AuditTrailInsertData
                     {
@@ -96,6 +119,16 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         {
                             Action = (int)DataModificationAction.Updated,
                             Fields = trailEntries,
+                            RefId = _webForm.RefId,
+                            TableRowId = _webForm.TableRowId
+                        });
+                    }
+                    else
+                    {
+                        auditTrails.Add(new AuditTrailInsertData
+                        {
+                            Action = (int)DataModificationAction.Saved,
+                            Fields = new List<AuditTrailEntry>(),
                             RefId = _webForm.RefId,
                             TableRowId = _webForm.TableRowId
                         });
@@ -477,7 +510,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                             if (!DictDm.ContainsKey(key))
                             {
                                 if (_column.Control is IEbPowerSelect)
-                                    Qry += (_column.Control as IEbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));                                
+                                    Qry += (_column.Control as IEbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
                                 else if (_column.Control is EbSimpleSelect)
                                     Qry += (_column.Control as EbSimpleSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
                                 else

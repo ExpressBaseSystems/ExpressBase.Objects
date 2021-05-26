@@ -332,7 +332,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class InsertDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<InsertDataFromWebformResponse>
 	{
 		[DataMember(Order = 1)]
-		public WebformData FormData { get; set; }
+		public string FormData { get; set; }
 
 		[DataMember(Order = 2)]
 		public string RefId { get; set; }

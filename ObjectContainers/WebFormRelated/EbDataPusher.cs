@@ -132,6 +132,53 @@ namespace ExpressBase.Objects
                 pusher.WebForm.UserObj = this.WebForm.UserObj;
                 pusher.WebForm.LocationId = this.WebForm.LocationId;
                 pusher.WebForm.SolutionObj = this.WebForm.SolutionObj;
+                pusher.WebForm.FormData = new WebformData() { MasterTable = pusher.WebForm.FormSchema.MasterTable };
+
+                JObject JObj = JObject.Parse(pusher.Json);
+
+                foreach (TableSchema _table in pusher.WebForm.FormSchema.Tables)
+                {
+                    if (JObj[_table.TableName] != null)
+                    {
+                        SingleTable Table = new SingleTable();
+                        foreach (JToken jRow in JObj[_table.TableName])
+                        {
+                            SingleRow Row = new SingleRow() { RowId = 0 };
+                            foreach (ColumnSchema _column in _table.Columns)
+                            {
+                                object val = null;
+                                if (jRow[_column.ColumnName] != null)
+                                    val = this.GetValueFormOutDict(OutputDict, ref Index);
+
+                                if (this.WebForm.AutoId != null && Convert.ToString(val) == FormConstants.AutoId_PlaceHolder)
+                                {
+                                    val = $"(SELECT {this.WebForm.AutoId.Name} FROM {this.WebForm.AutoId.TableName} WHERE {(this.WebForm.AutoId.TableName == this.WebForm.TableName ? string.Empty : (this.WebForm.TableName + CharConstants.UNDERSCORE))}id = eb_currval('{this.WebForm.TableName}_id_seq'))";
+                                    if (_column.Control is EbAutoId)
+                                        (_column.Control as EbAutoId).BypassParameterization = true;
+                                    else if (_column.Control is EbTextBox)
+                                        (_column.Control as EbTextBox).BypassParameterization = true;
+                                    else
+                                        val = string.Empty;
+                                }
+
+                                Row.Columns.Add(new SingleColumn
+                                {
+                                    Name = _column.ColumnName,
+                                    Type = _column.EbDbType,
+                                    Value = val
+                                });
+                            }
+                            if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrEmpty(pusher.SkipLineItemIf))
+                            {
+                                object status = this.GetValueFormOutDict(OutputDict, ref Index);
+                                if (Convert.ToBoolean(status))
+                                    continue;
+                            }
+                            Table.Add(Row);
+                        }
+                        pusher.WebForm.FormData.MultipleTables.Add(_table.TableName, Table);
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
                 {
@@ -139,62 +186,9 @@ namespace ExpressBase.Objects
                     if (Convert.ToBoolean(status))
                         pusher.WebForm.DataPusherConfig.AllowPush = true;
                 }
-                else
-                    pusher.WebForm.DataPusherConfig.AllowPush = true;
 
-                if (pusher.WebForm.DataPusherConfig.AllowPush)
-                {
-                    pusher.WebForm.FormData = new WebformData() { MasterTable = pusher.WebForm.FormSchema.MasterTable };
-                    JObject JObj = JObject.Parse(pusher.Json);
+                pusher.WebForm.MergeFormData();
 
-                    foreach (TableSchema _table in pusher.WebForm.FormSchema.Tables)
-                    {
-                        if (JObj[_table.TableName] != null)
-                        {
-                            SingleTable Table = new SingleTable();
-                            foreach (JToken jRow in JObj[_table.TableName])
-                            {
-                                if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrEmpty(pusher.SkipLineItemIf))
-                                {
-                                    object status = this.GetValueFormOutDict(OutputDict, ref Index);
-                                    if (Convert.ToBoolean(status))
-                                        continue;
-                                }
-                                SingleRow Row = new SingleRow() { RowId = 0 };
-                                foreach (ColumnSchema _column in _table.Columns)
-                                {
-                                    object val = null;
-                                    if (jRow[_column.ColumnName] != null)
-                                        val = this.GetValueFormOutDict(OutputDict, ref Index);
-
-                                    if (this.WebForm.AutoId != null && Convert.ToString(val) == FormConstants.AutoId_PlaceHolder)
-                                    {
-                                        val = $"(SELECT {this.WebForm.AutoId.Name} FROM {this.WebForm.AutoId.TableName} WHERE {(this.WebForm.AutoId.TableName == this.WebForm.TableName ? string.Empty : (this.WebForm.TableName + CharConstants.UNDERSCORE))}id = eb_currval('{this.WebForm.TableName}_id_seq'))";
-                                        if (_column.Control is EbAutoId)
-                                            (_column.Control as EbAutoId).BypassParameterization = true;
-                                        else if (_column.Control is EbTextBox)
-                                            (_column.Control as EbTextBox).BypassParameterization = true;
-                                        else
-                                            val = string.Empty;
-                                    }
-
-                                    Row.Columns.Add(new SingleColumn
-                                    {
-                                        Name = _column.ColumnName,
-                                        Type = _column.EbDbType,
-                                        Value = val
-                                    });
-                                }
-                                Table.Add(Row);
-                            }
-                            pusher.WebForm.FormData.MultipleTables.Add(_table.TableName, Table);
-                        }
-                    }
-
-                    pusher.WebForm.MergeFormData();
-                }
-                else
-                    pusher.WebForm.FormData = new WebformData();
 
                 if (this.WebForm.TableRowId > 0)//if edit mode then fill or map the id by refering FormDataBackup
                 {
@@ -263,36 +257,28 @@ namespace ExpressBase.Objects
         {
             this.CodeDict = new Dictionary<int, string>();
             string FnDef = string.Empty, FnCall = string.Empty;
-            int Index = 1;
+            int Index = 1; //Code index
+            int formIdx = 0; //form index
             foreach (EbDataPusher pusher in this.WebForm.DataPushers)
             {
                 if (pusher is EbApiDataPusher)
                     continue;
-                string PusherWrapIf = string.Empty, PusherFnCall = string.Empty;
-                if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
-                {
-                    this.CodeDict.Add(Index, pusher.PushOnlyIf);
-                    FnDef += GetFunctionDefinition(pusher.PushOnlyIf, Index);
-                    FnCall += GetFunctionCall(Index);
-                    PusherWrapIf = GetWrappedFnCall(Index, true);
-                    Index++;
-                }
+
+                FnCall += $"\ndestinationform = slaveForms[{formIdx++}];";
 
                 JObject JObj = JObject.Parse(pusher.Json);
+
                 foreach (TableSchema _table in pusher.WebForm.FormSchema.Tables)
                 {
                     if (JObj[_table.TableName] != null)
                     {
                         foreach (JToken jRow in JObj[_table.TableName])
                         {
-                            string RowWrapIf = string.Empty, RowFnCall = string.Empty;
-                            if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrEmpty(pusher.SkipLineItemIf))
+                            string DgName = null;
+                            if (_table.TableType == WebFormTableTypes.Grid)
                             {
-                                this.CodeDict.Add(Index, pusher.SkipLineItemIf);
-                                FnDef += GetFunctionDefinition(pusher.SkipLineItemIf, Index);
-                                PusherFnCall += GetFunctionCall(Index);
-                                RowWrapIf = GetWrappedFnCall(Index, false);
-                                Index++;
+                                FnCall += $"\ndestinationform.UpdateCurrentRowOfDG(\"{_table.ContainerName}\");";
+                                DgName = _table.ContainerName;
                             }
                             foreach (ColumnSchema _column in _table.Columns)
                             {
@@ -300,21 +286,28 @@ namespace ExpressBase.Objects
                                 {
                                     this.CodeDict.Add(Index, jRow[_column.ColumnName].ToString());
                                     FnDef += GetFunctionDefinition(jRow[_column.ColumnName].ToString(), Index);
-                                    RowFnCall += GetFunctionCall(Index);
+                                    FnCall += GetFunctionCall_NEW(Index, _column.ColumnName, DgName);
                                     Index++;
                                 }
                             }
-                            if (RowWrapIf == string.Empty)
-                                PusherFnCall += RowFnCall;
-                            else
-                                PusherFnCall += RowWrapIf.Replace("@InnerCode@", RowFnCall);
+                            if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrEmpty(pusher.SkipLineItemIf))
+                            {
+                                this.CodeDict.Add(Index, pusher.SkipLineItemIf);
+                                FnDef += GetFunctionDefinition(pusher.SkipLineItemIf, Index);
+                                FnCall += GetFunctionCall(Index);
+                                Index++;
+                            }
                         }
                     }
                 }
-                if (PusherWrapIf == string.Empty)
-                    FnCall += PusherFnCall;
-                else
-                    FnCall += PusherWrapIf.Replace("@InnerCode@", PusherFnCall);
+
+                if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
+                {
+                    this.CodeDict.Add(Index, pusher.PushOnlyIf);
+                    FnDef += GetFunctionDefinition(pusher.PushOnlyIf, Index);
+                    FnCall += GetFunctionCall(Index);
+                    Index++;
+                }
             }
             if (FnDef == string.Empty)
                 return string.Empty;
@@ -344,6 +337,26 @@ catch (Exception e)
     out_dict.Add({Index}, new object[]{{ 2, e.Message}}); 
 }}";
             return s;
+        }
+
+        private string GetFunctionCall_NEW(int Index, string CtrlName, string DgName)
+        {
+            string code = string.Format(@"
+try
+{{
+    var res{0} = fn_{0}();
+    destinationform.{1}.setValue(res{0});
+    out_dict.Add({0}, new object[]{{ 1, res{0}}});
+}}
+catch (Exception e)
+{{
+    out_dict.Add({0}, new object[]{{ 2, e.Message}});
+}}
+",
+Index,
+DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
+
+            return code;
         }
 
         private string GetWrappedFnCall(int Index, bool TrueContinue)
