@@ -425,12 +425,12 @@ else {
         {
             if (args.cField.Value == null)
             {
-                var p = args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type);
+                var p = args.DataDB.GetNewParameter(args.cField.Name, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
             }
             else if (!this.BypassParameterization)// (this.BypassParameterization && cField.Value == null) ~> error
-                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name, (EbDbTypes)args.cField.Type, args.cField.Value));
 
             if (args.ins)
             {
@@ -438,10 +438,10 @@ else {
                 if (this.BypassParameterization)
                     args._vals += Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
                 else
-                    args._vals += CharConstants.AT + args.cField.Name + CharConstants.UNDERSCORE + args.i + CharConstants.COMMA + CharConstants.SPACE;
+                    args._vals += CharConstants.AT + args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
             }
             else
-                args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + args.cField.Name + CharConstants.UNDERSCORE + args.i + CharConstants.COMMA + CharConstants.SPACE;
+                args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
             args.i++;
             return true;
         }

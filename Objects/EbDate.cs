@@ -301,8 +301,9 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public bool ParameterizeControl(ParameterizeCtrl_Params args, bool randomize)
         {
+            string paramName = randomize ? args.cField.Name + "_" + args.i : args.cField.Name;
             try
             {
                 if (this.EbDateType == EbDateType.Date)
@@ -325,13 +326,13 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                         args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
                 }
 
-                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, EbDbTypes.DateTime, args.cField.Value));
+                args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
             }
             catch (Exception e)
             {
                 if (!this.IsNullable)
                     Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {args.cField.Name}\nValue : {args.cField.Value}\nMessage : {e.Message}"); ;
-                DbParameter p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
+                DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
             }
@@ -339,12 +340,17 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             if (args.ins)
             {
                 args._cols += string.Concat(args.cField.Name, ", ");
-                args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
+                args._vals += string.Concat("@", paramName, ", ");
             }
             else
-                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+                args._colvals += string.Concat(args.cField.Name, "=@", paramName, ", ");
             args.i++;
             return true;
+        }
+
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        {
+            return this.ParameterizeControl(args, false);
         }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)

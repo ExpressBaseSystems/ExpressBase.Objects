@@ -204,7 +204,7 @@ namespace ExpressBase.Objects
                             throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
                     }
 
-                    if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) || this.Pattern.SerialLength == 0)
+                    if ((string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && !isSql) || this.Pattern.SerialLength == 0)
                         throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
 
                     if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX

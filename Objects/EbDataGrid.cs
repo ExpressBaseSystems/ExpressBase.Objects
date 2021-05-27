@@ -499,6 +499,28 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
             return EbControl.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
 
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        {
+            if (args.cField.Value == null || (this.EbDbType == EbDbTypes.Decimal && Convert.ToString(args.cField.Value) == string.Empty))
+            {
+                var p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
+                p.Value = DBNull.Value;
+                args.param.Add(p);
+            }
+            else
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
+
+            if (args.ins)
+            {
+                args._cols += string.Concat(args.cField.Name, ", ");
+                args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
+            }
+            else
+                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+            args.i++;
+            return true;
+        }
+
         public virtual DVBaseColumn GetDVBaseColumn(int index)
         {
             return new DVStringColumn { Data = index, Name = this.Name, sTitle = this.Title, Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px" };
@@ -883,7 +905,7 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            return this.EbDate.ParameterizeControl(args);
+            return this.EbDate.ParameterizeControl(args, true);
         }
 
         //EbDGDateColumn
