@@ -180,15 +180,15 @@ namespace ExpressBase.Objects
                     }
                 }
 
-                if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
+                pusher.WebForm.DataPusherConfig.AllowPush = true;
+                if (!string.IsNullOrWhiteSpace(pusher.PushOnlyIf))
                 {
                     object status = this.GetValueFormOutDict(OutputDict, ref Index);
-                    if (Convert.ToBoolean(status))
-                        pusher.WebForm.DataPusherConfig.AllowPush = true;
+                    if (!Convert.ToBoolean(status))
+                        pusher.WebForm.DataPusherConfig.AllowPush = false;
                 }
 
                 pusher.WebForm.MergeFormData();
-
 
                 if (this.WebForm.TableRowId > 0)//if edit mode then fill or map the id by refering FormDataBackup
                 {
