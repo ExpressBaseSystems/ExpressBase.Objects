@@ -17,12 +17,12 @@ namespace ExpressBase.Objects
         }
         //Collection of EbQuestion
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.SurveyControl)]
+        [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm)]
         public override List<EbControl> Controls { get; set; }
     }
 
     [HideInToolBox]
-    [EnableInBuilder(BuilderType.SurveyControl)]
+    [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm, BuilderType.UserControl)]
     public class EbQuestion : EbControlContainer
     {
         [HideInPropertyGrid]

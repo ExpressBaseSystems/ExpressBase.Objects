@@ -24,7 +24,7 @@ namespace ExpressBase.Objects
 		{
 
 			this.QuestionBankList = new Dictionary<int, EbQuestion>();
-			this.QuestionBankCtlList=new Dictionary<int, string> ();
+			this.QuestionBankCtlHtmlList=new Dictionary<int, string> ();
 	}
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
@@ -95,7 +95,7 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
-		public Dictionary<int, string> QuestionBankCtlList { get; set; }
+		public Dictionary<int, string> QuestionBankCtlHtmlList { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
@@ -150,7 +150,7 @@ namespace ExpressBase.Objects
 					EbQuestion qstn = EbSerializers.Json_Deserialize<EbQuestion>(dct.Value);
 					var ctlHtml=qstn.GetHtml();
 					this.QuestionBankList.Add(dct.Key, qstn);
-					this.QuestionBankCtlList.Add(dct.Key, ctlHtml);
+					this.QuestionBankCtlHtmlList.Add(dct.Key, ctlHtml);
 					this.OptionHtml += $"<option  value='{dct.Key}'>{qstn.Name}</option>";
 				}
 			}
@@ -262,11 +262,27 @@ namespace ExpressBase.Objects
 		public Ques_ext_props ext_props { get; set; }
 	}
 
+	public abstract class Ques_ext_propsAbstract { }
 
-
+	[UsedWithTopObjectParent(typeof(EbObject))]
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-	public class Ques_ext_props
+	public class Ques_ext_props:Ques_ext_propsAbstract
 	{
+
+		public Ques_ext_props() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public int ques_id { get; set; } 
+
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[DefaultPropValue("false")]
 		[Alias("Required")]
@@ -278,7 +294,7 @@ namespace ExpressBase.Objects
 		public bool unique { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-		[Alias("Vakidator")]
+		[Alias("Validator")]
 		public List<EbValidator> validator { get; set; }
 	}
 }
