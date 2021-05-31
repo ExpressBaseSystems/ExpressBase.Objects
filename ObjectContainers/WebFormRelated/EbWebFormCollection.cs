@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
                             args.InsertSet(cField);
 
                             if (cField.Control != null)
-                                cField.Control.ParameterizeControl(args);
+                                cField.Control.ParameterizeControl(args, WebForm.CrudContext);
                             else
                                 WebForm.ParameterizeUnknown(args);
                         }
@@ -97,7 +97,7 @@ namespace ExpressBase.Objects
                                     {
                                         SingleColumn ocF = bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
                                         args.UpdateSet(cField, ocF);
-                                        cField.Control.ParameterizeControl(args);
+                                        cField.Control.ParameterizeControl(args, WebForm.CrudContext);
                                     }
                                     else
                                     {
@@ -130,7 +130,7 @@ namespace ExpressBase.Objects
                             {
                                 args.InsertSet(cField);
                                 if (cField.Control != null)
-                                    cField.Control.ParameterizeControl(args);
+                                    cField.Control.ParameterizeControl(args, WebForm.CrudContext);
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }

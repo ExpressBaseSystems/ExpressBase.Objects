@@ -257,7 +257,7 @@ this.Init = function(id)
             param.Add(DataDB.GetNewParameter($"{key}_{i}", type, altVal));
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.cField.F));
             Dictionary<string, string> _od = args.ocF == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));

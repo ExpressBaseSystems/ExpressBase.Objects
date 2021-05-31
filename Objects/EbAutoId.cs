@@ -15,6 +15,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System.Net;
 using ExpressBase.Objects.WebFormRelated;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects
 {
@@ -172,7 +173,7 @@ namespace ExpressBase.Objects
 
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             if (args.ins)
             {
@@ -184,6 +185,7 @@ namespace ExpressBase.Objects
                 else
                 {
                     bool isSql = false;
+                    string SqlCode = null;
 
                     if (!string.IsNullOrWhiteSpace(this.Script?.Code))
                     {
@@ -199,7 +201,13 @@ namespace ExpressBase.Objects
                                 throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Null or empty string returned by C# script of AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
                         }
                         else if (this.Script.Lang == ScriptingLanguage.SQL)
+                        {
                             isSql = true;
+                            SqlCode = this.Script.Code;
+                            List<Param> _params = SqlHelper.GetSqlParams(SqlCode);
+                            foreach (Param _p in _params)
+                                SqlCode = SqlCode.Replace(_p.Name, _p.Name + crudContext);
+                        }
                         else
                             throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
                     }
@@ -210,17 +218,17 @@ namespace ExpressBase.Objects
                     if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
                         args._vals += string.Format("CONCAT(({1}), (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE ({4}))),",
                             args.cField.Name,
-                            isSql ? this.Script.Code : $"@{args.cField.Name}_{args.i}",
+                            isSql ? SqlCode : $"@{args.cField.Name}_{args.i}",
                             this.Pattern.SerialLength,
                             args.tbl,
-                            isSql ? $"({this.Script.Code}) || '%'" : $"'args.cField.Value%'");
+                            isSql ? $"({SqlCode}) || '%'" : $"'args.cField.Value%'");
                     else
                         args._vals += string.Format("(({1}) || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE ({4}) AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
                             args.cField.Name,
-                            isSql ? this.Script.Code : $"@{args.cField.Name}_{args.i}",
+                            isSql ? SqlCode : $"@{args.cField.Name}_{args.i}",
                             this.Pattern.SerialLength,
                             args.tbl,
-                            isSql ? $"({this.Script.Code}) || '%'" : $"'{args.cField.Value}%'");
+                            isSql ? $"({SqlCode}) || '%'" : $"'{args.cField.Value}%'");
 
                     if (!isSql)
                         args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, Convert.ToString(args.cField.Value)));

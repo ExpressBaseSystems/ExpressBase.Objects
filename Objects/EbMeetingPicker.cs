@@ -390,7 +390,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             if (!args.ins)
                 return false;

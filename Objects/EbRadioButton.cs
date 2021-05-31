@@ -205,32 +205,33 @@ return val"; } set { } }
         [JsonIgnore]
         public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', p1 == this.Tv).trigger('change');"; } set { } }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
+            string paramName = args.cField.Name + crudContext;
             EbDbTypes ebDbTypes = this.EbDbType == EbDbTypes.Int32 ? EbDbTypes.Int32 : EbDbTypes.String;
             if (args.cField.Value == null)
             {
-                var p = args.DataDB.GetNewParameter(args.cField.Name, ebDbTypes);
+                var p = args.DataDB.GetNewParameter(paramName, ebDbTypes);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
             }
             else
             {
                 if (this.ValueType == EbValueType.Boolean)
-                    args.param.Add(args.DataDB.GetNewParameter(args.cField.Name, EbDbTypes.String, Convert.ToString(args.cField.Value) == "true" ? "T" : "F"));
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.String, Convert.ToString(args.cField.Value) == "true" ? "T" : "F"));
                 else if (this.ValueType == EbValueType.Integer)
-                    args.param.Add(args.DataDB.GetNewParameter(args.cField.Name, EbDbTypes.Int32, Convert.ToInt32(args.cField.Value) == this.TrueValue_I ? this.TrueValue_I : this.FalseValue_I));
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.Int32, Convert.ToInt32(args.cField.Value) == this.TrueValue_I ? this.TrueValue_I : this.FalseValue_I));
                 else
-                    args.param.Add(args.DataDB.GetNewParameter(args.cField.Name, EbDbTypes.String, Convert.ToString(args.cField.Value) == this.TrueValue_S ? this.TrueValue_S : this.FalseValue_S));
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.String, Convert.ToString(args.cField.Value) == this.TrueValue_S ? this.TrueValue_S : this.FalseValue_S));
             }
 
             if (args.ins)
             {
                 args._cols += string.Concat(args.cField.Name, ", ");
-                args._vals += string.Concat("@", args.cField.Name, ", ");
+                args._vals += string.Concat("@", paramName, ", ");
             }
             else
-                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, ", ");
+                args._colvals += string.Concat(args.cField.Name, "=@", paramName, ", ");
             args.i++;
             return true;
         }

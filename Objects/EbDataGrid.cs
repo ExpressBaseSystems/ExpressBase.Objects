@@ -499,7 +499,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
             return EbControl.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             if (args.cField.Value == null || (this.EbDbType == EbDbTypes.Decimal && Convert.ToString(args.cField.Value) == string.Empty))
             {
@@ -742,7 +742,7 @@ return '✖';
             }
             set { }
         }
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             if (args.cField.Value == null)
             {
@@ -903,9 +903,9 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
         }
 
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
-            return this.EbDate.ParameterizeControl(args, true);
+            return this.EbDate.ParameterizeControl(args, true, crudContext);
         }
 
         //EbDGDateColumn

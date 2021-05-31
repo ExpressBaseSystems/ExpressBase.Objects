@@ -498,13 +498,13 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             bool AvoidParam = false;
 
             if (args.cField.Value == null)
             {
-                var p = args.DataDB.GetNewParameter(args.cField.Name, (EbDbTypes)args.cField.Type);
+                var p = args.DataDB.GetNewParameter(args.cField.Name + crudContext, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
                 if (this.Sendotp)
@@ -514,7 +514,7 @@ namespace ExpressBase.Objects
             }
             else
             {
-                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name, (EbDbTypes)args.cField.Type, args.cField.Value));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + crudContext, (EbDbTypes)args.cField.Type, args.cField.Value));
                 if (this.Sendotp)
                 {
                     if (args.ins)
@@ -542,7 +542,7 @@ namespace ExpressBase.Objects
             if (args.ins)
             {
                 args._cols += string.Concat(args.cField.Name, ", ");
-                args._vals += string.Concat("@", args.cField.Name, ", ");
+                args._vals += string.Concat("@", args.cField.Name + crudContext, ", ");
                 if (this.Sendotp)
                 {
                     args._cols += string.Concat(args.cField.Name, FormConstants._verified, ", ");
@@ -551,7 +551,7 @@ namespace ExpressBase.Objects
             }
             else
             {
-                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, ", ");
+                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name + crudContext, ", ");
                 if (this.Sendotp && !AvoidParam)
                 {
                     args._colvals += string.Concat(args.cField.Name, FormConstants._verified, "=@", args.cField.Name, FormConstants._verified, "_", args.i, ", ");

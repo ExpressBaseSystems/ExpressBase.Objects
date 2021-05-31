@@ -285,7 +285,7 @@ else if(this.NotifyBy === 3)
                                     throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
 
                                 ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, _p, Column, _idx, _this.UserObj);
-                                Column.Control.ParameterizeControl(args);
+                                Column.Control.ParameterizeControl(args, _this.CrudContext);
                                 _idx = args.i;
                                 _p[_idx - 1].ParameterName = p.Key;
                             }

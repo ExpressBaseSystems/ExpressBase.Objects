@@ -206,7 +206,7 @@ namespace ExpressBase.Objects
 			return Qry;
         } 
 
-		public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+		public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
 		{
 			string Qry = string.Empty;
 			List<Ques_Confi> Ques = JsonConvert.DeserializeObject<List<Ques_Confi>>(Convert.ToString(args.cField.Value));
