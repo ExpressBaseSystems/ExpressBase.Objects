@@ -59,6 +59,11 @@ namespace ExpressBase.Objects
         public MobileVerticalAlign VerticalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("true")]
+        public bool Transparent { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]

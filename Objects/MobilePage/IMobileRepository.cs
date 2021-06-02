@@ -34,6 +34,8 @@ namespace ExpressBase.Objects
 
     public interface IMobileUIControl
     {
+        bool Transparent { set; get; }
+
         string BackgroundColor { set; get; }
 
         int BorderRadius { set; get; }
