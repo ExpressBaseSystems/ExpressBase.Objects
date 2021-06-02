@@ -82,6 +82,8 @@ namespace ExpressBase.Objects
 
         public int DraftId { get; set; }
 
+        public string CrudContext { get; set; }
+
         public MyActionNotification MyActNotification { get; set; }
 
         [JsonIgnore]
@@ -934,7 +936,7 @@ namespace ExpressBase.Objects
 
         public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
         {
-            //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, eb_void, id
+            //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, eb_void, eb_created_at, eb_src_ver_id, eb_ro, id
             //normal table eb columns : eb_loc_id, id
             //grid table eb columns   : eb_loc_id, id, eb_row_num
             EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
@@ -959,9 +961,11 @@ namespace ExpressBase.Objects
                             this.FormData.IsCancelled = ebs.GetBooleanValue(SystemColumns.eb_void, dataRow[i++]);
                             DateTime dt = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.CreatedAt = dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            this.FormData.SrcVerId = Convert.ToInt32(dataRow[i++]);
+                            this.FormData.IsReadOnly = ebs.GetBooleanValue(SystemColumns.eb_ro, dataRow[i++]);
                         }
                         else
-                            i += 7;// 6 => Count of above properties
+                            i += 9;// 9 => Count of above properties
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
                     if (_rowId <= 0)
@@ -1679,6 +1683,8 @@ namespace ExpressBase.Objects
                 if (IsUpdate)
                 {
                     this.RefreshFormData(DataDB, service, true, true);
+                    if (this.FormData.IsReadOnly)
+                        throw new FormException("Unable to continue in readonly data entry!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
                     if (this.FormData.IsLocked)
                         throw new FormException("Unable to continue in locked data entry!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
 
@@ -1814,7 +1820,7 @@ namespace ExpressBase.Objects
                                 inArgs.UpdateSet(cField);
 
                             if (cField.Control != null)
-                                cField.Control.ParameterizeControl(inArgs);
+                                cField.Control.ParameterizeControl(inArgs, this.CrudContext);
                             else
                                 this.ParameterizeUnknown(inArgs);
                         }
@@ -2024,7 +2030,7 @@ namespace ExpressBase.Objects
                             throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
 
                         ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, _params, Column, _idx, this.UserObj);
-                        Column.Control.ParameterizeControl(args);
+                        Column.Control.ParameterizeControl(args, this.CrudContext);
                         _idx = args.i;
                         _params[_idx - 1].ParameterName = p.Key;
                     }

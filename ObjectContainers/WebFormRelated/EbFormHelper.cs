@@ -253,6 +253,8 @@ namespace ExpressBase.Objects
 
         public static void InitDataPushers(EbWebForm _this, IRedisClient Redis, IServiceClient client, Service service)
         {
+            int i = 1;
+            _this.CrudContext = 0.ToString();
             _this.FormCollection = new EbWebFormCollection(_this);
             if (_this.DataPushers != null)
             {
@@ -266,6 +268,7 @@ namespace ExpressBase.Objects
                     _form.SolutionObj = _this.SolutionObj;
                     _form.AfterRedisGet(Redis as RedisClient, client);
                     _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
+                    _form.CrudContext = i++.ToString();
                     pusher.WebForm = _form;
                     _this.FormCollection.Add(_form);
                     _this.FormDataPusherCount++;

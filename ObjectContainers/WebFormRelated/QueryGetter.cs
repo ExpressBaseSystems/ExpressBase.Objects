@@ -26,15 +26,17 @@ namespace ExpressBase.Objects.WebFormRelated
                 string _id = "id";
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
-                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, id",
-                        ebs[SystemColumns.eb_loc_id],
-                        ebs[SystemColumns.eb_ver_id],
-                        ebs[SystemColumns.eb_lock],
-                        ebs[SystemColumns.eb_push_id],//need only for slave forms in datapusher
-                        ebs[SystemColumns.eb_src_id],
-                        ebs[SystemColumns.eb_created_by],
-                        ebs[SystemColumns.eb_void],
-                        ebs[SystemColumns.eb_created_at]);
+                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, id",
+                        ebs[SystemColumns.eb_loc_id],//0
+                        ebs[SystemColumns.eb_ver_id],//1
+                        ebs[SystemColumns.eb_lock],//2
+                        ebs[SystemColumns.eb_push_id],//3 //need only for slave forms in datapusher
+                        ebs[SystemColumns.eb_src_id],//4
+                        ebs[SystemColumns.eb_created_by],//5
+                        ebs[SystemColumns.eb_void],//6
+                        ebs[SystemColumns.eb_created_at],//7
+                        ebs[SystemColumns.eb_src_ver_id],//8
+                        ebs[SystemColumns.eb_ro]);//9
                 else if (_table.TableType == WebFormTableTypes.Review)
                     _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
                 else

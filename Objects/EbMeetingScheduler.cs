@@ -535,7 +535,7 @@ else if (this.AttendeeConfig === 4)
             }
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             if (!args.ins)
                 return false;

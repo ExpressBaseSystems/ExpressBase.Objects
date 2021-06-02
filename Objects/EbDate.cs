@@ -301,9 +301,9 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
 
-        public bool ParameterizeControl(ParameterizeCtrl_Params args, bool randomize)
+        public bool ParameterizeControl(ParameterizeCtrl_Params args, bool randomize, string crudContext)
         {
-            string paramName = randomize ? args.cField.Name + "_" + args.i : args.cField.Name;
+            string paramName = randomize ? (args.cField.Name + "_" + args.i) : (args.cField.Name + crudContext);
             try
             {
                 if (this.EbDateType == EbDateType.Date)
@@ -348,9 +348,9 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             return true;
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
-            return this.ParameterizeControl(args, false);
+            return this.ParameterizeControl(args, false, crudContext);
         }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)

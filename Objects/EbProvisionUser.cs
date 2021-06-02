@@ -455,7 +455,7 @@ this.Init = function(id)
             }
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             if (!this.CreateOnlyIf_b)
                 return false;
