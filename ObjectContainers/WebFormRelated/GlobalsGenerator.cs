@@ -303,7 +303,13 @@ namespace ExpressBase.Objects.WebFormRelated
                 fG_DataDB = new FG_DataDB(OutDelObj.ExecuteScalar);
             }
             FG_Locations fG_Locations = Get_FG_Locations(_this.SolutionObj.Locations);
-            FG_WebForm fG_WebForm = new FG_WebForm() { id = _this.TableRowId, eb_loc_id = _this.LocationId, eb_ref_id = _this.RefId, __mode = _this.__mode };
+            FG_WebForm fG_WebForm = new FG_WebForm() 
+            {
+                id = _this.TableRowId,
+                eb_loc_id = _this.LocationId, 
+                eb_ref_id = _this.RefId, 
+                __mode = _this.__mode 
+            };
             fG_WebForm.eb_created_by = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
             fG_WebForm.eb_created_at = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);

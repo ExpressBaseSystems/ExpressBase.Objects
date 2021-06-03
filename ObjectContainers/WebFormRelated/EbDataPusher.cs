@@ -65,6 +65,15 @@ namespace ExpressBase.Objects
         [Alias("Multi push id")]
         public override string Name { get; set; }
 
+        [OnChangeExec(@"
+if (this.MultiPushIdType === 0 || this.MultiPushIdType === 1)
+    pg.ShowProperty('Name');
+else if (this.MultiPushIdType === 2)
+    pg.HideProperty('Name');
+")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public MultiPushIdTypes MultiPushIdType { get; set; }
+
         #region commented for backward compatibility
         //[PropertyEditor(PropertyEditorType.ObjectSelector)]
         //[EnableInBuilder(BuilderType.WebForm)]

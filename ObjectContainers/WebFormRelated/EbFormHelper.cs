@@ -267,7 +267,19 @@ namespace ExpressBase.Objects
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
                     _form.AfterRedisGet(Redis as RedisClient, client);
-                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
+                    string _multipushId = null;
+                    if (pusher is EbFormDataPusher _formPusher)
+                    {
+                        if (_formPusher.MultiPushIdType == MultiPushIdTypes.Default)
+                            _multipushId = _this.RefId + CharConstants.UNDERSCORE + pusher.Name;
+                        if (_formPusher.MultiPushIdType == MultiPushIdTypes.Row)
+                            _multipushId = pusher.Name;
+                    }
+                    _form.DataPusherConfig = new EbDataPusherConfig 
+                    { 
+                        SourceTable = _this.FormSchema.MasterTable, 
+                        MultiPushId = _multipushId
+                    };
                     _form.CrudContext = i++.ToString();
                     pusher.WebForm = _form;
                     _this.FormCollection.Add(_form);
