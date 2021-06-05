@@ -161,7 +161,7 @@ else if (this.MultiPushIdType === 2)
 
                                 if (this.WebForm.AutoId != null && Convert.ToString(val) == FormConstants.AutoId_PlaceHolder)
                                 {
-                                    val = $"(SELECT {this.WebForm.AutoId.Name} FROM {this.WebForm.AutoId.TableName} WHERE {(this.WebForm.AutoId.TableName == this.WebForm.TableName ? string.Empty : (this.WebForm.TableName + CharConstants.UNDERSCORE))}id = eb_currval('{this.WebForm.TableName}_id_seq'))";
+                                    val = $"(SELECT {this.WebForm.AutoId.Name} FROM {this.WebForm.AutoId.TableName} WHERE {(this.WebForm.AutoId.TableName == this.WebForm.TableName ? string.Empty : (this.WebForm.TableName + CharConstants.UNDERSCORE))}id = (SELECT(eb_currval('{this.WebForm.TableName}_id_seq'))))";
                                     if (_column.Control is EbAutoId)
                                         (_column.Control as EbAutoId).BypassParameterization = true;
                                     else if (_column.Control is EbTextBox)
