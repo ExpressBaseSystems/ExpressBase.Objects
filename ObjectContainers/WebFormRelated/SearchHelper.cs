@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
@@ -128,9 +129,11 @@ namespace ExpressBase.Objects.WebFormRelated
             DateTime startdt = DateTime.Now;
             string Message = $"Service started at {startdt}.";
             Console.WriteLine("Update all indexes start: " + startdt);
-            string qCols = "mtbl.id, mtbl.eb_created_by, mtbl.eb_created_at, mtbl.eb_lastmodified_by, mtbl.eb_lastmodified_at",
+            EbSystemColumns ebs = _webForm.SolutionObj.SolutionSettings.SystemColumns;
+
+            string qCols = $"mtbl.id, mtbl.{ebs[SystemColumns.eb_created_by]}, mtbl.{ebs[SystemColumns.eb_created_at]}, mtbl.{ebs[SystemColumns.eb_lastmodified_by]}, mtbl.{ebs[SystemColumns.eb_lastmodified_at]}",
                 qJoin = string.Empty,
-                qCdtn = "COALESCE(mtbl.eb_del, 'F') = 'F'";
+                qCdtn = $"COALESCE(mtbl.{ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)}";
             const int sysColCnt = 5;
             int tblCnt = 1, colCnt = sysColCnt;//Count
             List<string> labels = new List<string>();
@@ -179,7 +182,8 @@ namespace ExpressBase.Objects.WebFormRelated
                         DataDB.GetNewParameter("display_name", EbDbTypes.String, _webForm.DisplayName)
                     };
                     int i, j;
-                    for (i = 0; i < dt.Rows.Count; i++)
+                    int flushCounter = 0, UpserteRecords = 0;
+                    for (i = 0; i < dt.Rows.Count; i++, flushCounter++)
                     {
                         EbDataRow dr = dt.Rows[i];
                         Dictionary<string, string> JsonData = new Dictionary<string, string>();
@@ -206,11 +210,26 @@ namespace ExpressBase.Objects.WebFormRelated
                         {
                             upsertQry += GetDeleteQuery(i);
                         }
+
+                        if (flushCounter >= 10000)////
+                        {
+                            UpserteRecords += DataDB.DoNonQuery(upsertQry, parameters.ToArray());
+                            Console.WriteLine($"Upserted {UpserteRecords} records.");
+                            Message += $"\nUpserted {UpserteRecords} records.";
+
+                            flushCounter = 0;
+                            parameters = new List<DbParameter>()
+                            {
+                                DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
+                                DataDB.GetNewParameter("display_name", EbDbTypes.String, _webForm.DisplayName)
+                            };
+                            upsertQry = string.Empty;
+                        }
                     }
 
-                    int temp = DataDB.DoNonQuery(upsertQry, parameters.ToArray());
-                    Console.WriteLine($"Upserted {temp} records.");
-                    Message += $"\nUpserted {temp} records.";
+                    UpserteRecords += DataDB.DoNonQuery(upsertQry, parameters.ToArray());
+                    Console.WriteLine($"Upserted {UpserteRecords} records.");
+                    Message += $"\nUpserted {UpserteRecords} records.";
                 }
                 else
                 {
