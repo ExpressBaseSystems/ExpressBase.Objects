@@ -1176,7 +1176,7 @@ namespace ExpressBase.Objects
             {
                 for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
                 {
-                    if (this.DataPushers[i] is EbApiDataPusher)
+                    if (!(this.DataPushers[i] is EbFormDataPusher))
                         continue;
                     query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[j], out qrycount[j]);
                     this.DataPushers[i].WebForm.UserObj = this.UserObj;
@@ -1711,6 +1711,7 @@ namespace ExpressBase.Objects
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
+                //resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
                 resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
@@ -2268,7 +2269,7 @@ namespace ExpressBase.Objects
         private void PrepareWebFormData()
         {
             FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, null, null, true);
-            globals.slaveForms = GlobalsGenerator.GetEmptyDestinationModelGlobals(this);
+            globals.DestinationForms = GlobalsGenerator.GetEmptyDestinationModelGlobals(this.FormCollection.Skip(1).ToList());
 
             EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(this);
             string code = ebDataPushHelper.GetProcessedSingleCode();

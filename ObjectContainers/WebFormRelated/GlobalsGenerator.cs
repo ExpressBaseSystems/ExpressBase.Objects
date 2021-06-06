@@ -231,65 +231,20 @@ namespace ExpressBase.Objects.WebFormRelated
             return new FG_Root(new FG_Params(dict));
         }
 
-        public static List<FG_WebForm> GetEmptyDestinationModelGlobals(EbWebForm _this)
+        public static List<FG_WebForm> GetEmptyDestinationModelGlobals(List<EbWebForm> DestForms)
         {
             List<FG_WebForm> fG_WebFormsList = new List<FG_WebForm>();
-            for (int i = 1; i < _this.FormCollection.Count; i++)
+            for (int i = 0; i < DestForms.Count; i++)
             {
-                EbWebForm Form = _this.FormCollection[i];
+                EbWebForm Form = DestForms[i];
                 WebformData _formdata = Form.GetEmptyModel();
-                FG_WebForm fG_WebForm = new FG_WebForm() { id = Form.TableRowId, eb_loc_id = Form.LocationId, eb_ref_id = Form.RefId, __mode = Form.__mode };
-                fG_WebForm.eb_created_by = Form.TableRowId <= 0 ? Form.UserObj.UserId : _formdata.CreatedBy;
-                fG_WebForm.eb_created_at = Form.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(Form.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
-                GetEmptyDestinationModelGlobals_REC(fG_WebForm, Form, _formdata);
+                int createdBy = Form.TableRowId <= 0 ? Form.UserObj.UserId : _formdata.CreatedBy;
+                string createdAt = Form.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(Form.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
+                FG_WebForm fG_WebForm = new FG_WebForm(Form.TableName, Form.TableRowId, Form.LocationId, Form.RefId, createdBy, createdAt);
+                GetCSharpFormGlobalsRec_NEW(fG_WebForm, Form, _formdata, null);
                 fG_WebFormsList.Add(fG_WebForm);
             }
             return fG_WebFormsList;
-        }
-
-        public static void GetEmptyDestinationModelGlobals_REC(FG_WebForm fG_WebForm, EbControlContainer _container, WebformData _formdata)
-        {
-            SingleTable Table = _formdata.MultipleTables.ContainsKey(_container.TableName) ? _formdata.MultipleTables[_container.TableName] : new SingleTable();
-            SingleTable TableBkUp = new SingleTable();
-            if (_container is EbDataGrid)
-            {
-                SingleRow Row = _formdata.DGsRowDataModel[_container.TableName];
-                FG_Row fG_RowModel = new FG_Row();
-                foreach (EbControl _control in _container.Controls)
-                {
-                    fG_RowModel.Controls.Add(new FG_Control(_control.Name, Row[_control.Name]));
-                }
-                fG_WebForm.DataGrids.Add(new FG_DataGrid(_container.Name, fG_RowModel));
-            }
-            else if (_container is EbReview)
-            {
-                fG_WebForm.Review = GetReviewGlobal(_container as EbReview, Table, TableBkUp);
-            }
-            else
-            {
-                foreach (EbControl _control in _container.Controls)
-                {
-                    if (_control is EbControlContainer)
-                    {
-                        GetEmptyDestinationModelGlobals_REC(fG_WebForm, _control as EbControlContainer, _formdata);
-                    }
-                    else
-                    {
-                        object data = null;
-                        if (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id == 0)
-                            data = FormConstants.AutoId_PlaceHolder;
-                        else
-                        {
-                            if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null &&
-                                (!(_control is EbAutoId) || (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id > 0)))
-                                data = Table[0][_control.Name];
-                            else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
-                                data = TableBkUp[0][_control.Name];
-                        }
-                        fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control.Name, data));
-                    }
-                }
-            }
         }
 
         public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp, IDatabase DataDB, DbConnection DbCon, bool isSrcForm)
@@ -303,15 +258,9 @@ namespace ExpressBase.Objects.WebFormRelated
                 fG_DataDB = new FG_DataDB(OutDelObj.ExecuteScalar);
             }
             FG_Locations fG_Locations = Get_FG_Locations(_this.SolutionObj.Locations);
-            FG_WebForm fG_WebForm = new FG_WebForm() 
-            {
-                id = _this.TableRowId,
-                eb_loc_id = _this.LocationId, 
-                eb_ref_id = _this.RefId, 
-                __mode = _this.__mode 
-            };
-            fG_WebForm.eb_created_by = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
-            fG_WebForm.eb_created_at = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
+            int createdBy = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
+            string createdAt = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
+            FG_WebForm fG_WebForm = new FG_WebForm(_this.TableName, _this.TableRowId, _this.LocationId, _this.RefId, createdBy, createdAt);
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
 
             return new FG_Root(fG_WebForm, fG_User, fG_System, isSrcForm, fG_DataDB, fG_Locations);
@@ -321,31 +270,26 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             SingleTable Table = _formdata.MultipleTables.ContainsKey(_container.TableName) ? _formdata.MultipleTables[_container.TableName] : new SingleTable();
             SingleTable TableBkUp = _formdataBkUp != null && _formdataBkUp.MultipleTables.ContainsKey(_container.TableName) ? _formdataBkUp.MultipleTables[_container.TableName] : new SingleTable();
+            
             if (_container is EbDataGrid)
-            {
-                fG_WebForm.DataGrids.Add(GetDataGridGlobal(_container as EbDataGrid, Table, TableBkUp));
-            }
+                fG_WebForm.DataGrids.Add(GetDataGridGlobal(_container as EbDataGrid, Table, _formdata.DGsRowDataModel[_container.TableName]));
             else if (_container is EbReview)
-            {
                 fG_WebForm.Review = GetReviewGlobal(_container as EbReview, Table, TableBkUp);
-            }
             else
             {
                 foreach (EbControl _control in _container.Controls)
                 {
                     if (_control is EbControlContainer)
-                    {
                         GetCSharpFormGlobalsRec_NEW(fG_WebForm, _control as EbControlContainer, _formdata, _formdataBkUp);
-                    }
                     else
                     {
                         object data = null;
-                        if (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id == 0)
+                        if (_control is EbAutoId && fG_WebForm.__mode == "new")// && fG_WebForm.id == 0
                             data = FormConstants.AutoId_PlaceHolder;
                         else
                         {
                             if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null &&
-                                (!(_control is EbAutoId) || (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id > 0)))
+                                (!(_control is EbAutoId) || (_control is EbAutoId && fG_WebForm.__mode == "edit")))// && fG_WebForm.id > 0
                                 data = Table[0][_control.Name];
                             else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
                                 data = TableBkUp[0][_control.Name];
@@ -380,7 +324,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return fG_Locations;
         }
 
-        private static FG_DataGrid GetDataGridGlobal(EbDataGrid DG, SingleTable Table, SingleTable TableBkUp)
+        private static FG_DataGrid GetDataGridGlobal(EbDataGrid DG, SingleTable Table, SingleRow RowModel)
         {
             List<FG_Row> Rows = new List<FG_Row>();
             foreach (SingleRow Row in Table)
@@ -392,7 +336,13 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 Rows.Add(fG_Row);
             }
-            return new FG_DataGrid(DG.Name, Rows);
+            FG_Row fG_RowModel = new FG_Row();
+            foreach (EbControl _control in DG.Controls)
+            {
+                fG_RowModel.Controls.Add(new FG_Control(_control.Name, RowModel[_control.Name]));
+            }
+
+            return new FG_DataGrid(DG.Name, Rows, fG_RowModel);
         }
 
         private static FG_Review GetReviewGlobal(EbReview Rev, SingleTable Table, SingleTable TableBkUp)
