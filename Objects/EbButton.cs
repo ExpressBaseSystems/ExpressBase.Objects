@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [HideInToolBox]
+    //[HideInToolBox]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbButton : EbControlUI
     {
