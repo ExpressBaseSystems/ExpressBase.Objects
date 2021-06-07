@@ -95,6 +95,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyGroup(PGConstants.CORE)]
         public override string DisplayName { get; set; }
+        
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup(PGConstants.CORE)]
+        public override bool HideInMenu { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyGroup(PGConstants.CORE)]

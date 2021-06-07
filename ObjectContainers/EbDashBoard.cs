@@ -61,6 +61,10 @@ namespace ExpressBase.Objects
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string DisplayName { get; set; }
+        
+        [HideForUser]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public override bool HideInMenu { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DashBoard)]

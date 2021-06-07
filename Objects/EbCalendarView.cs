@@ -34,6 +34,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Calendar)]
         public override string DisplayName { get; set; }
 
+        [HideForUser]
+        [EnableInBuilder(BuilderType.Calendar)]
+        public override bool HideInMenu { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.Calendar)]
         public override string Description { get; set; }
@@ -82,7 +86,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Calendar)]
         [MetaOnly]
-        public override  DVColumnCollection Columns{ get; set; }
+        public override DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
@@ -91,7 +95,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        [HideInPropertyGrid]        
+        [HideInPropertyGrid]
         public AttendanceType CalendarType { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
@@ -139,13 +143,13 @@ namespace ExpressBase.Objects
             this.ObjectLinks = new List<ObjectBasicInfo>();
             this.PrimaryKey = new DVBaseColumn();
             this.ForeignKey = new DVBaseColumn();
-           
+
         }
 
         public override List<string> DiscoverRelatedRefids()
         {
             List<string> _refids = new List<string>();
-            
+
             return _refids;
         }
 

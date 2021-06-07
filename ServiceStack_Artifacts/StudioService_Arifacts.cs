@@ -328,6 +328,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Tags { get; set; }
 
         public string Apps { get; set; }
+
+        public bool HideInMenu { get; set; }
     }
 
     [DataContract]
@@ -367,6 +369,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Apps { get; set; }
 
         public bool IsImport { get; set; }
+
+        public bool HideInMenu { get; set; }
     }
 
     [DataContract]
@@ -468,6 +472,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SourceVerID { get; set; }
 
         public bool IsImport { get; set; }
+
+        public bool HideInMenu { get; set; }
     }
 
     [DataContract]
