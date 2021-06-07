@@ -239,11 +239,7 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public override bool Index { get; set; }
-
-        //hint: New mode - EbAutoId - DataPusher - Dest Form
-        [JsonIgnore]
-        public bool BypassParameterization { get; set; }
-
+               
         private string TextTransformString
         {
             get { return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });".Replace("{0}", this.Name).Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty); }
@@ -421,31 +417,6 @@ else {
         //.Replace("@Label@ ", this.Label ?? "@Label@ ");
         //        }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
-        {
-            string paramName = args.cField.Name + crudContext;
-            if (args.cField.Value == null)
-            {
-                var p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
-                p.Value = DBNull.Value;
-                args.param.Add(p);
-            }
-            else if (!this.BypassParameterization)// (this.BypassParameterization && cField.Value == null) ~> error
-                args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, args.cField.Value));
-
-            if (args.ins)
-            {
-                args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
-                if (this.BypassParameterization)
-                    args._vals += Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
-                else
-                    args._vals += CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
-            }
-            else
-                args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
-            args.i++;
-            return true;
-        }
     }
 
     public interface IEbInputControls

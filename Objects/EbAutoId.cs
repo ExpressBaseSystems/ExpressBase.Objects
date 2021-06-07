@@ -81,10 +81,6 @@ namespace ExpressBase.Objects
 
         public string TableName { get; set; }
 
-        //hint: New mode - EbAutoId - DataPusher - Dest Form
-        [JsonIgnore]
-        public bool BypassParameterization { get; set; }
-
         //HideInPropertyGrid
         //public string OnChange { get; set; }
         public override bool Hidden { get => base.Hidden; set => base.Hidden = value; }
@@ -189,9 +185,9 @@ namespace ExpressBase.Objects
 
                     if (!string.IsNullOrWhiteSpace(this.Script?.Code))
                     {
+                        EbWebForm WebForm = args.webForm as EbWebForm;
                         if (this.Script.Lang == ScriptingLanguage.CSharp)
                         {
-                            EbWebForm WebForm = args.webForm as EbWebForm;
                             if (WebForm.FormGlobals == null)
                                 WebForm.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(WebForm, WebForm.FormData, WebForm.FormDataBackup, args.DataDB, null, false);
 
@@ -206,7 +202,10 @@ namespace ExpressBase.Objects
                             SqlCode = this.Script.Code;
                             List<Param> _params = SqlHelper.GetSqlParams(SqlCode);
                             foreach (Param _p in _params)
-                                SqlCode = SqlCode.Replace(_p.Name, _p.Name + crudContext);
+                            {
+                                if (!EbFormHelper.IsExtraSqlParam(_p.Name, WebForm.TableName))
+                                    SqlCode = SqlCode.Replace(_p.Name, _p.Name + crudContext);
+                            }
                         }
                         else
                             throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");

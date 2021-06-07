@@ -34,7 +34,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetSurveyQuestionsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public List<String> Data { get; set; }
+        public Dictionary<int, String> Data { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

@@ -31,6 +31,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public bool DontThrowException { get; set; }
+
+        [DataMember(Order = 5)]
+        public Eb_Solution SoluObj { get; set; }
 	}
 
 	[DataContract]
