@@ -51,9 +51,9 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 foreach (EbDataPusher dp in _this.DataPushers)
                 {
-                    if (dp is EbApiDataPusher)
+                    if (dp is EbApiDataPusher _apiDp)
                     {
-                        if (string.IsNullOrEmpty((dp as EbApiDataPusher).ApiRefId))
+                        if (string.IsNullOrEmpty(_apiDp.ApiRefId))
                             throw new FormException($"Required 'Api ref id' for data pusher");
                     }
                     else
@@ -62,6 +62,12 @@ namespace ExpressBase.Objects.WebFormRelated
 
                         if (string.IsNullOrEmpty(dp.FormRefId))
                             throw new FormException($"Required 'Form ref id' for data pusher");
+
+                        if (dp is EbBatchFormDataPusher _batchdp)
+                        {
+                            if (string.IsNullOrWhiteSpace(_batchdp.SourceDG))
+                                throw new FormException($"Required 'Source datagrid' for data pusher");
+                        }
                     }
                     if (string.IsNullOrEmpty(dp.Json))
                         throw new FormException($"Required 'Json' for data pusher");

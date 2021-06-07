@@ -72,6 +72,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string AutoId_PlaceHolder = "__EbAutoId_PlaceHolder__";
         //DataPusher
         public const string __eb_loop_through = "__eb_loop_through";
+        public const string DataId_PlaceHolder = "__DataId_PlaceHolder__";
         //EbPhone ctrl
         public const string _verified = "_verified";
         public const string is_verified = "is_verified";

@@ -260,7 +260,7 @@ namespace ExpressBase.Objects
             {
                 foreach (EbDataPusher pusher in _this.DataPushers)
                 {
-                    if (pusher is EbApiDataPusher)
+                    if (!(pusher is EbFormDataPusher))
                         continue;
                     EbWebForm _form = GetEbObject<EbWebForm>(pusher.FormRefId, client, Redis, service);
                     _form.RefId = pusher.FormRefId;

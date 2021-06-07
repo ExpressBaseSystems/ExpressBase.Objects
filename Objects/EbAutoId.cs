@@ -81,10 +81,6 @@ namespace ExpressBase.Objects
 
         public string TableName { get; set; }
 
-        //hint: New mode - EbAutoId - DataPusher - Dest Form
-        [JsonIgnore]
-        public bool BypassParameterization { get; set; }
-
         //HideInPropertyGrid
         //public string OnChange { get; set; }
         public override bool Hidden { get => base.Hidden; set => base.Hidden = value; }
