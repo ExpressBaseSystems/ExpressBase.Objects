@@ -70,7 +70,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else
                 {
-                    string _pshId = _this.DataPusherConfig.MultiPushId == null? string.Empty: $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
+                    string _pshId = _this.DataPusherConfig.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
 
                     if (_table.TableName == _this.FormSchema.MasterTable)
                         query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id {3} AND COALESCE({4}, {5}) = {5};",
@@ -320,10 +320,11 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             string _qry;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+            EbDataPusherConfig conf = _this.DataPusherConfig;
 
             if (tblName.Equals(_this.TableName))
             {
-                if (_this.DataPusherConfig == null)
+                if (conf == null)
                 {
                     _qry = string.Format("INSERT INTO {0} ({8} {1}, {2}, {3}, {4}, {5}) VALUES ({9} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id); ",
                         tblName,
@@ -339,7 +340,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else
                 {
-                    string srcRef = _this.DataPusherConfig.SourceRecId <= 0 ? $"(SELECT eb_currval('{_this.DataPusherConfig.SourceTable}_id_seq'))" : $"@{_this.DataPusherConfig.SourceTable}_id";
+                    string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
                     _qry = string.Format(@"INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {9}_id, {5}, {6}, {7}, {8}, {15}, {16}) 
                                     VALUES ({19} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}); ",
@@ -352,11 +353,11 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_push_id],//6
                         ebs[SystemColumns.eb_lock],//7
                         ebs[SystemColumns.eb_signin_log_id],//8
-                        _this.DataPusherConfig.SourceTable,//9
+                        conf.SourceTable,//9
                         DataDB.EB_CURRENT_TIMESTAMP,//10
                         _this.TableName,//11
                         srcRef,//12
-                        _this.DataPusherConfig.MultiPushId == null ? "null" : $"'{_this.DataPusherConfig.MultiPushId}'",//13
+                        conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'",//13
                         ebs.GetBoolTrue(SystemColumns.eb_lock),//14
                         ebs[SystemColumns.eb_src_ver_id],//15
                         ebs[SystemColumns.eb_ro],//16
@@ -396,7 +397,9 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             string _qry;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
-            if (_this.DataPusherConfig == null)
+            EbDataPusherConfig conf = _this.DataPusherConfig;
+
+            if (conf == null)
             {
                 if (tblName.Equals(_this.TableName))
                     _qry = string.Format("UPDATE {0} SET {6} {1} = @eb_modified_by, {2} = {3} WHERE id = {7} AND COALESCE({4}, {5}) = {5}; ",
@@ -427,8 +430,8 @@ namespace ExpressBase.Objects.WebFormRelated
                 string pushIdChk = string.Empty;
                 if (tblName.Equals(_this.TableName))
                 {
-                    parentTbl = _this.DataPusherConfig.SourceTable;
-                    pushIdChk = _this.DataPusherConfig.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
+                    parentTbl = conf.SourceTable;
+                    pushIdChk = conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{conf.MultiPushId}'";
                 }
                 _qry = string.Format("UPDATE {0} SET {8} {1} = @eb_modified_by, {2} = {3} WHERE id = {9} AND {4}_id = @{4}_id AND COALESCE({5}, {6}) = {6} {7}; ",
                     tblName,//0
@@ -442,6 +445,99 @@ namespace ExpressBase.Objects.WebFormRelated
                     isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",
                     "{1}");
             }
+            return _qry;
+        }
+
+        public static string GetInsertQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
+        {
+            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+            EbDataPusherConfig conf = _this.DataPusherConfig;
+            string _qry;
+
+            if (tblName.Equals(_this.TableName))
+            {
+                _qry = $@"
+INSERT INTO {tblName} 
+    ({{0}} 
+    {ebs[SystemColumns.eb_created_by]}, 
+    {ebs[SystemColumns.eb_created_at]}, 
+    {ebs[SystemColumns.eb_loc_id]}, 
+    {ebs[SystemColumns.eb_ver_id]}, 
+    {ebs[SystemColumns.eb_src_ver_id]}, 
+    {ebs[SystemColumns.eb_src_id]}, 
+    {ebs[SystemColumns.eb_push_id]}, 
+    {ebs[SystemColumns.eb_lock]}, 
+    {ebs[SystemColumns.eb_signin_log_id]},
+    {ebs[SystemColumns.eb_ro]},
+    {conf.SourceTable}_id,
+    {conf.GridTableName}_id)
+VALUES
+    ({{1}}
+    @eb_createdby,
+    {DataDB.EB_CURRENT_TIMESTAMP},
+    @eb_loc_id,
+    @{_this.TableName}_eb_ver_id,
+    @{conf.SourceTable}_eb_ver_id,
+    {conf.GridDataId},
+    {(conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'")},
+    {ebs.GetBoolTrue(SystemColumns.eb_lock)},
+    @eb_signin_log_id,
+    {ebs.GetBoolTrue(SystemColumns.eb_ro)},
+    {conf.SourceRecId},
+    {conf.GridDataId});";
+            }
+            else
+            {
+                string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"{_this.TableRowId}";
+                _qry = $@"
+INSERT INTO {tblName} 
+    ({{0}} 
+    {ebs[SystemColumns.eb_created_by]}, 
+    {ebs[SystemColumns.eb_created_at]}, 
+    {ebs[SystemColumns.eb_loc_id]}, 
+    {_this.TableName}_id, 
+    {ebs[SystemColumns.eb_signin_log_id]}) 
+VALUES 
+    ({{1}} 
+    @eb_createdby, 
+    {DataDB.EB_CURRENT_TIMESTAMP}, 
+    @eb_loc_id , 
+    {srcRef}, 
+    @eb_signin_log_id); ";
+            }
+
+            return _qry;
+        }
+
+        public static string GetUpdateQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel)
+        {
+            string _qry, parentTblChk, pushIdChk;
+            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+            EbDataPusherConfig conf = _this.DataPusherConfig;
+
+            if (tblName.Equals(_this.TableName))
+            {
+                parentTblChk = $"{conf.GridTableName}_id = {conf.GridDataId} AND \n {conf.SourceTable}_id = {conf.SourceRecId} AND";
+                pushIdChk = conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{conf.MultiPushId}'";
+            }
+            else
+            {
+                parentTblChk = $"{_this.TableName}_id = @{_this.TableName}_id AND";
+                pushIdChk = string.Empty;
+            }
+
+            _qry = $@"
+UPDATE 
+    {tblName} 
+SET 
+    {(isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}")} 
+    {ebs[SystemColumns.eb_lastmodified_by]} = @eb_modified_by, 
+    {ebs[SystemColumns.eb_lastmodified_at]} = {DataDB.EB_CURRENT_TIMESTAMP} 
+WHERE 
+    {parentTblChk}
+    COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)} 
+    {pushIdChk}; ";
+
             return _qry;
         }
 

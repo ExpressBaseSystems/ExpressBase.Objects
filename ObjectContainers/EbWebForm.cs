@@ -135,7 +135,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         public WebFormAfterSaveModes FormModeAfterSave { get; set; }
-        
+
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         public PopupWebFormSize PopupFormSize { get; set; }
@@ -216,6 +216,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbFormNotification> Notifications { get; set; }
+
+        public EbWebForm ShallowCopy()
+        {
+            return (EbWebForm)this.MemberwiseClone();
+        }
 
         public override string GetHead()
         {
@@ -409,7 +414,7 @@ namespace ExpressBase.Objects
                     {
                         List<DbParameter> param = new List<DbParameter>();
 
-                        foreach(Param _p in Param)
+                        foreach (Param _p in Param)
                             param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
 
                         EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
@@ -1675,6 +1680,7 @@ namespace ExpressBase.Objects
             string resp;
             try
             {
+                WebformData in_data = JsonConvert.DeserializeObject<WebformData>(JsonConvert.SerializeObject(this.FormData));
                 this.DbConnection.Open();
                 this.DbTransaction = this.DbConnection.BeginTransaction();
 
@@ -1711,7 +1717,7 @@ namespace ExpressBase.Objects
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
-                //resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection);
+                resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, in_data);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
                 resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
@@ -2583,7 +2589,7 @@ namespace ExpressBase.Objects
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
                 string q = string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
-                
+
                 EbDataSet ds = DataDB.DoQueries(q + LockCheckQry, p);
                 int i = 0;
                 for (; i < this.DisableCancel.Count; i++)
@@ -2631,7 +2637,7 @@ namespace ExpressBase.Objects
                     this.DbTransaction.Commit();
                     this.DbConnection.Close();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     this.DbTransaction.Rollback();
                     Console.WriteLine("Exception in Cancel/RevokeCancel: " + ex.Message + "\n" + ex.StackTrace);

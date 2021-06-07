@@ -22,6 +22,11 @@ namespace ExpressBase.Objects
             this.MasterForm = ebWebForm;
         }
 
+        public EbWebFormCollection(List<EbWebForm> ebWebFormList) : base(ebWebFormList)
+        {
+            this.MasterForm = ebWebFormList[0];/////////dummy master
+        }
+
         public void Insert(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
         {
             ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
@@ -61,8 +66,11 @@ namespace ExpressBase.Objects
                         fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }
                 }
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
+                {
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+                }
             }
 
             args.CopyBack(ref _extqry, ref i);
@@ -143,6 +151,77 @@ namespace ExpressBase.Objects
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+            }
+            args.CopyBack(ref _extqry, ref i);
+        }
+
+        public void Update_Batch(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
+        {
+            ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
+            foreach (EbWebForm WebForm in this)
+            {
+                args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
+                EbDataPusherConfig conf = WebForm.DataPusherConfig;
+
+                foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
+                {
+                    foreach (SingleRow row in entry.Value)
+                    {
+                        args.ResetColVals();
+                        if (row.IsUpdate)
+                        {
+                            //SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId);
+                            //if (bkup_Row == null)
+                            //{
+                            //    Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {entry.Key}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
+                            //    continue;
+                            //}
+                            string t = string.Empty;
+                            if (!row.IsDelete)
+                            {
+                                foreach (SingleColumn cField in row.Columns)
+                                {
+                                    if (cField.Control != null)
+                                    {
+                                        SingleColumn ocF = null;// bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
+                                        args.UpdateSet(cField, ocF);
+                                        cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                    }
+                                    else
+                                    {
+                                        args.UpdateSet(cField);
+                                        WebForm.ParameterizeUnknown(args);
+                                    }
+                                }
+                            }
+
+                            string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, entry.Key, row.IsDelete);
+                            fullqry += string.Format(_qry, args._colvals);
+                            fullqry += t;
+                        }
+                        else
+                        {
+                            args.ResetColsAndVals();
+
+                            foreach (SingleColumn cField in row.Columns)
+                            {
+                                args.InsertSet(cField);
+                                if (cField.Control != null)
+                                    cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                else
+                                    WebForm.ParameterizeUnknown(args);
+                            }
+                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, entry.Key, conf.GridDataId <= 0);
+                            fullqry += string.Format(_qry, args._cols, args._vals);
+                        }
+                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, args);
+                    }
+                }
+                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
+                {
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+                }
             }
             args.CopyBack(ref _extqry, ref i);
         }

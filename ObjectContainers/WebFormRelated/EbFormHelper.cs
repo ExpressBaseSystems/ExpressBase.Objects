@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Reflection;
 using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ExpressBase.Objects
 {
@@ -258,26 +260,22 @@ namespace ExpressBase.Objects
             _this.FormCollection = new EbWebFormCollection(_this);
             if (_this.DataPushers != null)
             {
-                foreach (EbDataPusher pusher in _this.DataPushers)
+                foreach (EbFormDataPusher pusher in _this.DataPushers.FindAll(e => e is EbFormDataPusher))
                 {
-                    if (!(pusher is EbFormDataPusher))
-                        continue;
                     EbWebForm _form = GetEbObject<EbWebForm>(pusher.FormRefId, client, Redis, service);
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
                     _form.AfterRedisGet(Redis as RedisClient, client);
                     string _multipushId = null;
-                    if (pusher is EbFormDataPusher _formPusher)
+                    if (pusher.MultiPushIdType == MultiPushIdTypes.Default)
+                        _multipushId = _this.RefId + CharConstants.UNDERSCORE + pusher.Name;
+                    if (pusher.MultiPushIdType == MultiPushIdTypes.Row)
+                        _multipushId = pusher.Name;
+
+                    _form.DataPusherConfig = new EbDataPusherConfig
                     {
-                        if (_formPusher.MultiPushIdType == MultiPushIdTypes.Default)
-                            _multipushId = _this.RefId + CharConstants.UNDERSCORE + pusher.Name;
-                        if (_formPusher.MultiPushIdType == MultiPushIdTypes.Row)
-                            _multipushId = pusher.Name;
-                    }
-                    _form.DataPusherConfig = new EbDataPusherConfig 
-                    { 
-                        SourceTable = _this.FormSchema.MasterTable, 
+                        SourceTable = _this.FormSchema.MasterTable,
                         MultiPushId = _multipushId
                     };
                     _form.CrudContext = i++.ToString();
@@ -316,6 +314,18 @@ namespace ExpressBase.Objects
             }
             (_ebObject as EbObject).RefId = RefId;// temp fix (sometimes refid missing from ebObject)
             return _ebObject;
+        }
+
+        public static T DeepClone<T>(this T obj)
+        {
+            using (var ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(ms, obj);
+                ms.Position = 0;
+
+                return (T)bf.Deserialize(ms);
+            }
         }
 
         public static bool HasPermission(User UserObj, string RefId, string ForWhat, int LocId, bool NeglectLoc = false, string WC = TokenConstants.UC)
@@ -679,7 +689,7 @@ namespace ExpressBase.Objects
             return Tables;
         }
 
-        public static void InitFromDataBase(EbWebForm WebForm_L, JsonServiceClient ServiceClient, IRedisClient Redis, string WC) 
+        public static void InitFromDataBase(EbWebForm WebForm_L, JsonServiceClient ServiceClient, IRedisClient Redis, string WC)
         {
             //foreach (EbControl control in WebForm_L.Controls.FlattenAllEbControls().ToList().FindAll(e => e is EbDataGrid_New))// for old objects
             //{
