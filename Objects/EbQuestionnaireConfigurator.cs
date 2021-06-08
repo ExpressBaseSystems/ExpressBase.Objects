@@ -138,6 +138,7 @@ namespace ExpressBase.Objects
 			return ReplacePropsInHTML(EbCtrlHTML);
 		}
 
+
 		public void InitFromDataBase(JsonServiceClient ServiceClient)
 		{
 			////query is directly written- table, column namesa are given explicitly in query (only for postgre)
@@ -253,7 +254,10 @@ namespace ExpressBase.Objects
 			};
 		}
 
-    }
+		[JsonIgnore]
+		public override string EnableJSfn { get { return @"this.__IsDisable = false;debugger; $(`.queOuterDiv`).find('*').attr('disabled', 'disabled').css('background-color', 'var(--eb-disablegray)');"; } set { } }
+
+	}
 
 	public class Ques_Confi
 	{
@@ -293,8 +297,8 @@ namespace ExpressBase.Objects
 		[Alias("Unique")]
 		public bool unique { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-		[Alias("Validator")]
-		public List<EbValidator> validator { get; set; }
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		//[Alias("Validator")]
+		//public List<EbValidator> validator { get; set; }
 	}
 }
