@@ -110,8 +110,11 @@ else if (this.MultiPushIdType === 2)
         public EbBatchFormDataPusher() { }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [Alias("Multi push id")]
         public override string Name { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override string SkipLineItemIf { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Alias("Source datagrid")]
@@ -181,6 +184,12 @@ else if (this.MultiPushIdType === 2)
                     Form.DataPusherConfig.GridDataId = Row.RowId;
                     Form.MergeFormData();
                     Form.CrudContext = CrudContext++.ToString();
+                    if (!string.IsNullOrWhiteSpace(pusher.PushOnlyIf))
+                    {
+                        object status = this.GetValueFormOutDict(OutputDict, ref Index);
+                        if (!Convert.ToBoolean(status))
+                            Form.DataPusherConfig.AllowPush = false;
+                    }
                     FormList.Add(Form);
                 }
             }
@@ -347,9 +356,7 @@ else if (this.MultiPushIdType === 2)
             foreach (EbDataPusher pusher in this.WebForm.DataPushers.FindAll(e => e is EbBatchFormDataPusher))
             {
                 EbDataPusherConfig conf = pusher.WebForm.DataPusherConfig;
-
-                int ScriptCount = Index;
-
+                int startIndex = Index;
                 FnCall += $"\nfor (int i = 0; i < {conf.GridSingleTable.Count}; i++) \n{{";
                 FnCall += $"\nsourceform.{conf.GridName}.GetEnumerator();";
                 JObject JObj = JObject.Parse(pusher.Json);
@@ -380,26 +387,20 @@ else if (this.MultiPushIdType === 2)
                         }
                     }
                 }
-
-                if (Index - ScriptCount > 0)
+                if (Index - startIndex > 0)
                 {
-                    FnCall = FnCall.Replace("$Multiplier$", $"(i*{Index - ScriptCount})+");
-                    conf.ScriptCount = Index - ScriptCount;
+                    if (!string.IsNullOrEmpty(pusher.PushOnlyIf))////multiplier avoided - fix this
+                    {
+                        this.CodeDict.Add(Index, pusher.PushOnlyIf);
+                        FnDef += GetFunctionDefinition(pusher.PushOnlyIf, Index);
+                        FnCall += GetFunctionCall(Index, true);
+                        Index++;
+                    }
+                    FnCall = FnCall.Replace("$Multiplier$", $"(i*{Index - startIndex})+");
+                    conf.ScriptCount = Index - startIndex;
                 }
-
-                if (!string.IsNullOrEmpty(pusher.PushOnlyIf))////multiplier avoided - fix this
-                {
-                    this.CodeDict.Add(Index, pusher.PushOnlyIf);
-                    FnDef += GetFunctionDefinition(pusher.PushOnlyIf, Index);
-                    FnCall += GetFunctionCall(Index);
-                    Index++;
-                }
-
                 FnCall += "\n}";
-
-
             }
-
             if (FnDef == string.Empty)
                 return string.Empty;
 
@@ -530,13 +531,15 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 return "No BatchFormDataPushers";
 
             FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon, true);
-
+            List<EbBatchFormDataPusher> pushers = new List<EbBatchFormDataPusher>();
             foreach (EbBatchFormDataPusher batchDp in _this.DataPushers.FindAll(e => e is EbBatchFormDataPusher))
             {
+                pushers.Add(batchDp);
                 EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>(batchDp.FormRefId, null, service.Redis, service);
                 _form.RefId = batchDp.FormRefId;
                 _form.UserObj = _this.UserObj;
                 _form.SolutionObj = _this.SolutionObj;
+                _form.LocationId = _this.LocationId;
                 _form.AfterRedisGet(service);
                 TableSchema _table = _this.FormSchema.Tables.Find(e => e.ContainerName == batchDp.SourceDG);
                 SingleTable Table = _this.FormData.MultipleTables[_table.TableName];
@@ -561,43 +564,9 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             {
                 object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
                 EbWebFormCollection FormCollection = ebDataPushHelper.CreateWebFormDataBatch(out_dict);
+                EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon);
+                MergeFormData(FormCollection, FormCollectionBkUp, pushers);
 
-                //merge data
-                foreach (EbBatchFormDataPusher batchDp in _this.DataPushers.FindAll(e => e is EbBatchFormDataPusher))
-                {
-                    EbDataPusherConfig conf = batchDp.WebForm.DataPusherConfig;
-                    if (conf.GridSingleTableBackUp == null)
-                        continue;
-
-                    foreach (SingleRow oRow in conf.GridSingleTableBackUp)
-                    {
-                        EbWebForm Form = FormCollection.Find(e => e.DataPusherConfig.GridDataId == oRow.RowId && e.DataPusherConfig.GridName == conf.GridName);
-                        if (Form == null)
-                        {
-                            //if it is in backup then delete that record
-                            //if (oRow.IsDelete)
-                            //{
-
-                            //}
-                            //else
-                            continue;
-                        }
-                        if (oRow.RowId > 0)
-                        {
-                            foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
-                                entry.Value.ForEach(e => e.IsUpdate = true);
-                        }
-                        if ((oRow.IsDelete || !conf.AllowPush) && oRow.RowId > 0)
-                        {
-                            foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
-                                entry.Value.ForEach(e => e.IsDelete = true);
-                        }
-                        else if (!conf.AllowPush)
-                        {
-                            FormCollection.Remove(Form);
-                        }
-                    }
-                }
                 string fullqry = string.Empty;
                 string _extqry = string.Empty;
                 List<DbParameter> param = new List<DbParameter>();
@@ -618,7 +587,114 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             return "Nothing to process";
         }
 
-        #endregion Excel_Import
+        private static void MergeFormData(EbWebFormCollection FormCollection, EbWebFormCollection FormCollectionBkUp, List<EbBatchFormDataPusher> Pushers)
+        {
+            foreach (EbBatchFormDataPusher batchDp in Pushers)
+            {
+                List<EbWebForm> RmForm = new List<EbWebForm>();
+                foreach (EbWebForm Form in FormCollection)
+                {
+                    EbDataPusherConfig conf = Form.DataPusherConfig;
+                    EbWebForm FormBkUp = FormCollectionBkUp.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
+
+                    if (!conf.AllowPush && FormBkUp == null)
+                        RmForm.Add(Form);
+                    if (FormBkUp == null)//new
+                        continue;
+                    else
+                    {
+                        Form.FormDataBackup = FormBkUp.FormDataBackup;
+                        Form.TableRowId = FormBkUp.TableRowId;
+                        foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
+                        {
+                            for (int i = 0; i < entry.Value.Count; i++)
+                            {
+                                if (Form.FormDataBackup.MultipleTables[entry.Key].Count > i)
+                                    entry.Value[i].RowId = Form.FormDataBackup.MultipleTables[entry.Key][i].RowId;
+                            }
+                        }
+                        if (!conf.AllowPush)
+                        {
+                            foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
+                                entry.Value.ForEach(e => e.IsDelete = true);
+                        }
+                    }
+                }
+
+                RmForm.ForEach(e => FormCollection.Remove(e));
+
+                foreach (EbWebForm FormBkUp in FormCollectionBkUp)
+                {
+                    EbDataPusherConfig conf = FormBkUp.DataPusherConfig;
+                    EbWebForm Form = FormCollection.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
+
+                    if (Form == null)
+                    {
+                        FormBkUp.FormData = FormBkUp.FormDataBackup;
+                        foreach (KeyValuePair<string, SingleTable> entry in FormBkUp.FormData.MultipleTables)
+                            entry.Value.ForEach(e => e.IsDelete = true);
+                        FormCollection.Add(FormBkUp);
+                    }
+                }
+            }
+        }
+
+        private static EbWebFormCollection RefreshBatchFormData(List<EbBatchFormDataPusher> batchDataPushers, IDatabase DataDB, DbConnection DbCon)
+        {
+            string fullQuery = string.Empty;
+            List<int> QryCount = new List<int>();
+
+            foreach (EbBatchFormDataPusher batchDp in batchDataPushers)
+            {
+                fullQuery += QueryGetter.GetSelectQuery_Batch(batchDp.WebForm, out int qCount);
+                QryCount.Add(qCount);
+            }
+
+            EbDataSet dataset = DataDB.DoQueries(DbCon, fullQuery);
+
+            List<EbWebForm> FormListBkUp = new List<EbWebForm>();
+
+            for (int i = 0, start = 0; i < QryCount.Count; start += QryCount[i], i++)
+            {
+                WebFormSchema _schema = batchDataPushers[i].WebForm.FormSchema;
+                EbDataPusherConfig _conf = batchDataPushers[i].WebForm.DataPusherConfig;
+
+                for (int j = 0; j < dataset.Tables[start].Rows.Count; j++)
+                {
+                    EbDataSet ds = new EbDataSet();
+                    EbDataTable dt = new EbDataTable(_schema.MasterTable);
+                    dt.Columns = dataset.Tables[start].Columns;
+                    dt.Rows.Add(dataset.Tables[start].Rows[j]);
+                    ds.Tables.Add(dt);
+
+                    int src_lines_id = Convert.ToInt32(dt.Rows[0][_conf.GridTableName + "_id"]);
+                    int dest_master_id = Convert.ToInt32(dt.Rows[0]["id"]);
+
+                    for (int k = 1; k < QryCount[i]; k++)
+                    {
+                        EbDataTable dtLine = new EbDataTable(_schema.Tables[k].TableName);
+                        dtLine.Columns = dataset.Tables[start + k].Columns;
+                        dtLine.Rows.AddRange(dataset.Tables[start + k].Rows.FindAll(e => Convert.ToInt32(e[_schema.MasterTable + "_id"]) == dest_master_id));
+                        ds.Tables.Add(dtLine);
+                    }
+                    EbWebForm Form = GetShallowCopy(batchDataPushers[i].WebForm);
+                    Form.DataPusherConfig.GridDataId = src_lines_id;
+                    Form.CrudContext = j + "_";
+                    Form.RefreshFormDataInner(ds, DataDB, string.Empty, true, null);
+                    FormListBkUp.Add(Form);
+                }
+            }
+            return new EbWebFormCollection(FormListBkUp);
+        }
+
+        private static EbWebForm GetShallowCopy(EbWebForm WebForm)
+        {
+            EbWebForm Form = WebForm.ShallowCopy();
+            Form.DataPusherConfig = WebForm.DataPusherConfig.ShallowCopy();
+            return Form;
+        }
+
+        #endregion Batch_Data_Pusher
 
         #region _______________Excel_Import_______________
 

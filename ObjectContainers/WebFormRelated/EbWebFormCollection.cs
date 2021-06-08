@@ -24,7 +24,8 @@ namespace ExpressBase.Objects
 
         public EbWebFormCollection(List<EbWebForm> ebWebFormList) : base(ebWebFormList)
         {
-            this.MasterForm = ebWebFormList[0];/////////dummy master
+            if (ebWebFormList.Count > 0)
+                this.MasterForm = ebWebFormList[0];/////////dummy master
         }
 
         public void Insert(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
@@ -168,7 +169,7 @@ namespace ExpressBase.Objects
                     foreach (SingleRow row in entry.Value)
                     {
                         args.ResetColVals();
-                        if (row.IsUpdate)
+                        if (row.RowId > 0)
                         {
                             //SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId);
                             //if (bkup_Row == null)
@@ -195,7 +196,7 @@ namespace ExpressBase.Objects
                                 }
                             }
 
-                            string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, entry.Key, row.IsDelete);
+                            string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, entry.Key, row.IsDelete, row.RowId);
                             fullqry += string.Format(_qry, args._colvals);
                             fullqry += t;
                         }
@@ -211,7 +212,7 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, entry.Key, conf.GridDataId <= 0);
+                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, entry.Key);
                             fullqry += string.Format(_qry, args._cols, args._vals);
                         }
                         fullqry += WebForm.InsertUpdateLines(entry.Key, row, args);

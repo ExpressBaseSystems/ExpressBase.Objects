@@ -155,6 +155,77 @@ namespace ExpressBase.Objects.WebFormRelated
             return query;
         }
 
+        public static string GetSelectQuery_Batch(EbWebForm _this, out int _qryCount)
+        {
+            _qryCount = 0;
+            string query = string.Empty;
+            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+            EbDataPusherConfig conf = _this.DataPusherConfig;
+            string _pshId = conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{conf.MultiPushId}'";
+
+            foreach (TableSchema _table in _this.FormSchema.Tables)
+            {
+                string _cols = string.Empty;
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl);
+                if (_columns.Count() > 0)
+                {
+                    _cols = ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+                    IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
+                    if (_ph_cols.Count() > 0)
+                        _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
+                }
+
+                if (_table.TableName == _this.FormSchema.MasterTable)
+                {
+
+                    query += $@"
+SELECT
+    {ebs[SystemColumns.eb_loc_id]},
+    {ebs[SystemColumns.eb_ver_id]},
+    {ebs[SystemColumns.eb_lock]},
+    {ebs[SystemColumns.eb_push_id]},
+    {ebs[SystemColumns.eb_src_id]},
+    {ebs[SystemColumns.eb_created_by]},
+    {ebs[SystemColumns.eb_void]},
+    {ebs[SystemColumns.eb_created_at]},
+    {ebs[SystemColumns.eb_src_ver_id]},
+    {ebs[SystemColumns.eb_ro]},
+    id    
+    {_cols},
+    {conf.GridTableName}_id
+FROM
+    {_table.TableName}
+WHERE
+    {conf.SourceTable}_id = {conf.SourceRecId} AND
+    COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)} {_pshId}; ";
+                }
+                else
+                {
+                    if (_table.TableType == WebFormTableTypes.Grid)
+                        _cols = $"{ebs[SystemColumns.eb_loc_id]}, id, {ebs[SystemColumns.eb_row_num]}" + _cols;
+                    else
+                        _cols = $"{ebs[SystemColumns.eb_loc_id]}, id" + _cols;
+
+                    query += $@"
+SELECT 
+    {_cols},
+    {_this.FormSchema.MasterTable}_id
+FROM 
+    {_table.TableName} 
+WHERE 
+    {_this.FormSchema.MasterTable}_id IN (
+        SELECT id FROM {_this.FormSchema.MasterTable} 
+        WHERE {conf.SourceTable}_id = {conf.SourceRecId} AND 
+            COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)}) AND 
+    COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)} {_pshId} 
+{(_table.TableType == WebFormTableTypes.Grid ? ("ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : "")) : "")}; ";
+                }
+
+                _qryCount++;
+            }
+            return query;
+        }
+
         public static string GetDeleteQuery(EbWebForm _this, IDatabase DataDB)
         {
             string FullQry = string.Empty;
@@ -448,7 +519,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return _qry;
         }
 
-        public static string GetInsertQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
+        public static string GetInsertQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName)
         {
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             EbDataPusherConfig conf = _this.DataPusherConfig;
@@ -488,7 +559,7 @@ VALUES
             }
             else
             {
-                string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"{_this.TableRowId}";
+                string srcRef = _this.TableRowId > 0 ? $"{_this.TableRowId}" : $"(SELECT eb_currval('{_this.TableName}_id_seq'))";
                 _qry = $@"
 INSERT INTO {tblName} 
     ({{0}} 
@@ -509,7 +580,7 @@ VALUES
             return _qry;
         }
 
-        public static string GetUpdateQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel)
+        public static string GetUpdateQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel, int id)
         {
             string _qry, parentTblChk, pushIdChk;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
@@ -517,12 +588,12 @@ VALUES
 
             if (tblName.Equals(_this.TableName))
             {
-                parentTblChk = $"{conf.GridTableName}_id = {conf.GridDataId} AND \n {conf.SourceTable}_id = {conf.SourceRecId} AND";
+                parentTblChk = $"{conf.GridTableName}_id = {conf.GridDataId} AND {conf.SourceTable}_id = {conf.SourceRecId} AND id = {id} AND";
                 pushIdChk = conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{conf.MultiPushId}'";
             }
             else
             {
-                parentTblChk = $"{_this.TableName}_id = @{_this.TableName}_id AND";
+                parentTblChk = $"{_this.TableName}_id = @{_this.TableName}_id AND id = {id} AND";
                 pushIdChk = string.Empty;
             }
 

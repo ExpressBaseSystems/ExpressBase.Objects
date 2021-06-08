@@ -1196,7 +1196,7 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4]),
                 DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._refid, EbDbTypes.String, this.RefId)
             };
-            EbDataSet dataset = null;
+            EbDataSet dataset;
             if (this.DbConnection == null)
                 dataset = DataDB.DoQueries(query, param);
             else
@@ -1213,7 +1213,7 @@ namespace ExpressBase.Objects
             Console.WriteLine("No Exception in RefreshFormData");
         }
 
-        private void RefreshFormDataInner(EbDataSet dataset, IDatabase DataDB, string psquery, bool backup, Service service)
+        public void RefreshFormDataInner(EbDataSet dataset, IDatabase DataDB, string psquery, bool backup, Service service)
         {
             WebFormSchema _schema = this.FormSchema;
             WebformData _FormData;
