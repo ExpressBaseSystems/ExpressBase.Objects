@@ -257,6 +257,11 @@ namespace ExpressBase.Objects.WebFormRelated
                 DelegateTest OutDelObj = new DelegateTest(DataDB, DbCon);
                 fG_DataDB = new FG_DataDB(OutDelObj.ExecuteScalar);
             }
+            WebformData _formdataEmpty = _this.GetEmptyModel();
+            if (_formdata == null)
+                _formdata = _formdataEmpty;
+            else
+                _formdata.DGsRowDataModel = _formdataEmpty.DGsRowDataModel;
             FG_Locations fG_Locations = Get_FG_Locations(_this.SolutionObj.Locations);
             int createdBy = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
             string createdAt = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
