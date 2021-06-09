@@ -405,18 +405,22 @@ namespace ExpressBase.Objects
                     this.FormData.MultipleTables.Add(_dg.TableName, Table);
 
                     Dictionary<string, string> QrsDict = new Dictionary<string, string>();
+                    List<DbParameter> param = new List<DbParameter>();
+                    foreach (Param _p in Param)
+                        param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
+
                     foreach (KeyValuePair<EbDGPowerSelectColumn, string> psItem in psDict)
                     {
                         string t = psItem.Key.GetSelectQuery(DataDB, Service, psItem.Value);
                         QrsDict.Add(psItem.Key.EbSid, t);
+                        foreach (Param _p in psItem.Key.ParamsList)
+                        {
+                            if (!param.Exists(e => e.ParameterName == _p.Name))
+                                param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
+                        }
                     }
                     if (QrsDict.Count > 0)
                     {
-                        List<DbParameter> param = new List<DbParameter>();
-
-                        foreach (Param _p in Param)
-                            param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
-
                         EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
 
                         EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
@@ -1690,13 +1694,13 @@ namespace ExpressBase.Objects
                 {
                     this.RefreshFormData(DataDB, service, true, true);
                     if (this.FormData.IsReadOnly)
-                        throw new FormException("Unable to continue in readonly data entry!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
+                        throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
                     if (this.FormData.IsLocked)
-                        throw new FormException("Unable to continue in locked data entry!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
+                        throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
 
                     if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
-                        throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                        throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
 
                     resp = "Updated: " + this.Update(DataDB, service);
                 }

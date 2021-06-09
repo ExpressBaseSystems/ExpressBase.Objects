@@ -974,12 +974,33 @@ else// PS
         }
 
         //to get vm+dm only for audit trail
-        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms, List<DbParameter> param)
         {
             if (this.IsDataFromApi)
                 return string.Empty;
 
-            string Sql = this.GetSql(service);
+            EbDataReader dr = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, null, service.Redis, service);
+            string Sql = dr.Sql.Trim();
+            if (Sql.LastIndexOf(";") == Sql.Length - 1)
+                Sql = Sql.Substring(0, Sql.Length - 1);
+
+            List<Param> _Params = dr.GetParams(service.Redis as RedisClient);
+            foreach(Param _P in _Params)
+            {
+                if (!param.Exists(e => e.ParameterName == _P.Name))
+                {
+                    if (_P.Name == this.Name)
+                    {
+                        if (Sql.Contains(":" + this.Name))
+                            Sql = Sql.Replace(":" + this.Name, $"ANY(STRING_TO_ARRAY('{vms}'::TEXT, ',')::INT[])");
+                        if (Sql.Contains("@" + this.Name))
+                            Sql = Sql.Replace("@" + this.Name, $"ANY(STRING_TO_ARRAY('{vms}'::TEXT, ',')::INT[])");
+                    }
+                    else
+                        param.Add(DataDB.GetNewParameter(_P.Name, (EbDbTypes)Convert.ToInt32(_P.Type), _P.ValueTo));
+                }
+            }
+
             string vm = this.ValueMember.Name;
             string dm;
             if (this.RenderAsSimpleSelect)

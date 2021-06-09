@@ -6,6 +6,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using ServiceStack.Redis;
 using System.Collections.Generic;
+using System.Data.Common;
 
 namespace ExpressBase.Objects
 {
@@ -28,7 +29,7 @@ namespace ExpressBase.Objects
         void InitFromDataBase_SS(JsonServiceClient ServiceClient);
         string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null);
         string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl);
-        string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms);
+        string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms, List<DbParameter> param);
     }
 
     public interface IEbDataReaderControl

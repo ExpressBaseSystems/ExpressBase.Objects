@@ -260,7 +260,7 @@ else {
             List<string> _params = new List<string>();
             EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, null);
 
-            foreach (Param p in DataReader.InputParams)
+            foreach (Param p in DataReader.GetParams(redis as RedisClient))
             {
                 _params.Add(p.Name);
                 for (int i = 0; i < Allctrls.Length; i++)
@@ -295,7 +295,7 @@ else {
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>  
-                <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>"
+                <th class='slno' style='width:34px'><span class='grid-col-title'>#</span></th>"
 .Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty); ;
             foreach (EbDGColumn col in Controls)
             {
@@ -1699,9 +1699,9 @@ pg.HideProperty('IsDynamic');
             return this.EbPowerSelect.GetSelectQuery123(DataDB, service, table, column, parentTbl, masterTbl);
         }
 
-        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms, List<DbParameter> param)
         {
-            return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
+            return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms, param);
         }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)

@@ -76,6 +76,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override bool Index { get { return true; } }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 

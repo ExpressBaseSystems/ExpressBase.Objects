@@ -342,10 +342,10 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         for (int i = 0; i < _table.Columns.Count; i++)
                         {
                             EbControl _control = _table.Columns.ElementAt(i).Control;
-                            if (_control.DoNotPersist)
+                            if (_control.DoNotPersist || _control.Hidden)
                                 continue;
-                            if (_control is EbDGColumn)
-                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_control as EbDGColumn).Title ?? _control.Label);
+                            if (_control is EbDGColumn _dgcol)
+                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, _dgcol.Title ?? _control.Label);
                             else
                                 Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, _control.Label);
                         }
@@ -367,7 +367,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
 
                     foreach (ColumnSchema __column in _table.Columns)
                     {
-                        if (__column.Control.DoNotPersist)
+                        if (__column.Control.DoNotPersist || __column.Control.Hidden)
                             continue;
                         bool IsModified = false;
                         if (new_val_dict?.ContainsKey(__column.ColumnName) == true && old_val_dict?.ContainsKey(__column.ColumnName) == true)
@@ -493,6 +493,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         {
             string Qry = string.Empty;
             Dictionary<string, Dictionary<string, List<string>>> DictDm = new Dictionary<string, Dictionary<string, List<string>>>();
+            List<DbParameter> param = new List<DbParameter>();
 
             foreach (TableSchema _table in this.WebForm.FormSchema.Tables)
             {
@@ -510,7 +511,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                             if (!DictDm.ContainsKey(key))
                             {
                                 if (_column.Control is IEbPowerSelect)
-                                    Qry += (_column.Control as IEbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                                    Qry += (_column.Control as IEbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1), param);
                                 else if (_column.Control is EbSimpleSelect)
                                     Qry += (_column.Control as EbSimpleSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
                                 else
@@ -523,7 +524,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 }
             }
 
-            EbDataSet ds = DataDB.DoQueries(Qry);
+            EbDataSet ds = DataDB.DoQueries(Qry, param.ToArray());
 
             for (int i = 0; i < ds.Tables.Count; i++)
             {
