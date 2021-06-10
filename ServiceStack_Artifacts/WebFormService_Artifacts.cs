@@ -15,16 +15,16 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
 
-	//===================================== FORM TABLE CREATION   ==========================================
+    //===================================== FORM TABLE CREATION   ==========================================
 
-	[DataContract]
-	public class CreateWebFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateWebFormTableResponse>
-	{
-		[DataMember(Order = 1)]
-		public EbControlContainer WebObj { get; set; }
+    [DataContract]
+    public class CreateWebFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateWebFormTableResponse>
+    {
+        [DataMember(Order = 1)]
+        public EbControlContainer WebObj { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Apps { get; set; }
+        [DataMember(Order = 2)]
+        public string Apps { get; set; }
 
         [DataMember(Order = 3)]
         public bool IsImport { get; set; }
@@ -34,14 +34,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public Eb_Solution SoluObj { get; set; }
-	}
+    }
 
-	[DataContract]
-	public class CreateWebFormTableResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+    [DataContract]
+    public class CreateWebFormTableResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     [DataContract]
     public class CreateMyProfileTableRequest : EbServiceStackAuthRequest, IReturn<CreateMyProfileTableResponse>
@@ -63,14 +63,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     //================================== GET RECORD FOR RENDERING ================================================
 
     [DataContract]
-	public class GetRowDataRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
-	{
-		[DataMember(Order = 1)]
-		public string RefId { get; set; }
+    public class GetRowDataRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
 
-		[DataMember(Order = 2)]
-		public int RowId { get; set; }
-        
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
         [DataMember(Order = 3)]
         public int CurrentLoc { get; set; }
 
@@ -78,15 +78,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public WebFormRenderModes RenderMode { get; set; }
     }
 
-	[DataContract]
-	public class GetRowDataResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public string FormDataWrap { get; set; }
+    [DataContract]
+    public class GetRowDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string FormDataWrap { get; set; }
 
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     [DataContract]
     public class GetPrefillDataRequest : EbServiceStackAuthRequest, IReturn<GetPrefillDataResponse>
@@ -96,7 +96,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<Param> Params { get; set; }
-        
+
         [DataMember(Order = 3)]
         public int CurrentLoc { get; set; }
 
@@ -148,7 +148,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string RefId { get; set; }
-        
+
         [DataMember(Order = 2)]
         public int DataId { get; set; }
     }
@@ -158,7 +158,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<Param> Params { get; set; }
-        
+
         [DataMember(Order = 2)]
         public int Status { get; set; }
 
@@ -183,7 +183,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string Trigger { get; set; }
-        
+
         [DataMember(Order = 5)]
         public string WebFormData { get; set; }
 
@@ -251,7 +251,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Data { get; set; }
-        
+
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
@@ -268,14 +268,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Json { get; set; }
-        
+
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
 
     [DataContract]
-	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
+    public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
     {
         [DataMember(Order = 1)]
         public UniqCheckParam[] UniqCheckParam { get; set; }
@@ -283,81 +283,81 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 
     [DataContract]
-	public class UniqCheckParam
-	{
-		[DataMember(Order = 1)]
-		public string TableName { get; set; }
+    public class UniqCheckParam
+    {
+        [DataMember(Order = 1)]
+        public string TableName { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Field { get; set; }
+        [DataMember(Order = 2)]
+        public string Field { get; set; }
 
-		[DataMember(Order = 3)]
-		public string Value { get; set; }
+        [DataMember(Order = 3)]
+        public string Value { get; set; }
 
-		[DataMember(Order = 4)]
-		public int TypeI { get; set; }
-	}
+        [DataMember(Order = 4)]
+        public int TypeI { get; set; }
+    }
 
-	[DataContract]
-	public class DoUniqueCheckResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public Dictionary<string, bool> Response { get; set; }
+    [DataContract]
+    public class DoUniqueCheckResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, bool> Response { get; set; }
 
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
-	[DataContract]
-	public class GetDictionaryValueRequest : EbServiceStackAuthRequest, IReturn<GetDictionaryValueResponse>
-	{
-		[DataMember(Order = 1)]
-		public string[] Keys { get; set; }
+    [DataContract]
+    public class GetDictionaryValueRequest : EbServiceStackAuthRequest, IReturn<GetDictionaryValueResponse>
+    {
+        [DataMember(Order = 1)]
+        public string[] Keys { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Locale { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public string Locale { get; set; }
+    }
 
-	[DataContract]
-	public class GetDictionaryValueResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public Dictionary<string, string> Dict { get; set; }
+    [DataContract]
+    public class GetDictionaryValueResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, string> Dict { get; set; }
 
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
 
-	//======================================= INSERT OR UPDATE OR DELETE RECORD =============================================
+    //======================================= INSERT OR UPDATE OR DELETE RECORD =============================================
 
-	[DataContract]
-	public class InsertDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<InsertDataFromWebformResponse>
-	{
-		[DataMember(Order = 1)]
-		public string FormData { get; set; }
+    [DataContract]
+    public class InsertDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<InsertDataFromWebformResponse>
+    {
+        [DataMember(Order = 1)]
+        public string FormData { get; set; }
 
-		[DataMember(Order = 2)]
-		public string RefId { get; set; }
+        [DataMember(Order = 2)]
+        public string RefId { get; set; }
 
-		[DataMember(Order = 3)]
-		public int RowId { get; set; }
+        [DataMember(Order = 3)]
+        public int RowId { get; set; }
 
         [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
-        
+
         [DataMember(Order = 5)]
         public int DraftId { get; set; }
 
         [DataMember(Order = 6)]
         public string MobilePageRefId { get; set; }
     }
-	
-	[DataContract]
-	public class InsertDataFromWebformResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public int RowAffected { get; set; }
+
+    [DataContract]
+    public class InsertDataFromWebformResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowAffected { get; set; }
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
@@ -365,9 +365,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         //public WebformData FormData { get; set; }
         public string FormData { get; set; }
-        
+
         [DataMember(Order = 4)]
-		public ResponseStatus ResponseStatus { get; set; }
+        public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 5)]
         public int Status { get; set; }
@@ -380,38 +380,38 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 8)]
         public string StackTraceInt { get; set; }
-        
+
         [DataMember(Order = 9)]
         public string AffectedEntries { get; set; }
 
         [DataMember(Order = 9)]
         public Dictionary<string, string> MetaData { get; set; }
     }
-    
-	[DataContract]
-	public class InsertOrUpdateFormDataRqst : EbServiceStackAuthRequest, IReturn<InsertOrUpdateFormDataResp>
-	{
-		[DataMember(Order = 1)]
-		public FormGlobals FormGlobals { get; set; }
+
+    [DataContract]
+    public class InsertOrUpdateFormDataRqst : EbServiceStackAuthRequest, IReturn<InsertOrUpdateFormDataResp>
+    {
+        [DataMember(Order = 1)]
+        public FormGlobals FormGlobals { get; set; }
 
         [DataMember(Order = 2)]
-		public string PushJson { get; set; }
+        public string PushJson { get; set; }
 
-		[DataMember(Order = 3)]
-		public string RefId { get; set; }
+        [DataMember(Order = 3)]
+        public string RefId { get; set; }
 
-		[DataMember(Order = 4)]
-		public int RecordId { get; set; }
+        [DataMember(Order = 4)]
+        public int RecordId { get; set; }
 
         [DataMember(Order = 5)]
         public int LocId { get; set; }
 
-        [DataMember(Order = 6) ]
+        [DataMember(Order = 6)]
         public DbConnection TransactionConnection { get; set; }
     }
-	
-	[DataContract]
-	public class InsertOrUpdateFormDataResp : IEbSSResponse
+
+    [DataContract]
+    public class InsertOrUpdateFormDataResp : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int Status { get; set; }
@@ -423,7 +423,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int RecordId { get; set; }
 
         [DataMember(Order = 4)]
-		public ResponseStatus ResponseStatus { get; set; }
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]
@@ -431,7 +431,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string RefId { get; set; }
-        
+
         [DataMember(Order = 2)]
         public int LocId { get; set; }
 
@@ -472,7 +472,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public int DraftId { get; set; }
-        
+
         [DataMember(Order = 5)]
         public string Title { get; set; }
     }
@@ -541,7 +541,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetFormDraftResponse : IEbSSResponse
     {
-        
+
         [DataMember(Order = 1)]
         public string DataWrapper { get; set; }
 
@@ -549,7 +549,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 3)]
-        public string FormDatajson{ get; set; }
+        public string FormDatajson { get; set; }
     }
 
     [DataContract]
@@ -704,55 +704,75 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class GetPushedDataInfoRequest : EbServiceStackAuthRequest, IReturn<GetPushedDataInfoResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+    }
+
+    [DataContract]
+    public class GetPushedDataInfoResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Result { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
 
 
     //=============================================== AUDIT TRAIL ====================================================
 
     [DataContract]
-	public class GetAuditTrailRequest : EbServiceStackAuthRequest, IReturn<GetAuditTrailResponse>
-	{
-		[DataMember(Order = 1)]
-		public string FormId { get; set; }
+    public class GetAuditTrailRequest : EbServiceStackAuthRequest, IReturn<GetAuditTrailResponse>
+    {
+        [DataMember(Order = 1)]
+        public string FormId { get; set; }
 
-		[DataMember(Order = 2)]
-		public int RowId { get; set; }
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
     }
 
-	[DataContract]
-	public class GetAuditTrailResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public string Json { get; set; }
+    [DataContract]
+    public class GetAuditTrailResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Json { get; set; }
 
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
-	//[DataContract]
-	//public class FormTransaction
-	//{
-	//	[DataMember(Order = 1)]
-	//	public string CreatedBy;
+    //[DataContract]
+    //public class FormTransaction
+    //{
+    //	[DataMember(Order = 1)]
+    //	public string CreatedBy;
 
-	//	[DataMember(Order = 2)]
-	//	public string CreatedAt;
+    //	[DataMember(Order = 2)]
+    //	public string CreatedAt;
 
-	//	[DataMember(Order = 3)]
-	//	public List<FormTransactionLine> Details;
-	//}
+    //	[DataMember(Order = 3)]
+    //	public List<FormTransactionLine> Details;
+    //}
 
-	//[DataContract]
-	//public class FormTransactionLine
-	//{
-	//	[DataMember(Order = 1)]
-	//	public string FieldName;
+    //[DataContract]
+    //public class FormTransactionLine
+    //{
+    //	[DataMember(Order = 1)]
+    //	public string FieldName;
 
-	//	[DataMember(Order = 2)]
-	//	public string OldValue;
+    //	[DataMember(Order = 2)]
+    //	public string OldValue;
 
-	//	[DataMember(Order = 3)]
-	//	public string NewValue;
-	//}
+    //	[DataMember(Order = 3)]
+    //	public string NewValue;
+    //}
 
 
     //=============================================== MISCELLANEOUS ====================================================
@@ -773,14 +793,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    
+
     [DataContract]
     public class GetCtrlsFlatRequest : EbServiceStackAuthRequest, IReturn<GetCtrlsFlatResponse>
     {
         [DataMember(Order = 1)]
         public string RefId { get; set; }
     }
-    
+
     [DataContract]
     public class GetCtrlsFlatResponse : IEbSSResponse
     {
@@ -797,7 +817,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string InMsg { get; set; }
     }
-    
+
     [DataContract]
     public class UpdateAllFormTablesResponse : IEbSSResponse
     {
@@ -807,7 +827,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    
+
     [DataContract]
     public class CheckEmailConAvailableRequest : EbServiceStackAuthRequest, IReturn<CheckEmailConAvailableResponse>
     {
@@ -829,7 +849,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string RefId { get; set; }
 
-         [DataMember(Order = 2)]
+        [DataMember(Order = 2)]
         public List<Param> Param { get; set; }
 
 
@@ -853,8 +873,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetDistinctValuesRequest : EbServiceStackAuthRequest, IReturn<GetDistinctValuesResponse>
     {
         [DataMember(Order = 1)]
-        public string TableName { get; set; }  
-        
+        public string TableName { get; set; }
+
         [DataMember(Order = 2)]
         public string ColumnName { get; set; }
 
@@ -872,7 +892,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 
     //////for question configuration control
-    
+
     [DataContract]
     public class GetQuestionsBankRequest : EbServiceStackAuthRequest, IReturn<GetDistinctValuesResponse>
     {
@@ -883,7 +903,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetQuestionsBankResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int,String> Questionlst { get; set; }
+        public Dictionary<int, String> Questionlst { get; set; }
 
 
         [DataMember(Order = 2)]
@@ -895,7 +915,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         //public string TableName { get; set; }
     }
 
-    public class GetMyProfileEntryResponse:IEbSSResponse
+    public class GetMyProfileEntryResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int RowId { get; set; }
@@ -904,7 +924,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 3)]
-        public string Refid { get; set; }        
+        public string Refid { get; set; }
 
         [DataMember(Order = 4)]
         public bool ProfileExist { get; set; }
@@ -938,12 +958,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public FormException(string message) : base(message) { }
 
-        public FormException(string message, int code) : base(message) 
+        public FormException(string message, int code) : base(message)
         {
             this.ExceptionCode = code;
         }
 
-        public FormException(string message, int code, string msg, string stacktrace) : base(message) 
+        public FormException(string message, int code, string msg, string stacktrace) : base(message)
         {
             this.ExceptionCode = code;
             this.MessageInternal = msg;
