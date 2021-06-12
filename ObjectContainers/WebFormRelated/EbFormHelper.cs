@@ -696,7 +696,7 @@ namespace ExpressBase.Objects
             //	(control as EbDataGrid_New).ProcessDvColumnCollection();
             //}
 
-            foreach (EbControl control in WebForm_L.Controls.FlattenEbControls())
+            foreach (EbControl control in WebForm_L.Controls.FlattenAllEbControls())
             {
                 if (control is EbSimpleSelect)
                 {
