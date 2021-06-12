@@ -285,20 +285,23 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
-		public int ques_id { get; set; } 
+		public int Ques_id { get; set; } 
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[DefaultPropValue("false")]
 		[Alias("Required")]
-		public bool required { get; set; }
+		public bool Required { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[DefaultPropValue("false")]
 		[Alias("Unique")]
-		public bool unique { get; set; }
+		public bool Unique { get; set; }
 
-		//[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-		//[Alias("Validator")]
-		//public List<EbValidator> validator { get; set; }
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[Alias("Validator")]
+		[PropertyGroup("Validations")]
+		[PropertyEditor(PropertyEditorType.Collection)]
+		[HelpText("List of validators to consider before form save.")]
+		public List<EbValidator> Validators { get; set; }
 	}
 }

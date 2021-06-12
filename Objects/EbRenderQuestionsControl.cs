@@ -20,9 +20,9 @@ namespace ExpressBase.Objects
     {
         public EbRenderQuestionsControl()
         {
-
+            this.TableName = "test_table";
         }
-
+        public override string TableName { get; set; }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -73,8 +73,6 @@ namespace ExpressBase.Objects
     .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";");
             return ReplacePropsInHTML(EbCtrlHTML);
         }
-
-
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             string _html = string.Empty;
@@ -83,14 +81,17 @@ namespace ExpressBase.Objects
 
             GetRenderQuestionResponse result = ServiceClient.Get<GetRenderQuestionResponse>(new GetRenderQuestionsRequest { FormRefid = this.RefId, ControlId = this.ContextId });
 
+            //this.Questions.Add()
             foreach (GetRenderQuestions question in result.GetRenderQuestions)
             {
+                this.Controls.Add(EbSerializers.Json_Deserialize<EbQuestion>(question.Questions));
                 EbQuestion ebQuestion = EbSerializers.Json_Deserialize<EbQuestion>(question.Questions.ToString());
                 ebQuestionsHtml += ebQuestion.GetHtml();
             }
             ebQuestionsHtml = ebQuestionsHtml.Replace("@body@", _html).Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
             this.QuestionStr = ebQuestionsHtml + "</div>";
         }
+
 
         [HideInPropertyGrid]
         [JsonIgnore]
