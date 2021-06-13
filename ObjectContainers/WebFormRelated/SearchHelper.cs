@@ -124,7 +124,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return indexCtrlFound;
         }
 
-        public static string UpdateIndexes(IDatabase DataDB, EbWebForm _webForm)
+        public static string UpdateIndexes(IDatabase DataDB, EbWebForm _webForm, int limit)
         {
             DateTime startdt = DateTime.Now;
             string Message = $"Service started at {startdt}.";
@@ -169,67 +169,61 @@ namespace ExpressBase.Objects.WebFormRelated
             }
             if (labels.Count > 0)
             {
-                string fullQry = $"SELECT {qCols} FROM {_webForm.FormSchema.MasterTable} mtbl {qJoin} WHERE {qCdtn};";
-                EbDataTable dt = DataDB.DoQuery(fullQry);
-                if (dt.Rows.Count > 0)
+                int FLUSH_LIMIT = limit == 0 ? 10000 : limit;
+                string countQry = $"SELECT COUNT(*) FROM {_webForm.FormSchema.MasterTable} mtbl {qJoin} WHERE {qCdtn};";
+                EbDataTable _dt = DataDB.DoQuery(countQry);
+
+                if (_dt.Rows.Count > 0)
                 {
-                    Console.WriteLine($"Existing {dt.Rows.Count} records.");
-                    Message += $"\nExisting {dt.Rows.Count} records.";
-                    string upsertQry = string.Empty;
-                    List<DbParameter> parameters = new List<DbParameter>()
+                    int TOTAL_RECORDS = Convert.ToInt32(_dt.Rows[0][0]);
+                    Console.WriteLine($"Existing {TOTAL_RECORDS} records.");
+                    Message += $"\nExisting {TOTAL_RECORDS} records.";
+
+                    for (int x = 0; x <= TOTAL_RECORDS / FLUSH_LIMIT; x++)
                     {
-                        DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
-                        DataDB.GetNewParameter("display_name", EbDbTypes.String, _webForm.DisplayName)
-                    };
-                    int i, j;
-                    int flushCounter = 0, UpserteRecords = 0;
-                    for (i = 0; i < dt.Rows.Count; i++, flushCounter++)
-                    {
-                        EbDataRow dr = dt.Rows[i];
-                        Dictionary<string, string> JsonData = new Dictionary<string, string>();
-                        for (j = sysColCnt; j < colCnt; j++)
+                        string fullQry = $"SELECT {qCols} FROM {_webForm.FormSchema.MasterTable} mtbl {qJoin} WHERE {qCdtn} OFFSET {x * FLUSH_LIMIT} LIMIT {FLUSH_LIMIT};";
+                        EbDataTable dt = DataDB.DoQuery(fullQry);
+
+                        string upsertQry = string.Empty;
+                        List<DbParameter> parameters = new List<DbParameter>()
                         {
-                            string _val = Convert.ToString(dr[j]);
-                            string _lbl = labels[j - sysColCnt];
-                            if (!(dr.IsDBNull(j) || string.IsNullOrEmpty(_val) || JsonData.ContainsKey(_lbl)))
+                            DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
+                            DataDB.GetNewParameter("display_name", EbDbTypes.String, _webForm.DisplayName)
+                        };
+                        int i, j;
+                        int UpserteRecords = 0;
+                        for (i = 0; i < dt.Rows.Count; i++)
+                        {
+                            EbDataRow dr = dt.Rows[i];
+                            Dictionary<string, string> JsonData = new Dictionary<string, string>();
+                            for (j = sysColCnt; j < colCnt; j++)
                             {
-                                JsonData.Add(_lbl, _val);
+                                string _val = Convert.ToString(dr[j]);
+                                string _lbl = labels[j - sysColCnt];
+                                if (!(dr.IsDBNull(j) || string.IsNullOrEmpty(_val) || JsonData.ContainsKey(_lbl)))
+                                {
+                                    JsonData.Add(_lbl, _val);
+                                }
+                            }
+                            parameters.Add(DataDB.GetNewParameter($"data_id_{i}", EbDbTypes.Int32, dr[0]));
+                            if (JsonData.Count > 0)
+                            {
+                                parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
+                                parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
+                                parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
+                                parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
+                                parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
+                                upsertQry += GetUpsertQuery(i);
+                            }
+                            else
+                            {
+                                upsertQry += GetDeleteQuery(i);
                             }
                         }
-                        parameters.Add(DataDB.GetNewParameter($"data_id_{i}", EbDbTypes.Int32, dr[0]));
-                        if (JsonData.Count > 0)
-                        {
-                            parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
-                            parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
-                            parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
-                            parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
-                            parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
-                            upsertQry += GetUpsertQuery(i);
-                        }
-                        else
-                        {
-                            upsertQry += GetDeleteQuery(i);
-                        }
-
-                        if (flushCounter >= 10000)////
-                        {
-                            UpserteRecords += DataDB.DoNonQuery(upsertQry, parameters.ToArray());
-                            Console.WriteLine($"Upserted {UpserteRecords} records.");
-                            Message += $"\nUpserted {UpserteRecords} records.";
-
-                            flushCounter = 0;
-                            parameters = new List<DbParameter>()
-                            {
-                                DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
-                                DataDB.GetNewParameter("display_name", EbDbTypes.String, _webForm.DisplayName)
-                            };
-                            upsertQry = string.Empty;
-                        }
+                        UpserteRecords += DataDB.DoNonQuery(upsertQry, parameters.ToArray());
+                        Console.WriteLine($"Upserted {UpserteRecords} records.");
+                        Message += $"\nUpserted {UpserteRecords} records.";
                     }
-
-                    UpserteRecords += DataDB.DoNonQuery(upsertQry, parameters.ToArray());
-                    Console.WriteLine($"Upserted {UpserteRecords} records.");
-                    Message += $"\nUpserted {UpserteRecords} records.";
                 }
                 else
                 {
