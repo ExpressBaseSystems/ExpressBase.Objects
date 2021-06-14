@@ -23,12 +23,12 @@ using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects
 {
-    public enum DefaultSearchFor
+    public enum PsSearchOperators
     {
-        BeginingWithKeyword = 0,
-        EndingWithKeyword = 1,
-        ExactMatch = 2,
-        Contains = 3,
+        Contains = 0,
+        StartsWith = 1,
+        EndsWith = 2,
+        Equals = 3
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -509,11 +509,9 @@ else
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [Alias("Search Method")]
         [PropertyGroup(PGConstants.SEARCH)]
-        [HideInPropertyGrid]
         [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
-        public DefaultSearchFor DefaultSearchFor { get; set; }
+        public PsSearchOperators SearchOperator { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyGroup("Behavior")]

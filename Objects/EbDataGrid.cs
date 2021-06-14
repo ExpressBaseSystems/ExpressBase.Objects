@@ -1541,11 +1541,9 @@ pg.HideProperty('IsDynamic');
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [Alias("Search Method")]
         [PropertyGroup(PGConstants.SEARCH)]
-        [HideInPropertyGrid]
         [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
-        public DefaultSearchFor DefaultSearchFor { get { return this.EbPowerSelect.DefaultSearchFor; } set { this.EbPowerSelect.DefaultSearchFor = value; } }
+        public PsSearchOperators SearchOperator { get { return this.EbPowerSelect.SearchOperator; } set { this.EbPowerSelect.SearchOperator = value; } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
