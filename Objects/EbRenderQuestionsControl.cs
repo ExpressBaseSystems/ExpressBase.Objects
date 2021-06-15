@@ -20,9 +20,11 @@ namespace ExpressBase.Objects
     {
         public EbRenderQuestionsControl()
         {
-            this.TableName = "test_table";
+
         }
-        public override string TableName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+        public override string TableName { get { return "test_table"; } set { } }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -38,6 +40,10 @@ namespace ExpressBase.Objects
         public override bool DoNotPersist { get; set; }
 
         public string QuestionStr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool IsSpecialContainer { get { return true; } set { } }
 
 
         public override string GetDesignHtml()
