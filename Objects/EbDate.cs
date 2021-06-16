@@ -306,27 +306,36 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             string paramName = randomize ? (args.cField.Name + "_" + args.i) : (args.cField.Name + crudContext);
             try
             {
-                if (this.EbDateType == EbDateType.Date)
+                if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && this.IsNullable)
                 {
-                    if (this.ShowDateAs_ == DateShowFormat.Year)
-                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
-                    else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
-                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
-                    else
-                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
+                    p.Value = DBNull.Value;
+                    args.param.Add(p);
                 }
                 else
                 {
-                    if (this.EbDateType == EbDateType.DateTime)
+                    if (this.EbDateType == EbDateType.Date)
                     {
-                        DateTime dt = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                        args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
+                        if (this.ShowDateAs_ == DateShowFormat.Year)
+                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
+                        else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
+                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
+                        else
+                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                     }
-                    else//EbDateType.Time
-                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
-                }
+                    else
+                    {
+                        if (this.EbDateType == EbDateType.DateTime)
+                        {
+                            DateTime dt = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
+                        }
+                        else//EbDateType.Time
+                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
+                    }
 
-                args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
+                }
             }
             catch (Exception e)
             {

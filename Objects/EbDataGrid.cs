@@ -434,7 +434,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         public override string DisableJSfn { get { return @"
     if(!this.__IsDisable){
         let td = document.getElementById('td_' + this.EbSid_CtxId);
-        td.style.backgroundColor ='#eee';
+        td.style.backgroundColor ='rgb(238, 238, 238, 0.6)';
         td.style.pointerEvents = 'none';
         td.querySelector('.ctrl-cover').setAttribute('eb-readonly','true');
         td.querySelectorAll('input,select,button').disabled = true;
