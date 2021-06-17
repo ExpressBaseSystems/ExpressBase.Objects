@@ -583,29 +583,30 @@ namespace ExpressBase.Objects
             return this.FormData;
         }
 
-        public string ExecuteSqlValueExpression(IDatabase DataDB, Service Service, List<Param> Param, string Trigger)
+        public object ExecuteSqlValueExpression(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int ExprType)
         {
-            EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
-            EbControl TriggerCtrl = null;
-            string val = string.Empty;
-            for (int i = 0; i < Allctrls.Length; i++)
+            List<EbControl> Allctrls = this.Controls.GetAllControlsRecursively();
+            EbControl TriggerCtrl = Allctrls.Find(e => e.Name == Trigger);
+            if (TriggerCtrl == null)
+                return null;
+            object val = null;
+            EbScript ebScript = ExprType == 1 ? TriggerCtrl.DefaultValueExpression : TriggerCtrl.ValueExpr;
+            if (!string.IsNullOrWhiteSpace(ebScript?.Code) && ebScript.Lang == ScriptingLanguage.SQL)
             {
-                if (Allctrls[i].Name == Trigger)
+                try
                 {
-                    TriggerCtrl = Allctrls[i];
-                    break;
+                    DbParameter[] parameters = new DbParameter[Param.Count];
+                    for (int i = 0; i < Param.Count; i++)
+                        parameters[i] = DataDB.GetNewParameter(Param[i].Name, (EbDbTypes)Convert.ToInt32(Param[i].Type), Param[i].ValueTo);
+
+                    EbDataTable table = DataDB.DoQuery(ebScript.Code, parameters);
+                    if (table.Rows.Count > 0)
+                        val = table.Rows[0][0];
                 }
-            }
-            if (TriggerCtrl != null && TriggerCtrl.ValueExpr != null && TriggerCtrl.ValueExpr.Lang == ScriptingLanguage.SQL && !TriggerCtrl.ValueExpr.Code.IsNullOrEmpty())
-            {
-                DbParameter[] parameters = new DbParameter[Param.Count];
-                for (int i = 0; i < Param.Count; i++)
+                catch (Exception e)
                 {
-                    parameters[i] = DataDB.GetNewParameter(Param[i].Name, (EbDbTypes)Convert.ToInt32(Param[i].Type), Param[i].ValueTo);
+                    Console.WriteLine($"Exception in ExecuteSqlValueExpression: {e.Message}\n{e.StackTrace}");
                 }
-                EbDataTable table = DataDB.DoQuery(TriggerCtrl.ValueExpr.Code, parameters);
-                if (table.Rows.Count > 0)
-                    val = table.Rows[0][0].ToString();
             }
             return val;
         }
@@ -1697,6 +1698,8 @@ namespace ExpressBase.Objects
                         throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
                     if (this.FormData.IsLocked)
                         throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
+                    if (this.FormData.FormVersionId == 0)
+                        throw new FormException("Edit is blocked - Invalid Form RefId!", (int)HttpStatusCode.Forbidden, "Invalid FormVersionId", "EbWebForm -> Save");
 
                     if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))

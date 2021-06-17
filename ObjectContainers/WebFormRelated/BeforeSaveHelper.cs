@@ -362,7 +362,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (Allctrls[i] is EbAutoId)//One ctrl
                 {
                     EbAutoId _ctrl = Allctrls[i] as EbAutoId;
-                    if ((_ctrl.Pattern == null || string.IsNullOrWhiteSpace(_ctrl.Pattern.sPattern)) && 
+                    if ((_ctrl.Pattern == null || string.IsNullOrWhiteSpace(_ctrl.Pattern.sPattern)) &&
                         (string.IsNullOrEmpty(_ctrl.Script?.Code) || (_ctrl.Script?.Lang != ScriptingLanguage.CSharp && _ctrl.Script?.Lang != ScriptingLanguage.SQL)))
                         throw new FormException($"Please enter a valid pattern or script for AutoId control.");
                     if (_ctrl.Pattern.SerialLength <= 0)
@@ -418,7 +418,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             }
         }
 
-        private static void UpdateEbSid(EbWebForm _this, EbControl[] Allctrls) 
+        private static void UpdateEbSid(EbWebForm _this, EbControl[] Allctrls)
         {
             string ts = DateTime.UtcNow.ToString("yMdHms");
             if (_this.EbSid.Contains('_'))
@@ -483,12 +483,15 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     List<Param> _params = SqlHelper.GetSqlParams(code);
                     foreach (Param _p in _params)
                     {
-                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
-                        if (item.Value == null)
-                            throw new FormException($"Can't resolve {_p.Name} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
+                        if (!EbFormHelper.IsExtraSqlParam(_p.Name, _Form.TableName))
+                        {
+                            KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
+                            if (item.Value == null)
+                                throw new FormException($"Can't resolve {_p.Name} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
 
-                        dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
-                        _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
+                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
+                            _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
+                        }
                     }
                 }
             }
@@ -554,7 +557,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             if (item.Key != i)
                                 item.Value.Control.DrDependents.Add(_dict[i].Path);
                         }
-                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id" && _p.Name != _Form.TableName + "_id" && _p.Name != _dict[i].Control.Name)
+                        else if (!EbFormHelper.IsExtraSqlParam(_p.Name, _Form.TableName) && _p.Name != _dict[i].Control.Name)
                             throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[i].Control.Name}");
                     }
                 }
@@ -583,7 +586,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
             for (int i = 0; i < _dict.Count; i++)
             {
-                if (!string.IsNullOrEmpty(_dict[i].Control.DefaultValueExpression?.Code))
+                if (!string.IsNullOrWhiteSpace(_dict[i].Control.DefaultValueExpression?.Code))
                     CalcFlds.Add(i);
             }
 
@@ -609,6 +612,22 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         }
                         //if (!IsAnythingResolved)
                         //    throw new FormException($"Can't resolve some form variables in Js Default value expression of {_dict[CalcFlds[i]].Control.Name}");
+                    }
+                }
+                else if (_dict[CalcFlds[i]].Control.DefaultValueExpression.Lang == ScriptingLanguage.SQL)
+                {
+                    List<Param> _params = SqlHelper.GetSqlParams(code);
+                    foreach (Param _p in _params)
+                    {
+                        if (!EbFormHelper.IsExtraSqlParam(_p.Name, _this.TableName))
+                        {
+                            KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
+                            if (item.Value == null)
+                                throw new FormException($"Can't resolve {_p.Name} in SQL Default Value expression of {_dict[CalcFlds[i]].Control.Name}");
+                            if (CalcFlds[i] != item.Key)
+                                dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
+                            _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
+                        }
                     }
                 }
             }

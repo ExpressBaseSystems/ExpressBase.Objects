@@ -244,13 +244,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string Trigger { get; set; }
+
+        [DataMember(Order = 4)]
+        public int ExprType { get; set; }
     }
 
     [DataContract]
     public class ExecuteSqlValueExprResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public string Data { get; set; }
+        public object Result { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
