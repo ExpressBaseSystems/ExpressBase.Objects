@@ -626,7 +626,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                                 throw new FormException($"Can't resolve {_p.Name} in SQL Default Value expression of {_dict[CalcFlds[i]].Control.Name}");
                             if (CalcFlds[i] != item.Key)
                                 dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
-                            _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
+                            if (!_dict[CalcFlds[i]].Control.ValExpParams.Contains(item.Value.Path))
+                                _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
                         }
                     }
                 }
