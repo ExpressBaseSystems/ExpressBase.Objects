@@ -757,6 +757,7 @@ else// PS
     <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
             <div class='DDclose'><i class='fa fa-close' aria-hidden='true'></i></div>
+            <div class='DDrefresh'><i class='fa fa-refresh' aria-hidden='true'></i></div>
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
@@ -813,6 +814,7 @@ else// PS
     <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
             <div class='DDclose'><i class='fa fa-close' aria-hidden='true'></i></div>
+            <div class='DDrefresh'><i class='fa fa-refresh' aria-hidden='true'></i></div>
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
