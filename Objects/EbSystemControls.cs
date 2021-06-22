@@ -35,6 +35,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript ValueExpr { get; set; }
 
+        public override bool SelfTrigger { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript DefaultValueExpression { get; set; }
 
@@ -380,6 +382,7 @@ namespace ExpressBase.Objects
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+        public override bool SelfTrigger { get; set; }
 
         //EbSysCreatedBy
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
@@ -593,6 +596,7 @@ namespace ExpressBase.Objects
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+        public override bool SelfTrigger { get; set; }
 
         //EbSysCreatedAt
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
@@ -757,6 +761,7 @@ namespace ExpressBase.Objects
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+        public override bool SelfTrigger { get; set; }
 
         //EbSysModifiedBy
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
@@ -934,6 +939,7 @@ namespace ExpressBase.Objects
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+        public override bool SelfTrigger { get; set; }
 
         //EbSysModifiedAt
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)

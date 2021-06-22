@@ -146,7 +146,7 @@ namespace ExpressBase.Objects
         public override string VersionNumber { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        public override bool HideInMenu { get; set; }
+        public bool HideInMenu { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]

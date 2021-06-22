@@ -23,6 +23,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbScript ValueExpr { get; set; }
 
+        public override bool SelfTrigger { get; set; }
+
         [HideInPropertyGrid]
         public override EbScript DefaultValueExpression { get; set; }
 

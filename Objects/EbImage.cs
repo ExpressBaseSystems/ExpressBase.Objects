@@ -70,6 +70,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public override EbScript ValueExpr { get; set; }
 
+        public override bool SelfTrigger { get; set; }
+
         public override string UIchangeFns
         {
             get

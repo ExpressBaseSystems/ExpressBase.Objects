@@ -34,9 +34,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Calendar)]
         public override string DisplayName { get; set; }
 
-        [HideForUser]
-        [EnableInBuilder(BuilderType.Calendar)]
-        public override bool HideInMenu { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.Calendar)]

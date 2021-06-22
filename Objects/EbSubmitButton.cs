@@ -71,6 +71,8 @@ namespace ExpressBase.Objects.Objects
         [HideInPropertyGrid]
         public override EbScript ValueExpr { get; set; }
 
+        public override bool SelfTrigger { get; set; }
+
         [HideInPropertyGrid]
         public override string ToolTipText { get; set; }
 

@@ -40,6 +40,8 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.SqlJob)]
     public class EbSqlJob : EbSqlJobWrapper, IEBRootObject
     {
+        public bool HideInMenu { get; set; }
+
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]

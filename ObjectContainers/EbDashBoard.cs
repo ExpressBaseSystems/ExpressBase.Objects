@@ -62,10 +62,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string DisplayName { get; set; }
         
-        [HideForUser]
-        [EnableInBuilder(BuilderType.DashBoard)]
-        public override bool HideInMenu { get; set; }
-
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Description { get; set; }
@@ -90,6 +86,11 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.DashBoard)]
     public class EbDashBoard : EbDashBoardWraper, IEBRootObject
     {
+        [HideForUser]
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public bool HideInMenu { get; set; }
+
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         [DefaultPropValue("2")]

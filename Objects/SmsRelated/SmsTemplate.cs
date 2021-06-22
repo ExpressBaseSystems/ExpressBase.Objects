@@ -23,6 +23,8 @@ namespace ExpressBase.Objects.Objects.SmsRelated
     [EnableInBuilder(BuilderType.SmsBuilder)]
     public class EbSmsTemplate : EbSmsTemplateBase,IEBRootObject
     {
+        public bool HideInMenu { get; set; }
+
         [EnableInBuilder(BuilderType.SmsBuilder)]
         [HideInPropertyGrid]
         public override string RefId { get; set; }

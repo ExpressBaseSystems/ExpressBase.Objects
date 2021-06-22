@@ -52,6 +52,8 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.ApiBuilder)]
     public class EbApi : EbApiWrapper, IEBRootObject
     {
+        public bool HideInMenu { get; set; }
+
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [HideInPropertyGrid]
         public override string RefId { get; set; }

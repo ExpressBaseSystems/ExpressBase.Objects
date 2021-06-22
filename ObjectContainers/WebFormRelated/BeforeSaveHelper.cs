@@ -470,7 +470,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                             if (Regex.IsMatch(code, regex))
                             {
-                                dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                                if (CalcFlds[i] != j || _dict[j].Control.SelfTrigger)
+                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
                                 IsAnythingResolved = true;
                             }
                         }
@@ -488,8 +489,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
                             if (item.Value == null)
                                 throw new FormException($"Can't resolve {_p.Name} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
-
-                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
+                            
+                            if (CalcFlds[i] != item.Key || _dict[item.Key].Control.SelfTrigger)
+                                dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
                             _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
                         }
                     }

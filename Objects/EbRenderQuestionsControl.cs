@@ -135,6 +135,7 @@ namespace ExpressBase.Objects
         [HelpText("Define how Data Id of this field should be calculated.")]
         public override EbScript ValueExpr { get; set; }
 
+        public override bool SelfTrigger { get; set; }
 
 
         //public void InitFromDataBase(JsonServiceClient ServiceClient)

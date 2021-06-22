@@ -36,6 +36,8 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.EmailBuilder)]
     public class EbEmailTemplate : EbEmailTemplateBase,IEBRootObject
     {
+        public bool HideInMenu { get; set; }
+
         [EnableInBuilder(BuilderType.EmailBuilder)]
         public override string DisplayName { get; set; }
 

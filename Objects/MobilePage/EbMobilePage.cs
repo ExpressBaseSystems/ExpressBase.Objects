@@ -27,8 +27,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         public override string DisplayName { get; set; }
         
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public override bool HideInMenu { get; set; }
+        public bool HideInMenu { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Core")]

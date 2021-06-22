@@ -29,6 +29,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<Param> InputParams { get; set; }
 
+        public bool HideInMenu { get; set; }
+
         public virtual List<Param> GetParams(RedisClient _redis)
         {
             return new List<Param>();
