@@ -1498,15 +1498,6 @@ pg.HideProperty('IsDynamic');
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
-        [OnChangeExec(@"
-            if (this.IsInsertable === true ){
-	            pg.ShowProperty('FormRefId');
-	            pg.ShowProperty('OpenInNewTab');
-            } 
-            else {
-	            pg.HideProperty('FormRefId');
-	            pg.HideProperty('OpenInNewTab');
-            }")]
         [PropertyPriority(98)]
         public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
 

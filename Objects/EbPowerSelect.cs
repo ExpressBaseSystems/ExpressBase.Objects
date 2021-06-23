@@ -353,15 +353,6 @@ else
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
-        [OnChangeExec(@"
-            if (this.IsInsertable === true ){
-	            pg.ShowProperty('FormRefId');
-	            pg.ShowProperty('OpenInNewTab');
-            } 
-            else {
-	            pg.HideProperty('FormRefId');
-	            pg.HideProperty('OpenInNewTab');
-            }")]
         public bool IsInsertable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -750,7 +741,7 @@ else// PS
             if (this.DisplayMembers != null)
             {
                 return @"
-<div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;'>    
+<div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;' form-link='@form-link@'>    
     @addbtn@
     <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
@@ -770,7 +761,8 @@ else// PS
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
     .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn' id='" + EbSid_CtxId + "_addbtn'><i class='fa fa-plus' aria-hidden='true'></i></div>") : string.Empty)
-    .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
+    .Replace("@tooltipText@", this.ToolTipText ?? string.Empty)
+    .Replace("@form-link@", string.IsNullOrWhiteSpace(this.FormRefId) ? "false" : "true");
             }
             else
                 return string.Empty;
