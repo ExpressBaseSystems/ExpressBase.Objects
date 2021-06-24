@@ -392,29 +392,43 @@ WHERE
             string _qry;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             EbDataPusherConfig conf = _this.DataPusherConfig;
+            string currencyCols = string.Empty, currencyVals = string.Empty;
+            TableSchema _table = _this.FormSchema.Tables.Find(e => e.TableName == tblName);
+            if (_table != null)
+            {
+                if (_table.Columns.Exists(e => !e.Control.DoNotPersist && !e.Control.IsSysControl &&
+                ((e.Control is EbNumeric numCtrl && numCtrl.InputMode == NumInpMode.Currency) ||
+                (e.Control is EbDGNumericColumn numCol && numCol.InputMode == NumInpMode.Currency))))
+                {
+                    currencyCols = $", {ebs[SystemColumns.eb_currency_id]}, {ebs[SystemColumns.eb_currency_xid]}, {ebs[SystemColumns.eb_xrate1]}, {ebs[SystemColumns.eb_xrate2]}";
+                    currencyVals = $", 1, 'AED', 1, 1";
+                }
+            }
 
             if (tblName.Equals(_this.TableName))
             {
                 if (conf == null)
                 {
-                    _qry = string.Format("INSERT INTO {0} ({8} {1}, {2}, {3}, {4}, {5}) VALUES ({9} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id); ",
-                        tblName,
-                        ebs[SystemColumns.eb_created_by],
-                        ebs[SystemColumns.eb_created_at],
-                        ebs[SystemColumns.eb_loc_id],
-                        ebs[SystemColumns.eb_ver_id],
-                        ebs[SystemColumns.eb_signin_log_id],
-                        DataDB.EB_CURRENT_TIMESTAMP,
-                        _this.TableName,
-                        "{0}",
-                        "{1}");
+                    _qry = string.Format("INSERT INTO {0} ({10} {1}, {2}, {3}, {4}, {5}{8}) VALUES ({11} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id{9}); ",
+                        tblName,//0
+                        ebs[SystemColumns.eb_created_by],//1
+                        ebs[SystemColumns.eb_created_at],//2
+                        ebs[SystemColumns.eb_loc_id],//3
+                        ebs[SystemColumns.eb_ver_id],//4
+                        ebs[SystemColumns.eb_signin_log_id],//5
+                        DataDB.EB_CURRENT_TIMESTAMP,//6
+                        _this.TableName,//7
+                        currencyCols,//8
+                        currencyVals,//9
+                        "{0}",//10
+                        "{1}");//11
                 }
                 else
                 {
                     string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
-                    _qry = string.Format(@"INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {9}_id, {5}, {6}, {7}, {8}, {15}, {16}) 
-                                    VALUES ({19} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}); ",
+                    _qry = string.Format(@"INSERT INTO {0} ({20} {1}, {2}, {3}, {4}, {9}_id, {5}, {6}, {7}, {8}, {15}, {16}{18}) 
+                                    VALUES ({21} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}{19}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -433,8 +447,10 @@ WHERE
                         ebs[SystemColumns.eb_src_ver_id],//15
                         ebs[SystemColumns.eb_ro],//16
                         ebs.GetBoolTrue(SystemColumns.eb_ro),//17
-                        "{0}",//18
-                        "{1}");//19
+                        currencyCols,//18
+                        currencyVals,//19
+                        "{0}",//20
+                        "{1}");//21
                 }
 
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
@@ -455,8 +471,8 @@ WHERE
             else
             {
                 string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"@{_this.TableName}_id";
-                _qry = $@"INSERT INTO {tblName} ({{0}} {ebs[SystemColumns.eb_created_by]}, {ebs[SystemColumns.eb_created_at]}, {ebs[SystemColumns.eb_loc_id]}, {_this.TableName}_id, {ebs[SystemColumns.eb_signin_log_id]}) 
-                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , {srcRef}, @eb_signin_log_id); ";
+                _qry = $@"INSERT INTO {tblName} ({{0}} {ebs[SystemColumns.eb_created_by]}, {ebs[SystemColumns.eb_created_at]}, {ebs[SystemColumns.eb_loc_id]}, {_this.TableName}_id, {ebs[SystemColumns.eb_signin_log_id]}{currencyCols}) 
+                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , {srcRef}, @eb_signin_log_id{currencyVals}); ";
                 if (isIns && DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
             }

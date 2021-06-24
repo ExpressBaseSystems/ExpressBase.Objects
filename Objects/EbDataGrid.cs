@@ -653,6 +653,10 @@ else {
         [OnChangeUIFunction("Common.CONTROL_ICON")]
         public bool HideInputIcon { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        public NumInpMode InputMode { get; set; }
+
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
