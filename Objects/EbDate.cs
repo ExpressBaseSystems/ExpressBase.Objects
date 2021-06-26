@@ -26,6 +26,13 @@ namespace ExpressBase.Objects
         DateTime = 6,
     }
 
+    public enum DateRestrictionRule
+    {
+        None = 0,
+        FinancialYear = 1,
+        ActivePeriod = 2
+    }
+
     public enum TimeShowFormat
     {
         Hour_Minute_Second_12hrs,
@@ -116,6 +123,10 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         public EbDateType EbDateType { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        public DateRestrictionRule RestrictionRule { get; set; }
 
         //[EnableInBuilder(BuilderType.BotForm)]
         public DateTime Min { get; set; }

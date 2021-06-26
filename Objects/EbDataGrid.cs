@@ -835,6 +835,14 @@ return '✖';
             set { this.EbDate.EbDateType = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        public DateRestrictionRule RestrictionRule
+        {
+            get { return this.EbDate.RestrictionRule; }
+            set { this.EbDate.RestrictionRule = value; }
+        }
+
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
