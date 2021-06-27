@@ -2789,6 +2789,37 @@ namespace ExpressBase.Objects
             return _perm;
         }
 
+        public void DoRequiredCheck(bool IsMasterForm)
+        {
+            if (this.DataPusherConfig?.AllowPush == false)
+                return;
+
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                if (!(this.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0))
+                    continue;
+
+                foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Required && !e.Control.BypassParameterization))
+                {
+                    foreach (SingleRow Row in Table)
+                    {
+                        if (Row.IsDelete)
+                            continue;
+                        SingleColumn cField = Row.GetColumn(_column.ColumnName);
+                        if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+                        {
+                            string msg = $" is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
+                            if (_table.TableType == WebFormTableTypes.Grid)
+                                msg = $"{(cField.Control as EbDGColumn).Title ?? cField.Control.Name} in {_table.Title ?? _table.ContainerName}";
+                            else
+                                msg = cField.Control.Label ?? cField.Control.Name + msg;
+                            throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebForm -> DoRequiredCheck");
+                        }
+                    }
+                }
+            }
+        }
+
         public void AfterRedisGet(Service service)
         {
             EbFormHelper.AfterRedisGet(this, service.Redis, null, service);

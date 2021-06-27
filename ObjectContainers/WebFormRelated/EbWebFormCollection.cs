@@ -37,6 +37,7 @@ namespace ExpressBase.Objects
 
                 if (WebForm.DataPusherConfig?.AllowPush == false)
                     continue;
+                WebForm.DoRequiredCheck(WebForm == MasterForm);
                 if (!(WebForm.FormData.MultipleTables.ContainsKey(WebForm.FormSchema.MasterTable) && WebForm.FormData.MultipleTables[WebForm.FormSchema.MasterTable].Count > 0))
                 {
                     string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
@@ -83,6 +84,7 @@ namespace ExpressBase.Objects
             foreach (EbWebForm WebForm in this)
             {
                 args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
+                WebForm.DoRequiredCheck(WebForm == MasterForm);
 
                 foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
                 {
@@ -276,6 +278,29 @@ namespace ExpressBase.Objects
                             mstrFormCtrls++;
                     }
                 }
+
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Grid))
+                {
+                    if (!(WebForm.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0))
+                        continue;
+
+                    foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique))
+                    {
+                        List<string> Vals = new List<string>();
+                        foreach (SingleRow Row in Table)
+                            CheckDGUniqe(Row, _column, _table, Vals, WebForm);
+
+                        if (WebForm.FormDataBackup != null && WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
+                        {
+                            foreach (SingleRow RowBkUp in TableBkUp)
+                            {
+                                SingleRow Row = Table.Find(e => e.RowId == RowBkUp.RowId);
+                                if (Row == null)
+                                    CheckDGUniqe(RowBkUp, _column, _table, Vals, WebForm);
+                            }
+                        }
+                    }
+                }
             }
 
             if (fullQuery != string.Empty)
@@ -293,5 +318,23 @@ namespace ExpressBase.Objects
                 }
             }
         }
+
+        private void CheckDGUniqe(SingleRow Row, ColumnSchema _column, TableSchema _table, List<string> Vals, EbWebForm WebForm)
+        {
+            if (Row.IsDelete)
+                return;
+            SingleColumn cField = Row.GetColumn(_column.ColumnName);
+            if (cField == null || cField.Value == null || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+                return;
+            if (Vals.Contains(Convert.ToString(cField.Value)))
+            {
+                string msg2 = $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
+                string msg1 = $"{(cField.Control as EbDGColumn).Title ?? cField.Control.Name} in {_table.Title ?? _table.ContainerName} must be unique" + msg2;
+                msg2 = $"DG column is not unique. Control name: {_table.ContainerName}.{cField.Control.Name}" + msg2;
+                throw new FormException(msg1, (int)HttpStatusCode.BadRequest, msg2, "EbWebFormCollection -> ExecUniqueCheck");
+            }
+            Vals.Add(Convert.ToString(cField.Value));
+        }
+
     }
 }

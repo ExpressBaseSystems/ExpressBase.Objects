@@ -16,6 +16,8 @@ using ExpressBase.Security;
 using System.Globalization;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Constants;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -315,47 +317,70 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         public bool ParameterizeControl(ParameterizeCtrl_Params args, bool randomize, string crudContext)
         {
             string paramName = randomize ? (args.cField.Name + "_" + args.i) : (args.cField.Name + crudContext);
-            try
+            //try
+            //{
+            if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && this.IsNullable)
             {
-                if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && this.IsNullable)
-                {
-                    DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
-                    p.Value = DBNull.Value;
-                    args.param.Add(p);
-                }
-                else
-                {
-                    if (this.EbDateType == EbDateType.Date)
-                    {
-                        if (this.ShowDateAs_ == DateShowFormat.Year)
-                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
-                        else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
-                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
-                        else
-                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                    }
-                    else
-                    {
-                        if (this.EbDateType == EbDateType.DateTime)
-                        {
-                            DateTime dt = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
-                        }
-                        else//EbDateType.Time
-                            args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
-                    }
-
-                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
-                }
-            }
-            catch (Exception e)
-            {
-                if (!this.IsNullable)
-                    Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {args.cField.Name}\nValue : {args.cField.Value}\nMessage : {e.Message}"); ;
                 DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
             }
+            else
+            {
+                if (this.EbDateType == EbDateType.Date)
+                {
+                    if (this.ShowDateAs_ == DateShowFormat.Year)
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
+                    else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
+                    else
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+                    if (this.RestrictionRule == DateRestrictionRule.FinancialYear || this.RestrictionRule == DateRestrictionRule.ActivePeriod)
+                    {
+                        EbFinancialYears fys = (args.webForm as EbWebForm)?.SolutionObj?.FinancialYears;
+                        if (fys != null && fys.List.Count > 0)
+                        {
+                            DateTime Date = Convert.ToDateTime(args.cField.Value);
+                            bool DateIsOk = false, IsSysUser = args.usr.RoleIds.Exists(e => e < 100);
+                            foreach (EbFinancialYear fy in fys.List)
+                            {
+                                if ((!fy.Locked || IsSysUser) && ((this.RestrictionRule == DateRestrictionRule.FinancialYear && fy.FyStart <= Date && fy.FyEnd >= Date) ||
+                                                                    (this.RestrictionRule == DateRestrictionRule.ActivePeriod && fy.ActStart <= Date && fy.ActEnd >= Date)))
+                                {
+                                    DateIsOk = true;
+                                    break;
+                                }
+                            }
+                            if (!DateIsOk)
+                            {
+                                throw new FormException($"{this.Label ?? this.Name} must be between Financial years", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (this.EbDateType == EbDateType.DateTime)
+                    {
+                        DateTime dt = DateTime.ParseExact(args.cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
+                    }
+                    else//EbDateType.Time
+                        args.cField.Value = DateTime.ParseExact(args.cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
+                }
+
+                args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
+            }
+            //}
+            //catch (Exception e)
+            //{
+            //    if (!this.IsNullable)
+            //        Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {args.cField.Name}\nValue : {args.cField.Value}\nMessage : {e.Message}"); ;
+            //    DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
+            //    p.Value = DBNull.Value;
+            //    args.param.Add(p);
+            //}
 
             if (args.ins)
             {
