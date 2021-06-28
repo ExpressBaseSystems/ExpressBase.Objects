@@ -343,10 +343,13 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                         {
                             DateTime Date = Convert.ToDateTime(args.cField.Value);
                             bool DateIsOk = false, IsSysUser = args.usr.RoleIds.Exists(e => e < 100);
+                            string finStartEnd = null, shtDtPtn = args.usr.Preference.GetShortDatePattern();
                             foreach (EbFinancialYear fy in fys.List)
                             {
-                                if ((!fy.Locked || IsSysUser) && ((this.RestrictionRule == DateRestrictionRule.FinancialYear && fy.FyStart <= Date && fy.FyEnd >= Date) ||
-                                                                    (this.RestrictionRule == DateRestrictionRule.ActivePeriod && fy.ActStart <= Date && fy.ActEnd >= Date)))
+                                if (finStartEnd == null && !fy.Locked)
+                                    finStartEnd = GetFyDate(this.RestrictionRule, fy, true).ToString(shtDtPtn, CultureInfo.InvariantCulture) + " and " + GetFyDate(this.RestrictionRule, fy, false).ToString(shtDtPtn, CultureInfo.InvariantCulture);
+
+                                if ((!fy.Locked || IsSysUser) && GetFyDate(this.RestrictionRule, fy, true) <= Date && GetFyDate(this.RestrictionRule, fy, false) >= Date)
                                 {
                                     DateIsOk = true;
                                     break;
@@ -354,7 +357,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                             }
                             if (!DateIsOk)
                             {
-                                throw new FormException($"{this.Label ?? this.Name} must be between Financial years", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
+                                throw new FormException($"{this.Label ?? this.Name} must be between {finStartEnd ?? "Financial years"}", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
                             }
                         }
                     }
@@ -391,6 +394,15 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                 args._colvals += string.Concat(args.cField.Name, "=@", paramName, ", ");
             args.i++;
             return true;
+        }
+
+        private static DateTime GetFyDate(DateRestrictionRule rule, EbFinancialYear fy, bool IsStart)
+        {
+            if (rule == DateRestrictionRule.FinancialYear)
+                return IsStart ? fy.FyStart : fy.FyEnd;
+            if (rule == DateRestrictionRule.ActivePeriod)
+                return IsStart ? fy.ActStart : fy.ActEnd;
+            throw new FormException($"DateRestrictionRule {rule} is not valid in the current context", (int)HttpStatusCode.BadRequest, $"DateRestrictionRule must be FinancialYear/ActivePeriod", "EbDate -> GetFyDate");
         }
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)

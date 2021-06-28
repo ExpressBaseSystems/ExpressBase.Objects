@@ -2808,11 +2808,11 @@ namespace ExpressBase.Objects
                         SingleColumn cField = Row.GetColumn(_column.ColumnName);
                         if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                         {
-                            string msg = $" is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
+                            string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
                             if (_table.TableType == WebFormTableTypes.Grid)
-                                msg = $"{(cField.Control as EbDGColumn).Title ?? cField.Control.Name} in {_table.Title ?? _table.ContainerName}";
+                                msg = $"'{(cField.Control as EbDGColumn).Title ?? cField.Control.Name}' in {_table.Title ?? _table.ContainerName} Grid {msg}";
                             else
-                                msg = cField.Control.Label ?? cField.Control.Name + msg;
+                                msg = $"'{cField.Control.Label ?? cField.Control.Name}' {msg}";
                             throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebForm -> DoRequiredCheck");
                         }
                     }

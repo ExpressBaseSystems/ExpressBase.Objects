@@ -329,7 +329,7 @@ namespace ExpressBase.Objects
             if (Vals.Contains(Convert.ToString(cField.Value)))
             {
                 string msg2 = $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
-                string msg1 = $"{(cField.Control as EbDGColumn).Title ?? cField.Control.Name} in {_table.Title ?? _table.ContainerName} must be unique" + msg2;
+                string msg1 = $"Value in the '{(cField.Control as EbDGColumn).Title ?? cField.Control.Name}' column ({_table.Title ?? _table.ContainerName} Grid) must be unique" + msg2;
                 msg2 = $"DG column is not unique. Control name: {_table.ContainerName}.{cField.Control.Name}" + msg2;
                 throw new FormException(msg1, (int)HttpStatusCode.BadRequest, msg2, "EbWebFormCollection -> ExecUniqueCheck");
             }

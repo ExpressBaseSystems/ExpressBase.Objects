@@ -28,6 +28,14 @@ namespace ExpressBase.Objects
         public static List<string> DiscoverRelatedRefids(EbControlContainer _this)
         {
             List<string> refids = new List<string>();
+            if (_this is EbWebForm webForm)
+            {
+                foreach (EbDataPusher pusher in webForm.DataPushers)
+                {
+                    if (!string.IsNullOrWhiteSpace(pusher.FormRefId))
+                        refids.Add(pusher.FormRefId);
+                }
+            }
             EbControl[] _flatCtrls = new List<EbControl>() { _this }.FlattenAllEbControls();
             for (int i = 0; i < _flatCtrls.Length; i++)
             {
@@ -69,6 +77,19 @@ namespace ExpressBase.Objects
 
         public static void ReplaceRefid(EbControlContainer _this, Dictionary<string, string> RefidMap)
         {
+            if (_this is EbWebForm webForm)
+            {
+                foreach (EbDataPusher pusher in webForm.DataPushers)
+                {
+                    if (!string.IsNullOrWhiteSpace(pusher.FormRefId))
+                    {
+                        if (RefidMap.ContainsKey(pusher.FormRefId))
+                            pusher.FormRefId = RefidMap[pusher.FormRefId];
+                        else
+                            pusher.FormRefId = string.Empty;
+                    }
+                }
+            }
             EbControl[] _flatCtrls = new List<EbControl>() { _this }.FlattenAllEbControls();
             for (int i = 0; i < _flatCtrls.Length; i++)
             {
