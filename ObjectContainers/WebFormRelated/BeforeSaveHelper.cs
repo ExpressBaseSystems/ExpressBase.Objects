@@ -256,7 +256,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (Allctrls[i] is IEbPowerSelect)
                 {
                     IEbPowerSelect _ctrl = Allctrls[i] as IEbPowerSelect;
-                    string _label = (Allctrls[i] as EbControl).Label;
+                    string _label = (Allctrls[i] is EbDGPowerSelectColumn _dgCtrl) ? _dgCtrl.Title ?? _dgCtrl.Name : (Allctrls[i] as EbControl).Label ?? (Allctrls[i] as EbControl).Name;
                     if (string.IsNullOrEmpty(_ctrl.DataSourceId) && !_ctrl.IsDataFromApi)
                         throw new FormException("Set Data Reader for " + _label);
                     if (string.IsNullOrEmpty(_ctrl.Url) && _ctrl.IsDataFromApi)

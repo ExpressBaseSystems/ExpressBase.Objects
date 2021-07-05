@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -281,6 +282,9 @@ namespace ExpressBase.Objects
             _this.FormCollection = new EbWebFormCollection(_this);
             if (_this.DataPushers != null)
             {
+                if (_this.DataPushers.Exists(e => !(e is EbFormDataPusher || e is EbApiDataPusher || e is EbBatchFormDataPusher)))
+                    throw new FormException("DataPusher config is invalid! Contact Admin.", (int)HttpStatusCode.InternalServerError, "Check the type of all DataPushers. [Save the form in dev side]", "EbFormHelper -> InitDataPushers");
+
                 foreach (EbFormDataPusher pusher in _this.DataPushers.FindAll(e => e is EbFormDataPusher))
                 {
                     EbWebForm _form = GetEbObject<EbWebForm>(pusher.FormRefId, client, Redis, service);

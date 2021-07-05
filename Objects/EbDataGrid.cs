@@ -1685,6 +1685,11 @@ pg.HideProperty('IsDynamic');
             this.DBareHtml = this.GetBareHtml();
         }
 
+        public void UpdateParamsMeta(Service Service, IRedisClient Redis)
+        {
+            this.EbPowerSelect.UpdateParamsMeta(Service, Redis);
+        }
+
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
         {
             this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis, Allctrls);
@@ -1692,7 +1697,7 @@ pg.HideProperty('IsDynamic');
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
-            return this.EbPowerSelect.GetSelectQuery(DataDB, service, Col, Tbl, _id, masterTbl);
+            return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, true);
         }
 
         public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
