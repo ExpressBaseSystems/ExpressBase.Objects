@@ -79,5 +79,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string phone_no = "phone_no";
         public const string otp = "otp";
         public const string timestamp = "timestamp";
+        //PowerSelect
+        public const string __ebedt = "__ebedt";//ebEdited
     }
 }

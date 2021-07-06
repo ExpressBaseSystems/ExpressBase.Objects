@@ -49,8 +49,9 @@ namespace ExpressBase.Objects.WebFormRelated
 
             if (_this.DataPushers?.Count > 0)
             {
-                foreach (EbDataPusher dp in _this.DataPushers)
+                for (int i = 0; i < _this.DataPushers.Count; i++)
                 {
+                    EbDataPusher dp = _this.DataPushers[i];
                     if (dp is EbApiDataPusher _apiDp)
                     {
                         if (string.IsNullOrEmpty(_apiDp.ApiRefId))
@@ -58,8 +59,6 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     else
                     {
-                        //Can convert to EbFormDataPusher here!!!
-
                         if (string.IsNullOrEmpty(dp.FormRefId))
                             throw new FormException($"Required 'Form ref id' for data pusher");
 
@@ -67,6 +66,22 @@ namespace ExpressBase.Objects.WebFormRelated
                         {
                             if (string.IsNullOrWhiteSpace(_batchdp.SourceDG))
                                 throw new FormException($"Required 'Source datagrid' for data pusher");
+                        }
+                        else if (!(dp is EbFormDataPusher))
+                        {
+                            //Converting to EbFormDataPusher!!! Old objects may contain 'EbDataPusher' type (base type)
+
+                            _this.DataPushers[i] = new EbFormDataPusher()
+                            {
+                                EbSid = dp.EbSid,
+                                FormRefId = dp.FormRefId,
+                                Json = dp.Json,
+                                MultiPushIdType = Common.MultiPushIdTypes.Default,
+                                Name = dp.Name,
+                                PushOnlyIf = dp.PushOnlyIf,
+                                SkipLineItemIf = dp.SkipLineItemIf
+                            };
+                            dp = _this.DataPushers[i];
                         }
                     }
                     if (string.IsNullOrEmpty(dp.Json))
@@ -256,7 +271,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (Allctrls[i] is IEbPowerSelect)
                 {
                     IEbPowerSelect _ctrl = Allctrls[i] as IEbPowerSelect;
-                    string _label = (Allctrls[i] as EbControl).Label;
+                    string _label = (Allctrls[i] is EbDGPowerSelectColumn _dgCtrl) ? _dgCtrl.Title ?? _dgCtrl.Name : (Allctrls[i] as EbControl).Label ?? (Allctrls[i] as EbControl).Name;
                     if (string.IsNullOrEmpty(_ctrl.DataSourceId) && !_ctrl.IsDataFromApi)
                         throw new FormException("Set Data Reader for " + _label);
                     if (string.IsNullOrEmpty(_ctrl.Url) && _ctrl.IsDataFromApi)
@@ -489,7 +504,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
                             if (item.Value == null)
                                 throw new FormException($"Can't resolve {_p.Name} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
-                            
+
                             if (CalcFlds[i] != item.Key || _dict[item.Key].Control.SelfTrigger)
                                 dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
                             _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);

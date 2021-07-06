@@ -20,6 +20,7 @@ using ExpressBase.Common.Constants;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Text.RegularExpressions;
+using ExpressBase.Objects.WebFormRelated;
 
 namespace ExpressBase.Objects
 {
@@ -825,6 +826,19 @@ else// PS
                 return string.Empty;
         }
 
+        public void UpdateParamsMeta(Service Service, IRedisClient Redis)
+        {
+            if (!this.IsDataFromApi)
+            {
+                EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, null, Redis, Service);
+                this.ParamsList = DrObj.GetParams(Redis as RedisClient);
+            }
+            else
+            {
+                this.ParamsList = new List<Param>();
+            }
+        }
+
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
         {
             if (this.IsDataFromApi)
@@ -851,7 +865,7 @@ else// PS
                                 throw new FormException($"Invalid control name '{p.ControlName}' for 'data api parameters' of power select control({this.Label}).");
                             this.ParamsList.Add(new Param() { Name = p.ControlName, Type = Convert.ToString((int)paramCtrl.EbDbType) });
                         }
-                    }                        
+                    }
                 }
             }
             else
@@ -910,10 +924,15 @@ else// PS
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
-            if (this.IsDataFromApi)
+            return EbPowerSelect.GetSelectQuery(this, DataDB, service, Col, Tbl, _id, masterTbl, false);
+        }
+
+        public static string GetSelectQuery(EbPowerSelect _this, IDatabase DataDB, Service service, string Col, string Tbl, string _id, string masterTbl, bool IsDgPs)
+        {
+            if (_this.IsDataFromApi)
                 return string.Empty;
 
-            string Sql = this.GetSql(service);
+            string Sql = _this.GetSql(service);
 
             if (Tbl == null || _id == null)// prefill mode
             {
@@ -922,13 +941,13 @@ else// PS
                 {
                     s = string.Format(@"SELECT __A.* FROM ({0}) __A 
                                     WHERE FIND_IN_SET(__A.{1}, '{2}');",
-                                                        Sql, this.ValueMember.Name, Col);
+                                                        Sql, _this.ValueMember.Name, Col);
                 }
                 else
                 {
                     s = string.Format(@"SELECT DISTINCT __A.* FROM ({0}) __A 
                                     WHERE __A.{1} = ANY(STRING_TO_ARRAY('{2}'::TEXT, ',')::INT[]);",
-                                                        Sql, this.ValueMember.Name, Col);
+                                                        Sql, _this.ValueMember.Name, Col);
                 }
                 return s;
             }
@@ -940,13 +959,22 @@ else// PS
                 {
                     s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
                                     WHERE FIND_IN_SET(__A.{2}, __B.{3}) AND __B.{4} = :{5}_id;",
-                                         Sql, Tbl, this.ValueMember.Name, Col, _id, masterTbl);
+                                         Sql, Tbl, _this.ValueMember.Name, Col, _id, masterTbl);
                 }
                 else
                 {
+                    if (IsDgPs && _this.ParamsList.Exists(e => e.Name == _this.Name))
+                    {
+                        if (Sql.Contains(":" + _this.Name))
+                            Sql = Sql.Replace(":" + _this.Name, $"ANY(STRING_TO_ARRAY(:{_this.Name}{FormConstants.__ebedt}, ',')::INT[])");
+                        if (Sql.Contains("@" + _this.Name))
+                            Sql = Sql.Replace("@" + _this.Name, $"ANY(STRING_TO_ARRAY(@{_this.Name}{FormConstants.__ebedt}, ',')::INT[])");
+                    }
+
                     s = string.Format(@"SELECT DISTINCT __A.* FROM ({0}) __A, {1} __B
                                     WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :{5}_id;",
-                                        Sql, Tbl, this.ValueMember.Name, Col, _id, masterTbl);
+                                        Sql, Tbl, _this.ValueMember.Name, Col, _id, masterTbl);
+                    //Tbl = "invtrans_lines", Col = "itemmaster1_id", _id = "invtrans_id", master = "invtrans"
                 }
                 return s;
             }
@@ -976,8 +1004,7 @@ else// PS
             if (Sql.LastIndexOf(";") == Sql.Length - 1)
                 Sql = Sql.Substring(0, Sql.Length - 1);
 
-            List<Param> _Params = dr.GetParams(service.Redis as RedisClient);
-            foreach(Param _P in _Params)
+            foreach (Param _P in this.ParamsList)
             {
                 if (!param.Exists(e => e.ParameterName == _P.Name))
                 {

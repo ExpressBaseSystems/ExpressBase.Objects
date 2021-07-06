@@ -540,7 +540,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 _form.UserObj = _this.UserObj;
                 _form.SolutionObj = _this.SolutionObj;
                 _form.LocationId = _this.LocationId;
-                _form.AfterRedisGet(service);
+                _form.AfterRedisGet_All(service);
                 TableSchema _table = _this.FormSchema.Tables.Find(e => e.ContainerName == batchDp.SourceDG);
                 SingleTable Table = _this.FormData.MultipleTables[_table.TableName];
                 SingleTable TableBkUp = in_data.MultipleTables.ContainsKey(_table.TableName) ? in_data.MultipleTables[_table.TableName] : null;

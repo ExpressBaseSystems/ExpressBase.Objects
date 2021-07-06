@@ -318,7 +318,7 @@ namespace ExpressBase.Objects
                     _form.RefId = psCtrl.DataImportId;
                     _form.UserObj = this.UserObj;
                     _form.SolutionObj = this.SolutionObj;
-                    _form.AfterRedisGet(Service);
+                    _form.AfterRedisGet_All(Service);
                     _form.TableRowId = Convert.ToInt32(psColumn.Value);
                     _form.RefreshFormData(DataDB, Service);
                     _form.FormatImportData(DataDB, Service, this);
@@ -443,7 +443,7 @@ namespace ExpressBase.Objects
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
                 _form.SolutionObj = this.SolutionObj;
-                _form.AfterRedisGet(Service);
+                _form.AfterRedisGet_All(Service);
                 _form.TableRowId = Param[0].ValueTo;
                 _form.FormatImportData(DataDB, Service, this);
                 //this.FormData = _form.FormData;
@@ -1514,34 +1514,8 @@ namespace ExpressBase.Objects
 
                 if (drPsList.Count > 0)
                 {
-                    List<DbParameter> param = new List<DbParameter>();
                     this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
-
-                    for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
-                    {
-                        if (dataset.Tables[i].Rows.Count > 0)
-                        {
-                            EbDataRow dataRow = dataset.Tables[i].Rows[0];
-                            foreach (EbDataColumn dataColumn in dataset.Tables[i].Columns)
-                            {
-                                DbParameter t = param.Find(e => e.ParameterName == dataColumn.ColumnName);
-                                if (t == null)
-                                {
-                                    if (dataRow.IsDBNull(dataColumn.ColumnIndex))
-                                    {
-                                        var p = DataDB.GetNewParameter(dataColumn.ColumnName, dataColumn.Type);
-                                        p.Value = DBNull.Value;
-                                        param.Add(p);
-                                    }
-                                    else
-                                        param.Add(DataDB.GetNewParameter(dataColumn.ColumnName, dataColumn.Type, dataRow[dataColumn.ColumnIndex]));
-                                }
-                            }
-                        }
-                    }
-
-                    EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
-
+                    List<DbParameter> param = this.GetPsParams(drPsList, _FormData, DataDB, service);
                     EbDataSet ds;
                     if (this.DbConnection == null)
                         ds = DataDB.DoQueries(psquery, param.ToArray());
@@ -1574,6 +1548,67 @@ namespace ExpressBase.Objects
                 this.FormGlobals = null;// FormGlobals is a reusing Object, so clear when a data change happens
                 this.ExeDeleteCancelEditScript(DataDB, _FormData);
             }
+        }
+
+        private List<DbParameter> GetPsParams(List<EbControl> drPsList, WebformData _FormData, IDatabase DataDB, Service service)
+        {
+            TableSchema _table = null;
+            ColumnSchema _column = null;
+            List<DbParameter> param = new List<DbParameter>();
+            EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
+
+            foreach (EbControl psCtrl in drPsList)
+            {
+                List<Param> ParamsList = (psCtrl as IEbDataReaderControl).ParamsList;
+                if (ParamsList == null)
+                {
+                    (psCtrl as IEbPowerSelect).UpdateParamsMeta(service, service.Redis);
+                    //throw new FormException("PowerSelect version is deprecated! Contact Admin.", (int)HttpStatusCode.InternalServerError, $"ParamsList of '{psCtrl.Name}'(Powerselect) is null. Save form in dev side.", "EbWebForm -> RefreshFormDataInner");
+                }
+
+                foreach (Param _psParam in ParamsList)
+                {
+                    if (param.Exists(e => e.ParameterName == _psParam.Name))
+                        continue;
+
+                    _table = null;
+                    _column = null;
+                    foreach (TableSchema __table in this.FormSchema.Tables)
+                    {
+                        _column = __table.Columns.Find(e => e.Control.Name == _psParam.Name);
+                        if (_column != null)
+                        {
+                            _table = __table;
+                            break;
+                        }
+                    }
+
+                    if (_table != null && _FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0)
+                    {
+                        if (_table.TableType == WebFormTableTypes.Grid)
+                        {
+                            if (psCtrl.Name == _psParam.Name)
+                            {
+                                List<string> vms = new List<string>();
+                                foreach (SingleRow Row in Table)
+                                {
+                                    if (Row[_column.ColumnName] != null)
+                                        vms.Add(Convert.ToString(Row[_column.ColumnName]));
+                                }
+                                param.Add(DataDB.GetNewParameter(_psParam.Name + FormConstants.__ebedt, EbDbTypes.String, vms.Join(",")));
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), Table[0][_column.ColumnName]));
+                            continue;
+                        }
+                    }
+                    param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), _psParam.ValueTo));
+                }
+            }
+            return param;
         }
 
         //For Prefill Mode
@@ -2820,18 +2855,23 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void AfterRedisGet(Service service)
+        public void AfterRedisGet_All(Service service)
         {
             EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
             SchemaHelper.GetWebFormSchema(this);
             EbFormHelper.InitDataPushers(this, service.Redis, null, service);
         }
-
-        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        
+        public void AfterRedisGet_All(RedisClient Redis, IServiceClient client)
         {
             EbFormHelper.AfterRedisGet(this, Redis, client, null);
             SchemaHelper.GetWebFormSchema(this);
             EbFormHelper.InitDataPushers(this, Redis, client, null);
+        }
+
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            EbFormHelper.AfterRedisGet(this, Redis, client, null);
         }
 
         public override List<string> DiscoverRelatedRefids()

@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -287,7 +288,7 @@ namespace ExpressBase.Objects
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
-                    _form.AfterRedisGet(Redis as RedisClient, client);
+                    _form.AfterRedisGet_All(Redis as RedisClient, client);
                     string _multipushId = null;
                     if (pusher.MultiPushIdType == MultiPushIdTypes.Default)
                         _multipushId = _this.RefId + CharConstants.UNDERSCORE + pusher.Name;
