@@ -282,16 +282,13 @@ namespace ExpressBase.Objects
             _this.FormCollection = new EbWebFormCollection(_this);
             if (_this.DataPushers != null)
             {
-                if (_this.DataPushers.Exists(e => !(e is EbFormDataPusher || e is EbApiDataPusher || e is EbBatchFormDataPusher)))
-                    throw new FormException("DataPusher config is invalid! Contact Admin.", (int)HttpStatusCode.InternalServerError, "Check the type of all DataPushers. [Save the form in dev side]", "EbFormHelper -> InitDataPushers");
-
                 foreach (EbFormDataPusher pusher in _this.DataPushers.FindAll(e => e is EbFormDataPusher))
                 {
                     EbWebForm _form = GetEbObject<EbWebForm>(pusher.FormRefId, client, Redis, service);
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
-                    _form.AfterRedisGet(Redis as RedisClient, client);
+                    _form.AfterRedisGet_All(Redis as RedisClient, client);
                     string _multipushId = null;
                     if (pusher.MultiPushIdType == MultiPushIdTypes.Default)
                         _multipushId = _this.RefId + CharConstants.UNDERSCORE + pusher.Name;

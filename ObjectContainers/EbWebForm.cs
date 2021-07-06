@@ -318,7 +318,7 @@ namespace ExpressBase.Objects
                     _form.RefId = psCtrl.DataImportId;
                     _form.UserObj = this.UserObj;
                     _form.SolutionObj = this.SolutionObj;
-                    _form.AfterRedisGet(Service);
+                    _form.AfterRedisGet_All(Service);
                     _form.TableRowId = Convert.ToInt32(psColumn.Value);
                     _form.RefreshFormData(DataDB, Service);
                     _form.FormatImportData(DataDB, Service, this);
@@ -443,7 +443,7 @@ namespace ExpressBase.Objects
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
                 _form.SolutionObj = this.SolutionObj;
-                _form.AfterRedisGet(Service);
+                _form.AfterRedisGet_All(Service);
                 _form.TableRowId = Param[0].ValueTo;
                 _form.FormatImportData(DataDB, Service, this);
                 //this.FormData = _form.FormData;
@@ -2855,18 +2855,23 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void AfterRedisGet(Service service)
+        public void AfterRedisGet_All(Service service)
         {
             EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
             SchemaHelper.GetWebFormSchema(this);
             EbFormHelper.InitDataPushers(this, service.Redis, null, service);
         }
-
-        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        
+        public void AfterRedisGet_All(RedisClient Redis, IServiceClient client)
         {
             EbFormHelper.AfterRedisGet(this, Redis, client, null);
             SchemaHelper.GetWebFormSchema(this);
             EbFormHelper.InitDataPushers(this, Redis, client, null);
+        }
+
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            EbFormHelper.AfterRedisGet(this, Redis, client, null);
         }
 
         public override List<string> DiscoverRelatedRefids()
