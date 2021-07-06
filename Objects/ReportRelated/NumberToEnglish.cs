@@ -26,7 +26,7 @@ namespace ExpressBase.Objects
         private String changeToWords(String numb, bool isCurrency)
         {
             String val = "", wholeNo = numb, points = "", andStr = "", pointStr = "";
-            String endStr = (isCurrency) ? ("Only") : ("");
+            String endStr = "";// (isCurrency) ? ("Only") : ("");
             try
             {
                 int decimalPlace = numb.IndexOf(".");
@@ -37,7 +37,7 @@ namespace ExpressBase.Objects
                     if (Convert.ToInt32(points) > 0)
                     {
                         andStr = (isCurrency) ? ("and") : ("point");// just to separate whole numbers from points/cents
-                        endStr = (isCurrency) ? ("Dirhams " + endStr) : ("");
+                        //endStr = (isCurrency) ? ("Dirhams " + endStr) : ("");
                         pointStr = translateCents(points);
                     }
                 }

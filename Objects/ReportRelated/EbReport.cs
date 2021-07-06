@@ -218,6 +218,10 @@ namespace ExpressBase.Objects
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool RenderReportFooterInBottom { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public string BackgroundImage { get; set; }
@@ -854,32 +858,38 @@ namespace ExpressBase.Objects
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //pf_Yposition = dt_Yposition + DT_FillHeight;
             pf_Yposition = (float)detailEnd /*+ DetailHeight*/ + dt_Yposition;
-            rf_Yposition = pf_Yposition + PageFooterHeight;
-
-            foreach (EbReportFooter r_footer in ReportFooters)
+            if (RenderReportFooterInBottom)
             {
-                float footer_diffrence = 0;
-                EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
-                if (SortedReportFields.Length > 0)
-                {
-                    for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
-                    {
-                        EbReportField field = SortedReportFields[iSortPos];
-                        // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
-                        if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
-                        {
-                            AddNewPage();
-                            //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
-                            footer_diffrence = field.TopPt;
-                            FooterDrawn = true;
-                            rf_Yposition = Margin.Top;
-                        }
-                        field.TopPt -= footer_diffrence;
-                        DrawFields(field, rf_Yposition, 0);
-                    }
-                }
-                rf_Yposition += r_footer.HeightPt;
+                rf_Yposition = HeightPt-ReportFooterHeight;
             }
+            else
+            {                
+                rf_Yposition = pf_Yposition + PageFooterHeight;
+            }
+            foreach (EbReportFooter r_footer in ReportFooters)
+                {
+                    float footer_diffrence = 0;
+                    EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
+                    if (SortedReportFields.Length > 0)
+                    {
+                        for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                        {
+                            EbReportField field = SortedReportFields[iSortPos];
+                            // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
+                            if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
+                            {
+                                AddNewPage();
+                                //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
+                                footer_diffrence = field.TopPt;
+                                FooterDrawn = true;
+                                rf_Yposition = Margin.Top;
+                            }
+                            field.TopPt -= footer_diffrence;
+                            DrawFields(field, rf_Yposition, 0);
+                        }
+                    }
+                    rf_Yposition += r_footer.HeightPt;
+                }
         }
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
@@ -983,7 +993,7 @@ namespace ExpressBase.Objects
             Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser.FullName + ", " + timestamp);
             phrase.Font.Size = 6;
             phrase.Font.Color = BaseColor.Gray;
-            ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - Margin.Right - Margin.Left) - Margin.Right, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt -/* Margin.Right*/20 - Margin.Left) - /*Margin.Right*/20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
 
