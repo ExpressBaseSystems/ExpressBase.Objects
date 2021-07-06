@@ -620,7 +620,7 @@ namespace ExpressBase.Objects
                 JObject o = new JObject();
                 foreach (ColumnSchema _column in _table.Columns)
                 {
-                    o[_column.ColumnName] = "value";
+                    o[_column.ColumnName] = Convert.ToString((EbDbTypes)_column.EbDbType);
                 }
                 JArray array = new JArray();
                 array.Add(o);
@@ -2861,7 +2861,7 @@ namespace ExpressBase.Objects
             SchemaHelper.GetWebFormSchema(this);
             EbFormHelper.InitDataPushers(this, service.Redis, null, service);
         }
-        
+
         public void AfterRedisGet_All(RedisClient Redis, IServiceClient client)
         {
             EbFormHelper.AfterRedisGet(this, Redis, client, null);
