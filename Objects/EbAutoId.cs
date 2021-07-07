@@ -16,6 +16,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using System.Net;
 using ExpressBase.Objects.WebFormRelated;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects
 {
@@ -83,6 +84,8 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         public string TableName { get; set; }
+
+        private bool IsSqlExpr { get; set; }
 
         //HideInPropertyGrid
         //public string OnChange { get; set; }
@@ -183,7 +186,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    bool isSql = false;
+                    this.IsSqlExpr = false;
                     string SqlCode = null;
 
                     if (!string.IsNullOrWhiteSpace(this.Script?.Code))
@@ -201,7 +204,7 @@ namespace ExpressBase.Objects
                         }
                         else if (this.Script.Lang == ScriptingLanguage.SQL)
                         {
-                            isSql = true;
+                            this.IsSqlExpr = true;
                             SqlCode = this.Script.Code;
                             List<Param> _params = SqlHelper.GetSqlParams(SqlCode);
                             foreach (Param _p in _params)
@@ -214,31 +217,53 @@ namespace ExpressBase.Objects
                             throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
                     }
 
-                    if ((string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && !isSql) || this.Pattern.SerialLength == 0)
+                    if ((string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && !this.IsSqlExpr) || this.Pattern.SerialLength == 0)
                         throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
 
                     if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
                         args._vals += string.Format("CONCAT(({1}), (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE ({4}))),",
                             args.cField.Name,
-                            isSql ? SqlCode : $"@{args.cField.Name}_{args.i}",
+                            this.IsSqlExpr ? SqlCode : $"@{args.cField.Name}_{args.i}",
                             this.Pattern.SerialLength,
                             args.tbl,
-                            isSql ? $"({SqlCode}) || '%'" : $"'args.cField.Value%'");
+                            this.IsSqlExpr ? $"({SqlCode}) || '%'" : $"'args.cField.Value%'");
                     else
                         args._vals += string.Format("(({1}) || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE ({4}) AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
                             args.cField.Name,
-                            isSql ? SqlCode : $"@{args.cField.Name}_{args.i}",
+                            this.IsSqlExpr ? SqlCode : $"@{args.cField.Name}_{args.i}",
                             this.Pattern.SerialLength,
                             args.tbl,
-                            isSql ? $"({SqlCode}) || '%'" : $"'{args.cField.Value}%'");
+                            this.IsSqlExpr ? $"({SqlCode}) || '%'" : $"'{args.cField.Value}%'");
 
-                    if (!isSql)
+                    if (!this.IsSqlExpr)
                         args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, Convert.ToString(args.cField.Value)));
                 }
                 args.i++;
                 return true;
             }
             return false;
+        }
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            object _formattedData = Value == null ? null : Convert.ToString(Value);
+            string _displayMember = Value == null ? string.Empty : Value.ToString();
+
+            if (this.IsSqlExpr)
+            {
+                this.IsSqlExpr = false;
+                if (string.IsNullOrWhiteSpace(_displayMember))
+                    throw new FormException("AutoId Generation Failed! Please try again.", (int)HttpStatusCode.InternalServerError, $"Invalid AutoId inserted: {Value}", "EbAutoId => GetSingleColumn");
+            }
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = _formattedData,
+                Control = this,
+                ObjType = this.ObjType,
+                F = _displayMember
+            };
         }
     }
 
