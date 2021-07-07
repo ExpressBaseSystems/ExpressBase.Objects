@@ -566,9 +566,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 if (_dict[i].Control is IEbDataReaderControl && (_dict[i].Control as IEbDataReaderControl).ParamsList?.Count > 0)
                 {
+                    bool IsDgCtrl = _dict[i].Control is EbDGColumn;
                     foreach (Param _p in (_dict[i].Control as IEbDataReaderControl).ParamsList)
                     {
-                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
+                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => (!(e.Value.Control is EbDGColumn) || IsDgCtrl) && e.Value.Control.Name == _p.Name);
                         if (item.Value != null)
                         {
                             if (item.Key != i)
