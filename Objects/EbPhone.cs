@@ -461,7 +461,7 @@ namespace ExpressBase.Objects
             _column.M = JsonConvert.SerializeObject(meta);
         }
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             object _formattedData = Value;
             string _displayMember = Value == null ? string.Empty : Value.ToString();

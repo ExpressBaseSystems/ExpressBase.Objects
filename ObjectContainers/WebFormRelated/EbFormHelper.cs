@@ -457,7 +457,7 @@ namespace ExpressBase.Objects
                             if (c != null) c.Value = null;
                             foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true))
                             {
-                                SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null);
+                                SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
                                 c_.Value = t.Value; c_.F = t.F;
                             }
                             c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
@@ -506,7 +506,7 @@ namespace ExpressBase.Objects
                                 SingleColumn ColumnSrc = RowSrc.GetColumn(_columnDes.ColumnName);
                                 if (ColumnSrc != null)
                                 {
-                                    RowDes.SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                                    RowDes.SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                                     string _formattedData = Convert.ToString(ColumnSrc.Value);
                                     if (_columnDes.Control is EbDGPowerSelectColumn && !string.IsNullOrEmpty(_formattedData))
                                     {
@@ -533,7 +533,7 @@ namespace ExpressBase.Objects
                             ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(_columnDes.ColumnName);
                             if (ColumnSrc != null && !(_columnDes.Control is EbAutoId) && (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation))
                             {
-                                FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                                FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                                 _formattedData = Convert.ToString(ColumnSrc.Value);
                             }
                             else
@@ -577,7 +577,7 @@ namespace ExpressBase.Objects
                         string _formattedData = Convert.ToString(entry.Value[0][_column.ColumnName]);
                         if (ColumnSrc != null && !(_column.Control is EbAutoId) && (!_column.Control.IsSysControl || _column.Control is EbSysLocation))
                         {
-                            entry.Value[0].SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                            entry.Value[0].SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                             _formattedData = Convert.ToString(ColumnSrc.Value);
                         }
                         if (_column.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
@@ -610,7 +610,7 @@ namespace ExpressBase.Objects
                             SingleColumn ColumnSrc = RowSrc.GetColumn(_column.ColumnName);
                             if (ColumnSrc != null)
                             {
-                                RowDes.SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                                RowDes.SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                                 string _formattedData = Convert.ToString(ColumnSrc.Value);
                                 if (_column.Control is EbDGPowerSelectColumn && !string.IsNullOrEmpty(_formattedData))
                                 {

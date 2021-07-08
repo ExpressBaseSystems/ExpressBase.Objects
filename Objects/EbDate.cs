@@ -410,7 +410,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             return this.ParameterizeControl(args, false, crudContext);
         }
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }

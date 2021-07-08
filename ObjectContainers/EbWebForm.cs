@@ -394,10 +394,10 @@ namespace ExpressBase.Objects
                                             psDict[_column.Control as EbDGPowerSelectColumn] += CharConstants.COMMA + _formattedData;
                                     }
                                 }
-                                Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, _formattedData));
+                                Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, _formattedData, false));
                             }
                             else
-                                Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
+                                Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
                         }
 
                         Table.Add(Row);
@@ -485,7 +485,7 @@ namespace ExpressBase.Objects
                     {
                         SingleColumn ColumnSrc = FormDes.FormDataBackup.MultipleTables[FormDes.FormSchema.MasterTable][0].Columns.Find(e => e.Name == Table[0].Columns[i].Name);
                         if (ColumnSrc != null)
-                            Table[0].Columns[i] = Table[0].Columns[i].Control.GetSingleColumn(this.UserObj, this.SolutionObj, ColumnSrc.Value);
+                            Table[0].Columns[i] = Table[0].Columns[i].Control.GetSingleColumn(this.UserObj, this.SolutionObj, ColumnSrc.Value, false);
                     }
                 }
             }
@@ -826,7 +826,7 @@ namespace ExpressBase.Objects
                     {
                         if (Column == null)
                         {
-                            Column = c.GetSingleColumn(this.UserObj, this.SolutionObj, null);
+                            Column = c.GetSingleColumn(this.UserObj, this.SolutionObj, null, true);
                             Row.Columns.Add(Column);
                         }
                         Column.F = JsonConvert.SerializeObject(_d);
@@ -883,7 +883,7 @@ namespace ExpressBase.Objects
                     {
                         if (Column == null)
                         {
-                            Column = c.GetSingleColumn(this.UserObj, this.SolutionObj, null);
+                            Column = c.GetSingleColumn(this.UserObj, this.SolutionObj, null, true);
                             Row.Columns.Add(Column);
                         }
                         _d.Add(FormConstants.meta_json, JsonConvert.SerializeObject(_metaDict));
@@ -918,7 +918,7 @@ namespace ExpressBase.Objects
                     SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     SingleTable Table = new SingleTable();
                     foreach (ColumnSchema _column in _table.Columns)
-                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
+                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
                     Table.Add(Row);
                     _FormData.MultipleTables.Add(_table.TableName, Table);
                 }
@@ -933,7 +933,7 @@ namespace ExpressBase.Objects
                         Value = 0
                     });
                     foreach (ColumnSchema _column in _table.Columns)
-                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
+                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
 
                     _FormData.MultipleTables.Add(_table.TableName, new SingleTable());
                     _FormData.DGsRowDataModel.Add(_table.TableName, Row);
@@ -1022,13 +1022,13 @@ namespace ExpressBase.Objects
             if (_control != null)
             {
                 if ((_control.DoNotPersist && !_control.IsSysControl) || dataColumn == null)
-                    Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
+                    Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
                 else
                 {
                     object val = dataRow[dataColumn.ColumnIndex];
                     if (dataRow.IsDBNull(dataColumn.ColumnIndex))
                         val = null;
-                    Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, val));
+                    Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, val, false));
                 }
                 return;
             }
@@ -1627,7 +1627,7 @@ namespace ExpressBase.Objects
                         Param p = _params.Find(e => e.Name == Column.Name);
                         if (p != null)
                         {
-                            SingleColumn NwCol = Column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, p.ValueTo);
+                            SingleColumn NwCol = Column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, p.ValueTo, false);
                             Column.Value = NwCol.Value;
                             Column.F = NwCol.F;
                             param.Add(DataDB.GetNewParameter(Column.Name, (EbDbTypes)Column.Type, Column.Value));

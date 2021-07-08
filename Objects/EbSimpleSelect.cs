@@ -400,7 +400,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             return s;
         }
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             object _formattedData = null;
             string _displayMember = string.Empty;

@@ -244,12 +244,12 @@ namespace ExpressBase.Objects
             return false;
         }
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             object _formattedData = Value == null ? null : Convert.ToString(Value);
             string _displayMember = Value == null ? string.Empty : Value.ToString();
 
-            if (this.IsSqlExpr)
+            if (this.IsSqlExpr && !Default)
             {
                 this.IsSqlExpr = false;
                 if (string.IsNullOrWhiteSpace(_displayMember))

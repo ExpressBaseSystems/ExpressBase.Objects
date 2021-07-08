@@ -236,7 +236,7 @@ return val"; } set { } }
             return true;
         }
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             object _formattedData = null;
             string _displayMember = "false";

@@ -207,7 +207,7 @@ namespace ExpressBase.Objects
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
 
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             string _displayMember = string.Empty;
             int loc_id = UserObj.Preference.CurrrentLocation;
@@ -385,7 +385,7 @@ namespace ExpressBase.Objects
         public override bool SelfTrigger { get; set; }
 
         //EbSysCreatedBy
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbSysCreatedBy.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
@@ -599,7 +599,7 @@ namespace ExpressBase.Objects
         public override bool SelfTrigger { get; set; }
 
         //EbSysCreatedAt
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
@@ -764,7 +764,7 @@ namespace ExpressBase.Objects
         public override bool SelfTrigger { get; set; }
 
         //EbSysModifiedBy
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbSysCreatedBy.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
@@ -942,7 +942,7 @@ namespace ExpressBase.Objects
         public override bool SelfTrigger { get; set; }
 
         //EbSysModifiedAt
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }

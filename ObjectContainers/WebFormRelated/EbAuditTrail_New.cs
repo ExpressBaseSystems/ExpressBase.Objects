@@ -475,11 +475,11 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 if (ctrl is EbNumeric || ctrl is EbDGNumericColumn ||
                     ctrl is EbBooleanSelect || ctrl is EbDGBooleanSelectColumn ||
                     ctrl is EbDGBooleanColumn || ctrl is EbRadioButton)
-                    value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value).F;
+                    value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value, false).F;
                 else if (value != null)
                 {
                     if (ctrl is EbDate || ctrl is EbDGDateColumn)
-                        value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value).F;
+                        value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value, false).F;
                 }
             }
             catch (Exception e)

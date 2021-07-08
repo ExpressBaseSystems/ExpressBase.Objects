@@ -226,7 +226,7 @@ else {
             return html;
         }
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbNumeric.GetSingleColumn(this, UserObj, SoluObj, Value);
         }

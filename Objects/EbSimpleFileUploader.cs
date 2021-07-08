@@ -233,7 +233,7 @@ namespace ExpressBase.Objects
 			}
 		}
 
-		public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+		public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
 		{
 			return new SingleColumn()
 			{

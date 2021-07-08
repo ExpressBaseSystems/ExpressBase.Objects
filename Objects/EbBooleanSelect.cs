@@ -176,7 +176,7 @@ namespace ExpressBase.Objects
 .Replace("@data-ebtype@", "30");
         }
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbBooleanSelect.GetSingleColumn(this, UserObj, SoluObj, Value);
         }

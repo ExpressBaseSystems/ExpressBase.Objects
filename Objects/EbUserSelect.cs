@@ -144,7 +144,7 @@ namespace ExpressBase.Objects
         //--------Hide in property grid------------end
 
 
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             object _formattedData = Value;
             string _displayMember = string.Empty;
