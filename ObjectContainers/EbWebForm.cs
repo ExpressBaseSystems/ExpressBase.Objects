@@ -1559,12 +1559,12 @@ namespace ExpressBase.Objects
 
             foreach (EbControl psCtrl in drPsList)
             {
-                List<Param> ParamsList = psCtrl is IEbDataReaderControl ? (psCtrl as IEbDataReaderControl).ParamsList : new List<Param>();
+                List<Param> ParamsList = (psCtrl as IEbDataReaderControl).ParamsList;
                 if (ParamsList == null)
                 {
                     Console.WriteLine($"ParamsList in PowerSelect {psCtrl.Name} is null.");
                     (psCtrl as IEbPowerSelect).UpdateParamsMeta(service, service.Redis);
-                    //throw new FormException("PowerSelect version is deprecated! Contact Admin.", (int)HttpStatusCode.InternalServerError, $"ParamsList of '{psCtrl.Name}'(Powerselect) is null. Save form in dev side.", "EbWebForm -> RefreshFormDataInner");
+                    ParamsList = (psCtrl as IEbDataReaderControl).ParamsList;
                 }
 
                 foreach (Param _psParam in ParamsList)
