@@ -94,6 +94,14 @@ namespace ExpressBase.Objects
         [Alias("Columns")]
         public override List<EbControl> Controls { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Behavior")]
+        public override bool Hidden { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Behavior")]
+        public bool AllowEditOnCompletion { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-stack-exchange'></i>"; } set { } }
@@ -298,7 +306,8 @@ namespace ExpressBase.Objects
     public class EbReviewStage : ReviewStageAbstract
     {
         [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Core")]
+        [Alias("Unique Id")]
         public string EbSid { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -417,7 +426,8 @@ else{
     public class EbReviewAction : ReviewActionAbstract
     {
         [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Core")]
+        [Alias("Unique Id")]
         public string EbSid { get; set; }
 
         public EbReviewAction() { }
