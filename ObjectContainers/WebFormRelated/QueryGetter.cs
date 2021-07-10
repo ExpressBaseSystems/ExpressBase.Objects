@@ -409,7 +409,7 @@ WHERE
             {
                 if (conf == null)
                 {
-                    _qry = string.Format("INSERT INTO {0} ({10} {1}, {2}, {3}, {4}, {5}{8}) VALUES ({11} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id{9}); ",
+                    _qry = string.Format("INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({19} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -420,15 +420,23 @@ WHERE
                         _this.TableName,//7
                         currencyCols,//8
                         currencyVals,//9
-                        "{0}",//10
-                        "{1}");//11
+                        ebs[SystemColumns.eb_void],//10
+                        ebs[SystemColumns.eb_del],//11
+                        ebs[SystemColumns.eb_lock],//12
+                        ebs[SystemColumns.eb_ro],//13
+                        ebs.GetBoolFalse(SystemColumns.eb_void),//14
+                        ebs.GetBoolFalse(SystemColumns.eb_del),//15
+                        ebs.GetBoolFalse(SystemColumns.eb_lock),//16
+                        ebs.GetBoolFalse(SystemColumns.eb_ro),//17
+                        "{0}",//18
+                        "{1}");//19
                 }
                 else
                 {
                     string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
-                    _qry = string.Format(@"INSERT INTO {0} ({20} {1}, {2}, {3}, {4}, {9}_id, {5}, {6}, {7}, {8}, {15}, {16}{18}) 
-                                    VALUES ({21} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}{19}); ",
+                    _qry = string.Format(@"INSERT INTO {0} ({24} {1}, {2}, {3}, {4}, {9}_id, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}) 
+                                    VALUES ({25} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -449,8 +457,12 @@ WHERE
                         ebs.GetBoolTrue(SystemColumns.eb_ro),//17
                         currencyCols,//18
                         currencyVals,//19
-                        "{0}",//20
-                        "{1}");//21
+                        ebs[SystemColumns.eb_void],//20
+                        ebs[SystemColumns.eb_del],//21
+                        ebs.GetBoolFalse(SystemColumns.eb_void),//22
+                        ebs.GetBoolFalse(SystemColumns.eb_del),//23
+                        "{0}",//24
+                        "{1}");//25
                 }
 
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
@@ -471,8 +483,29 @@ WHERE
             else
             {
                 string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"@{_this.TableName}_id";
-                _qry = $@"INSERT INTO {tblName} ({{0}} {ebs[SystemColumns.eb_created_by]}, {ebs[SystemColumns.eb_created_at]}, {ebs[SystemColumns.eb_loc_id]}, {_this.TableName}_id, {ebs[SystemColumns.eb_signin_log_id]}{currencyCols}) 
-                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , {srcRef}, @eb_signin_log_id{currencyVals}); ";
+                _qry = $@"
+INSERT INTO {tblName} (
+    {{0}} 
+    {ebs[SystemColumns.eb_created_by]}, 
+    {ebs[SystemColumns.eb_created_at]}, 
+    {ebs[SystemColumns.eb_loc_id]}, 
+    {_this.TableName}_id, 
+    {ebs[SystemColumns.eb_signin_log_id]},
+    {ebs[SystemColumns.eb_void]},
+    {ebs[SystemColumns.eb_del]}
+    {currencyCols}
+) 
+VALUES (
+    {{1}} 
+    @eb_createdby, 
+    {DataDB.EB_CURRENT_TIMESTAMP}, 
+    @eb_loc_id , 
+    {srcRef}, 
+    @eb_signin_log_id,
+    {ebs.GetBoolFalse(SystemColumns.eb_void)},
+    {ebs.GetBoolFalse(SystemColumns.eb_del)}
+    {currencyVals}
+); ";
                 if (isIns && DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
             }
