@@ -1386,7 +1386,7 @@ namespace ExpressBase.Objects
                                         {
                                             new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
                                             new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
-                                            new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? Table[0]["id"] : 0},
+                                            new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = (hasPerm || backup) ? Table[0]["id"] : 0},
                                             new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
                                             new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null, F = hasPerm ? f_dt : null},
                                             new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId : 0, F = hasPerm ? this.UserObj.FullName : string.Empty},
@@ -1960,82 +1960,157 @@ namespace ExpressBase.Objects
             string masterId = $"@{this.TableName}_id";
             EbReviewStage nextStage = null;
             bool insMyActRequired = false;
+            bool insInEdit = false;
+            bool entryCriteriaRslt = true;
             FG_Root globals = null;
+            if (!string.IsNullOrWhiteSpace(ebReview.EntryCriteria?.Code))
+            {
+                globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
+                object status = this.ExecuteCSharpScriptNew(ebReview.EntryCriteria.Code, globals);
+                bool.TryParse(Convert.ToString(status), out entryCriteriaRslt);
+            }
             if (isInsert)
             {
-                masterId = $"(SELECT eb_currval('{this.TableName}_id_seq'))";
-                nextStage = ebReview.FormStages[0];
+                if (entryCriteriaRslt)
+                {
+                    masterId = $"(SELECT eb_currval('{this.TableName}_id_seq'))";
+                    nextStage = ebReview.FormStages[0];
+                }
+                else
+                    return string.Empty;
             }
             else
             {
-                int reviewRowCount = this.FormData.MultipleTables.ContainsKey(ebReview.TableName) ? this.FormData.MultipleTables[ebReview.TableName].Count : 0;
-
-                if (reviewRowCount == 1)
+                if (!entryCriteriaRslt)
                 {
-                    bool permissionGranted = false;
                     if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
                     {
-                        SingleRow Row = this.FormDataBackup.MultipleTables[ebReview.TableName].Find(e => e.RowId <= 0);
-                        if (Row != null && Convert.ToString(Row["eb_my_actions_id"]) == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]))
-                            permissionGranted = true;
-                    }
-                    if (!permissionGranted)
-                        throw new FormException("Access denied to execute review", (int)HttpStatusCode.Unauthorized, $"Following entry is not present in FormDataBackup. eb_my_actions_id: {this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]} ", "From GetMyActionInsertUpdateQuery");
-
-                    insUpQ = $@"UPDATE eb_my_actions SET completed_at = {DataDB.EB_CURRENT_TIMESTAMP}, completed_by = @eb_createdby, is_completed = 'T',
-					    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')) WHERE id = @eb_my_actions_id_{i} AND eb_del = 'F'; ";
-                    param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]));
-                    Console.WriteLine("Will try to UPDATE eb_my_actions");
-
-                    if (!(ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"])) is EbReviewStage currentStage))
-                        throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
-
-                    //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
-                    //_FG_Root globals = new _FG_Root(global, this, service);
-
-                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
-
-                    object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
-                    string nxtStName = string.Empty;
-                    if (stageObj is FG_Review_Stage)
-                        nxtStName = (stageObj as FG_Review_Stage).name;
-
-                    GlobalsGenerator.PostProcessGlobals(this, globals, service);
-                    string _reviewStatus = globals.form.review._ReviewStatus;
-                    if (_reviewStatus == "Completed" || _reviewStatus == "Abandoned")
-                    {
-                        this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
-                        insMyActRequired = false;
-                        // eb_approval - update review_status
-                        insUpQ += $@"UPDATE eb_approval SET review_status = '{_reviewStatus}', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
-                                    WHERE eb_src_id = @{this.TableName}_id AND eb_ver_id =  @{this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                    }
-                    else
-                    {
-                        EbReviewStage nxtSt = currentStage;
-                        if (!nxtStName.IsNullOrEmpty())
-                            nxtSt = ebReview.FormStages.Find(e => e.Name == nxtStName);
-
-                        if (nxtSt != null)
+                        SingleRow RowBkUp = this.FormDataBackup.MultipleTables[ebReview.TableName].Find(e => e.RowId <= 0);
+                        if (RowBkUp != null)
                         {
-                            //backtrack to the same user - code here if needed
-                            nextStage = nxtSt;
-                            insMyActRequired = true;
+                            insUpQ += $@"
+UPDATE 
+    eb_my_actions 
+SET 
+    completed_at = {DataDB.EB_CURRENT_TIMESTAMP},
+    completed_by = @eb_createdby, 
+    is_completed = 'F', 
+    eb_del = 'T'
+WHERE 
+    id = @eb_my_actions_id_{i} AND 
+    eb_del = 'F'; ";
+                            param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, RowBkUp["eb_my_actions_id"]));
+                            Console.WriteLine("Will try to DELETE eb_my_actions");
                         }
-                        else
-                            throw new FormException("Unable to decide next stage", (int)HttpStatusCode.InternalServerError, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
+                        if (this.FormDataBackup.MultipleTables[ebReview.TableName].Count > 0)
+                        {
+                            insUpQ += $@"
+UPDATE 
+    eb_approval 
+SET 
+    eb_lastmodified_by = @eb_modified_by, 
+    eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}, 
+    eb_del = 'T'
+WHERE 
+    eb_src_id = @{this.TableName}_id AND 
+    eb_ver_id =  @{this.TableName}_eb_ver_id AND 
+    COALESCE(eb_del, 'F') = 'F'; 
+UPDATE 
+    eb_approval_lines
+SET
+    eb_lastmodified_by = @eb_modified_by, 
+    eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}, 
+    eb_del = 'T'
+WHERE
+    eb_src_id = @{this.TableName}_id AND 
+    eb_ver_id =  @{this.TableName}_eb_ver_id AND 
+    COALESCE(eb_del, 'F') = 'F'; ";
+                        }
                     }
-                }
-                else if (reviewRowCount == 0)
-                {
-                    Console.WriteLine("No items reviewed in this form data save");
-                    return string.Empty;
                 }
                 else
-                    throw new FormException("Bad Request for review control", (int)HttpStatusCode.BadRequest, "eb_approval_lines contains more than one rows, only one review allowed at a time", "From GetMyActionInsertUpdateQuery");
+                {
+                    int reviewRowCount = this.FormData.MultipleTables.ContainsKey(ebReview.TableName) ? this.FormData.MultipleTables[ebReview.TableName].Count : 0;
+
+                    if (reviewRowCount == 1)
+                    {
+                        bool permissionGranted = false;
+                        if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
+                        {
+                            SingleRow Row = this.FormDataBackup.MultipleTables[ebReview.TableName].Find(e => e.RowId <= 0);
+                            if (Row != null && Convert.ToString(Row["eb_my_actions_id"]) == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]))
+                                permissionGranted = true;
+                        }
+                        if (!permissionGranted)
+                            throw new FormException("Access denied to execute review", (int)HttpStatusCode.Unauthorized, $"Following entry is not present in FormDataBackup. eb_my_actions_id: {this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]} ", "From GetMyActionInsertUpdateQuery");
+
+                        insUpQ += $@"UPDATE eb_my_actions SET completed_at = {DataDB.EB_CURRENT_TIMESTAMP}, completed_by = @eb_createdby, is_completed = 'T',
+					    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')) WHERE id = @eb_my_actions_id_{i} AND eb_del = 'F'; ";
+                        param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]));
+                        Console.WriteLine("Will try to UPDATE eb_my_actions");
+
+                        if (!(ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"])) is EbReviewStage currentStage))
+                            throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
+
+                        //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
+                        //_FG_Root globals = new _FG_Root(global, this, service);
+
+                        if (globals == null)
+                            globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
+
+                        object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
+                        string nxtStName = string.Empty;
+                        if (stageObj is FG_Review_Stage)
+                            nxtStName = (stageObj as FG_Review_Stage).name;
+
+                        GlobalsGenerator.PostProcessGlobals(this, globals, service);
+                        string _reviewStatus = globals.form.review._ReviewStatus;
+                        if (_reviewStatus == "Completed" || _reviewStatus == "Abandoned")
+                        {
+                            this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
+                            insMyActRequired = false;
+                            // eb_approval - update review_status
+                            insUpQ += $@"UPDATE eb_approval SET review_status = '{_reviewStatus}', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
+                                    WHERE eb_src_id = @{this.TableName}_id AND eb_ver_id =  @{this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
+                        }
+                        else
+                        {
+                            EbReviewStage nxtSt = currentStage;
+                            if (!nxtStName.IsNullOrEmpty())
+                                nxtSt = ebReview.FormStages.Find(e => e.Name == nxtStName);
+
+                            if (nxtSt != null)
+                            {
+                                //backtrack to the same user - code here if needed
+                                nextStage = nxtSt;
+                                insMyActRequired = true;
+                            }
+                            else
+                                throw new FormException("Unable to decide next stage", (int)HttpStatusCode.InternalServerError, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
+                        }
+                    }
+                    else if (reviewRowCount == 0)
+                    {
+                        if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
+                        {
+                            if (this.FormDataBackup.MultipleTables[ebReview.TableName].Count == 0)
+                            {
+                                insInEdit = true;
+                                nextStage = ebReview.FormStages[0];
+                            }
+                        }
+                        if (!insInEdit)
+                        {
+                            Console.WriteLine("No items reviewed in this form data save");
+                            return string.Empty;
+                        }
+                    }
+                    else
+                        throw new FormException("Bad Request for review control", (int)HttpStatusCode.BadRequest, "eb_approval_lines contains more than one rows, only one review allowed at a time", "From GetMyActionInsertUpdateQuery");
+                }
             }
 
-            if (isInsert || insMyActRequired)// first save or insert myaction required in edit
+            if (isInsert || insMyActRequired || insInEdit)// first save or insert myaction required in edit
             {
                 string _col = string.Empty, _val = string.Empty;
                 this.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
@@ -2137,6 +2212,12 @@ namespace ExpressBase.Objects
                 {
                     insUpQ += $@"INSERT INTO eb_approval(review_status, eb_my_actions_id, eb_src_id, eb_ver_id, eb_created_by, eb_created_at, eb_del)
                                     VALUES('In Process', (SELECT eb_currval('eb_my_actions_id_seq')), (SELECT eb_currval('{this.TableName}_id_seq')), 
+                                    @{this.TableName}_eb_ver_id, @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'); ";
+                }
+                else if (insInEdit)
+                {
+                    insUpQ += $@"INSERT INTO eb_approval(review_status, eb_my_actions_id, eb_src_id, eb_ver_id, eb_created_by, eb_created_at, eb_del)
+                                    VALUES('In Process', (SELECT eb_currval('eb_my_actions_id_seq')), @{this.TableName}_id, 
                                     @{this.TableName}_eb_ver_id, @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'); ";
                 }
                 else // eb_approval - update eb_my_actions_id

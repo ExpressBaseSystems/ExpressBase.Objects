@@ -102,6 +102,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public bool AllowEditOnCompletion { get; set; }
 
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript EntryCriteria { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-stack-exchange'></i>"; } set { } }
