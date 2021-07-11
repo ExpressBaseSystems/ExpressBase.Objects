@@ -442,6 +442,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 string id = Allctrls[i].EbSid;
+                if (id == null)
+                    continue;
                 if (id.Contains('-'))
                     Allctrls[i].EbSid = ts + i + id.Substring(id.IndexOf('-'));
                 else
