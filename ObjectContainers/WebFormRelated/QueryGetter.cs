@@ -38,7 +38,10 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_src_ver_id],//8
                         ebs[SystemColumns.eb_ro]);//9
                 else if (_table.TableType == WebFormTableTypes.Review)
+                {
                     _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
+                    _cols = "eb_loc_id, id";
+                }
                 else
                     _id = _this.FormSchema.MasterTable + "_id";
 

@@ -21,6 +21,7 @@ using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Text.RegularExpressions;
 using ExpressBase.Objects.WebFormRelated;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -747,7 +748,7 @@ else// PS
     <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
     <center class='pow-center'>
-        <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
+        <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%; display: none;'> 
             <div class='DDclose'><i class='fa fa-close' aria-hidden='true'></i></div>
             <div class='DDrefresh'><i class='fa fa-refresh' aria-hidden='true'></i></div>
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
@@ -963,6 +964,9 @@ else// PS
                 }
                 else
                 {
+                    if (_this.ParamsList == null)
+                        throw new FormException($"Invalid ParamsList in '{_this.Label ?? _this.Name}'. Contact Admin", (int)HttpStatusCode.InternalServerError, "Save object in dev side", "EbPowerSelect -> GetSelectQuery");
+                    
                     if (IsDgPs && _this.ParamsList.Exists(e => e.Name == _this.Name))
                     {
                         if (Sql.Contains(":" + _this.Name))
