@@ -217,6 +217,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbFormNotification> Notifications { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override bool IsDisable { get; set; }
+
         public EbWebForm ShallowCopy()
         {
             return (EbWebForm)this.MemberwiseClone();
@@ -1747,6 +1751,9 @@ namespace ExpressBase.Objects
                 {
                     //if (wc == TokenConstants.UC && !EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
                     //    throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+
+                    if (this.IsDisable)
+                        throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly form", "EbWebForm -> Save");
 
                     this.TableRowId = this.Insert(DataDB, service);
                     resp = "Inserted: " + this.TableRowId;
