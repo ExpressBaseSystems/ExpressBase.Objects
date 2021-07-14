@@ -625,6 +625,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+    
+    public class GetRefIdByVerIdRequest : EbServiceStackAuthRequest, IReturn<GetRefIdByVerIdResponse>
+    {
+        public int ObjVerId { get; set; }
+    }
+
+    public class GetRefIdByVerIdResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     [DataContract]
     public class EbObjectWrapper
