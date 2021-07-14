@@ -275,7 +275,7 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             SingleTable Table = _formdata.MultipleTables.ContainsKey(_container.TableName) ? _formdata.MultipleTables[_container.TableName] : new SingleTable();
             SingleTable TableBkUp = _formdataBkUp != null && _formdataBkUp.MultipleTables.ContainsKey(_container.TableName) ? _formdataBkUp.MultipleTables[_container.TableName] : new SingleTable();
-            
+
             if (_container is EbDataGrid)
                 fG_WebForm.DataGrids.Add(GetDataGridGlobal(_container as EbDataGrid, Table, _formdata.DGsRowDataModel[_container.TableName]));
             else if (_container is EbReview)
@@ -297,6 +297,8 @@ namespace ExpressBase.Objects.WebFormRelated
                                 data = Table[0][_control.Name];
                             else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
                                 data = TableBkUp[0][_control.Name];
+                            else if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null)// Hint: For BatchDataPusher, AutoId available in 'Table' only
+                                data = Table[0][_control.Name];
                         }
                         fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control.Name, data));
                     }

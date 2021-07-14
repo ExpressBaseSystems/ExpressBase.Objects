@@ -200,7 +200,7 @@ namespace ExpressBase.Objects
                             args.cField.Value = Convert.ToString(WebForm.ExecuteCSharpScriptNew(this.Script.Code, WebForm.FormGlobals));
 
                             if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)))
-                                throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Null or empty string returned by C# script of AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
+                                throw new FormException("Unable to process [null return by AutoId script]", (int)HttpStatusCode.InternalServerError, "Null or empty string returned by C# script of AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
                         }
                         else if (this.Script.Lang == ScriptingLanguage.SQL)
                         {
@@ -214,11 +214,11 @@ namespace ExpressBase.Objects
                             }
                         }
                         else
-                            throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
+                            throw new FormException("Unable to process [Invalid AutoId lang]", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
                     }
 
                     if ((string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && !this.IsSqlExpr) || this.Pattern.SerialLength == 0)
-                        throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
+                        throw new FormException("Unable to process [Invalid AutoId pattern]", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
 
                     if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
                         args._vals += string.Format("CONCAT(({1}), (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE ({4}))),",
