@@ -51,7 +51,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string comments = "comments";
         public const string is_form_data_editable = "is_form_data_editable";
         public const string has_permission = "has_permission";
-        public const string __control_stage = "__control_stage";
+        public const string __system_stage = "__system_stage";
         public const string __review_reset = "__review_reset";
         //Prov Location
         public const string longname = "longname";

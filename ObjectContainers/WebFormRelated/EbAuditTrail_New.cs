@@ -447,7 +447,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 if (_column.ColumnName == FormConstants.stage_unique_id)
                 {
                     new_val = reviewCtrl.FormStages.Find(e => e.EbSid == val)?.Name;
-                    if (val == FormConstants.__control_stage)
+                    if (val == FormConstants.__system_stage)
                         new_val = "System";
                 }
                 else if (_column.ColumnName == FormConstants.action_unique_id)

@@ -98,7 +98,7 @@ namespace ExpressBase.Objects.WebFormRelated
             bool insMyActRequired = false, entryCriteriaRslt = true;
             EbReviewStage nextStage = null;
 
-            if (Convert.ToString(this.Table[0][FormConstants.stage_unique_id]) == FormConstants.__control_stage &&
+            if (Convert.ToString(this.Table[0][FormConstants.stage_unique_id]) == FormConstants.__system_stage &&
                 Convert.ToString(this.Table[0][FormConstants.action_unique_id]) == FormConstants.__review_reset)
             {
                 bool hasRoleMatch = false;
