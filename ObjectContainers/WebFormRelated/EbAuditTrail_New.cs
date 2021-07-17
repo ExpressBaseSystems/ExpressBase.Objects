@@ -444,11 +444,13 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             {
                 EbReview reviewCtrl = this.WebForm.FormSchema.ExtendedControls.Find(e => e is EbReview) as EbReview;
                 string val = new_val;
-                if (_column.ColumnName == "stage_unique_id")
+                if (_column.ColumnName == FormConstants.stage_unique_id)
                 {
                     new_val = reviewCtrl.FormStages.Find(e => e.EbSid == val)?.Name;
+                    if (val == FormConstants.__control_stage)
+                        new_val = "System";
                 }
-                else if (_column.ColumnName == "action_unique_id")
+                else if (_column.ColumnName == FormConstants.action_unique_id)
                 {
                     foreach (EbReviewStage st in reviewCtrl.FormStages)
                     {
@@ -456,6 +458,11 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         if (act != null)
                         {
                             new_val = act.Name;
+                            break;
+                        }
+                        else if (val == FormConstants.__review_reset)
+                        {
+                            new_val = "Reset";
                             break;
                         }
                     }

@@ -717,38 +717,10 @@ namespace ExpressBase.Objects
                             FormData.MultipleTables[dgCtrl.TableName][i][str_row_num] = j;
                     }
                 }
-                else if (c is EbReview)
+                else if (c is EbReview ebReview)
                 {
                     if (!c.DoNotPersist || this.TableRowId <= 0)// merge in edit mode only
-                    {
-                        EbReview ebReview = (c as EbReview);
-                        if (FormData.MultipleTables.ContainsKey(ebReview.TableName) && FormData.MultipleTables[ebReview.TableName].Count > 0)
-                        {
-                            SingleTable rows = FormData.MultipleTables[ebReview.TableName];
-                            for (int i = 0; i < rows.Count; i++)
-                            {
-                                if (rows[i].RowId > 0)
-                                {
-                                    rows.RemoveAt(i--);
-                                }
-                            }
-                            if (rows.Count == 1)//one new entry// need to write code for 'AfterSaveRoutines'
-                            {
-                                foreach (TableSchema t in this.FormSchema.Tables)
-                                {
-                                    if (t.TableName != ebReview.TableName)
-                                        FormData.MultipleTables.Remove(t.TableName);// approval execution, hence removing other data if present
-                                }
-                                string[] str_t = { "stage_unique_id", "action_unique_id", "eb_my_actions_id", "comments" };
-                                for (int i = 0; i < str_t.Length; i++)
-                                {
-                                    EbControl con = ebReview.Controls.Find(e => e.Name == str_t[i]);
-                                    FormData.MultipleTables[ebReview.TableName][0].SetEbDbType(con.Name, con.EbDbType);
-                                    FormData.MultipleTables[ebReview.TableName][0].SetControl(con.Name, con);
-                                }
-                            }
-                        }
-                    }
+                        ebReview.MergeFormData(this.FormData, this.FormSchema);
                 }
                 else if (c is EbControlContainer)
                 {
@@ -1355,7 +1327,7 @@ namespace ExpressBase.Objects
                         {
                             if (Table.Count == 1)
                             {
-                                string stageEbSid = Convert.ToString(Table[0]["stage_unique_id"]);
+                                string stageEbSid = Convert.ToString(Table[0][FormConstants.stage_unique_id]);
                                 EbReviewStage activeStage = (EbReviewStage)(Ctrl as EbReview).FormStages.Find(e => (e as EbReviewStage).EbSid == stageEbSid);
 
                                 if (activeStage != null)
@@ -1388,14 +1360,14 @@ namespace ExpressBase.Objects
                                         RowId = 0,
                                         Columns = new List<SingleColumn>
                                         {
-                                            new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
-                                            new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
-                                            new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = (hasPerm || backup) ? Table[0]["id"] : 0},
-                                            new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
-                                            new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null, F = hasPerm ? f_dt : null},
-                                            new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId : 0, F = hasPerm ? this.UserObj.FullName : string.Empty},
-                                            new SingleColumn{ Name = "is_form_data_editable", Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0]["is_form_data_editable"])},
-                                            new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
+                                            new SingleColumn{ Name = FormConstants.stage_unique_id, Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
+                                            new SingleColumn{ Name = FormConstants.action_unique_id, Type = (int)EbDbTypes.String, Value = stAction},
+                                            new SingleColumn{ Name = FormConstants.eb_my_actions_id, Type = (int)EbDbTypes.Decimal, Value = (hasPerm || backup) ? Table[0]["id"] : 0},
+                                            new SingleColumn{ Name = FormConstants.comments, Type = (int)EbDbTypes.String, Value = ""},
+                                            new SingleColumn{ Name = FormConstants.eb_created_at, Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null, F = hasPerm ? f_dt : null},
+                                            new SingleColumn{ Name = FormConstants.eb_created_by, Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId : 0, F = hasPerm ? this.UserObj.FullName : string.Empty},
+                                            new SingleColumn{ Name = FormConstants.is_form_data_editable, Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0][FormConstants.is_form_data_editable])},
+                                            new SingleColumn{ Name = FormConstants.has_permission, Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
                                         }
                                     });
                                     if (this.MyActNotification != null)
@@ -1717,6 +1689,80 @@ namespace ExpressBase.Objects
             return data;
         }
 
+        public string SaveReview(EbConnectionFactory EbConFactory, Service service, string wc)
+        {
+            IDatabase DataDB = EbConFactory.DataDB;
+            this.DbConnection = DataDB.GetNewConnection();
+            string resp;
+            try
+            {
+                this.DbConnection.Open();
+                this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                this.RefreshFormData(DataDB, service, true, false);
+                CheckConstraints(wc);
+
+
+                string fullqry = string.Empty;
+                string _extqry = string.Empty;
+                List<DbParameter> param = new List<DbParameter>();
+                int i = 0;
+
+                this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
+
+                fullqry += _extqry;
+                fullqry += EbReviewHelper.GetMyActionInsertUpdateQueryxx(this, DataDB, param, ref i, service);
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, this.UserObj.UserId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
+                resp = "Updated: " + DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
+
+                this.RefreshFormData(DataDB, service, false, true);
+                Console.WriteLine("EbWebForm.SaveReview.UpdateAuditTrail start");
+                EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
+                Console.WriteLine("EbWebForm.SaveReview.AfterSave start");
+                resp += " - AfterSave: " + this.AfterSave(DataDB, true);
+                this.DbTransaction.Commit();
+                Console.WriteLine("EbWebForm.SaveReview.DbTransaction Committed");
+                //Console.WriteLine("EbWebForm.SaveReview.SendNotifications start");
+                //resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                //Console.WriteLine("EbWebForm.SaveReview.SendMobileNotification start");
+                //EbFnGateway.SendMobileNotification(this, EbConFactory);
+                Console.WriteLine("EbWebForm.SaveReview.resp = " + resp);
+            }
+            catch (FormException ex1)
+            {
+                try { this.DbTransaction.Rollback(); }
+                catch (Exception ex2) { Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}"); }
+                throw ex1;
+            }
+            catch (Exception ex1)
+            {
+                try { this.DbTransaction.Rollback(); }
+                catch (Exception ex2) { Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}"); }
+                throw new FormException("Review submission failed! [Internal server error]", (int)HttpStatusCode.InternalServerError, ex1.Message, ex1.StackTrace);
+            }
+            this.DbConnection.Close();
+            return resp;
+        }
+
+        private void CheckConstraints(string wc)
+        {
+            if (this.FormData.IsReadOnly)
+                throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
+            if (this.FormData.IsLocked)
+                throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
+            if (this.FormData.FormVersionId == 0)
+                throw new FormException("Edit is blocked - Invalid Form RefId!", (int)HttpStatusCode.Forbidden, "Invalid FormVersionId", "EbWebForm -> Save");
+
+            if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
+                        (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
+                throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+        }
+
         //Normal save
         public string Save(EbConnectionFactory EbConFactory, Service service, string wc)
         {
@@ -1734,17 +1780,7 @@ namespace ExpressBase.Objects
                 if (IsUpdate)
                 {
                     this.RefreshFormData(DataDB, service, true, true);
-                    if (this.FormData.IsReadOnly)
-                        throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
-                    if (this.FormData.IsLocked)
-                        throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
-                    if (this.FormData.FormVersionId == 0)
-                        throw new FormException("Edit is blocked - Invalid Form RefId!", (int)HttpStatusCode.Forbidden, "Invalid FormVersionId", "EbWebForm -> Save");
-
-                    if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
-                        (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
-                        throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-
+                    CheckConstraints(wc);
                     resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
@@ -1821,7 +1857,7 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
-            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, true, service);
+            fullqry += EbReviewHelper.GetMyActionInsertUpdateQuery(this, DataDB, param, ref i, true, service);
             fullqry += this.GetDraftTableUpdateQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
@@ -1928,7 +1964,7 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
-            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, false, service);
+            fullqry += EbReviewHelper.GetMyActionInsertUpdateQuery(this, DataDB, param, ref i, false, service);
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, this.UserObj.UserId));
@@ -1956,285 +1992,6 @@ namespace ExpressBase.Objects
                 else
                     provCtrl.CreateOnlyIf_b = true;
             }
-        }
-
-        private string GetMyActionInsertUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i, bool isInsert, Service service)
-        {
-            EbReview ebReview = (EbReview)this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
-            if (ebReview == null || ebReview.FormStages.Count == 0)
-                return string.Empty;
-            string insUpQ = string.Empty;
-            string masterId = $"@{this.TableName}_id";
-            EbReviewStage nextStage = null;
-            bool insMyActRequired = false;
-            bool insInEdit = false;
-            bool entryCriteriaRslt = true;
-            FG_Root globals = null;
-            if (!string.IsNullOrWhiteSpace(ebReview.EntryCriteria?.Code))
-            {
-                globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
-                object status = this.ExecuteCSharpScriptNew(ebReview.EntryCriteria.Code, globals);
-                bool.TryParse(Convert.ToString(status), out entryCriteriaRslt);
-            }
-            if (isInsert)
-            {
-                if (entryCriteriaRslt)
-                {
-                    masterId = $"(SELECT eb_currval('{this.TableName}_id_seq'))";
-                    nextStage = ebReview.FormStages[0];
-                }
-                else
-                    return string.Empty;
-            }
-            else
-            {
-                if (!entryCriteriaRslt)
-                {
-                    if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
-                    {
-                        SingleRow RowBkUp = this.FormDataBackup.MultipleTables[ebReview.TableName].Find(e => e.RowId <= 0);
-                        if (RowBkUp != null)
-                        {
-                            insUpQ += $@"
-UPDATE 
-    eb_my_actions 
-SET 
-    completed_at = {DataDB.EB_CURRENT_TIMESTAMP},
-    completed_by = @eb_createdby, 
-    is_completed = 'F', 
-    eb_del = 'T'
-WHERE 
-    id = @eb_my_actions_id_{i} AND 
-    eb_del = 'F'; ";
-                            param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, RowBkUp["eb_my_actions_id"]));
-                            Console.WriteLine("Will try to DELETE eb_my_actions");
-                        }
-                        if (this.FormDataBackup.MultipleTables[ebReview.TableName].Count > 0)
-                        {
-                            insUpQ += $@"
-UPDATE 
-    eb_approval 
-SET 
-    eb_lastmodified_by = @eb_modified_by, 
-    eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}, 
-    eb_del = 'T'
-WHERE 
-    eb_src_id = @{this.TableName}_id AND 
-    eb_ver_id =  @{this.TableName}_eb_ver_id AND 
-    COALESCE(eb_del, 'F') = 'F'; 
-UPDATE 
-    eb_approval_lines
-SET
-    eb_lastmodified_by = @eb_modified_by, 
-    eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}, 
-    eb_del = 'T'
-WHERE
-    eb_src_id = @{this.TableName}_id AND 
-    eb_ver_id =  @{this.TableName}_eb_ver_id AND 
-    COALESCE(eb_del, 'F') = 'F'; ";
-                        }
-                    }
-                }
-                else
-                {
-                    int reviewRowCount = this.FormData.MultipleTables.ContainsKey(ebReview.TableName) ? this.FormData.MultipleTables[ebReview.TableName].Count : 0;
-
-                    if (reviewRowCount == 1)
-                    {
-                        bool permissionGranted = false;
-                        if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
-                        {
-                            SingleRow Row = this.FormDataBackup.MultipleTables[ebReview.TableName].Find(e => e.RowId <= 0);
-                            if (Row != null && Convert.ToString(Row["eb_my_actions_id"]) == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]))
-                                permissionGranted = true;
-                        }
-                        if (!permissionGranted)
-                            throw new FormException("Access denied to execute review", (int)HttpStatusCode.Unauthorized, $"Following entry is not present in FormDataBackup. eb_my_actions_id: {this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]} ", "From GetMyActionInsertUpdateQuery");
-
-                        insUpQ += $@"UPDATE eb_my_actions SET completed_at = {DataDB.EB_CURRENT_TIMESTAMP}, completed_by = @eb_createdby, is_completed = 'T',
-					    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')) WHERE id = @eb_my_actions_id_{i} AND eb_del = 'F'; ";
-                        param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]));
-                        Console.WriteLine("Will try to UPDATE eb_my_actions");
-
-                        if (!(ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"])) is EbReviewStage currentStage))
-                            throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
-
-                        //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
-                        //_FG_Root globals = new _FG_Root(global, this, service);
-
-                        if (globals == null)
-                            globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
-
-                        object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
-                        string nxtStName = string.Empty;
-                        if (stageObj is FG_Review_Stage)
-                            nxtStName = (stageObj as FG_Review_Stage).name;
-
-                        GlobalsGenerator.PostProcessGlobals(this, globals, service);
-                        string _reviewStatus = globals.form.review._ReviewStatus;
-                        if (_reviewStatus == "Completed" || _reviewStatus == "Abandoned")
-                        {
-                            this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
-                            insMyActRequired = false;
-                            // eb_approval - update review_status
-                            insUpQ += $@"UPDATE eb_approval SET review_status = '{_reviewStatus}', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
-                                    WHERE eb_src_id = @{this.TableName}_id AND eb_ver_id =  @{this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                        }
-                        else
-                        {
-                            EbReviewStage nxtSt = currentStage;
-                            if (!nxtStName.IsNullOrEmpty())
-                                nxtSt = ebReview.FormStages.Find(e => e.Name == nxtStName);
-
-                            if (nxtSt != null)
-                            {
-                                //backtrack to the same user - code here if needed
-                                nextStage = nxtSt;
-                                insMyActRequired = true;
-                            }
-                            else
-                                throw new FormException("Unable to decide next stage", (int)HttpStatusCode.InternalServerError, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
-                        }
-                    }
-                    else if (reviewRowCount == 0)
-                    {
-                        if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
-                        {
-                            if (this.FormDataBackup.MultipleTables[ebReview.TableName].Count == 0)
-                            {
-                                insInEdit = true;
-                                nextStage = ebReview.FormStages[0];
-                            }
-                        }
-                        if (!insInEdit)
-                        {
-                            Console.WriteLine("No items reviewed in this form data save");
-                            return string.Empty;
-                        }
-                    }
-                    else
-                        throw new FormException("Bad Request for review control", (int)HttpStatusCode.BadRequest, "eb_approval_lines contains more than one rows, only one review allowed at a time", "From GetMyActionInsertUpdateQuery");
-                }
-            }
-
-            if (isInsert || insMyActRequired || insInEdit)// first save or insert myaction required in edit
-            {
-                string _col = string.Empty, _val = string.Empty;
-                this.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
-                if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
-                {
-                    _col = "role_ids";
-                    _val = $"@role_ids_{i}";
-                    string roles = nextStage.ApproverRoles == null ? string.Empty : nextStage.ApproverRoles.Join(",");
-                    param.Add(DataDB.GetNewParameter($"@role_ids_{i++}", EbDbTypes.String, roles));
-                    this.MyActNotification.RoleIds = nextStage.ApproverRoles;
-                }
-                else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
-                {
-                    _col = "usergroup_id";
-                    _val = $"@usergroup_id_{i}";
-                    param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
-                    this.MyActNotification.UserGroupId = nextStage.ApproverUserGroup;
-                }
-                else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
-                {
-                    string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
-                    List<DbParameter> _params = new List<DbParameter>();
-                    int _idx = 0;
-                    foreach (KeyValuePair<string, string> p in nextStage.QryParams)
-                    {
-                        if (EbFormHelper.IsExtraSqlParam(p.Key, this.TableName))
-                            continue;
-                        SingleTable Table = null;
-                        if (this.FormData.MultipleTables.ContainsKey(p.Value))
-                            Table = this.FormData.MultipleTables[p.Value];
-                        else if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(p.Value))
-                            Table = this.FormDataBackup.MultipleTables[p.Value];
-                        else
-                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} not found in MultipleTables");
-                        TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == p.Value);
-                        if (_table.TableType != WebFormTableTypes.Normal)
-                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but it is not a normal table");
-                        if (Table.Count != 1)
-                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but table is empty");
-                        SingleColumn Column = Table[0].Columns.Find(e => e.Control?.Name == p.Key);
-                        if (Column == null || Column.Control == null)
-                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
-
-                        ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, _params, Column, _idx, this.UserObj);
-                        Column.Control.ParameterizeControl(args, this.CrudContext);
-                        _idx = args.i;
-                        _params[_idx - 1].ParameterName = p.Key;
-                    }
-                    List<int> uids = new List<int>();
-                    EbFormHelper.AddExtraSqlParams(_params, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
-                    EbDataTable dt = DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
-                    foreach (EbDataRow dr in dt.Rows)
-                    {
-                        int.TryParse(dr[0].ToString(), out int temp);
-                        if (!uids.Contains(temp))
-                            uids.Add(temp);
-                    }
-                    _col = "user_ids";
-                    _val = $"'{uids.Join(",")}'";
-                    this.MyActNotification.UserIds = uids;
-                }
-                else
-                    throw new FormException("Unable to process review control", (int)HttpStatusCode.InternalServerError, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
-
-                string description = null;
-                string autoId = string.Empty;
-                if (this.AutoId != null)
-                {
-                    if (isInsert)
-                        autoId = $" ' || (SELECT {this.AutoId.Name} FROM {this.AutoId.TableName} WHERE {(this.AutoId.TableName == this.TableName ? string.Empty : (this.TableName + CharConstants.UNDERSCORE))}id = {masterId}) || ' ";
-                    else if (this.FormDataBackup.MultipleTables.ContainsKey(this.AutoId.TableName) && this.FormDataBackup.MultipleTables[this.AutoId.TableName].Count > 0)
-                        autoId = CharConstants.SPACE + Convert.ToString(this.FormDataBackup.MultipleTables[this.AutoId.TableName][0][this.AutoId.Name]) + CharConstants.SPACE;
-                }
-                if (!string.IsNullOrEmpty(nextStage.NotificationContent?.Code?.Trim()))
-                {
-                    if (globals == null)
-                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
-                    object msg = this.ExecuteCSharpScriptNew(nextStage.NotificationContent.Code, globals);
-                    description = Convert.ToString(msg);
-                    if (!string.IsNullOrEmpty(description))
-                    {
-                        if (this.AutoId != null && isInsert && description.Contains(FormConstants.AutoId_PlaceHolder))
-                            description = description.Replace(FormConstants.AutoId_PlaceHolder, autoId);
-                    }
-                }
-                if (string.IsNullOrEmpty(description))
-                    description = $"{this.DisplayName} {(autoId.IsEmpty() ? string.Empty : (CharConstants.SPACE + autoId))}in {nextStage.Name}";
-
-                insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable, my_action_type)
-                                VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                                '{this.RefId}', {masterId}, 'F', '{description}', '{(nextStage.IsFormEditable ? "T" : "F")}', '{MyActionTypes.Approval}'); ";
-                if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                    insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
-
-                this.MyActNotification.Title = "Review required";
-                Console.WriteLine("Will try to INSERT eb_my_actions");
-
-                if (isInsert)// eb_approval - insert entry here
-                {
-                    insUpQ += $@"INSERT INTO eb_approval(review_status, eb_my_actions_id, eb_src_id, eb_ver_id, eb_created_by, eb_created_at, eb_del)
-                                    VALUES('In Process', (SELECT eb_currval('eb_my_actions_id_seq')), (SELECT eb_currval('{this.TableName}_id_seq')), 
-                                    @{this.TableName}_eb_ver_id, @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'); ";
-                }
-                else if (insInEdit)
-                {
-                    insUpQ += $@"INSERT INTO eb_approval(review_status, eb_my_actions_id, eb_src_id, eb_ver_id, eb_created_by, eb_created_at, eb_del)
-                                    VALUES('In Process', (SELECT eb_currval('eb_my_actions_id_seq')), @{this.TableName}_id, 
-                                    @{this.TableName}_eb_ver_id, @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'); ";
-                }
-                else // eb_approval - update eb_my_actions_id
-                {
-                    insUpQ += $@"UPDATE eb_approval SET eb_my_actions_id = (SELECT eb_currval('eb_my_actions_id_seq')), eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
-                                    WHERE eb_src_id = @{this.TableName}_id AND eb_ver_id =  @{this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                }
-            }
-
-            return insUpQ;
         }
 
         public string GetFileUploaderUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i)

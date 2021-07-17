@@ -1061,6 +1061,12 @@ pg.ShowProperty('SubTypeFormat');
         public List<DVBaseColumn> FormDataId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyGroup(PGConstants.CORE)]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> ResetterRoles { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public StringRenderType RenderAs { get; set; }
 

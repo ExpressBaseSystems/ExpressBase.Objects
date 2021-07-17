@@ -392,6 +392,53 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class ExecuteReviewRequest : EbServiceStackAuthRequest, IReturn<ExecuteReviewResponse>
+    {
+        [DataMember(Order = 1)]
+        public string FormData { get; set; }
+
+        [DataMember(Order = 2)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CurrentLoc { get; set; }
+
+        [DataMember(Order = 5)]
+        public int DraftId { get; set; }
+    }
+
+    [DataContract]
+    public class ExecuteReviewResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string FormData { get; set; }
+
+        [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 5)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 7)]
+        public string MessageInt { get; set; }
+
+        [DataMember(Order = 8)]
+        public string StackTraceInt { get; set; }
+    }
+
+    [DataContract]
     public class InsertOrUpdateFormDataRqst : EbServiceStackAuthRequest, IReturn<InsertOrUpdateFormDataResp>
     {
         [DataMember(Order = 1)]

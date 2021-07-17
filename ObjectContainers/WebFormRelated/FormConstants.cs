@@ -45,12 +45,14 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string context = "context";
         public const string context_sec = "context_sec";
         //Approval
-        public const string stage = "stage";
-        public const string status = "status";
-        public const string approver_role = "approver_role";
-        public const string remarks = "remarks";
-        public const string eb_created_by_id = "eb_created_by_id";
-        public const string eb_created_by_name = "eb_created_by_name";
+        public const string stage_unique_id = "stage_unique_id";
+        public const string action_unique_id = "action_unique_id";
+        public const string eb_my_actions_id = "eb_my_actions_id";
+        public const string comments = "comments";
+        public const string is_form_data_editable = "is_form_data_editable";
+        public const string has_permission = "has_permission";
+        public const string __control_stage = "__control_stage";
+        public const string __review_reset = "__review_reset";
         //Prov Location
         public const string longname = "longname";
         public const string shortname = "shortname";

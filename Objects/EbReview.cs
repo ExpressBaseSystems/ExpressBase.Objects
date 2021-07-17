@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Linq;
 using ExpressBase.Common.Constants;
+using ExpressBase.Objects.WebFormRelated;
 
 namespace ExpressBase.Objects
 {
@@ -32,12 +33,12 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.EbDbType = this.EbDbType;    
             Controls = new List<EbControl>() {
-                new EbDGStringColumn() { Name = "stage_unique_id", EbDbType = EbDbTypes.String, Title = "Stage"},
-                new EbDGStringColumn() { Name = "action_unique_id", EbDbType = EbDbTypes.String, Title = "Action"},
-                new EbDGNumericColumn() { Name = "eb_my_actions_id", EbDbType = EbDbTypes.Decimal, Title = "My_Action_Id"},
-                new EbDGStringColumn() { Name = "comments", EbDbType = EbDbTypes.String, Title = "Comments"},
-                new EbDGDateColumn() { Name = "eb_created_at", EbDbType = EbDbTypes.DateTime, EbDateType = EbDateType.DateTime, DoNotPersist = true, IsSysControl = true},
-                new EbDGCreatedByColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.Decimal, DoNotPersist = true, IsSysControl = true}//,
+                new EbDGStringColumn() { Name = FormConstants.stage_unique_id, EbDbType = EbDbTypes.String, Title = "Stage"},
+                new EbDGStringColumn() { Name =  FormConstants.action_unique_id, EbDbType = EbDbTypes.String, Title = "Action"},
+                new EbDGNumericColumn() { Name =  FormConstants.eb_my_actions_id, EbDbType = EbDbTypes.Decimal, Title = "My_Action_Id", Hidden = true},
+                new EbDGStringColumn() { Name =  FormConstants.comments, EbDbType = EbDbTypes.String, Title = "Comments"},
+                new EbDGDateColumn() { Name =  FormConstants.eb_created_at, EbDbType = EbDbTypes.DateTime, EbDateType = EbDateType.DateTime, DoNotPersist = true, IsSysControl = true},
+                new EbDGCreatedByColumn() { Name =  FormConstants.eb_created_by, EbDbType = EbDbTypes.Decimal, DoNotPersist = true, IsSysControl = true}//,
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
             };
         }
@@ -54,7 +55,7 @@ namespace ExpressBase.Objects
         [ReservedValues()]
         public override string Name { get; set; }
 
-        [PropertyGroup("Events")]
+        [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> OnApprovalRoutines { get; set; }
@@ -102,11 +103,17 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public bool AllowEditOnCompletion { get; set; }
 
-
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript EntryCriteria { get; set; }
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> ResetterRoles { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -302,6 +309,34 @@ namespace ExpressBase.Objects
                 COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
         }
 
+        public void MergeFormData(WebformData FormData, WebFormSchema FormSchema)
+        {
+            if (FormData.MultipleTables.ContainsKey(this.TableName) && FormData.MultipleTables[this.TableName].Count > 0)
+            {
+                SingleTable rows = FormData.MultipleTables[this.TableName];
+                for (int i = 0; i < rows.Count; i++)
+                {
+                    if (rows[i].RowId > 0)
+                        rows.RemoveAt(i--);
+                }
+                if (rows.Count == 1)//one new entry// need to write code for 'AfterSaveRoutines'
+                {
+                    foreach (TableSchema t in FormSchema.Tables)
+                    {
+                        if (t.TableName != this.TableName)
+                            FormData.MultipleTables.Remove(t.TableName);// approval execution, hence removing other data if present
+                    }
+                    string[] str_t = { FormConstants.stage_unique_id, FormConstants.action_unique_id, FormConstants.eb_my_actions_id, FormConstants.comments };
+                    for (int i = 0; i < str_t.Length; i++)
+                    {
+                        EbControl con = this.Controls.Find(e => e.Name == str_t[i]);
+                        FormData.MultipleTables[this.TableName][0].SetEbDbType(con.Name, con.EbDbType);
+                        FormData.MultipleTables[this.TableName][0].SetControl(con.Name, con);
+                    }
+                }
+            }
+        }
+
     }
 
     public abstract class ReviewStageAbstract { }
@@ -324,7 +359,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string DDHtml { get; set; }
 
-        public EbReviewStage() 
+        public EbReviewStage()
         {
             this.NotificationContent = new EbScript();
         }
