@@ -479,7 +479,7 @@ WHERE
             if (takeCurVal)
                 str = $"(SELECT eb_currval('{this.webForm.TableName}_id_seq'))";
             else
-                str = $"{this.webForm.TableName}_id";
+                str = $"@{this.webForm.TableName}_id";
 
             return $@"
 INSERT INTO eb_approval(
