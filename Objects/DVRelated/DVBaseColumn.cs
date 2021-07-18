@@ -1074,6 +1074,7 @@ pg.ShowProperty('SubTypeFormat');
         {
             this.FormDataId = new List<DVBaseColumn>();
             this.ConditionalFormating = new List<ColumnCondition>();
+            this.ResetterRoles = new List<Int32>();
         }
 
     }
