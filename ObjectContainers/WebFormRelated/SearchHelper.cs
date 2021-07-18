@@ -169,7 +169,7 @@ namespace ExpressBase.Objects.WebFormRelated
             }
             if (labels.Count > 0)
             {
-                int FLUSH_LIMIT = limit == 0 ? 10000 : limit;
+                int FLUSH_LIMIT = limit == 0 ? 1000 : limit;
                 string countQry = $"SELECT COUNT(*) FROM {_webForm.FormSchema.MasterTable} mtbl {qJoin} WHERE {qCdtn};";
                 EbDataTable _dt = DataDB.DoQuery(countQry);
 
@@ -191,7 +191,6 @@ namespace ExpressBase.Objects.WebFormRelated
                             DataDB.GetNewParameter("display_name", EbDbTypes.String, _webForm.DisplayName)
                         };
                         int i, j;
-                        int UpserteRecords = 0;
                         for (i = 0; i < dt.Rows.Count; i++)
                         {
                             EbDataRow dr = dt.Rows[i];
@@ -220,9 +219,10 @@ namespace ExpressBase.Objects.WebFormRelated
                                 upsertQry += GetDeleteQuery(i);
                             }
                         }
-                        UpserteRecords += DataDB.DoNonQuery(upsertQry, parameters.ToArray());
-                        Console.WriteLine($"Upserted {UpserteRecords} records.");
-                        Message += $"\nUpserted {UpserteRecords} records.";
+                        int UpserteRecords = DataDB.DoNonQuery(upsertQry, parameters.ToArray());
+                        string strMsg = $"Upserted {_webForm.FormSchema.MasterTable}: ({x * FLUSH_LIMIT} - {x * FLUSH_LIMIT + UpserteRecords}) records.";
+                        Console.WriteLine(strMsg);
+                        Message += "\n" + strMsg;
                     }
                 }
                 else
