@@ -1727,10 +1727,10 @@ namespace ExpressBase.Objects
                 resp += " - AfterSave: " + this.AfterSave(DataDB, true);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.SaveReview.DbTransaction Committed");
-                //Console.WriteLine("EbWebForm.SaveReview.SendNotifications start");
-                //resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
-                //Console.WriteLine("EbWebForm.SaveReview.SendMobileNotification start");
-                //EbFnGateway.SendMobileNotification(this, EbConFactory);
+                Console.WriteLine("EbWebForm.SaveReview.SendNotifications start");
+                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                Console.WriteLine("EbWebForm.SaveReview.SendMobileNotification start");
+                EbFnGateway.SendMobileNotification(this, EbConFactory);
                 Console.WriteLine("EbWebForm.SaveReview.resp = " + resp);
             }
             catch (FormException ex1)

@@ -25,12 +25,14 @@ namespace ExpressBase.Objects.WebFormRelated
         public static string GetMyActionInsertUpdateQuery(EbWebForm webForm, IDatabase DataDB, List<DbParameter> param, ref int i, bool isInsert, Service service)
         {
             EbReviewHelper_inner inner = new EbReviewHelper_inner(webForm, DataDB, param, isInsert, service);
+            if (inner.ReviewNotFound) return string.Empty;
             return inner.GetMyActionInsertUpdateQuery(ref i);
         }
 
         public static string GetMyActionInsertUpdateQueryxx(EbWebForm webForm, IDatabase DataDB, List<DbParameter> param, ref int i, Service service)
         {
             EbReviewHelper_inner inner = new EbReviewHelper_inner(webForm, DataDB, param, false, service);
+            if (inner.ReviewNotFound) return string.Empty;
             return inner.GetMyActionInsertUpdateQueryxx(ref i);
         }
 
@@ -70,15 +72,22 @@ namespace ExpressBase.Objects.WebFormRelated
         private FG_Root globals { get; set; }
         private SingleTable Table { get; set; }
         private SingleTable TableBkUp { get; set; }
+        public bool ReviewNotFound { get; set; }
 
         internal EbReviewHelper_inner(EbWebForm webForm, IDatabase DataDB, List<DbParameter> param, bool isInsert, Service service)
         {
+            this.ebReview = (EbReview)webForm.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
+            if (this.ebReview == null || this.ebReview.FormStages.Count == 0)
+            {
+                this.ReviewNotFound = true;
+                return;
+            }
+
             this.webForm = webForm;
             this.DataDB = DataDB;
             this.param = param;
             this.isInsert = isInsert;
             this.service = service;
-            this.ebReview = (EbReview)this.webForm.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
             this.globals = null;
 
             if (this.webForm.FormData?.MultipleTables.ContainsKey(this.ebReview.TableName) == true)
@@ -152,8 +161,6 @@ namespace ExpressBase.Objects.WebFormRelated
 
         public string GetMyActionInsertUpdateQuery(ref int i)
         {
-            if (this.ebReview == null || this.ebReview.FormStages.Count == 0)
-                return string.Empty;
             string insUpQ = string.Empty, masterId = $"@{this.webForm.TableName}_id";
             bool insMyActRequired = false, insInEdit = false, entryCriteriaRslt = true;
             EbReviewStage nextStage = null;
@@ -425,7 +432,8 @@ INSERT INTO eb_my_actions(
     eb_del, 
     description, 
     is_form_data_editable, 
-    my_action_type)
+    my_action_type,
+    hide)
 VALUES (
     {_col_val[1]}, 
     {this.DataDB.EB_CURRENT_TIMESTAMP}, 
@@ -436,7 +444,8 @@ VALUES (
     'F', 
     '{description}', 
     '{(nextStage.IsFormEditable ? "T" : "F")}', 
-    '{MyActionTypes.Approval}'); ";
+    '{MyActionTypes.Approval}',
+    '{(nextStage.HideNotification ? "T" : "F")}'); ";
         }
 
         private string GetMyActionUpdateQry(int i)
