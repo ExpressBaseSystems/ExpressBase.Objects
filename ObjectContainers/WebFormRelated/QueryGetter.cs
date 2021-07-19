@@ -180,7 +180,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
                 {
-
+                    //imp: column order is same as normal primary table 
                     query += $@"
 SELECT
     {ebs[SystemColumns.eb_loc_id]},
@@ -601,7 +601,7 @@ VALUES
     @eb_loc_id,
     @{_this.TableName}_eb_ver_id,
     @{conf.SourceTable}_eb_ver_id,
-    {conf.GridDataId},
+    {conf.SourceRecId},
     {(conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'")},
     {ebs.GetBoolTrue(SystemColumns.eb_lock)},
     @eb_signin_log_id,

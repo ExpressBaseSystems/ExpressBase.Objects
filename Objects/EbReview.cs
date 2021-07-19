@@ -445,6 +445,7 @@ else if (this.ApproverEntity === 3)
         public bool IsFormEditable { get; set; }
 
         [PropertyGroup("Behavior")]
+        [PropertyPriority(6)]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool HideNotification { get; set; }
 
