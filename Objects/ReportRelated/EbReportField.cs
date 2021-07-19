@@ -71,11 +71,23 @@ namespace ExpressBase.Objects
                 return WidthPt + LeftPt;
             }
         }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript LayoutExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript HideExpression { get; set; }
+
+        public bool IsHidden { get; set; }
+
         public BaseColor GetColor(string Color)
         {
             int colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
         }
+
         public Phrase GetFormattedPhrase(EbFont Font, EbFont _reportFont, string text)
         {
             iTextSharp.text.Font iTextFont = null;

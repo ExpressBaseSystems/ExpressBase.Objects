@@ -456,6 +456,7 @@ namespace ExpressBase.Objects
                 return _ghHeight;
             }
         }
+
         private float _gfHeight = 0;
         public float GroupFooterHeight
         {
@@ -471,6 +472,7 @@ namespace ExpressBase.Objects
                 return _gfHeight;
             }
         }
+
         private float dt_fillheight = 0;
         [JsonIgnore]
         public float DT_FillHeight
@@ -860,52 +862,55 @@ namespace ExpressBase.Objects
             pf_Yposition = (float)detailEnd /*+ DetailHeight*/ + dt_Yposition;
             if (RenderReportFooterInBottom)
             {
-                rf_Yposition = HeightPt-ReportFooterHeight;
+                rf_Yposition = HeightPt - ReportFooterHeight;
             }
             else
-            {                
+            {
                 rf_Yposition = pf_Yposition + PageFooterHeight;
             }
             foreach (EbReportFooter r_footer in ReportFooters)
+            {
+                float footer_diffrence = 0;
+                EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
+                if (SortedReportFields.Length > 0)
                 {
-                    float footer_diffrence = 0;
-                    EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
-                    if (SortedReportFields.Length > 0)
+                    for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
-                        for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                        EbReportField field = SortedReportFields[iSortPos];
+                        // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
+                        if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
                         {
-                            EbReportField field = SortedReportFields[iSortPos];
-                            // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
-                            if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
-                            {
-                                AddNewPage();
-                                //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
-                                footer_diffrence = field.TopPt;
-                                FooterDrawn = true;
-                                rf_Yposition = Margin.Top;
-                            }
-                            field.TopPt -= footer_diffrence;
-                            DrawFields(field, rf_Yposition, 0);
+                            AddNewPage();
+                            //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
+                            footer_diffrence = field.TopPt;
+                            FooterDrawn = true;
+                            rf_Yposition = Margin.Top;
                         }
+                        field.TopPt -= footer_diffrence;
+                        DrawFields(field, rf_Yposition, 0);
                     }
-                    rf_Yposition += r_footer.HeightPt;
                 }
+                rf_Yposition += r_footer.HeightPt;
+            }
         }
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
-            List<Param> RowParams = null;
-            if (field is EbDataField)
+            if (!field.IsHidden)
             {
-                EbDataField field_org = field as EbDataField;
-                if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.Name))
-                    CallSummerize(field_org, serialnumber);
-                if (AppearanceScriptCollection.ContainsKey(field.Name))
-                    RunAppearanceExpression(field_org, serialnumber);
-                if (!string.IsNullOrEmpty(field_org.LinkRefId))
-                    RowParams = CreateRowParamForLink(field_org, serialnumber);
+                List<Param> RowParams = null;
+                if (field is EbDataField)
+                {
+                    EbDataField field_org = field as EbDataField;
+                    if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.Name))
+                        CallSummerize(field_org, serialnumber);
+                    if (AppearanceScriptCollection.ContainsKey(field.Name))
+                        RunAppearanceExpression(field_org, serialnumber);
+                    if (!string.IsNullOrEmpty(field_org.LinkRefId))
+                        RowParams = CreateRowParamForLink(field_org, serialnumber);
+                }
+                field.DrawMe(section_Yposition, this, RowParams, serialnumber);
             }
-            field.DrawMe(section_Yposition, this, RowParams, serialnumber);
         }
 
         public void RunAppearanceExpression(EbDataField field, int slno)
