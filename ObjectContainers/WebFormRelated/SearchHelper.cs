@@ -183,17 +183,25 @@ namespace ExpressBase.Objects.WebFormRelated
                     {
                         string fullQry = $"SELECT {qCols} FROM {_webForm.FormSchema.MasterTable} mtbl {qJoin} WHERE {qCdtn} OFFSET {x * FLUSH_LIMIT} LIMIT {FLUSH_LIMIT};";
                         EbDataTable dt = DataDB.DoQuery(fullQry);
+                        int i, j;
+                        StringBuilder idxSelQry = new StringBuilder();
+                        for (i = 0; i < dt.Rows.Count; i++)
+                            idxSelQry.Append("SELECT id FROM eb_index_table WHERE ref_id = @ref_id AND data_id = " + Convert.ToString(dt.Rows[i][0]) + " AND COALESCE(eb_del, 'F') = 'F'; ");
 
-                        string upsertQry = string.Empty; 
+                        EbDataSet ds = DataDB.DoQueries(idxSelQry.ToString(), new DbParameter[] { DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId) });
+
+                        StringBuilder updateQry = new StringBuilder(); 
+                        StringBuilder insertQry = new StringBuilder(); 
                         DbParameter[] parameters = new DbParameter[]
                         {
                             DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
                             DataDB.GetNewParameter("disp_name", EbDbTypes.String, _webForm.DisplayName)
                         };
-                        int i, j;
+                        
                         for (i = 0; i < dt.Rows.Count; i++)
                         {
                             EbDataRow dr = dt.Rows[i];
+                            int id = ds.Tables[i].Rows.Count > 0 ? Convert.ToInt32(ds.Tables[i].Rows[0][0]) : 0;
                             Dictionary<string, string> JsonData = new Dictionary<string, string>();
                             for (j = sysColCnt; j < colCnt; j++)
                             {
@@ -207,22 +215,36 @@ namespace ExpressBase.Objects.WebFormRelated
                             if (JsonData.Count > 0)
                             {
                                 string json = JsonConvert.SerializeObject(JsonData);
+                                string dataId = Convert.ToString(dr[0]);
+                                string creBy = Convert.ToString(dr[1]);
+                                string creAt = Convert.ToDateTime(dr[2]).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                string modBy = Convert.ToString(dr[3]);
+                                string modAt = Convert.ToDateTime(dr[4]).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-                                upsertQry += GetUpsertQuery(
-                                    json,
-                                    Convert.ToString(dr[3]),
-                                    Convert.ToDateTime(dr[4]).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
-                                    Convert.ToString(dr[0]),
-                                    Convert.ToString(dr[1]),
-                                    Convert.ToDateTime(dr[2]).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
-                                    );
+                                if (id > 0)
+                                {
+                                    updateQry.Append("UPDATE eb_index_table SET display_name = @disp_name, data_json = '" + json + 
+                                        "', modified_by = " + modBy + ", modified_at = '" + modAt + "' WHERE  id = " + id + ";");
+                                }
+                                else
+                                {
+                                    insertQry.Append("(@disp_name, '" + json + "', @ref_id, " + dataId + ", " + creBy + ", '" + creAt + "', " + modBy + ", '" + modAt + "', 'F'),");
+                                }
                             }
                             else
                             {
-                                upsertQry += GetDeleteQueryDup(Convert.ToString(dr[0]));
+                                if (id > 0)
+                                    updateQry.Append("UPDATE eb_index_table SET eb_del = 'T' WHERE id = " + id + ";");
                             }
                         }
-                        int UpserteRecords = DataDB.DoNonQuery(upsertQry, parameters);
+                        if (insertQry.Length > 0)
+                        {
+                            insertQry.Length--;
+                            insertQry.Insert(0, "INSERT INTO eb_index_table (display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del) VALUES");
+                            insertQry.Append(";");
+                        }
+
+                        int UpserteRecords = DataDB.DoNonQuery(updateQry.ToString() + insertQry.ToString(), parameters);
                         string strMsg = $"Upserted {_webForm.FormSchema.MasterTable}: ({x * FLUSH_LIMIT} - {x * FLUSH_LIMIT + UpserteRecords}) records.";
                         Console.WriteLine(strMsg);
                         Message += "\n" + strMsg;
@@ -250,41 +272,41 @@ namespace ExpressBase.Objects.WebFormRelated
             return Message;
         }
 
-        private static string GetUpsertQuery(string json, string modBy, string modAt, string id, string creBy, string creAt)
-        {
-            return string.Join(string.Empty, new string[] { @"
-UPDATE 
-    eb_index_table 
-SET 
-    display_name = @disp_name, 
-    data_json = '", json, @"', 
-    modified_by = ", modBy, @", 
-    modified_at = '", modAt, @"'
-WHERE 
-    ref_id = @ref_id AND 
-    data_id = ", id, @" AND 
-    COALESCE(eb_del, 'F') = 'F';
-INSERT INTO eb_index_table 
-(
-    display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del
-)
-SELECT 
-    @disp_name, '", json, "', @ref_id, ", id, ", ", creBy, ", '", creAt, "', ", modBy, ", '", modAt, @"', 'F'
- WHERE NOT EXISTS 
-(
-    SELECT 1 FROM 
-        eb_index_table 
-    WHERE 
-        ref_id = @ref_id AND 
-        data_id = ", id, @" AND 
-        COALESCE(eb_del, 'F') = 'F'
-);" });
-        }
+//        private static string GetUpsertQuery(string json, string modBy, string modAt, string id, string creBy, string creAt)
+//        {
+//            return string.Join(string.Empty, new string[] { @"
+//UPDATE 
+//    eb_index_table 
+//SET 
+//    display_name = @disp_name, 
+//    data_json = '", json, @"', 
+//    modified_by = ", modBy, @", 
+//    modified_at = '", modAt, @"'
+//WHERE 
+//    ref_id = @ref_id AND 
+//    data_id = ", id, @" AND 
+//    COALESCE(eb_del, 'F') = 'F';
+//INSERT INTO eb_index_table 
+//(
+//    display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del
+//)
+//SELECT 
+//    @disp_name, '", json, "', @ref_id, ", id, ", ", creBy, ", '", creAt, "', ", modBy, ", '", modAt, @"', 'F'
+// WHERE NOT EXISTS 
+//(
+//    SELECT 1 FROM 
+//        eb_index_table 
+//    WHERE 
+//        ref_id = @ref_id AND 
+//        data_id = ", id, @" AND 
+//        COALESCE(eb_del, 'F') = 'F'
+//);" });
+//        }
 
-        private static string GetDeleteQueryDup(string id)
-        {
-            return string.Join(string.Empty, "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND data_id = ", id, " AND COALESCE(eb_del, 'F') = 'F';");
-        }
+//        private static string GetDeleteQueryDup(string id)
+//        {
+//            return string.Join(string.Empty, "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND data_id = ", id, " AND COALESCE(eb_del, 'F') = 'F';");
+//        }
 
         private static string GetDeleteQuery(int i)
         {

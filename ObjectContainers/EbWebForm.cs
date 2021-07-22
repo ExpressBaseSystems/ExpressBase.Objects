@@ -587,7 +587,7 @@ namespace ExpressBase.Objects
             return this.FormData;
         }
 
-        public object ExecuteSqlValueExpression(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int ExprType)
+        public string ExecuteSqlValueExpression(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int ExprType)
         {
             List<EbControl> Allctrls = this.Controls.GetAllControlsRecursively();
             EbControl TriggerCtrl = Allctrls.Find(e => e.Name == Trigger);
@@ -606,13 +606,15 @@ namespace ExpressBase.Objects
                     EbDataTable table = DataDB.DoQuery(ebScript.Code, parameters);
                     if (table.Rows.Count > 0)
                         val = table.Rows[0][0];
+                    SingleColumn Column = TriggerCtrl.GetSingleColumn(this.UserObj, this.SolutionObj, val, false);
+                    val = JsonConvert.SerializeObject(Column);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine($"Exception in ExecuteSqlValueExpression: {e.Message}\n{e.StackTrace}");
                 }
             }
-            return val;
+            return Convert.ToString(val);
         }
 
         public string GetDataPusherJson()
