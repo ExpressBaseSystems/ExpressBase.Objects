@@ -1702,7 +1702,7 @@ namespace ExpressBase.Objects
                 this.DbTransaction = this.DbConnection.BeginTransaction();
 
                 this.RefreshFormData(DataDB, service, true, false);
-                CheckConstraints(wc);
+                CheckConstraints(wc, true);
 
 
                 string fullqry = string.Empty;
@@ -1751,11 +1751,11 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        private void CheckConstraints(string wc)
+        private void CheckConstraints(string wc, bool avoidLocked = false)
         {
             if (this.FormData.IsReadOnly)
                 throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
-            if (this.FormData.IsLocked)
+            if (this.FormData.IsLocked && !avoidLocked)
                 throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
             if (this.FormData.FormVersionId == 0)
                 throw new FormException("Edit is blocked - Invalid Form RefId!", (int)HttpStatusCode.Forbidden, "Invalid FormVersionId", "EbWebForm -> Save");
