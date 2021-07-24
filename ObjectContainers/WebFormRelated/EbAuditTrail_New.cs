@@ -20,7 +20,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         Cancelled = 4,
         DeleteReverted = 5,
         CancelReverted = 6,
-        Saved = 7, //Updated but no changes to show
+        Saved_with_no_changes = 7, //Updated but no changes to show
         Locked = 8,
         Unlocked = 9
     }
@@ -127,7 +127,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                     {
                         auditTrails.Add(new AuditTrailInsertData
                         {
-                            Action = (int)DataModificationAction.Saved,
+                            Action = (int)DataModificationAction.Saved_with_no_changes,
                             Fields = new List<AuditTrailEntry>(),
                             RefId = _webForm.RefId,
                             TableRowId = _webForm.TableRowId
@@ -319,7 +319,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 {
                     Trans.Add(m_id, new FormTransaction()
                     {
-                        ActionType = action.ToString(),
+                        ActionType = action.ToString().Replace("_", " "),
                         CreatedBy = Convert.ToString(dr["fullname"]),
                         CreatedById = Convert.ToString(dr["eb_createdby"]),
                         CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ConvertFromUtc(this.WebForm.UserObj.Preference.TimeZone).ToString(this.WebForm.UserObj.Preference.GetShortDatePattern() + " " + this.WebForm.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture)
