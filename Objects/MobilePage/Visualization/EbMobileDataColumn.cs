@@ -30,8 +30,8 @@ namespace ExpressBase.Objects
         public int ColumnIndex { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
         [UIproperty]
-        [MetaOnly]
         public string ColumnName { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]

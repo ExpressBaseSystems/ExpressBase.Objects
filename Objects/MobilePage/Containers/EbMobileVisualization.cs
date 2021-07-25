@@ -19,7 +19,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Core")]
-        [DefaultPropValue("'Dynamic'")]
+        [DefaultPropValue("0")]
         [OnChangeExec(@"
                 if (this.Type === 1) { 
                     pg.ShowPropertiesExt(['StaticParameters','Items']);
