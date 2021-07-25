@@ -324,9 +324,10 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         CreatedById = Convert.ToString(dr["eb_createdby"]),
                         CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ConvertFromUtc(this.WebForm.UserObj.Preference.TimeZone).ToString(this.WebForm.UserObj.Preference.GetShortDatePattern() + " " + this.WebForm.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture)
                     });
-                    if (action != DataModificationAction.Updated)
-                        continue;
                 }
+                if (action != DataModificationAction.Updated)
+                    continue;
+
                 string[] rel_ids = Convert.ToString(dr["idrelation"]).Split('-');
                 string new_val = dr.IsDBNull(10) ? null : Convert.ToString(dr["newvalue"]);
                 string old_val = dr.IsDBNull(9) ? null : Convert.ToString(dr["oldvalue"]);
