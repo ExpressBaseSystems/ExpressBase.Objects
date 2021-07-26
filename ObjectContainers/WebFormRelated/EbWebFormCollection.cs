@@ -43,7 +43,7 @@ namespace ExpressBase.Objects
                     string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
                     fullqry += string.Format(_q, string.Empty, string.Empty);
                 }
-                foreach (TableSchema _table in WebForm.FormSchema.Tables)
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
                 {
                     if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
                         continue;
@@ -86,17 +86,20 @@ namespace ExpressBase.Objects
                 args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
                 WebForm.DoRequiredCheck(WebForm == MasterForm);
 
-                foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
                 {
-                    foreach (SingleRow row in entry.Value)
+                    if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
+                        continue;
+
+                    foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
                         args.ResetColVals();
                         if (row.RowId > 0)
                         {
-                            SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId);
+                            SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[_table.TableName].Find(e => e.RowId == row.RowId);
                             if (bkup_Row == null)
                             {
-                                Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {entry.Key}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
+                                Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {_table.TableName}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
                                 continue;
                             }
                             string t = string.Empty;
@@ -117,19 +120,19 @@ namespace ExpressBase.Objects
                                     }
                                 }
                             }
-                            else if (WebForm.DataPusherConfig == null && !entry.Key.Equals(WebForm.TableName))
+                            else if (WebForm.DataPusherConfig == null && !_table.TableName.Equals(WebForm.TableName))
                             {
                                 List<TableSchema> _tables = WebForm.FormSchema.Tables.FindAll(e => e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
-                                foreach (TableSchema _table in _tables)
+                                foreach (TableSchema _tbl in _tables)
                                 {
-                                    t += $@"UPDATE {_table.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
-                                        {entry.Key}_id = @{entry.Key}_id_{args.i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                                    param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + args.i, EbDbTypes.Int32, row.RowId));
+                                    t += $@"UPDATE {_tbl.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
+                                        {_table.TableName}_id = @{_table.TableName}_id_{args.i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
+                                    param.Add(DataDB.GetNewParameter(_table.TableName + "_id_" + args.i, EbDbTypes.Int32, row.RowId));
                                     args.i++;
                                 }
                             }
 
-                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, entry.Key, row.IsDelete);
+                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete);
                             fullqry += string.Format(_qry, args._colvals, row.RowId);
                             fullqry += t;
                         }
@@ -145,10 +148,10 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, WebForm.TableRowId == 0);
+                            string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, WebForm.TableRowId == 0);
                             fullqry += string.Format(_qry, args._cols, args._vals);
                         }
-                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, args);
+                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
