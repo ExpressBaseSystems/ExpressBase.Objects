@@ -1700,18 +1700,14 @@ namespace ExpressBase.Objects
             {
                 this.DbConnection.Open();
                 this.DbTransaction = this.DbConnection.BeginTransaction();
-
                 this.RefreshFormData(DataDB, service, true, false);
                 CheckConstraints(wc, true);
-
 
                 string fullqry = string.Empty;
                 string _extqry = string.Empty;
                 List<DbParameter> param = new List<DbParameter>();
                 int i = 0;
-
                 this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
-
                 fullqry += _extqry;
                 fullqry += EbReviewHelper.GetMyActionInsertUpdateQueryxx(this, DataDB, param, ref i, service);
                 param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
@@ -1751,18 +1747,18 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        private void CheckConstraints(string wc, bool avoidLocked = false)
+        private void CheckConstraints(string wc, bool reviewFlow = false)
         {
             if (this.FormData.IsReadOnly)
                 throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
-            if (this.FormData.IsLocked && !avoidLocked)
+            if (this.FormData.IsLocked && !reviewFlow)
                 throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
             if (this.FormData.FormVersionId == 0)
                 throw new FormException("Edit is blocked - Invalid Form RefId!", (int)HttpStatusCode.Forbidden, "Invalid FormVersionId", "EbWebForm -> Save");
             if (this.FormData.IsCancelled)
                 throw new FormException("This form submission is CANCELLED!", (int)HttpStatusCode.Forbidden, "Cancelled record", "EbWebForm -> Save");
 
-            if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
+            if (!reviewFlow && wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                 throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
         }
@@ -2466,13 +2462,13 @@ namespace ExpressBase.Objects
         private bool CanCancel(IDatabase DataDB)
         {
             EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
-
-            string LockCheckQry = string.Format("SELECT id FROM {0} WHERE id = @id AND COALESCE({1}, {2}) = {2} AND COALESCE({3}, {4}) = {4};",
-                this.TableName,
-                ebs[SystemColumns.eb_del],
-                ebs.GetBoolFalse(SystemColumns.eb_del),
-                ebs[SystemColumns.eb_lock],
-                ebs.GetBoolFalse(SystemColumns.eb_lock));
+            string LockCheckQry = string.Empty;
+            //string LockCheckQry = string.Format("SELECT id FROM {0} WHERE id = @id AND COALESCE({1}, {2}) = {2} AND COALESCE({3}, {4}) = {4};",
+            //    this.TableName,
+            //    ebs[SystemColumns.eb_del],
+            //    ebs.GetBoolFalse(SystemColumns.eb_del),
+            //    ebs[SystemColumns.eb_lock],
+            //    ebs.GetBoolFalse(SystemColumns.eb_lock));
 
             DbParameter[] p = new DbParameter[] {
                 DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
@@ -2495,12 +2491,12 @@ namespace ExpressBase.Objects
                 if (ds.Tables[i].Rows.Count <= 0)
                     return false;
             }
-            else
-            {
-                EbDataSet ds = DataDB.DoQueries(LockCheckQry, p);
-                if (ds.Tables[0].Rows.Count <= 0)
-                    return false;
-            }
+            //else
+            //{
+            //    EbDataSet ds = DataDB.DoQueries(LockCheckQry, p);
+            //    if (ds.Tables[0].Rows.Count <= 0)
+            //        return false;
+            //}
             return true;
         }
 
