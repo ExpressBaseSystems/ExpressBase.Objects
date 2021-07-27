@@ -1759,6 +1759,8 @@ namespace ExpressBase.Objects
                 throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
             if (this.FormData.FormVersionId == 0)
                 throw new FormException("Edit is blocked - Invalid Form RefId!", (int)HttpStatusCode.Forbidden, "Invalid FormVersionId", "EbWebForm -> Save");
+            if (this.FormData.IsCancelled)
+                throw new FormException("This form submission is CANCELLED!", (int)HttpStatusCode.Forbidden, "Cancelled record", "EbWebForm -> Save");
 
             if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
