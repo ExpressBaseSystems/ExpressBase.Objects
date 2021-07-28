@@ -16,9 +16,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string Refid { get; set; }
 
-        public User RenderingUser { get; set; }
+        public string RenderingUserAuthId { get; set; }
 
-        public User ReadingUser { get; set; }
+        public string ReadingUserAuthId { get; set; }
 
         public List<Param> Params { get; set; }
     }
