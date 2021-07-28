@@ -326,7 +326,7 @@ namespace ExpressBase.Objects
                 if (_currentTimeStamp == DateTime.MinValue)
                 {
                     _currentTimeStamp = DateTime.UtcNow;
-                    string timezone = ReadingUser.Preference.TimeZone;
+                    string timezone = ReadingUser?.Preference?.TimeZone ?? "(UTC) Coordinated Universal Time";
                     _currentTimeStamp = _currentTimeStamp.ConvertFromUtc(timezone);
                 }
                 return _currentTimeStamp;
@@ -995,7 +995,7 @@ namespace ExpressBase.Objects
         {
             string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
             ColumnText ct = new ColumnText(Canvas);
-            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser.FullName + ", " + timestamp);
+            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser?.FullName??"Machine User" + ", " + timestamp);
             phrase.Font.Size = 6;
             phrase.Font.Color = BaseColor.Gray;
             ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt -/* Margin.Right*/20 - Margin.Left) - /*Margin.Right*/20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
