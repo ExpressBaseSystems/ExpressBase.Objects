@@ -447,7 +447,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.RenderingUser.FullName);
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.RenderingUser?.FullName ?? "Machine User");
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
