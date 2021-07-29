@@ -1,21 +1,19 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
-using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.ServiceClients;
-using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
+using ExpressBase.CoreBase.Globals;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using ServiceStack;
@@ -23,9 +21,6 @@ using ServiceStack.Redis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Data;
-using System.DrawingCore.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -543,10 +538,10 @@ namespace ExpressBase.Objects
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, NTV> CalcValInRow { get; set; } = new Dictionary<string, NTV>();
+        public Dictionary<string, PDF_NTV> CalcValInRow { get; set; } = new Dictionary<string, PDF_NTV>();
 
         [JsonIgnore]
-        public Dictionary<string, NTV> SummaryValInRow { get; set; } = new Dictionary<string, NTV>();
+        public Dictionary<string, PDF_NTV> SummaryValInRow { get; set; } = new Dictionary<string, PDF_NTV>();
 
         public dynamic GetDataFieldValue(string column_name, int i, int tableIndex)
         {
@@ -575,7 +570,7 @@ namespace ExpressBase.Objects
         public void CallSummerize(EbDataField field, int serialnumber)
         {
             string column_val = string.Empty;
-            Globals globals = new Globals
+            EbPdfGlobals globals = new EbPdfGlobals
             {
                 CurrentField = field
             };
@@ -743,16 +738,15 @@ namespace ExpressBase.Objects
 
         public void DoLoopInDetail(int serialnumber)
         {
-            RowHeight = 0;
-            MultiRowTop = 0;
-            string column_val;
-
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             foreach (EbReportDetail detail in Detail)
             {
+                string column_val;
+                RowHeight = 0;
+                MultiRowTop = 0;
                 EbDataField[] SortedList = FieldsNotSummaryPerDetail[detail];
-                Globals globals = new Globals();
+                EbPdfGlobals globals = new EbPdfGlobals();
                 for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
                     EbDataField field = SortedList[iSortPos];
@@ -763,9 +757,9 @@ namespace ExpressBase.Objects
                         EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
 
                         if (CalcValInRow.ContainsKey(field.Title))
-                            CalcValInRow[field.Title] = new NTV { Name = field.Title, Type = dbtype, Value = column_val };
+                            CalcValInRow[field.Title] = new PDF_NTV { Name = field.Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val };
                         else
-                            CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = dbtype, Value = column_val });
+                            CalcValInRow.Add(field.Title, new PDF_NTV { Name = field.Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val });
                         AddParamsNCalcsInGlobal(globals);
                     }
                     else
@@ -897,7 +891,7 @@ namespace ExpressBase.Objects
 
         public void RunAppearanceExpression(EbDataField field, int slno)
         {
-            Globals globals = new Globals { CurrentField = field };
+            EbPdfGlobals globals = new EbPdfGlobals { CurrentField = field };
             AddParamsNCalcsInGlobal(globals);
             if (field.Font is null)
                 globals.CurrentField.Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
@@ -906,7 +900,7 @@ namespace ExpressBase.Objects
                 string TName = calcfd.Split('.')[0];
                 int TableIndex = Convert.ToInt32(TName.Substring(1));
                 string fName = calcfd.Split('.')[1];
-                globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[slno][fName] });
+                globals[TName].Add(fName, new PDF_NTV { Name = fName, Type = (PDF_EbDbTypes)(int)DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[slno][fName] });
             }
             AppearanceScriptCollection[field.Name].RunAsync(globals);
         }
@@ -977,7 +971,7 @@ namespace ExpressBase.Objects
         {
             string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
             ColumnText ct = new ColumnText(Canvas);
-            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser?.FullName??"Machine User" + ", " + timestamp);
+            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser?.FullName ?? "Machine User" + ", " + timestamp);
             phrase.Font.Size = 6;
             phrase.Font.Color = BaseColor.Gray;
             ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt -/* Margin.Right*/20 - Margin.Left) - /*Margin.Right*/20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
@@ -1093,7 +1087,7 @@ namespace ExpressBase.Objects
             return fileByte;
         }
 
-        public void AddParamsNCalcsInGlobal(Globals globals)
+        public void AddParamsNCalcsInGlobal(EbPdfGlobals globals)
         {
             foreach (string key in CalcValInRow.Keys) //adding Calc to global
             {
@@ -1103,7 +1097,7 @@ namespace ExpressBase.Objects
             if (Parameters != null)
                 foreach (Param p in Parameters) //adding Params to global
                 {
-                    globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                    globals["Params"].Add(p.Name, new PDF_NTV { Name = p.Name, Type = (PDF_EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
                 }
 
             if (SummaryValInRow.Count > 0)

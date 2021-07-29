@@ -17,6 +17,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Common.Data;
 using ExpressBase.Objects.Objects;
 using System.Globalization;
+using ExpressBase.CoreBase.Globals;
 
 namespace ExpressBase.Objects
 {
@@ -140,32 +141,28 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetFormattedPhrase(this.Font, _reportFont, column_val);
 
-            if (this.RenderInMultiLine)
+            if (this.RenderInMultiLine && column_val != string.Empty && column_type == System.Data.DbType.Decimal)
             {
-                if (column_val != string.Empty)
+                try
                 {
-                    try
+                    BaseFont calcbasefont = phrase.Font.GetCalculatedBaseFont(false);
+                    float stringwidth = calcbasefont.GetWidthPoint(column_val, phrase.Font.CalculatedSize);
+                    if (stringwidth > 0)
                     {
-                        BaseFont calcbasefont = phrase.Font.GetCalculatedBaseFont(false);
-                        float stringwidth = calcbasefont.GetWidthPoint(column_val, phrase.Font.CalculatedSize);
-                        if (stringwidth > 0)
+                        float charwidth = stringwidth / column_val.Length;
+                        int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
+                        if (numberofCharsInALine < column_val.Length)
                         {
-                            float charwidth = stringwidth / column_val.Length;
-                            Console.WriteLine(Math.Floor(WidthPt / charwidth));
-                            int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
-                            if (numberofCharsInALine < column_val.Length)
-                            {
-                                if (column_type == System.Data.DbType.Decimal)
-                                    column_val = "###";
-                                //else if (column_type == System.Data.DbType.String)
-                                //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
-                            }
+
+                            column_val = "###";
+                            //else if (column_type == System.Data.DbType.String)
+                            //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
                         }
                     }
-                    catch (Exception e)
-                    {
-                        throw e;
-                    }
+                }
+                catch (Exception e)
+                {
+                    throw e;
                 }
             }
             return GetFormattedPhrase(this.Font, _reportFont, column_val);
@@ -202,9 +199,10 @@ namespace ExpressBase.Objects
             }
             return column_val;
         }
+
         public void DoRenderInMultiLine(string column_val, EbReport Report)
         {
-            Report.RowHeight = 0;
+            //Report.RowHeight = 0;
             Report.MultiRowTop = 0;
             DbType datatype = (DbType)DbType;
             int val_length = column_val.Length;
@@ -212,7 +210,7 @@ namespace ExpressBase.Objects
             float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
             if (calculatedValueSize > this.WidthPt)
             {
-               int rowsneeded = (datatype == System.Data.DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
+                int rowsneeded = (datatype == System.Data.DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
                 if (rowsneeded > 1)
                 {
                     if (Report.MultiRowTop == 0)
@@ -550,9 +548,9 @@ namespace ExpressBase.Objects
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val });
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
@@ -883,7 +881,7 @@ namespace ExpressBase.Objects
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = string.Empty;
             EbDbTypes dbtype = EbDbTypes.String;
-            Globals globals = new Globals
+            EbPdfGlobals globals = new EbPdfGlobals
             {
                 CurrentField = this
             };
@@ -898,16 +896,16 @@ namespace ExpressBase.Objects
                         int TableIndex = Convert.ToInt32(TName.Substring(1));
                         string fName = datafd.Split('.')[1];
                         int RowIndex = (TableIndex == Rep.DetailTableIndex) ? slno : 0;
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
+                        globals[TName].Add(fName, new PDF_NTV { Name = fName, Type = (PDF_EbDbTypes)(int)Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
                     }
                 column_val = (Rep.ValueScriptCollection[Name].RunAsync(globals)).Result.ReturnValue.ToString();
 
                 dbtype = (EbDbTypes)CalcFieldIntType;
 
                 if (Rep.CalcValInRow.ContainsKey(Title))
-                    Rep.CalcValInRow[Title] = new NTV { Name = Title, Type = dbtype, Value = column_val };
+                    Rep.CalcValInRow[Title] = new PDF_NTV { Name = Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val };
                 else
-                    Rep.CalcValInRow.Add(Title, new NTV { Name = Title, Type = dbtype, Value = column_val });
+                    Rep.CalcValInRow.Add(Title, new PDF_NTV { Name = Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val });
                 Rep.AddParamsNCalcsInGlobal(globals);
             }
             catch (Exception e)
@@ -946,7 +944,7 @@ namespace ExpressBase.Objects
             ct.Go();
         }
 
-        public dynamic GetCalcFieldValue(Globals globals, EbDataSet DataSet, int serialnumber, EbReport Rep)
+        public dynamic GetCalcFieldValue(EbPdfGlobals globals, EbDataSet DataSet, int serialnumber, EbReport Rep)
         {
             dynamic value = null;
             foreach (string calcfd in this.DataFieldsUsedInCalc)
@@ -954,7 +952,7 @@ namespace ExpressBase.Objects
                 string TName = calcfd.Split('.')[0];
                 string fName = calcfd.Split('.')[1];
                 int tableindex = Convert.ToInt32(TName.Substring(1));
-                globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
+                globals[TName].Add(fName, new PDF_NTV { Name = fName, Type = (PDF_EbDbTypes)(int)DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
             }
             value = (Rep.ValueScriptCollection[this.Name].RunAsync(globals)).Result.ReturnValue.ToString();
             return value;
@@ -1063,9 +1061,9 @@ namespace ExpressBase.Objects
                 column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val });
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
