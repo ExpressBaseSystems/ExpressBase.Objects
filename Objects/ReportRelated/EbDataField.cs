@@ -202,6 +202,31 @@ namespace ExpressBase.Objects
             }
             return column_val;
         }
+        public void DoRenderInMultiLine(string column_val, EbReport Report)
+        {
+            Report.RowHeight = 0;
+            Report.MultiRowTop = 0;
+            DbType datatype = (DbType)DbType;
+            int val_length = column_val.Length;
+            Phrase phrase = new Phrase(column_val, this.GetItextFont(this.Font, this.Font));
+            float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
+            if (calculatedValueSize > this.WidthPt)
+            {
+               int rowsneeded = (datatype == System.Data.DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
+                if (rowsneeded > 1)
+                {
+                    if (Report.MultiRowTop == 0)
+                    {
+                        Report.MultiRowTop = this.TopPt;
+                    }
+                    float k = (phrase.Font.CalculatedSize) * (rowsneeded - 1);
+                    if (k > Report.RowHeight)
+                    {
+                        Report.RowHeight = k;
+                    }
+                }
+            }
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -818,7 +843,7 @@ namespace ExpressBase.Objects
             get
             {
                 if (_dataFieldsUsed == null)
-                    if (ValExpression != null && ValExpression.Code != null)
+                    if (ValExpression?.Code != null)
                     {
                         IEnumerable<string> matches = Regex.Matches(ValExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
                              .Select(m => m.Groups[0].Value)
@@ -921,9 +946,9 @@ namespace ExpressBase.Objects
             ct.Go();
         }
 
-        public dynamic GetCalcFieldValue(Globals globals,EbDataSet DataSet, int serialnumber, EbReport Rep)
+        public dynamic GetCalcFieldValue(Globals globals, EbDataSet DataSet, int serialnumber, EbReport Rep)
         {
-            dynamic value = null; 
+            dynamic value = null;
             foreach (string calcfd in this.DataFieldsUsedInCalc)
             {
                 string TName = calcfd.Split('.')[0];
@@ -942,7 +967,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [MetaOnly]
         public SummaryFunctionsNumeric Function { get; set; }
-         
+
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }

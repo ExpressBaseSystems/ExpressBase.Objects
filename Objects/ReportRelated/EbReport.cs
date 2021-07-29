@@ -743,56 +743,38 @@ namespace ExpressBase.Objects
 
         public void DoLoopInDetail(int serialnumber)
         {
-            int rowsneeded = 1;
             RowHeight = 0;
             MultiRowTop = 0;
-            string column_val = string.Empty;
+            string column_val;
 
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             foreach (EbReportDetail detail in Detail)
             {
                 EbDataField[] SortedList = FieldsNotSummaryPerDetail[detail];
+                Globals globals = new Globals();
                 for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
                     EbDataField field = SortedList[iSortPos];
-                    Phrase phrase;
                     if (field is EbCalcField)
                     {
-                        Globals globals = new Globals
-                        {
-                            CurrentField = field
-                        };
+                        globals.CurrentField = field;
                         column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
+                        EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
+
+                        if (CalcValInRow.ContainsKey(field.Title))
+                            CalcValInRow[field.Title] = new NTV { Name = field.Title, Type = dbtype, Value = column_val };
+                        else
+                            CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = dbtype, Value = column_val });
+                        AddParamsNCalcsInGlobal(globals);
                     }
                     else
                     {
                         column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
                     }
 
-                    if ((field as EbDataField).RenderInMultiLine)
-                    {
-                        DbType datatype = (DbType)field.DbType;
-                        int val_length = column_val.Length;
-                        phrase = new Phrase(column_val, field.GetItextFont(field.Font, this.Font));
-                        float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
-                        if (calculatedValueSize > field.WidthPt)
-                        {
-                            rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
-                            if (rowsneeded > 1)
-                            {
-                                if (MultiRowTop == 0)
-                                {
-                                    MultiRowTop = field.TopPt;
-                                }
-                                float k = (phrase.Font.CalculatedSize) * (rowsneeded - 1);
-                                if (k > RowHeight)
-                                {
-                                    RowHeight = k;
-                                }
-                            }
-                        }
-                    }
+                    if (field.RenderInMultiLine)
+                        field.DoRenderInMultiLine(column_val, this);
                 }
                 EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
                 if (SortedReportFields.Length > 0)
