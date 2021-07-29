@@ -253,7 +253,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ExecuteSqlValueExprResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public object Result { get; set; }
+        public string Result { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

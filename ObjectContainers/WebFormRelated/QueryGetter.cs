@@ -237,7 +237,7 @@ WHERE
             foreach (EbWebForm ebWebForm in _this.FormCollection)
             {
                 WebFormSchema _schema = ebWebForm.FormSchema;
-                foreach (TableSchema _table in _schema.Tables)
+                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
                 {
                     string autoIdBckUp = string.Empty;
                     //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName)
@@ -311,7 +311,7 @@ WHERE
             foreach (EbWebForm ebWebForm in _this.FormCollection)
             {
                 WebFormSchema _schema = ebWebForm.FormSchema;
-                foreach (TableSchema _table in _schema.Tables)
+                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
                 {
                     string Qry = string.Format("UPDATE {0} SET {1} = {5}, {2} = @eb_lastmodified_by, {3} = {4} ",
                         _table.TableName,//0
@@ -473,16 +473,16 @@ WHERE
                 if (_this.IsLocEditable)
                     _qry = _qry.Replace($", {ebs[SystemColumns.eb_loc_id]}", string.Empty).Replace(", @eb_loc_id", string.Empty);
             }
-            else if (tblName.Equals("eb_approval_lines"))
-            {
-                _qry = $@"INSERT INTO eb_approval_lines ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_src_id, eb_ver_id, eb_signin_log_id) 
-                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_id, @{_this.TableName}_eb_ver_id, @eb_signin_log_id); ";
-                if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                    _qry += "SELECT eb_persist_currval('eb_approval_lines_id_seq'); ";
-                // eb_approval - update eb_approval_lines_id
-                _qry += $@"UPDATE eb_approval SET eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')), eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
-                               WHERE eb_src_id = @{_this.TableName}_id AND eb_ver_id =  @{_this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
-            }
+            //else if (tblName.Equals("eb_approval_lines"))
+            //{
+            //    _qry = $@"INSERT INTO eb_approval_lines ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_src_id, eb_ver_id, eb_signin_log_id) 
+            //                VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_id, @{_this.TableName}_eb_ver_id, @eb_signin_log_id); ";
+            //    if (DataDB.Vendor == DatabaseVendors.MYSQL)
+            //        _qry += "SELECT eb_persist_currval('eb_approval_lines_id_seq'); ";
+            //    // eb_approval - update eb_approval_lines_id
+            //    _qry += $@"UPDATE eb_approval SET eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')), eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
+            //                   WHERE eb_src_id = @{_this.TableName}_id AND eb_ver_id =  @{_this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
+            //}
             else
             {
                 string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"@{_this.TableName}_id";

@@ -20,6 +20,13 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string Abandoned = "Abandoned";
     }
 
+    internal enum ReviewStatusEnum
+    {
+        In_Process = 1,
+        Completed = 2,
+        Abandoned = 3
+    }
+
     public static class EbReviewHelper
     {
         public static string GetMyActionInsertUpdateQuery(EbWebForm webForm, IDatabase DataDB, List<DbParameter> param, ref int i, bool isInsert, Service service)
@@ -110,6 +117,7 @@ namespace ExpressBase.Objects.WebFormRelated
             if (Convert.ToString(this.Table[0][FormConstants.stage_unique_id]) == FormConstants.__system_stage &&
                 Convert.ToString(this.Table[0][FormConstants.action_unique_id]) == FormConstants.__review_reset)
             {
+                insUpQ += this.GetApprovalLinesInsertQry(ref i);
                 bool hasRoleMatch = false;
                 if (this.ebReview.ResetterRoles != null)
                     hasRoleMatch = this.webForm.UserObj.RoleIds.Select(x => x).Intersect(this.ebReview.ResetterRoles).Any() ||
@@ -222,7 +230,7 @@ namespace ExpressBase.Objects.WebFormRelated
         private EbReviewStage ExecuteOneStage(ref string insUpQ, ref int i, ref bool insMyActRequired, bool ApprovalFlow)
         {
             EbReviewStage nextStage = null;
-
+            insUpQ += this.GetApprovalLinesInsertQry(ref i);
             insUpQ += this.UpdateMyAction(ref i);
 
             if (!(this.ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.Table[0]["stage_unique_id"])) is EbReviewStage currentStage))
@@ -326,14 +334,14 @@ namespace ExpressBase.Objects.WebFormRelated
                 _col = "role_ids";
                 _val = $"@role_ids_{i}";
                 string roles = nextStage.ApproverRoles == null ? string.Empty : nextStage.ApproverRoles.Join(",");
-                this.param.Add(this.DataDB.GetNewParameter($"@role_ids_{i++}", EbDbTypes.String, roles));
+                this.param.Add(this.DataDB.GetNewParameter($"role_ids_{i++}", EbDbTypes.String, roles));
                 this.webForm.MyActNotification.RoleIds = nextStage.ApproverRoles;
             }
             else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
             {
                 _col = "usergroup_id";
                 _val = $"@usergroup_id_{i}";
-                this.param.Add(this.DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
+                this.param.Add(this.DataDB.GetNewParameter($"usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
                 this.webForm.MyActNotification.UserGroupId = nextStage.ApproverUserGroup;
             }
             else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
@@ -414,7 +422,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             string insUpQ = this.GetMyActionUpdateQry(i);
 
-            this.param.Add(this.DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, this.Table[0][FormConstants.eb_my_actions_id]));
+            this.param.Add(this.DataDB.GetNewParameter($"eb_my_actions_id_{i++}", EbDbTypes.Int32, this.Table[0][FormConstants.eb_my_actions_id]));
             Console.WriteLine("Will try to UPDATE eb_my_actions");
             return insUpQ;
         }
@@ -433,6 +441,7 @@ INSERT INTO eb_my_actions(
     description, 
     is_form_data_editable, 
     my_action_type,
+    action_type,
     hide)
 VALUES (
     {_col_val[1]}, 
@@ -445,6 +454,7 @@ VALUES (
     '{description}', 
     '{(nextStage.IsFormEditable ? "T" : "F")}', 
     '{MyActionTypes.Approval}',
+    {(int)MyActionTypes.Approval},
     '{(nextStage.HideNotification ? "T" : "F")}'); ";
         }
 
@@ -477,7 +487,7 @@ SET
 WHERE 
     id = @eb_my_actions_id_{i} AND 
     eb_del = 'F'; ";
-            this.param.Add(this.DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, myActId));
+            this.param.Add(this.DataDB.GetNewParameter($"eb_my_actions_id_{i++}", EbDbTypes.Int32, myActId));
             Console.WriteLine("Will try to DELETE eb_my_actions");
             return delQ;
         }
@@ -493,6 +503,7 @@ WHERE
             return $@"
 INSERT INTO eb_approval(
     review_status, 
+    status,
     eb_my_actions_id, 
     eb_src_id, 
     eb_ver_id, 
@@ -501,6 +512,7 @@ INSERT INTO eb_approval(
     eb_del)
 VALUES(
     '{ReviewStatus.In_Process}', 
+    {(int)ReviewStatusEnum.In_Process},
     (SELECT eb_currval('eb_my_actions_id_seq')), 
     {str}, 
     @{this.webForm.TableName}_eb_ver_id, 
@@ -514,12 +526,12 @@ VALUES(
             string upStr;
             if (isdel)
                 upStr = "eb_del = 'T'";
-            else if (_reviewStatus == null)
+            else if (_reviewStatus == null && !isReset)
                 upStr = "eb_my_actions_id = (SELECT eb_currval('eb_my_actions_id_seq'))";
             else if (isReset)
-                upStr = $"eb_my_actions_id = (SELECT eb_currval('eb_my_actions_id_seq')), review_status = '{ReviewStatus.In_Process}'";
+                upStr = $"eb_my_actions_id = (SELECT eb_currval('eb_my_actions_id_seq')), review_status = '{ReviewStatus.In_Process}', status = {(int)ReviewStatusEnum.In_Process}";
             else
-                upStr = $"review_status = '{_reviewStatus}'";
+                upStr = $"review_status = '{_reviewStatus}', status = {(int)(ReviewStatusEnum)Enum.Parse(typeof(ReviewStatusEnum), _reviewStatus)}";
 
             return $@"
 UPDATE 
@@ -532,6 +544,53 @@ WHERE
     eb_src_id = @{this.webForm.TableName}_id AND 
     eb_ver_id =  @{this.webForm.TableName}_eb_ver_id AND 
     COALESCE(eb_del, 'F') = 'F'; ";
+        }
+
+        private string GetApprovalLinesInsertQry(ref int i)
+        {
+            string qry = $@"
+INSERT INTO eb_approval_lines (
+    stage_unique_id,
+    action_unique_id,
+    eb_my_actions_id,
+    comments,
+    eb_created_by, 
+    eb_created_at, 
+    eb_loc_id, 
+    eb_src_id, 
+    eb_ver_id, 
+    eb_signin_log_id,
+    eb_approval_id
+) 
+VALUES (
+    @stage_unique_id_{i},
+    @action_unique_id_{i},
+    @eb_my_actions_id_{i},
+    @comments_{i},
+    @eb_createdby, 
+    {DataDB.EB_CURRENT_TIMESTAMP}, 
+    @eb_loc_id, 
+    @{this.webForm.TableName}_id, 
+    @{this.webForm.TableName}_eb_ver_id, 
+    @eb_signin_log_id, 
+    (SELECT id FROM eb_approval WHERE eb_src_id = @{this.webForm.TableName}_id AND eb_ver_id =  @{this.webForm.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F' LIMIT 1));
+
+UPDATE 
+    eb_approval 
+SET 
+    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')), 
+    eb_lastmodified_by = @eb_modified_by, 
+    eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
+WHERE 
+    eb_src_id = @{this.webForm.TableName}_id AND 
+    eb_ver_id =  @{this.webForm.TableName}_eb_ver_id AND 
+    COALESCE(eb_del, 'F') = 'F';";
+
+            this.param.Add(this.DataDB.GetNewParameter($"stage_unique_id_{i}", EbDbTypes.String, this.Table[0][FormConstants.stage_unique_id]));
+            this.param.Add(this.DataDB.GetNewParameter($"action_unique_id_{i}", EbDbTypes.String, this.Table[0][FormConstants.action_unique_id]));
+            this.param.Add(this.DataDB.GetNewParameter($"eb_my_actions_id_{i}", EbDbTypes.Int32, this.Table[0][FormConstants.eb_my_actions_id]));
+            this.param.Add(this.DataDB.GetNewParameter($"comments_{i++}", EbDbTypes.String, this.Table[0][FormConstants.comments]));
+            return qry;
         }
 
         private string GetApprovalLinesDeleteQry()
