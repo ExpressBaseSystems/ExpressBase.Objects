@@ -25,6 +25,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using static ExpressBase.CoreBase.Globals.PdfGEbFont;
+
 namespace ExpressBase.Objects
 {
     public enum EbReportSectionType
@@ -538,10 +540,10 @@ namespace ExpressBase.Objects
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, PDF_NTV> CalcValInRow { get; set; } = new Dictionary<string, PDF_NTV>();
+        public Dictionary<string, PdfNTV> CalcValInRow { get; set; } = new Dictionary<string, PdfNTV>();
 
         [JsonIgnore]
-        public Dictionary<string, PDF_NTV> SummaryValInRow { get; set; } = new Dictionary<string, PDF_NTV>();
+        public Dictionary<string, PdfNTV> SummaryValInRow { get; set; } = new Dictionary<string, PdfNTV>();
 
         public dynamic GetDataFieldValue(string column_name, int i, int tableIndex)
         {
@@ -572,7 +574,7 @@ namespace ExpressBase.Objects
             string column_val = string.Empty;
             EbPdfGlobals globals = new EbPdfGlobals
             {
-                CurrentField = field
+                // CurrentField = field
             };
 
             AddParamsNCalcsInGlobal(globals);
@@ -757,9 +759,9 @@ namespace ExpressBase.Objects
                         EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
 
                         if (CalcValInRow.ContainsKey(field.Title))
-                            CalcValInRow[field.Title] = new PDF_NTV { Name = field.Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val };
+                            CalcValInRow[field.Title] = new PdfNTV { Name = field.Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val };
                         else
-                            CalcValInRow.Add(field.Title, new PDF_NTV { Name = field.Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val });
+                            CalcValInRow.Add(field.Title, new PdfNTV { Name = field.Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val });
                         AddParamsNCalcsInGlobal(globals);
                     }
                     else
@@ -891,18 +893,34 @@ namespace ExpressBase.Objects
 
         public void RunAppearanceExpression(EbDataField field, int slno)
         {
-            EbPdfGlobals globals = new EbPdfGlobals { CurrentField = field };
+            if (field.Font is null || field.Font.Size == 0)
+                field.Font = new EbFont { color = "#000000", FontName = "Roboto", Caps = false, Size = 10, Strikethrough = false, Style = FontStyle.NORMAL, Underline = false };
+            PdfGEbFont pg_font = new PdfGEbFont
+            {
+                Caps = field.Font.Caps,
+                color = field.Font.color,
+                FontName = field.Font.FontName,
+                Size = field.Font.Size,
+                Strikethrough = field.Font.Strikethrough,
+                Style = (PdfGFontStyle)(int)field.Font.Style,
+                Underline = field.Font.Underline
+            };
+            EbPdfGlobals globals = new EbPdfGlobals
+            {
+                CurrentField = new PdfGReportField(field.LeftPt, field.WidthPt, field.TopPt, field.HeightPt, field.BackColor, field.ForeColor, field.IsHidden, pg_font)
+            };
+
             AddParamsNCalcsInGlobal(globals);
-            if (field.Font is null)
-                globals.CurrentField.Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+
             foreach (string calcfd in field.DataFieldsUsedAppearance)
             {
                 string TName = calcfd.Split('.')[0];
                 int TableIndex = Convert.ToInt32(TName.Substring(1));
                 string fName = calcfd.Split('.')[1];
-                globals[TName].Add(fName, new PDF_NTV { Name = fName, Type = (PDF_EbDbTypes)(int)DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[slno][fName] });
+                globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[slno][fName] });
             }
             AppearanceScriptCollection[field.Name].RunAsync(globals);
+            field.SetValuesFromGlobals(globals.CurrentField);
         }
 
         public List<Param> CreateRowParamForLink(EbDataField field, int slno)
@@ -1097,7 +1115,7 @@ namespace ExpressBase.Objects
             if (Parameters != null)
                 foreach (Param p in Parameters) //adding Params to global
                 {
-                    globals["Params"].Add(p.Name, new PDF_NTV { Name = p.Name, Type = (PDF_EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                    globals["Params"].Add(p.Name, new PdfNTV { Name = p.Name, Type = (PdfEbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
                 }
 
             if (SummaryValInRow.Count > 0)

@@ -16,6 +16,8 @@ using ExpressBase.Common.Data;
 using Newtonsoft.Json;
 using ServiceStack;
 using ExpressBase.Common.Constants;
+using ExpressBase.CoreBase.Globals;
+using FontStyle = ExpressBase.Common.FontStyle;
 
 namespace ExpressBase.Objects
 {
@@ -96,7 +98,7 @@ namespace ExpressBase.Objects
                 if (!(_reportFont is null))
                     Font = _reportFont;
                 else
-                    Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 8, Strikethrough = false, Style = 0, Underline = false });
+                    Font = (new EbFont { color = "#000000", FontName = "Roboto", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
             }
             iTextFont = FontFactory.GetFont(Font.FontName, Font.Size, (int)Font.Style);
             iTextFont.Color = GetColor(Font.color);
@@ -154,6 +156,28 @@ namespace ExpressBase.Objects
             else if (format == DateFormatReport.dd_MMMM_yyyy)
                 return string.Format("{0:dd MMMM yyyy}", dt);
             return column_val;
+        }
+
+        public void SetValuesFromGlobals(PdfGReportField field)
+        {
+            LeftPt = field.Left;
+            WidthPt = field.Width;
+            TopPt = field.Top;
+            HeightPt = field.Height;
+            BackColor = field.BackColor;
+            ForeColor = field.ForeColor;
+            IsHidden = field.IsHidden;
+            Font = new EbFont
+            {
+                Caps = field.Font.Caps,
+                color = field.Font.color,
+                FontName = field.Font.FontName,
+                Size = field.Font.Size,
+                Strikethrough = field.Font.Strikethrough,
+                Style = (FontStyle)(int)field.Font.Style,
+                Underline = field.Font.Underline
+            };
+
         }
     }
 

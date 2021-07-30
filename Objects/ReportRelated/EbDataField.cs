@@ -71,14 +71,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
         [UIproperty]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        [JsonConverter(typeof(Base64Converter))]
-        [Alias("Appearance Expression Old")]
-        public string AppearanceExpression { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
-        [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorJS)]
         [Alias("Appearance Expression")]
         public EbScript AppearExpression { get; set; }
@@ -548,9 +540,9 @@ namespace ExpressBase.Objects
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val });
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
@@ -804,13 +796,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        [JsonConverter(typeof(Base64Converter))]
-        [Alias("Value Exp Old")]
-        public string ValueExpression { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [Alias("Value Expression")]
         public EbScript ValExpression { get; set; }
 
@@ -883,7 +868,7 @@ namespace ExpressBase.Objects
             EbDbTypes dbtype = EbDbTypes.String;
             EbPdfGlobals globals = new EbPdfGlobals
             {
-                CurrentField = this
+                //CurrentField = this
             };
 
             Rep.AddParamsNCalcsInGlobal(globals);
@@ -896,16 +881,16 @@ namespace ExpressBase.Objects
                         int TableIndex = Convert.ToInt32(TName.Substring(1));
                         string fName = datafd.Split('.')[1];
                         int RowIndex = (TableIndex == Rep.DetailTableIndex) ? slno : 0;
-                        globals[TName].Add(fName, new PDF_NTV { Name = fName, Type = (PDF_EbDbTypes)(int)Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
+                        globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
                     }
                 column_val = (Rep.ValueScriptCollection[Name].RunAsync(globals)).Result.ReturnValue.ToString();
 
                 dbtype = (EbDbTypes)CalcFieldIntType;
 
                 if (Rep.CalcValInRow.ContainsKey(Title))
-                    Rep.CalcValInRow[Title] = new PDF_NTV { Name = Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val };
+                    Rep.CalcValInRow[Title] = new PdfNTV { Name = Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val };
                 else
-                    Rep.CalcValInRow.Add(Title, new PDF_NTV { Name = Title, Type = (PDF_EbDbTypes)(int)dbtype, Value = column_val });
+                    Rep.CalcValInRow.Add(Title, new PdfNTV { Name = Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val });
                 Rep.AddParamsNCalcsInGlobal(globals);
             }
             catch (Exception e)
@@ -952,7 +937,7 @@ namespace ExpressBase.Objects
                 string TName = calcfd.Split('.')[0];
                 string fName = calcfd.Split('.')[1];
                 int tableindex = Convert.ToInt32(TName.Substring(1));
-                globals[TName].Add(fName, new PDF_NTV { Name = fName, Type = (PDF_EbDbTypes)(int)DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
+                globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
             }
             value = (Rep.ValueScriptCollection[this.Name].RunAsync(globals)).Result.ReturnValue.ToString();
             return value;
@@ -1061,9 +1046,9 @@ namespace ExpressBase.Objects
                 column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new PDF_NTV { Name = Title, Type = PDF_EbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val });
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
