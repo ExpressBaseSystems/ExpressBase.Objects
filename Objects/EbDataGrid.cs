@@ -665,7 +665,11 @@ else {
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return "return parseFloat(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
+            get 
+            {
+                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ";" +
+                  " return parseFloat(val.replace(/,/g, ''))"; 
+            }
 
             set { }
         }
@@ -673,7 +677,8 @@ else {
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn
         {
-            get { return "let val = parseFloat(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "); return val.toFixed(this.DecimalPlaces);"; }
+            get { return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = parseFloat(val.replace(/,/g, '')); " +
+                    "return this.InputMode == 1 ? val.toLocaleString('en-IN', { maximumFractionDigits: this.DecimalPlaces, minimumFractionDigits: this.DecimalPlaces }) : val.toFixed(this.DecimalPlaces);"; }
 
             set { }
         }
