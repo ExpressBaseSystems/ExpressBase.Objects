@@ -167,16 +167,17 @@ namespace ExpressBase.Objects
             BackColor = field.BackColor;
             ForeColor = field.ForeColor;
             IsHidden = field.IsHidden;
-            Font = new EbFont
-            {
-                Caps = field.Font.Caps,
-                color = field.Font.color,
-                FontName = field.Font.FontName,
-                Size = field.Font.Size,
-                Strikethrough = field.Font.Strikethrough,
-                Style = (FontStyle)(int)field.Font.Style,
-                Underline = field.Font.Underline
-            };
+            if (field.Font != null)
+                Font = new EbFont
+                {
+                    Caps = field.Font.Caps,
+                    color = field.Font.color,
+                    FontName = field.Font.FontName,
+                    Size = field.Font.Size,
+                    Strikethrough = field.Font.Strikethrough,
+                    Style = (FontStyle)(int)field.Font.Style,
+                    Underline = field.Font.Underline
+                };
 
         }
     }
