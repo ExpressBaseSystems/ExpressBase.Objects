@@ -140,6 +140,11 @@ namespace ExpressBase.Objects
         [HelpText("Define actions to do after a datagrid row painted on screen.")]
         public EbScript OnRowPaint { get; set; }
 
+        [PropertyGroup("Data")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript PersistRowOnlyIf { get; set; }
+
         [JsonIgnore]
         public override string OnChangeBindJSFn
         {
