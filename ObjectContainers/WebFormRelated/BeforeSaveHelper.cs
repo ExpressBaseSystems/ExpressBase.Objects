@@ -329,6 +329,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             throw new FormException("Set 'options' for simple select column - " + _ctrl.Title ?? _ctrl.Name);
                     }
                 }
+                else if (Allctrls[i] is EbExportButton _ctrl)
+                {
+                    if (string.IsNullOrWhiteSpace(_ctrl.FormRefId))
+                    {
+                        throw new FormException("Set 'Destination Form' for Export Button - " + _ctrl.Label ?? _ctrl.Name);
+                    }
+                }
 
                 //--------------------------
                 if (Allctrls[i] is EbDynamicCardSet)
