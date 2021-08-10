@@ -444,36 +444,43 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             else if (_table.TableType == WebFormTableTypes.Review)
             {
                 EbReview reviewCtrl = this.WebForm.FormSchema.ExtendedControls.Find(e => e is EbReview) as EbReview;
-                string val = new_val;
-                if (_column.ColumnName == FormConstants.stage_unique_id)
-                {
-                    new_val = reviewCtrl.FormStages.Find(e => e.EbSid == val)?.Name;
-                    if (val == FormConstants.__system_stage)
-                        new_val = "System";
-                }
-                else if (_column.ColumnName == FormConstants.action_unique_id)
-                {
-                    foreach (EbReviewStage st in reviewCtrl.FormStages)
-                    {
-                        EbReviewAction act = st.StageActions.Find(e => e.EbSid == val);
-                        if (act != null)
-                        {
-                            new_val = act.Name;
-                            break;
-                        }
-                        else if (val == FormConstants.__review_reset)
-                        {
-                            new_val = "Reset";
-                            break;
-                        }
-                    }
-                }
+                old_val = this.GetFormattedApprovalData(old_val, _column, reviewCtrl);
+                new_val = this.GetFormattedApprovalData(new_val, _column, reviewCtrl);
             }
             else
             {
                 old_val = this.GetFormattedData(_column.Control, old_val);
                 new_val = this.GetFormattedData(_column.Control, new_val);
             }
+        }
+
+        private string GetFormattedApprovalData(string unf_val, ColumnSchema _column, EbReview reviewCtrl)
+        {
+            string val = unf_val;
+            if (_column.ColumnName == FormConstants.stage_unique_id)
+            {
+                unf_val = reviewCtrl.FormStages.Find(e => e.EbSid == val)?.Name;
+                if (val == FormConstants.__system_stage)
+                    unf_val = "System";
+            }
+            else if (_column.ColumnName == FormConstants.action_unique_id)
+            {
+                foreach (EbReviewStage st in reviewCtrl.FormStages)
+                {
+                    EbReviewAction act = st.StageActions.Find(e => e.EbSid == val);
+                    if (act != null)
+                    {
+                        unf_val = act.Name;
+                        break;
+                    }
+                    else if (val == FormConstants.__review_reset)
+                    {
+                        unf_val = "Reset";
+                        break;
+                    }
+                }
+            }
+            return unf_val;
         }
 
         private string GetFormattedData(EbControl ctrl, string value)// missing: ss !IsDynamic
