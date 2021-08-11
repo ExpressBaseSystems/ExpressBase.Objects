@@ -133,7 +133,7 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetFormattedPhrase(this.Font, _reportFont, column_val);
 
-            if (this.RenderInMultiLine && column_val != string.Empty && column_type == System.Data.DbType.Decimal)
+            if (this.RenderInMultiLine && column_val != string.Empty && column_type == System.Data.DbType.Decimal || column_type == System.Data.DbType.Double || column_type == System.Data.DbType.Int16 || column_type == System.Data.DbType.Int32 || column_type == System.Data.DbType.Int64 || column_type == System.Data.DbType.VarNumeric)
             {
                 try
                 {
@@ -202,7 +202,11 @@ namespace ExpressBase.Objects
             float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
             if (calculatedValueSize > this.WidthPt)
             {
-                int rowsneeded = (datatype == System.Data.DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
+                int rowsneeded;
+                if (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16 || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric)
+                    rowsneeded = 1;
+                else
+                    rowsneeded = Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
                 if (rowsneeded > 1)
                 {
                     if (Report.MultiRowTop == 0)
