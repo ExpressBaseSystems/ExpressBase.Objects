@@ -264,8 +264,8 @@ else {
         {
             List<string> _params = new List<string>();
             EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, null);
-
-            foreach (Param p in DataReader.GetParams(redis as RedisClient))
+            this.ParamsList = DataReader.GetParams(redis as RedisClient);
+            foreach (Param p in this.ParamsList)
             {
                 _params.Add(p.Name);
                 for (int i = 0; i < Allctrls.Length; i++)
@@ -278,16 +278,16 @@ else {
             }
 
             this.Eb__paramControls = _params;
-            Eb__DSQuery = DataReader.Sql;
         }
 
+        //Deprecated
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public List<string> Eb__paramControls { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public string Eb__DSQuery { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public List<Param> ParamsList { get; set; }
 
         public override string GetBareHtml()
         {
@@ -665,10 +665,10 @@ else {
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get 
+            get
             {
                 return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ";" +
-                  " return parseFloat(val.replace(/,/g, ''))"; 
+                  " return parseFloat(val.replace(/,/g, ''))";
             }
 
             set { }
@@ -677,8 +677,11 @@ else {
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn
         {
-            get { return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = parseFloat(val.replace(/,/g, '')); " +
-                    "return this.InputMode == 1 ? val.toLocaleString('en-IN', { maximumFractionDigits: this.DecimalPlaces, minimumFractionDigits: this.DecimalPlaces }) : val.toFixed(this.DecimalPlaces);"; }
+            get
+            {
+                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = parseFloat(val.replace(/,/g, '')); " +
+                  "return this.InputMode == 1 ? val.toLocaleString('en-IN', { maximumFractionDigits: this.DecimalPlaces, minimumFractionDigits: this.DecimalPlaces }) : val.toFixed(this.DecimalPlaces);";
+            }
 
             set { }
         }
