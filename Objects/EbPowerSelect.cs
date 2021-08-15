@@ -1059,7 +1059,7 @@ else// PS
                 ObjType = this.ObjType,
                 F = string.Empty,
                 D = new Dictionary<int, Dictionary<string, string>>(),
-                R = new Dictionary<string, List<dynamic>>()
+                R = new Dictionary<string, List<object>>()
             };
         }
     }

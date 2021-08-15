@@ -1482,50 +1482,51 @@ namespace ExpressBase.Objects
                     }
                 }
 
-                List<EbControl> drPsList = new List<EbControl>();
-                List<EbControl> apiPsList = new List<EbControl>();
-                foreach (TableSchema Tbl in _schema.Tables)
-                {
-                    drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
-                    apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
-                }
-
-                if (drPsList.Count > 0)
-                {
-                    this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
-                    List<DbParameter> param = this.GetPsParams(drPsList, _FormData, DataDB, service);
-                    EbDataSet ds;
-                    if (this.DbConnection == null)
-                        ds = DataDB.DoQueries(psquery, param.ToArray());
-                    else
-                        ds = DataDB.DoQueries(this.DbConnection, psquery, param.ToArray());
-
-                    if (ds.Tables.Count > 0)
-                    {
-                        int tblIdx = 0;
-                        foreach (EbControl ctrl in drPsList)
-                        {
-                            SingleTable Table = new SingleTable();
-                            this.GetFormattedData(ds.Tables[tblIdx], Table);
-                            _FormData.PsDm_Tables.Add(ctrl.EbSid, Table);
-                            tblIdx++;
-                        }
-                    }
-                }
-
-                foreach (EbControl Ctrl in apiPsList)
-                {
-                    Dictionary<string, SingleTable> Tables = EbFormHelper.GetDataFormApi(service, Ctrl, this, _FormData, false);
-                    if (Tables.Count > 0)
-                        _FormData.PsDm_Tables.Add(Ctrl.EbSid, Tables.ElementAt(0).Value);
-                    else
-                        _FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
-                }
-
-                this.PostFormatFormData();
-                this.FormGlobals = null;// FormGlobals is a reusing Object, so clear when a data change happens
                 this.ExeDeleteCancelEditScript(DataDB, _FormData);
             }
+
+            List<EbControl> drPsList = new List<EbControl>();
+            List<EbControl> apiPsList = new List<EbControl>();
+            foreach (TableSchema Tbl in _schema.Tables)
+            {
+                drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+                apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+            }
+
+            if (drPsList.Count > 0)
+            {
+                this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
+                List<DbParameter> param = this.GetPsParams(drPsList, _FormData, DataDB, service);
+                EbDataSet ds;
+                if (this.DbConnection == null)
+                    ds = DataDB.DoQueries(psquery, param.ToArray());
+                else
+                    ds = DataDB.DoQueries(this.DbConnection, psquery, param.ToArray());
+
+                if (ds.Tables.Count > 0)
+                {
+                    int tblIdx = 0;
+                    foreach (EbControl ctrl in drPsList)
+                    {
+                        SingleTable Table = new SingleTable();
+                        this.GetFormattedData(ds.Tables[tblIdx], Table);
+                        _FormData.PsDm_Tables.Add(ctrl.EbSid, Table);
+                        tblIdx++;
+                    }
+                }
+            }
+
+            foreach (EbControl Ctrl in apiPsList)
+            {
+                Dictionary<string, SingleTable> Tables = EbFormHelper.GetDataFormApi(service, Ctrl, this, _FormData, false);
+                if (Tables.Count > 0)
+                    _FormData.PsDm_Tables.Add(Ctrl.EbSid, Tables.ElementAt(0).Value);
+                else
+                    _FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
+            }
+
+            this.PostFormatFormData();
+            this.FormGlobals = null;// FormGlobals is a reusing Object, so clear when a data change happens
         }
 
         private List<DbParameter> GetPsParams(List<EbControl> drPsList, WebformData _FormData, IDatabase DataDB, Service service)
@@ -2270,6 +2271,7 @@ namespace ExpressBase.Objects
                     globalsType: typeof(FG_Root)
                 );
                 valscript.Compile();
+                //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                 return (valscript.RunAsync(globals)).Result.ReturnValue;
             }
             catch (Exception ex)
