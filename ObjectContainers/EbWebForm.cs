@@ -335,122 +335,94 @@ namespace ExpressBase.Objects
         {
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
             EbControl TriggerCtrl = Array.Find(Allctrls, c => c.Name == Trigger);
-            EbControl[] DGs = Array.FindAll(Allctrls, c => c is EbDataGrid);
 
-            if (TriggerCtrl == null)
-                throw new FormException("Bad request", (int)HttpStatusCode.BadRequest, "Trigger control not found: " + Trigger, "EbWebForm -> ImportData");
+            if (TriggerCtrl == null || !(TriggerCtrl is EbDataGrid))
+                throw new FormException("Bad request", (int)HttpStatusCode.BadRequest, "Trigger control(dg) not found: " + Trigger, "EbWebForm -> ImportData");
 
             this.FormData = new WebformData();
 
-            if (TriggerCtrl.DependedDG != null && TriggerCtrl.DependedDG.Count > 0)// dg dr
+            EbDataGrid _dg = TriggerCtrl as EbDataGrid;
+
+            TableSchema _sc = this.FormSchema.Tables.Find(tbl => tbl.TableName == _dg.TableName);
+            if (_sc == null)
+                throw new FormException("Bad request", (int)HttpStatusCode.BadRequest, "Table schema not found: " + Trigger, "EbWebForm -> ImportData");
+
+            EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);
+            foreach (Param item in dataReader.GetParams(Service.Redis as RedisClient))
             {
-                //this.GetDGsEmptyModel();
-                foreach (string dgName in TriggerCtrl.DependedDG)
+                Param _p = Param.Find(p => p.Name == item.Name);
+                if (_p != null)
+                    _p.Type = item.Type;
+                else
+                    Console.WriteLine("Param not found in request: " + item.Name);//or throw Exception
+            }
+            DataSourceDataSetResponse response = Service.Gateway.Send<DataSourceDataSetResponse>(new DataSourceDataSetRequest { RefId = _dg.DataSourceId, Params = Param });
+
+            SingleTable Table = new SingleTable();
+            Dictionary<EbDGPowerSelectColumn, string> psDict = new Dictionary<EbDGPowerSelectColumn, string>();
+
+            int rowCounter = -501;
+            foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
+            {
+                SingleRow Row = new SingleRow();
+                if (_dg.IsLoadDataSourceInEditMode && RowId > 0 && _row[FormConstants.id] != null)
+                    Row.RowId = Convert.ToInt32(_row[FormConstants.id]);// assuming id is RowId /////
+                else
+                    Row.RowId = rowCounter--;
+                foreach (ColumnSchema _column in _sc.Columns)
                 {
-                    if (!(Array.Find(DGs, e => e.Name == dgName) is EbDataGrid _dg))
+                    EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
+                    if (dc != null && !_row.IsDBNull(dc.ColumnIndex))
                     {
-                        Console.WriteLine("DG not found:" + dgName);
-                        break;
-                    }
-
-                    TableSchema _sc = this.FormSchema.Tables.Find(tbl => tbl.TableName == _dg.TableName);
-                    if (_sc == null)
-                    {
-                        Console.WriteLine("Schema table not found:" + _dg.TableName);
-                        break;
-                    }
-
-                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);
-                    foreach (Param item in dataReader.GetParams(Service.Redis as RedisClient))
-                    {
-                        Param _p = Param.Find(p => p.Name == item.Name);
-                        if (_p != null)
-                            _p.Type = item.Type;
-                        else
-                            Console.WriteLine("Param not found in request: " + item.Name);//or throw Exception
-                    }
-                    DataSourceDataSetResponse response = Service.Gateway.Send<DataSourceDataSetResponse>(new DataSourceDataSetRequest { RefId = _dg.DataSourceId, Params = Param });
-
-                    SingleTable Table = new SingleTable();
-                    Dictionary<EbDGPowerSelectColumn, string> psDict = new Dictionary<EbDGPowerSelectColumn, string>();
-
-                    int rowCounter = -501;
-                    foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
-                    {
-                        SingleRow Row = new SingleRow();
-                        if (_dg.IsLoadDataSourceInEditMode && RowId > 0 && _row[FormConstants.id] != null)
-                            Row.RowId = Convert.ToInt32(_row[FormConstants.id]);// assuming id is RowId /////
-                        else
-                            Row.RowId = rowCounter--;
-                        foreach (ColumnSchema _column in _sc.Columns)
+                        string _formattedData = Convert.ToString(_row[dc.ColumnIndex]);
+                        if (_column.Control is EbDGPowerSelectColumn)
                         {
-                            EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
-                            if (dc != null && !_row.IsDBNull(dc.ColumnIndex))
+                            if (!string.IsNullOrEmpty(_formattedData))
                             {
-                                string _formattedData = Convert.ToString(_row[dc.ColumnIndex]);
-                                if (_column.Control is EbDGPowerSelectColumn)
-                                {
-                                    if (!string.IsNullOrEmpty(_formattedData))
-                                    {
-                                        if (!psDict.ContainsKey(_column.Control as EbDGPowerSelectColumn))
-                                            psDict.Add(_column.Control as EbDGPowerSelectColumn, _formattedData);
-                                        else
-                                            psDict[_column.Control as EbDGPowerSelectColumn] += CharConstants.COMMA + _formattedData;
-                                    }
-                                }
-                                Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, _formattedData, false));
+                                if (!psDict.ContainsKey(_column.Control as EbDGPowerSelectColumn))
+                                    psDict.Add(_column.Control as EbDGPowerSelectColumn, _formattedData);
+                                else
+                                    psDict[_column.Control as EbDGPowerSelectColumn] += CharConstants.COMMA + _formattedData;
                             }
-                            else
-                                Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
                         }
-
-                        Table.Add(Row);
+                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, _formattedData, false));
                     }
-                    this.FormData.MultipleTables.Add(_dg.TableName, Table);
+                    else
+                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
+                }
 
-                    Dictionary<string, string> QrsDict = new Dictionary<string, string>();
-                    List<DbParameter> param = new List<DbParameter>();
-                    foreach (Param _p in Param)
+                Table.Add(Row);
+            }
+            this.FormData.MultipleTables.Add(_dg.TableName, Table);
+
+            Dictionary<string, string> QrsDict = new Dictionary<string, string>();
+            List<DbParameter> param = new List<DbParameter>();
+            foreach (Param _p in Param)
+                param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
+
+            foreach (KeyValuePair<EbDGPowerSelectColumn, string> psItem in psDict)
+            {
+                string t = psItem.Key.GetSelectQuery(DataDB, Service, psItem.Value);
+                QrsDict.Add(psItem.Key.EbSid, t);
+                foreach (Param _p in psItem.Key.ParamsList)
+                {
+                    if (!param.Exists(e => e.ParameterName == _p.Name))
                         param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
-
-                    foreach (KeyValuePair<EbDGPowerSelectColumn, string> psItem in psDict)
-                    {
-                        string t = psItem.Key.GetSelectQuery(DataDB, Service, psItem.Value);
-                        QrsDict.Add(psItem.Key.EbSid, t);
-                        foreach (Param _p in psItem.Key.ParamsList)
-                        {
-                            if (!param.Exists(e => e.ParameterName == _p.Name))
-                                param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
-                        }
-                    }
-                    if (QrsDict.Count > 0)
-                    {
-                        EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
-
-                        EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
-                        int i = 0;
-                        foreach (KeyValuePair<string, string> item in QrsDict)
-                        {
-                            SingleTable Tbl = new SingleTable();
-                            this.GetFormattedData(dataset.Tables[i++], Tbl);
-                            this.FormData.PsDm_Tables.Add(item.Key, Tbl);
-                        }
-                        this.PostFormatFormData();
-                    }
                 }
             }
-
-            else if (TriggerCtrl is EbPowerSelect && !string.IsNullOrEmpty((TriggerCtrl as EbPowerSelect).DataImportId))// ps import
+            if (QrsDict.Count > 0)
             {
-                Param[0].Type = ((int)EbDbTypes.Int32).ToString();
-                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);
-                _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
-                _form.UserObj = this.UserObj;
-                _form.SolutionObj = this.SolutionObj;
-                _form.AfterRedisGet_All(Service);
-                _form.TableRowId = Param[0].ValueTo;
-                _form.FormatImportData(DataDB, Service, this);
-                //this.FormData = _form.FormData;
+                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
+
+                EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
+                int i = 0;
+                foreach (KeyValuePair<string, string> item in QrsDict)
+                {
+                    SingleTable Tbl = new SingleTable();
+                    this.GetFormattedData(dataset.Tables[i++], Tbl);
+                    this.FormData.PsDm_Tables.Add(item.Key, Tbl);
+                }
+                this.PostFormatFormData();
             }
         }
 
