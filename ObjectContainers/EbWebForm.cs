@@ -422,7 +422,7 @@ namespace ExpressBase.Objects
                     this.GetFormattedData(dataset.Tables[i++], Tbl);
                     this.FormData.PsDm_Tables.Add(item.Key, Tbl);
                 }
-                this.PostFormatFormData();
+                this.PostFormatFormData(this.FormData);
             }
         }
 
@@ -509,7 +509,7 @@ namespace ExpressBase.Objects
                     else
                         FormDes.FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
                 }
-                FormDes.PostFormatFormData();
+                FormDes.PostFormatFormData(FormDes.FormData);
             }
         }
 
@@ -553,7 +553,7 @@ namespace ExpressBase.Objects
                             this.FormData.PsDm_Tables.Add(Col.Control.EbSid, Tbl);
                     }
                 }
-                this.PostFormatFormData();
+                this.PostFormatFormData(this.FormData);
             }
 
             return this.FormData;
@@ -1016,9 +1016,9 @@ namespace ExpressBase.Objects
             });
         }
 
-        public void PostFormatFormData()// fill ps displaymembers, columns in FormData
+        public void PostFormatFormData(WebformData _FormData)// fill ps displaymembers, columns in FormData
         {
-            foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
+            foreach (KeyValuePair<string, SingleTable> Table in _FormData.MultipleTables)
             {
                 foreach (SingleRow Row in Table.Value)
                 {
@@ -1050,7 +1050,7 @@ namespace ExpressBase.Objects
                                 ColColl = psColCtrl.Columns;
                             }
 
-                            if (Column.Value == null || string.IsNullOrEmpty(Convert.ToString(Column.Value)) || !this.FormData.PsDm_Tables.ContainsKey(EbSid))
+                            if (Column.Value == null || string.IsNullOrEmpty(Convert.ToString(Column.Value)) || !_FormData.PsDm_Tables.ContainsKey(EbSid))
                                 continue;
 
                             //List<SingleRow> Cols = new List<SingleRow>();
@@ -1059,7 +1059,7 @@ namespace ExpressBase.Objects
                             Dictionary<int, Dictionary<string, string>> DispM_dup = new Dictionary<int, Dictionary<string, string>>();//duplicate
                             string[] temp = Convert.ToString(Column.Value).Split(",");
                             int[] vms = Array.ConvertAll<string, int>(temp, int.Parse);
-                            SingleTable tbl = this.FormData.PsDm_Tables[EbSid];
+                            SingleTable tbl = _FormData.PsDm_Tables[EbSid];
 
                             for (int i = 0; i < vms.Length; i++)
                             {
@@ -1497,7 +1497,7 @@ namespace ExpressBase.Objects
                     _FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
             }
 
-            this.PostFormatFormData();
+            this.PostFormatFormData(_FormData);
             this.FormGlobals = null;// FormGlobals is a reusing Object, so clear when a data change happens
         }
 
@@ -1617,7 +1617,7 @@ namespace ExpressBase.Objects
                     this.GetFormattedData(dataset.Tables[i++], Table);
                     this.FormData.PsDm_Tables.Add(item.Key, Table);
                 }
-                this.PostFormatFormData();
+                this.PostFormatFormData(this.FormData);
             }
         }
 
