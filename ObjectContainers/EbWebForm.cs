@@ -261,12 +261,12 @@ namespace ExpressBase.Objects
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
         public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
         {
-            BeforeSaveHelper.BeforeSave(this, serviceClient, redis);
+            BeforeSaveHelper.BeforeSave(this, serviceClient, redis, null);
         }
 
         public void BeforeSave(Service service)
         {
-            BeforeSaveHelper.BeforeSave(this, null, null);
+            BeforeSaveHelper.BeforeSave(this, null, service.Redis, service);
         }
 
         //import data from another form or api linked in power select

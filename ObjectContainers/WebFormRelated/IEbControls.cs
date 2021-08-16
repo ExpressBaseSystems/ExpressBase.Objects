@@ -37,7 +37,7 @@ namespace ExpressBase.Objects
     {
         List<Param> ParamsList { get; set; }
 
-        void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls);
+        void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls, Service service);
     }
 
     public interface IEbExtraQryCtrl

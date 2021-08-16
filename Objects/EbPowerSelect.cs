@@ -840,7 +840,7 @@ else// PS
             }
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls, Service service)
         {
             if (this.IsDataFromApi)
             {
@@ -871,7 +871,7 @@ else// PS
             }
             else
             {
-                EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);
+                EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, service);
                 this.ParamsList = DrObj.GetParams(Redis as RedisClient);
             }
 
@@ -966,7 +966,7 @@ else// PS
                 {
                     if (_this.ParamsList == null)
                         throw new FormException($"Invalid ParamsList in '{_this.Label ?? _this.Name}'. Contact Admin", (int)HttpStatusCode.InternalServerError, "Save object in dev side", "EbPowerSelect -> GetSelectQuery");
-                    
+
                     if (IsDgPs && _this.ParamsList.Exists(e => e.Name == _this.Name))
                     {
                         if (Sql.Contains(":" + _this.Name))

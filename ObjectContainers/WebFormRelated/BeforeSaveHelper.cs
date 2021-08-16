@@ -19,7 +19,7 @@ namespace ExpressBase.Objects.WebFormRelated
     public static class BeforeSaveHelper
     {
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
-        public static void BeforeSave(EbWebForm _this, IServiceClient serviceClient, IRedisClient redis)
+        public static void BeforeSave(EbWebForm _this, IServiceClient serviceClient, IRedisClient redis, Service service)
         {
             Dictionary<string, string> tbls = new Dictionary<string, string>();
             if (string.IsNullOrEmpty(_this.TableName))
@@ -36,7 +36,7 @@ namespace ExpressBase.Objects.WebFormRelated
             };
             if (_this.MakeEbSidUnique)
                 UpdateEbSid(_this, Allctrls, false);
-            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl);
+            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, service);
             PerformRequirdUpdate(_this, _this.TableName);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
@@ -185,7 +185,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 _Notifications[i].BeforeSaveValidation(_dict);
         }
 
-        private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, out EbReview ebReviewCtrl)
+        private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, out EbReview ebReviewCtrl, Service service)
         {
             ebReviewCtrl = null;
             for (int i = 0; i < Allctrls.Length; i++)//DataGrid.InitDSRelated
@@ -224,8 +224,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             (DataGrid.Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
                         }
                     }
-                    if (!string.IsNullOrEmpty(DataGrid.DataSourceId) && serviceClient != null)
-                        DataGrid.InitDSRelated(serviceClient, redis, Allctrls);
+                    if (!string.IsNullOrEmpty(DataGrid.DataSourceId))
+                        DataGrid.InitDSRelated(serviceClient, redis, Allctrls, service);
                 }
                 else if (Allctrls[i] is EbProvisionUser)
                 {
@@ -262,11 +262,11 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))
                         throw new FormException($"Please set a Table View for {Allctrls[i].Label}.");
                 }
-                else if (Allctrls[i] is EbPdfControl && serviceClient != null)
+                else if (Allctrls[i] is EbPdfControl)
                 {
                     if (string.IsNullOrEmpty((Allctrls[i] as EbPdfControl).PdfRefid))
                         throw new FormException($"Please set a pdf View for {Allctrls[i].Label}.");
-                    (Allctrls[i] as EbPdfControl).FetchParamsMeta(serviceClient, redis);
+                    (Allctrls[i] as EbPdfControl).FetchParamsMeta(serviceClient, redis, service);
                 }
                 else if (Allctrls[i] is IEbPowerSelect)
                 {
@@ -391,8 +391,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException($"Please enter a valid SerialLength for AutoId control.");
                 }
 
-                if (Allctrls[i] is IEbDataReaderControl && serviceClient != null)
-                    (Allctrls[i] as IEbDataReaderControl).FetchParamsMeta(serviceClient, redis, Allctrls);
+                if (Allctrls[i] is IEbDataReaderControl)
+                    (Allctrls[i] as IEbDataReaderControl).FetchParamsMeta(serviceClient, redis, Allctrls, service);
             }
         }
 
@@ -809,7 +809,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 { typeof(EbAutoId), false }
             };
-            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl);
+            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, null);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
             CalcValueExprDependency(_this, _dict);

@@ -16,7 +16,7 @@ namespace ExpressBase.Objects
 {
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbChartControl:EbTVcontrol
+    public class EbChartControl : EbTVcontrol
     {
         public EbChartControl() { }
 
@@ -24,8 +24,8 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-			//this.BareControlHtml4Bot = this.BareControlHtml;
-			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            //this.BareControlHtml4Bot = this.BareControlHtml;
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
@@ -64,12 +64,12 @@ namespace ExpressBase.Objects
             this.ChartVisualizationJson = EbSerializers.Json_Serialize(ChartVisualization);
         }
 
-        public override void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis, EbControl[] Allctrls)
+        public override void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis, EbControl[] Allctrls, Service service)
         {
-            EbChartVisualization ChartVisualization = EbFormHelper.GetEbObject<EbChartVisualization>(TVRefId, ServiceClient, redis, null);
+            EbChartVisualization ChartVisualization = EbFormHelper.GetEbObject<EbChartVisualization>(TVRefId, ServiceClient, redis, service);
             if (string.IsNullOrEmpty(ChartVisualization.DataSourceRefId))
                 throw new FormException($"Missing Data Reader of Chart control view that is connected to {this.Label}.");
-            EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(ChartVisualization.DataSourceRefId, ServiceClient, redis, null);
+            EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(ChartVisualization.DataSourceRefId, ServiceClient, redis, service);
             this.ParamsList = DrObj.GetParams(redis as RedisClient);
         }
 
@@ -83,7 +83,7 @@ namespace ExpressBase.Objects
 		</div>
     </div>
 </div>"
-	.Replace("@ebsid@", this.EbSid_CtxId);
+    .Replace("@ebsid@", this.EbSid_CtxId);
 
             return html;
         }

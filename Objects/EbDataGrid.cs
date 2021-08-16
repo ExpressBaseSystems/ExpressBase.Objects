@@ -260,10 +260,10 @@ else {
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
 
-        public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis, EbControl[] Allctrls)
+        public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis, EbControl[] Allctrls, Service service)
         {
             List<string> _params = new List<string>();
-            EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, null);
+            EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, service);
             this.ParamsList = DataReader.GetParams(redis as RedisClient);
             foreach (Param p in this.ParamsList)
             {
@@ -1703,9 +1703,9 @@ pg.HideProperty('IsDynamic');
             this.EbPowerSelect.UpdateParamsMeta(Service, Redis);
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls, Service service)
         {
-            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis, Allctrls);
+            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis, Allctrls, service);
         }
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
