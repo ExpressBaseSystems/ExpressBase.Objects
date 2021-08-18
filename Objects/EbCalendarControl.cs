@@ -119,7 +119,8 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <input type='text' class='date' id='datefrom' hidden/><input type='text' class='date' id='dateto' hidden/>
+       Range : <input type='text' class='date' id='datefrom' /*hidden*/ style='width: 30%;'/>
+       -<input type='text' class='date' id='dateto' /*hidden*/style='width: 30%;'/>
 </div>
         "
 .Replace("@name@", this.Name)
