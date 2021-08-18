@@ -56,6 +56,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public virtual EbFont Font { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        public float Leading { get; set; } = 12;
+
         [JsonIgnore]
         public float Llx
         {
@@ -350,6 +355,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
 
@@ -361,7 +367,7 @@ namespace ExpressBase.Objects
             string column_val = FormatDate(Rep.CurrentTimestamp.ToString(), Format, Rep);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -389,6 +395,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -399,7 +406,7 @@ namespace ExpressBase.Objects
 
             ColumnText ct = new ColumnText(Rep.Canvas);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber.ToString());
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -427,6 +434,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -436,7 +444,7 @@ namespace ExpressBase.Objects
 
             ColumnText ct = new ColumnText(Rep.Canvas);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber + "/"/* + writer.PageCount*/);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -464,6 +472,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -473,7 +482,7 @@ namespace ExpressBase.Objects
 
             ColumnText ct = new ColumnText(Rep.Canvas);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.RenderingUser?.FullName ?? "Machine User");
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -497,6 +506,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -506,7 +516,7 @@ namespace ExpressBase.Objects
 
             ColumnText ct = new ColumnText(Rep.Canvas);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Title);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -535,6 +545,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -547,7 +558,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -576,6 +587,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -588,7 +600,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
 
@@ -617,6 +629,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -629,7 +642,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -662,6 +675,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -675,7 +689,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
 
@@ -705,6 +719,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -717,7 +732,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -770,6 +785,7 @@ namespace ExpressBase.Objects
                     this.Source = 'url(../images/barcode.png) center no-repeat';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -844,7 +860,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("Exception: " + e.ToString());
                 ColumnText ct = new ColumnText(Rep.Canvas);
                 float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, Leading, (int)TextAlign);
                 ct.Go();
             }
         }
@@ -883,6 +899,7 @@ namespace ExpressBase.Objects
                     this.Source = 'url(../images/Qr-code.png) center no-repeat';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -905,7 +922,7 @@ namespace ExpressBase.Objects
             {
                 ColumnText ct = new ColumnText(Rep.Canvas);
                 float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, Leading, (int)TextAlign);
                 ct.Go();
                 Console.WriteLine("Exception: " + e.ToString());
             }
@@ -936,6 +953,7 @@ namespace ExpressBase.Objects
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
                     this.Title = 'slno';
+                    this.Leading = 12;
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -945,7 +963,7 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, (Rep.iDetailRowPos + 1).ToString());
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -1008,6 +1026,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
 
@@ -1019,7 +1038,7 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }

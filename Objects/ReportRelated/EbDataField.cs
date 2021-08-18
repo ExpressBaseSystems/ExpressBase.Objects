@@ -58,7 +58,7 @@ namespace ExpressBase.Objects
         public string Suffix { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
+        [PropertyGroup("Appearance")]
         [UIproperty]
         public Boolean RenderInMultiLine { get; set; } = true;
 
@@ -69,7 +69,7 @@ namespace ExpressBase.Objects
         public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
+        [PropertyGroup("Appearance")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorJS)]
         [Alias("Appearance Expression")]
@@ -124,7 +124,7 @@ namespace ExpressBase.Objects
                 ct.AddText(phrase);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
 
@@ -226,7 +226,6 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldText : EbDataField
     {
-
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -242,6 +241,7 @@ namespace ExpressBase.Objects
                         this.ForeColor = '#201c1c';
                         this.Border = 1;
                         this.BorderColor = '#eae6e6';
+                        this.Leading = 12;
                     };";
         }
 
@@ -249,24 +249,21 @@ namespace ExpressBase.Objects
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
+            if (Prefix != "" || Suffix != "")
+                column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
-                Paragraph p = new Paragraph
-                {
-                    a
-                };
+                Paragraph p = new Paragraph { a };
                 p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
-            {
                 ct.AddText(phrase);
-            }
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
 
@@ -294,6 +291,7 @@ namespace ExpressBase.Objects
                         this.ForeColor = '#201c1c';
                         this.Border = 1;
                         this.BorderColor = '#eae6e6';
+                        this.Leading = 12;
                     };";
         }
 
@@ -322,7 +320,7 @@ namespace ExpressBase.Objects
             }
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -345,6 +343,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                        this.Leading = 12;
                 };";
         }
 
@@ -367,7 +366,7 @@ namespace ExpressBase.Objects
                 ct.AddText(phrase);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -405,6 +404,7 @@ namespace ExpressBase.Objects
                         this.Border = 1;
                         this.BorderColor = '#eae6e6';
                         this.DecimalPlaces = 2;
+                        this.Leading = 12;
                     };";
         }
 
@@ -434,7 +434,7 @@ namespace ExpressBase.Objects
             else
                 ct.AddText(phrase);
             ct.Canvas.SetColorFill(GetColor(ForeColor));
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
 
@@ -533,6 +533,7 @@ namespace ExpressBase.Objects
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
                     this.DecimalPlaces = 2;
+                    this.Leading = 12;
                 };";
         }
 
@@ -550,7 +551,7 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -622,6 +623,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
 
@@ -632,7 +634,7 @@ namespace ExpressBase.Objects
             string column_val = SummarizedValue.ToString();
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
-            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -704,6 +706,7 @@ namespace ExpressBase.Objects
         this.ForeColor = '#201c1c';
         this.Border = 1;
         this.BorderColor = '#eae6e6';
+        this.Leading = 12;
         };";
         }
 
@@ -718,7 +721,7 @@ namespace ExpressBase.Objects
             ct.AddText(phrase);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -766,6 +769,7 @@ namespace ExpressBase.Objects
         this.ForeColor = '#201c1c';
         this.Border = 1;
         this.BorderColor = '#eae6e6';
+        this.Leading = 12;
         };";
         }
 
@@ -789,7 +793,7 @@ namespace ExpressBase.Objects
                 ct.AddText(phrase);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -862,6 +866,7 @@ namespace ExpressBase.Objects
         this.Border = 1;
         this.BorderColor = '#eae6e6';
         this.DecimalPlaces = 2;
+        this.Leading = 12;
         };";
         }
 
@@ -929,7 +934,7 @@ namespace ExpressBase.Objects
 
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
 
@@ -1035,6 +1040,7 @@ namespace ExpressBase.Objects
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
                     this.DecimalPlaces = 2;
+                    this.Leading = 12;
                 };";
         }
 
@@ -1064,7 +1070,7 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -1136,6 +1142,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
 
@@ -1155,7 +1162,7 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -1227,6 +1234,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
 
@@ -1247,7 +1255,7 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
@@ -1295,6 +1303,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Leading = 12;
                 };";
         }
 
@@ -1314,7 +1323,7 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
     }
