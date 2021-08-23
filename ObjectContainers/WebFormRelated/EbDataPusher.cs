@@ -680,7 +680,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                     EbWebForm Form = GetShallowCopy(batchDataPushers[i].WebForm);
                     Form.DataPusherConfig.GridDataId = src_lines_id;
                     Form.CrudContext = j + "_";
-                    Form.RefreshFormDataInner(ds, DataDB, string.Empty, true, null);
+                    Form.RefreshFormDataInner(ds, DataDB, true, null);
                     FormListBkUp.Add(Form);
                 }
             }

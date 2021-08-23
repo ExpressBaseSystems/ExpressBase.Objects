@@ -11,11 +11,10 @@ namespace ExpressBase.Objects.WebFormRelated
 {
     static class QueryGetter
     {
-        public static string GetSelectQuery(EbWebForm _this, IDatabase DataDB, Service _service, out string _queryPs, out int _qryCount)
+        public static string GetSelectQuery(EbWebForm _this, IDatabase DataDB, Service _service, out int _qryCount)
         {
             string query = string.Empty;
             string extquery = string.Empty;
-            _queryPs = string.Empty;
             _qryCount = 0;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             foreach (TableSchema _table in _this.FormSchema.Tables)
@@ -67,9 +66,6 @@ namespace ExpressBase.Objects.WebFormRelated
                         _table.TableType == WebFormTableTypes.Grid ? ("ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : string.Empty)) : "ORDER BY id",
                         _table.TableType == WebFormTableTypes.Review ? SystemColumns.eb_del : ebs[SystemColumns.eb_del],
                         _table.TableType == WebFormTableTypes.Review ? "'F'" : ebs.GetBoolFalse(SystemColumns.eb_del));
-
-                    foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi))
-                        _queryPs += (Col.Control as IEbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
                 }
                 else
                 {

@@ -1050,13 +1050,18 @@ else// PS
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
+            return EbPowerSelect.GetSingleColumn(this, UserObj, SoluObj, Value, Default);
+        }
+
+        public static SingleColumn GetSingleColumn(EbControl _this, User UserObj, Eb_Solution SoluObj, object Value, bool Default)
+        {
             return new SingleColumn()
             {
-                Name = this.Name,
-                Type = (int)this.EbDbType,
+                Name = _this.Name,
+                Type = (int)_this.EbDbType,
                 Value = Value,
-                Control = this,
-                ObjType = this.ObjType,
+                Control = _this,
+                ObjType = _this.ObjType,
                 F = string.Empty,
                 D = new Dictionary<int, Dictionary<string, string>>(),
                 R = new Dictionary<string, List<object>>()

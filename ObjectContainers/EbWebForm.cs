@@ -1016,7 +1016,7 @@ namespace ExpressBase.Objects
             });
         }
 
-        public void PostFormatFormData(WebformData _FormData)// fill ps displaymembers, columns in FormData
+        public void PostFormatFormData(WebformData _FormData, bool cxtPro = false)// fill ps displaymembers, columns in FormData
         {
             foreach (KeyValuePair<string, SingleTable> Table in _FormData.MultipleTables)
             {
@@ -1044,7 +1044,10 @@ namespace ExpressBase.Objects
                             else
                             {
                                 EbDGPowerSelectColumn psColCtrl = Column.Control as EbDGPowerSelectColumn;
-                                EbSid = psColCtrl.EbSid;
+                                if (!psColCtrl.IsDataFromApi && psColCtrl.StrictSelect && cxtPro)
+                                    EbSid = psColCtrl.EbSid + Row.RowId;
+                                else
+                                    EbSid = psColCtrl.EbSid;
                                 VmName = psColCtrl.ValueMember.Name;
                                 DmsColl = psColCtrl.DisplayMembers;
                                 ColColl = psColCtrl.Columns;
@@ -1126,10 +1129,9 @@ namespace ExpressBase.Objects
         public void RefreshFormData(IDatabase DataDB, Service service, bool backup = false, bool includePushData = false)
         {
             int formCount = (this.FormDataPusherCount > 0 && includePushData) ? this.FormDataPusherCount + 1 : 1;
-            string[] psquery = new string[formCount];
             int[] qrycount = new int[formCount];
             EbWebForm[] _FormCollection = new EbWebForm[formCount];
-            string query = QueryGetter.GetSelectQuery(this, DataDB, service, out psquery[0], out qrycount[0]);
+            string query = QueryGetter.GetSelectQuery(this, DataDB, service, out qrycount[0]);
             _FormCollection[0] = this;
 
             if (this.FormDataPusherCount > 0 && includePushData)
@@ -1138,7 +1140,7 @@ namespace ExpressBase.Objects
                 {
                     if (!(this.DataPushers[i] is EbFormDataPusher))
                         continue;
-                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[j], out qrycount[j]);
+                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out qrycount[j]);
                     this.DataPushers[i].WebForm.UserObj = this.UserObj;
                     this.DataPushers[i].WebForm.SolutionObj = this.SolutionObj;
                     _FormCollection[j++] = this.DataPushers[i].WebForm;
@@ -1163,12 +1165,12 @@ namespace ExpressBase.Objects
             {
                 EbDataSet ds = new EbDataSet();
                 ds.Tables.AddRange(dataset.Tables.GetRange(start, qrycount[i]));
-                _FormCollection[i].RefreshFormDataInner(ds, DataDB, psquery[i], backup, service);
+                _FormCollection[i].RefreshFormDataInner(ds, DataDB, backup, service);
             }
             Console.WriteLine("No Exception in RefreshFormData");
         }
 
-        public void RefreshFormDataInner(EbDataSet dataset, IDatabase DataDB, string psquery, bool backup, Service service)
+        public void RefreshFormDataInner(EbDataSet dataset, IDatabase DataDB, bool backup, Service service)
         {
             WebFormSchema _schema = this.FormSchema;
             WebformData _FormData;
@@ -1470,7 +1472,9 @@ namespace ExpressBase.Objects
                 if (drPsList.Count > 0)
                 {
                     this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
-                    List<DbParameter> param = this.GetPsParams(drPsList, _FormData, DataDB, service);
+                    List<DbParameter> param = new List<DbParameter>();
+                    Dictionary<string, List<int>> row_ids = new Dictionary<string, List<int>>();
+                    string psquery = this.GetPsQueryAndParams(drPsList, _FormData, DataDB, service, param, row_ids);
                     EbDataSet ds;
                     if (this.DbConnection == null)
                         ds = DataDB.DoQueries(psquery, param.ToArray());
@@ -1480,12 +1484,18 @@ namespace ExpressBase.Objects
                     if (ds.Tables.Count > 0)
                     {
                         int tblIdx = 0;
-                        foreach (EbControl ctrl in drPsList)
+                        for (int x = 0; x < drPsList.Count; x++)
                         {
-                            SingleTable Table = new SingleTable();
-                            this.GetFormattedData(ds.Tables[tblIdx], Table);
-                            _FormData.PsDm_Tables.Add(ctrl.EbSid, Table);
-                            tblIdx++;
+                            for (int y = 0; y < row_ids[drPsList[x].EbSid].Count; y++)
+                            {
+                                SingleTable Table = new SingleTable();
+                                this.GetFormattedData(ds.Tables[tblIdx], Table);
+                                string key = drPsList[x].EbSid;
+                                if (drPsList[x] is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect)
+                                    key = drPsList[x].EbSid + row_ids[drPsList[x].EbSid][y];
+                                _FormData.PsDm_Tables.Add(key, Table);
+                                tblIdx++;
+                            }
                         }
                     }
                 }
@@ -1499,71 +1509,131 @@ namespace ExpressBase.Objects
                         _FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
                 }
 
-                this.PostFormatFormData(_FormData);
+                this.PostFormatFormData(_FormData, true);
                 this.FormGlobals = null;// FormGlobals is a reusing Object, so clear when a data change happens
             }
         }
 
-        private List<DbParameter> GetPsParams(List<EbControl> drPsList, WebformData _FormData, IDatabase DataDB, Service service)
+        private string GetPsQueryAndParams(List<EbControl> drPsList, WebformData _FormData, IDatabase DataDB, Service service, List<DbParameter> param, Dictionary<string, List<int>> row_ids)
         {
-            TableSchema _table = null;
-            ColumnSchema _column = null;
-            List<DbParameter> param = new List<DbParameter>();
-            EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
+            string psquery_all = string.Empty, psqry;
+            int p_i = 0;
 
             foreach (EbControl psCtrl in drPsList)
             {
+                row_ids.Add(psCtrl.EbSid, new List<int>());
                 List<Param> ParamsList = (psCtrl as IEbDataReaderControl).ParamsList;
+                IEbPowerSelect ipsCtrl = psCtrl as IEbPowerSelect;
                 if (ParamsList == null)
                 {
-                    Console.WriteLine($"ParamsList in PowerSelect {psCtrl.Name} is null.");
-                    (psCtrl as IEbPowerSelect).UpdateParamsMeta(service, service.Redis);
+                    Console.WriteLine($"ParamsList in PowerSelect {psCtrl.Name} is null. Trying to UpdateParamsMeta...");
+                    ipsCtrl.UpdateParamsMeta(service, service.Redis);
                     ParamsList = (psCtrl as IEbDataReaderControl).ParamsList;
+                    if (ParamsList == null)
+                        throw new FormException($"Invalid ParamsList in '{psCtrl.Label ?? psCtrl.Name}'. Contact Admin", (int)HttpStatusCode.InternalServerError, "Save object in dev side", "EbWebForm");
                 }
 
-                foreach (Param _psParam in ParamsList)
+                psqry = ipsCtrl.GetSql(service);
+                TableSchema _pstable = this.FormSchema.Tables.Find(e => e.Columns.Exists(ee => ee.ColumnName == psCtrl.Name));
+                if (_pstable == null)
+                    throw new FormException("Something went wrong", (int)HttpStatusCode.InternalServerError, "_pstable is null", "EbWebForm");
+                SingleTable psTable = _FormData.MultipleTables.ContainsKey(_pstable.TableName) ? _FormData.MultipleTables[_pstable.TableName] : null;
+                if (psTable == null)
+                    Console.WriteLine("[INFO] PS_Table is null.");
+                string vm_vals = string.Empty;
+
+                if (psCtrl is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect && psTable?.Count > 0)// separate query
                 {
-                    if (param.Exists(e => e.ParameterName == _psParam.Name))
-                        continue;
-
-                    _table = null;
-                    _column = null;
-                    foreach (TableSchema __table in this.FormSchema.Tables)
+                    foreach (SingleRow Row in psTable)
                     {
-                        _column = __table.Columns.Find(e => e.Control.Name == _psParam.Name);
-                        if (_column != null)
-                        {
-                            _table = __table;
-                            break;
-                        }
+                        string temp = this.AddPsParams(psCtrl, _FormData, DataDB, param, Row, ref p_i, psqry);
+                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, Convert.ToString(Row[psCtrl.Name]), true);
+                        p_i++;
+                        row_ids[psCtrl.EbSid].Add(Row.RowId);
                     }
-
-                    if (_table != null && _FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0)
+                }
+                else if (psCtrl is EbDGPowerSelectColumn && psTable?.Count > 0)
+                {
+                    List<string> vms = new List<string>();
+                    foreach (SingleRow Row in psTable)
                     {
-                        if (_table.TableType == WebFormTableTypes.Grid)
+                        if (Row[psCtrl.Name] != null)
+                            vms.Add(Convert.ToString(Row[psCtrl.Name]));
+                    }
+                    if (ParamsList.Exists(e => e.Name == psCtrl.Name))
+                    {
+                        if (psqry.Contains(":" + psCtrl.Name))
+                            psqry = psqry.Replace(":" + psCtrl.Name, $"ANY(STRING_TO_ARRAY('{vms.Join(",")}', ',')::INT[])");
+                        if (psqry.Contains("@" + psCtrl.Name))
+                            psqry = psqry.Replace("@" + psCtrl.Name, $"ANY(STRING_TO_ARRAY('{vms.Join(",")}', ',')::INT[])");
+                    }
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, vms.Join(","), false);
+                    row_ids[psCtrl.EbSid].Add(0);
+                    this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
+                }
+                else if (psTable?.Count > 0)
+                {
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, Convert.ToString(psTable[0][psCtrl.Name]), false);
+                    row_ids[psCtrl.EbSid].Add(0);
+                    this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
+                }
+            }
+
+            EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
+            return psquery_all;
+        }
+
+        private string GetPsDmSelectQuery(string psqry, IEbPowerSelect ipsCtrl, string vms, bool isStrict)
+        {
+            if (!(!ipsCtrl.MultiSelect && isStrict))
+                vms = $"ANY(STRING_TO_ARRAY('{vms}', ',')::INT[])";
+            else
+                vms = $"'{vms}'";
+            return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms};";
+        }
+
+        private string AddPsParams(EbControl psCtrl, WebformData _FormData, IDatabase DataDB, List<DbParameter> param, SingleRow curRow, ref int i, string qry)
+        {
+            foreach (Param _psParam in (psCtrl as IEbDataReaderControl).ParamsList)
+            {
+                if (param.Exists(e => e.ParameterName == _psParam.Name))
+                    continue;
+
+                TableSchema _p_table = null;
+                ColumnSchema _p_column = null;
+                foreach (TableSchema __table in this.FormSchema.Tables)
+                {
+                    _p_column = __table.Columns.Find(e => e.Control.Name == _psParam.Name);
+                    if (_p_column != null)
+                    {
+                        _p_table = __table;
+                        break;
+                    }
+                }
+
+                if (_p_table != null && _FormData.MultipleTables.TryGetValue(_p_table.TableName, out SingleTable Table) && Table.Count > 0)
+                {
+                    if (_p_table.TableType == WebFormTableTypes.Grid)
+                    {
+                        if (curRow != null)
                         {
-                            if (psCtrl.Name == _psParam.Name)
+                            if (!(_psParam.Name == psCtrl.Name && qry == null))
                             {
-                                List<string> vms = new List<string>();
-                                foreach (SingleRow Row in Table)
-                                {
-                                    if (Row[_column.ColumnName] != null)
-                                        vms.Add(Convert.ToString(Row[_column.ColumnName]));
-                                }
-                                param.Add(DataDB.GetNewParameter(_psParam.Name + FormConstants.__ebedt, EbDbTypes.String, vms.Join(",")));
-                                continue;
+                                param.Add(DataDB.GetNewParameter(_psParam.Name + i, (EbDbTypes)Convert.ToInt32(_psParam.Type), curRow[_psParam.Name]));
+                                qry = qry.Replace("@" + _psParam.Name, "@" + _psParam.Name + i).Replace(":" + _psParam.Name, ":" + _psParam.Name + i);
                             }
-                        }
-                        else
-                        {
-                            param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), Table[0][_column.ColumnName]));
                             continue;
                         }
                     }
-                    param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), _psParam.ValueTo));
+                    else
+                    {
+                        param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), Table[0][_p_column.ColumnName]));
+                        continue;
+                    }
                 }
+                param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), _psParam.ValueTo));
             }
-            return param;
+            return qry;
         }
 
         //For Prefill Mode
