@@ -19,6 +19,7 @@ namespace ExpressBase.Objects
         DVColumnCollection DisplayMembers { get; set; }
         bool IsInsertable { get; set; }
         string FormRefId { get; set; }
+        bool MultiSelect { get; set; }
 
         bool IsDataFromApi { get; set; }
         string Url { get; set; }
@@ -31,6 +32,7 @@ namespace ExpressBase.Objects
         string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl);
         string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms, List<DbParameter> param);
         void UpdateParamsMeta(Service Service, IRedisClient Redis);
+        string GetSql(Service service);
     }
 
     public interface IEbDataReaderControl

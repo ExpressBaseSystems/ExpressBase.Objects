@@ -1685,6 +1685,9 @@ pg.HideProperty('IsDynamic');
         public List<Param> ParamsList { get { return this.EbPowerSelect.ParamsList; } set { this.EbPowerSelect.ParamsList = value; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        public bool StrictSelect { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbPowerSelect"; } }
 
@@ -1703,6 +1706,11 @@ pg.HideProperty('IsDynamic');
             this.EbPowerSelect.UpdateParamsMeta(Service, Redis);
         }
 
+        public string GetSql(Service Service)
+        {
+            return this.EbPowerSelect.GetSql(Service);
+        }
+
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls, Service service)
         {
             this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis, Allctrls, service);
@@ -1710,7 +1718,7 @@ pg.HideProperty('IsDynamic');
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
-            return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, true);
+            return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, !StrictSelect);
         }
 
         public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
@@ -1726,7 +1734,7 @@ pg.HideProperty('IsDynamic');
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             this.EbPowerSelect.Name = this.Name;
-            return this.EbPowerSelect.GetSingleColumn(UserObj, SoluObj, Value, Default);
+            return EbPowerSelect.GetSingleColumn(this, UserObj, SoluObj, Value, Default);
         }
 
         public override DVBaseColumn GetDVBaseColumn(int index)
