@@ -442,10 +442,14 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
         public static void UpdateEbSid(EbWebForm _this, EbControl[] Allctrls, bool tsOnly)
         {
-            string ts = DateTime.UtcNow.ToString("MMMydHms");
+            string ts;
             if (_this.EbSid.Contains('_') && !tsOnly)
                 ts = _this.EbSid.Substring(_this.EbSid.LastIndexOf('_') + 1);
-
+            else
+            {
+                ts = DateTime.UtcNow.ToString("MMMydHms");
+                _this.EbSid = _this.EbSid + '_' + ts;
+            }
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 string id = Allctrls[i].EbSid;
