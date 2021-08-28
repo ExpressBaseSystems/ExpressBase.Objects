@@ -67,6 +67,15 @@ namespace ExpressBase.Objects
             }
         }
 
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [EbRequired]
+        [Unique]
+        [regexCheck]
+        [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
+        [DefaultPropValue("eb_prov_loc_id")]
+        public override string Name { get; set; }
+
         //[EnableInBuilder(BuilderType.WebForm)]
         //[HideInPropertyGrid]
         //public override bool Hidden { get; set; }
@@ -83,9 +92,9 @@ namespace ExpressBase.Objects
         [ListType(typeof(UsrLocFieldAbstract))]
         public List<UsrLocFieldAbstract> Fields { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm)]
-        //[HideInPropertyGrid]
-        //public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Int32; } }
 
         //--------Hide in property grid------------
 
