@@ -289,28 +289,34 @@ namespace ExpressBase.Objects.WebFormRelated
                     else
                     {
                         object data = null;
-                        Dictionary<string, List<object>> psRows = null;
+                        Dictionary<string, object> Metas = new Dictionary<string, object>();
                         if (_control is EbAutoId && fG_WebForm.__mode == "new")// && fG_WebForm.id == 0
-                            data = FormConstants.AutoId_PlaceHolder;
+                            data = FG_Constants.AutoId_PlaceHolder;
                         else
                         {
+                            SingleColumn psSC = null;
                             if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null && !(_control is EbAutoId)) //(!(_control is EbAutoId) || (_control is EbAutoId && fG_WebForm.__mode == "edit")))// && fG_WebForm.id > 0
                             {
                                 data = Table[0][_control.Name];
-                                psRows = Table[0].GetColumn(_control.Name).R;
+                                psSC = Table[0].GetColumn(_control.Name);
                             }
                             else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
                             {
                                 data = TableBkUp[0][_control.Name];
-                                psRows = TableBkUp[0].GetColumn(_control.Name).R;
+                                psSC = TableBkUp[0].GetColumn(_control.Name);
                             }
                             else if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null)// Hint: For BatchDataPusher, AutoId available in 'Table' only
                             {
                                 data = Table[0][_control.Name];
-                                psRows = Table[0].GetColumn(_control.Name).R;
+                                psSC = Table[0].GetColumn(_control.Name);
                             }
+                            if (psSC != null && _control is IEbPowerSelect)
+                                Metas.Add(FG_Constants.Columns, psSC.R);
                         }
-                        fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control.Name, data, psRows));
+                        if (_control is EbAutoId ebAI)
+                            Metas.Add(FG_Constants.SerialLength, ebAI.Pattern?.SerialLength ?? 0);
+
+                        fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control.Name, _control.ObjType, data, Metas));
                     }
                 }
             }
@@ -343,19 +349,28 @@ namespace ExpressBase.Objects.WebFormRelated
         private static FG_DataGrid GetDataGridGlobal(EbDataGrid DG, SingleTable Table, SingleRow RowModel)
         {
             List<FG_Row> Rows = new List<FG_Row>();
+            Dictionary<string, object> Metas = null;
             foreach (SingleRow Row in Table)
             {
                 FG_Row fG_Row = new FG_Row() { id = Convert.ToInt32(Row[FormConstants.id]) };
                 foreach (EbControl _control in DG.Controls)
                 {
-                    fG_Row.Controls.Add(new FG_Control(_control.Name, Row[_control.Name], Row.GetColumn(_control.Name).R));
+                    if (_control is EbDGPowerSelectColumn)
+                        Metas = new Dictionary<string, object>() { { FG_Constants.Columns, Row.GetColumn(_control.Name).R } };
+                    else
+                        Metas = null;
+                    fG_Row.Controls.Add(new FG_Control(_control.Name, _control.ObjType, Row[_control.Name], Metas));
                 }
                 Rows.Add(fG_Row);
             }
             FG_Row fG_RowModel = new FG_Row();
             foreach (EbControl _control in DG.Controls)
             {
-                fG_RowModel.Controls.Add(new FG_Control(_control.Name, RowModel[_control.Name], RowModel.GetColumn(_control.Name).R));
+                if (_control is EbDGPowerSelectColumn)
+                    Metas = new Dictionary<string, object>() { { FG_Constants.Columns, RowModel.GetColumn(_control.Name).R } };
+                else
+                    Metas = null;
+                fG_RowModel.Controls.Add(new FG_Control(_control.Name, _control.ObjType, RowModel[_control.Name], Metas));
             }
 
             return new FG_DataGrid(DG.Name, Rows, fG_RowModel);

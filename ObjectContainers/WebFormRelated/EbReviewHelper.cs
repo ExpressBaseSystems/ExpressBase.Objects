@@ -302,8 +302,8 @@ namespace ExpressBase.Objects.WebFormRelated
                 description = Convert.ToString(msg);
                 if (!string.IsNullOrEmpty(description))
                 {
-                    if (this.webForm.AutoId != null && this.isInsert && description.Contains(FormConstants.AutoId_PlaceHolder))
-                        description = description.Replace(FormConstants.AutoId_PlaceHolder, autoId);
+                    if (this.webForm.AutoId != null && this.isInsert && description.Contains(FG_Constants.AutoId_PlaceHolder))
+                        description = description.Replace(FG_Constants.AutoId_PlaceHolder, autoId);
                 }
             }
             if (string.IsNullOrEmpty(description))
