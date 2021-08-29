@@ -449,6 +449,10 @@ else if (this.MultiPushIdType === 2)
                                 FnCall += $"\ndestinationform.UpdateCurrentRowOfDG(\"{_table.ContainerName}\");";
                                 DgName = _table.ContainerName;
                             }
+                            if (jRow is JObject temp && temp.TryGetValue(FormConstants.__eb_loop_through, out JToken _val))
+                            {
+                                FnCall += $"\n{_val};";//.GetEnumerator()
+                            }
                             foreach (ColumnSchema _column in _table.Columns)
                             {
                                 if (jRow[_column.ColumnName] != null)
