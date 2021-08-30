@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="..\ServiceStack\src\ServiceStack.RabbitMq\ServiceStack.RabbitMq.csproj" /><!--
+    <!--<ProjectReference Include="..\ServiceStack\src\ServiceStack.RabbitMq\ServiceStack.RabbitMq.csproj" />-->
     <ProjectReference Include="..\ExpressBase.Common\ExpressBase.Common.csproj" />
     <ProjectReference Include="..\ExpressBase.CoreBase\ExpressBase.CoreBase.csproj" />
   </ItemGroup>
