@@ -36,7 +36,7 @@ namespace ExpressBase.Objects.WebFormRelated
             };
             if (_this.MakeEbSidUnique)
                 UpdateEbSid(_this, Allctrls, false);
-            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, service);
+            PerformRequirdCheck(_this, Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, service);
             PerformRequirdUpdate(_this, _this.TableName);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
@@ -185,7 +185,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 _Notifications[i].BeforeSaveValidation(_dict);
         }
 
-        private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, out EbReview ebReviewCtrl, Service service)
+        private static void PerformRequirdCheck(EbControlContainer _cont, EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, out EbReview ebReviewCtrl, Service service)
         {
             ebReviewCtrl = null;
             for (int i = 0; i < Allctrls.Length; i++)//DataGrid.InitDSRelated
@@ -365,9 +365,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty(_ctrl.TableName))
                         throw new FormException("Please enter a valid Static Card table name");
                 }
-                else if (Allctrls[i] is EbProvisionLocation)//One ctrl
+                else if (Allctrls[i] is EbProvisionLocation provLoc)//One ctrl
                 {
-                    EbProvisionLocation provLoc = Allctrls[i] as EbProvisionLocation;
                     foreach (UsrLocFieldAbstract fld in provLoc.Fields)
                     {
                         UsrLocField _field = fld as UsrLocField;
@@ -380,6 +379,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         if (Allctrls.FirstOrDefault(e => e.Name == _field.ControlName) == null)
                             throw new FormException($"Invalid control name '{_field.ControlName}' for {_field.Name} in ProvisionLocation control({provLoc.Name}).");
                     }
+                    if (_cont is EbWebForm Form)
+                        Form.IsLocIndependent = true;
                 }
                 else if (Allctrls[i] is EbAutoId)//One ctrl
                 {
@@ -813,7 +814,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 { typeof(EbAutoId), false }
             };
-            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, null);
+            PerformRequirdCheck(_this, Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, null);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
             CalcValueExprDependency(_this, _dict);
