@@ -116,6 +116,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public List<Param> ParamsList { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("Associated controls")]
+        public List<AssociatedCtrlAbstract> AssocCtrls { get; set; }
+
         public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
@@ -428,5 +433,22 @@ namespace ExpressBase.Objects
         //        }
         //    }
         //}
+    }
+
+    public abstract class AssociatedCtrlAbstract { }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("Associated control")]
+    public class AssociatedCtrl : AssociatedCtrlAbstract
+    {
+        public AssociatedCtrl() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string ControlName { get; set; }
     }
 }

@@ -10,11 +10,11 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.8.2" />
     <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.3.4" />
     <PackageReference Include="QRCoder" Version="1.3.2" />
-    <PackageReference Include="RestSharp" Version="106.11.7" />
+    <PackageReference Include="RestSharp" Version="106.12.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="..\ServiceStack.Core\ServiceStack.RabbitMq\ServiceStack.RabbitMq.csproj" />-->
+    <!--<ProjectReference Include="..\ServiceStack\src\ServiceStack.RabbitMq\ServiceStack.RabbitMq.csproj" />-->
     <ProjectReference Include="..\ExpressBase.Common\ExpressBase.Common.csproj" />
     <ProjectReference Include="..\ExpressBase.CoreBase\ExpressBase.CoreBase.csproj" />
   </ItemGroup>
