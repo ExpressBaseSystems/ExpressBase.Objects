@@ -184,6 +184,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 21)]
         public bool showCheckboxColumn { get; set; }
 
+         [DataMember(Order = 22)]
+        public string Source { get; set; }
+
     }
 
     [Route("/table")]

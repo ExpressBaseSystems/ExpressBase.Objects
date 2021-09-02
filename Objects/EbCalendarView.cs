@@ -10,7 +10,7 @@ namespace ExpressBase.Objects
 {
     public enum AttendanceType
     {
-        Hourly = 0,
+        // Hourly = 0,
         DayWise = 1,
         Weekely = 2,
         Monthly = 3,
@@ -54,6 +54,7 @@ namespace ExpressBase.Objects
     {
         [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "DataColumns", "bVisible")]
         [EnableInBuilder(BuilderType.Calendar)]
+        [HideInPropertyGrid]
         public List<DVBaseColumn> DataColumns { get; set; }
 
         [MetaOnly]
@@ -67,6 +68,7 @@ namespace ExpressBase.Objects
             console.log('ondeselection');
             this.bVisible = false;")]
         [EnableInBuilder(BuilderType.Calendar)]
+        [HideInPropertyGrid]
         public List<DVBaseColumn> KeyColumns { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
@@ -75,10 +77,12 @@ namespace ExpressBase.Objects
 
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "KeyColumns", 1)]
         [EnableInBuilder(BuilderType.Calendar)]
+        [HideInPropertyGrid]
         public DVBaseColumn PrimaryKey { get; set; }
 
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "LinesColumns", 1)]
         [EnableInBuilder(BuilderType.Calendar)]
+        [HideInPropertyGrid]
         public DVBaseColumn ForeignKey { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
@@ -87,7 +91,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
-        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm, EbObjectTypes.iTableVisualization)]
+        [HideInPropertyGrid]
         public List<ObjectBasicInfo> ObjectLinks { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]

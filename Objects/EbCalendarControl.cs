@@ -18,7 +18,7 @@ namespace ExpressBase.Objects.Objects
         public override string ToolNameAlias { get { return " Calendar "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.DateTime; } }
 
         public string GetOptionHtml()
         {
@@ -44,7 +44,7 @@ namespace ExpressBase.Objects.Objects
                 return @"
                     console.log('datefrom     :'+$('#datefrom').val());
                     console.log('dateto     :'+$('#dateto').val());
-                    var value = $('#datefrom').val() + ',' + $('#dateto').val();
+                    var value = $('#datefrom').val() + ',' + $('#dateto').val()+ ',' + $('#id').val();
                     if(value !== null)
                         return value.toString();
                     else
@@ -121,6 +121,7 @@ namespace ExpressBase.Objects.Objects
         </div>
        Range : <input type='text' class='date' id='datefrom' /*hidden*/ style='width: 30%;'/>
        -<input type='text' class='date' id='dateto' /*hidden*/style='width: 30%;'/>
+        <input type = 'text' id ='id' value = '0' hidden>
 </div>
         "
 .Replace("@name@", this.Name)

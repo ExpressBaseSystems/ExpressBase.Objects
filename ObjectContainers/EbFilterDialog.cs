@@ -41,6 +41,8 @@ namespace ExpressBase.Objects
                     val = "01/2018";
                 else if (c is EbDate && (c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month_Date)
                     val = "01-01-2018";
+                else if(c is EbCalendarControl)
+                    val = "01-01-2018";
                 Param _p = new Param { Name = c.Name, Type = Convert.ToInt32(c.EbDbType).ToString(), Value = val };
                 if (c is EbPowerSelect)
                 {
