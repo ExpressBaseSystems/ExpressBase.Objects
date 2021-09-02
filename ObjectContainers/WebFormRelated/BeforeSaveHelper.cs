@@ -554,8 +554,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
             //Value expression execution order for DoNotPersist ctrls
             _Form.DoNotPersistExecOrder = new List<string>();//cleared the old values
-            List<KeyValuePair<int, int>> DnpDpndcy = dpndcy.FindAll(x => _dict[x.Key].Control.DoNotPersist && _dict[x.Value].Control.DoNotPersist && x.Key != x.Value);
-            List<int> DnpFlds = CalcFlds.FindAll(x => _dict[x].Control.DoNotPersist);
+            List<KeyValuePair<int, int>> DnpDpndcy = dpndcy.FindAll(x => _dict[x.Key].Control.DoNotPersist && _dict[x.Value].Control.DoNotPersist && x.Key != x.Value && !(_dict[x.Key].Control is EbDGColumn));
+            List<int> DnpFlds = CalcFlds.FindAll(x => _dict[x].Control.DoNotPersist && !(_dict[x].Control is EbDGColumn));
             List<int> ExecOrd = new List<int>();
 
             int stopCounter = 0;
@@ -644,7 +644,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
             for (int i = 0; i < _dict.Count; i++)
             {
-                if (!string.IsNullOrWhiteSpace(_dict[i].Control.DefaultValueExpression?.Code))
+                if (!string.IsNullOrWhiteSpace(_dict[i].Control.DefaultValueExpression?.Code) && !(_dict[i].Control is EbDGColumn))
                     CalcFlds.Add(i);
             }
 
