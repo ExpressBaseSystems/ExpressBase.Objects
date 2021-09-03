@@ -54,7 +54,7 @@ namespace ExpressBase.Objects
     {
         [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "DataColumns", "bVisible")]
         [EnableInBuilder(BuilderType.Calendar)]
-        [HideInPropertyGrid]
+        [HideForUser]
         public List<DVBaseColumn> DataColumns { get; set; }
 
         [MetaOnly]
@@ -68,7 +68,7 @@ namespace ExpressBase.Objects
             console.log('ondeselection');
             this.bVisible = false;")]
         [EnableInBuilder(BuilderType.Calendar)]
-        [HideInPropertyGrid]
+        [HideForUser]
         public List<DVBaseColumn> KeyColumns { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
@@ -77,12 +77,12 @@ namespace ExpressBase.Objects
 
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "KeyColumns", 1)]
         [EnableInBuilder(BuilderType.Calendar)]
-        [HideInPropertyGrid]
+        [HideForUser]
         public DVBaseColumn PrimaryKey { get; set; }
 
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "LinesColumns", 1)]
         [EnableInBuilder(BuilderType.Calendar)]
-        [HideInPropertyGrid]
+        [HideForUser]
         public DVBaseColumn ForeignKey { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
@@ -92,7 +92,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm, EbObjectTypes.iTableVisualization)]
-        [HideInPropertyGrid]
+        [HideForUser]
         public List<ObjectBasicInfo> ObjectLinks { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
