@@ -1547,7 +1547,8 @@ namespace ExpressBase.Objects
                     foreach (SingleRow Row in psTable)
                     {
                         string temp = this.AddPsParams(psCtrl, _FormData, DataDB, param, Row, ref p_i, psqry);
-                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, Convert.ToString(Row[psCtrl.Name]), true);
+                        int.TryParse(Convert.ToString(Row[psCtrl.Name]), out int x);
+                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, x.ToString(), true);
                         p_i++;
                         row_ids[psCtrl.EbSid].Add(Row.RowId);
                     }
@@ -1557,8 +1558,8 @@ namespace ExpressBase.Objects
                     List<string> vms = new List<string>();
                     foreach (SingleRow Row in psTable)
                     {
-                        if (Row[psCtrl.Name] != null)
-                            vms.Add(Convert.ToString(Row[psCtrl.Name]));
+                        if (Row[psCtrl.Name] != null && int.TryParse(Convert.ToString(Row[psCtrl.Name]), out int x))
+                            vms.Add(x.ToString());
                     }
                     if (ParamsList.Exists(e => e.Name == psCtrl.Name))
                     {
@@ -1573,7 +1574,8 @@ namespace ExpressBase.Objects
                 }
                 else if (psTable?.Count > 0)
                 {
-                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, Convert.ToString(psTable[0][psCtrl.Name]), false);
+                    int.TryParse(Convert.ToString(psTable[0][psCtrl.Name]), out int x);
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, x.ToString(), false);
                     row_ids[psCtrl.EbSid].Add(0);
                     this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
                 }
@@ -1588,7 +1590,7 @@ namespace ExpressBase.Objects
             if (!(!ipsCtrl.MultiSelect && isStrict))
                 vms = $"ANY(STRING_TO_ARRAY('{vms}', ',')::INT[])";
             else
-                vms = $"'{vms}'";
+                vms = $"{vms}";
             return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms};";
         }
 
