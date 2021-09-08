@@ -1048,13 +1048,67 @@ else// PS
             return s;
         }
 
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
+        {
+            return EbPowerSelect.ParameterizeControl(this, args, crudContext);
+        }
+
+        public static bool ParameterizeControl(dynamic _this, ParameterizeCtrl_Params args, string crudContext)
+        {
+            string paramName = args.cField.Name + crudContext;
+            string _sv = Convert.ToString(args.cField.Value);
+            if (args.cField.Value == null || _sv == string.Empty)
+            {
+                var p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
+                p.Value = DBNull.Value;
+                args.param.Add(p);
+            }
+            else
+            {
+                bool throwException = false;
+                if (_this.MultiSelect)
+                {
+                    string[] arr = _sv.Split(',');
+                    if (arr.Length != arr.Select(e => int.TryParse(e, out int t)).Count())
+                        throwException = true;
+                }
+                else
+                {
+                    if (!int.TryParse(_sv, out int _iv))
+                        throwException = true;
+                }
+                if (throwException)
+                    throw new FormException($"Invalid value({_sv}) found for PowerSelect: {_this.Name}", (int)HttpStatusCode.InternalServerError, $"Unable to parse '{_sv}' as numeric value for {_this.Name}", "From EbPowerSelect.ParameterizeControl()");
+                args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, args.cField.Value));
+            }
+            if (args.ins)
+            {
+                args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
+                args._vals += CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+            }
+            else
+                args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+            args.i++;
+            return true;
+        }
+
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             return EbPowerSelect.GetSingleColumn(this, UserObj, SoluObj, Value, Default);
         }
 
-        public static SingleColumn GetSingleColumn(EbControl _this, User UserObj, Eb_Solution SoluObj, object Value, bool Default)
+        public static SingleColumn GetSingleColumn(dynamic _this, User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
+            string _sv = Convert.ToString(Value);
+            if (Value != null)
+            {
+                if (_this.MultiSelect)
+                    Value = _sv;
+                else if (int.TryParse(_sv, out int _iv))
+                    Value = _iv;
+                else
+                    throw new FormException($"Invalid value({_sv}) found for PowerSelect: {_this.Name}", (int)HttpStatusCode.InternalServerError, $"Unable to parse '{_sv}' as numeric value for {_this.Name}", "From EbPowerSelect.GetSingleColumn()");
+            }
             return new SingleColumn()
             {
                 Name = _this.Name,

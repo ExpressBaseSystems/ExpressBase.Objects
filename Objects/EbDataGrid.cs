@@ -1731,6 +1731,11 @@ pg.HideProperty('IsDynamic');
             return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms, param);
         }
 
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
+        {
+            return EbPowerSelect.ParameterizeControl(this, args, crudContext);
+        }
+
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             this.EbPowerSelect.Name = this.Name;

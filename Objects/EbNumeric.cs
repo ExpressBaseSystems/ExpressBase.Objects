@@ -5,12 +5,14 @@ using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -45,7 +47,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [OnChangeUIFunction("Common.INP_FONT_STYLE")]
         public EbFont FontStyle { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
@@ -60,7 +62,7 @@ namespace ExpressBase.Objects
                 { return parseFloat($('#' + this.EbSid_CtxId).val().replace(/,/g, '')) || 0; }
                 else{ return parseFloat($('#' + this.EbSid_CtxId).val()) || 0;}";
             }
-            set { } 
+            set { }
         }
 
         [JsonIgnore]
@@ -87,15 +89,15 @@ namespace ExpressBase.Objects
         [HelpText("Number of decimal places")]
         public int DecimalPlaces { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public bool IsBasicControl { get => true; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public bool IsBasicControl { get => true; }
 
-		//[HideInPropertyGrid]
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//public override bool IsReadOnly { get => this.IsDisable; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.BotForm)]
         public bool AutoIncrement { get; set; }
 
         //[ProtoBuf.ProtoMember(4)]
@@ -244,7 +246,10 @@ else {
             }
             else
             {
-                _formattedData = Convert.ToDouble(Value);
+                if (double.TryParse(Convert.ToString(Value), out double _t))
+                    _formattedData = _t;
+                else
+                    throw new FormException($"Invalid numeric value found({_this.Name})", (int)HttpStatusCode.InternalServerError, $"Unable to parse '{Convert.ToString(Value)}' as numeric value for {_this.Name}", "From EbNumeric.GetSingleColumn()");
                 _displayMember = string.Format("{0:0" + padding + "}", _formattedData);
             }
 

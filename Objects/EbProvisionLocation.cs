@@ -319,6 +319,8 @@ this.Init = function(id)
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
+            if (Value != null && int.TryParse(Convert.ToString(Value), out int _t))
+                Value = _t;
             return new SingleColumn()
             {
                 Name = this.Name,
