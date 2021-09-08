@@ -419,7 +419,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         eb_users__email = 1,
         eb_users__phnoprimary,
-        eb_roles__role_name
+        eb_roles__role_name,
+        eb_users__nickname
     }
 
     [DataContract]
