@@ -5,8 +5,6 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects.Objects
 {
@@ -27,6 +25,8 @@ namespace ExpressBase.Objects.Objects
         public List<ObjectBasicInfo> ObjectLinks { get; set; }
 
         Globals globals = new Globals();
+
+        public int InitialColumnsCount { get; set; }
 
         public DataStruct4CalView(EbCalendarView C)
         {
@@ -62,6 +62,7 @@ namespace ExpressBase.Objects.Objects
 
             EbDataRow Row;
             long value;
+            long prev_value;
             int summary_last_index = summary.Keys.Last();
             for (int i = 0; i < _formattedTable.Rows.Count; i++)//filling consolidated data
             {
@@ -73,7 +74,8 @@ namespace ExpressBase.Objects.Objects
                     foreach (int columnIndex in columnIndexes)
                     {
                         value = _innerDict[_id].GetValue(columnIndex);
-                        Row[columnIndex] = GetFormattedValue(value, Row,columnIndex);
+                        prev_value = (columnIndex > this.InitialColumnsCount && Columns.GetColumnByIndex(columnIndex).StartDate > Columns.GetColumnByIndex(columnIndex - 1).StartDate) ? _innerDict[_id].GetValue(columnIndex - 1) : 0;
+                        Row[columnIndex] = GetFormattedValue(value, Row, columnIndex, prev_value);
                         Row["Total"] = (long)(Row["Total"] ?? 0L) + value;
                         summary[columnIndex][0] = (long)summary[columnIndex][0] + value;
                         summary[summary_last_index][0] = (long)summary[summary_last_index][0] + value;
@@ -82,41 +84,64 @@ namespace ExpressBase.Objects.Objects
             }
         }
 
-        private object GetFormattedValue(object value, EbDataRow row,int columnIndex)
+        private object GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value)
         {
             object formattedVal = string.Empty;
             if (ConditionalFormating.Count > 0)
             {
-                foreach (ColumnCondition cond in ConditionalFormating)
+                DoConditionalFormating(ref formattedVal, value, row);
+            }
+            else
+            {
+                formattedVal = value;
+                formattedVal = (this.ObjectLinks.Count == 1) ? "<a href = '#' oncontextmenu = 'return false' class ='tablelink4calendar' data-popup='true' data-link='" + ObjectLinks[0].ObjRefId + "' data-colindex='" + columnIndex + "'  data-column='" + this.Columns.GetColumnByIndex(columnIndex).Name + "'>" + formattedVal + "</a>" : formattedVal;
+                if (prev_value > 0 && value > 0)
                 {
-                    if (cond is AdvancedCondition)
+                    long percent = ((value - prev_value) * 100) / value;
+                    if (percent < 0)
                     {
-                        bool result = EvaluateExpression(row, ref globals, (cond as AdvancedCondition), value);
-                        if ((cond as AdvancedCondition).RenderAS == AdvancedRenderType.Default)
-                        {
-                            if (result == (cond as AdvancedCondition).GetBoolValue())
-                                formattedVal = "<div class='conditionformat' style='background-color:" + cond.BackGroundColor + ";color:" + cond.FontColor + ";'>" + value + "</div>";
-                        }
-                        else
-                        {
-                            if (result == (cond as AdvancedCondition).GetBoolValue())
-                                formattedVal = "<i class='fa fa-check' aria-hidden='true'  style='color:green'></i>";
-                            else
-                                formattedVal = "<i class='fa fa-times' aria-hidden='true' style='color:red'></i>";
-                        }
+                        formattedVal += "<span class ='cal-percent-caret-red'><i class='fa fa-caret-down' aria-hidden='true'></i></span></span>" +
+                                        "<span class='cal-percent-container'><span class ='cal-percent cal-percent-red'>" + Math.Abs(percent) + "%" + "</span>";
                     }
-                    if (cond.CompareValues(value))
+                    else
                     {
-                        formattedVal = "<div class='conditionformat' style='background-color:" + cond.BackGroundColor + ";color:" + cond.FontColor + ";'>" + value + "</div>";
+                        formattedVal += "<span class ='cal-percent-caret-green'><i class='fa fa-caret-up' aria-hidden='true'></i></span></span>" +
+                                        "<span class='cal-percent-container'><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span>";
                     }
                 }
             }
-            else
-                formattedVal = value;
-            formattedVal = (this.ObjectLinks.Count==1) ? "<a href = '#' oncontextmenu = 'return false' class ='tablelink4calendar' data-popup='true' data-link='" +  ObjectLinks[0].ObjRefId + "' data-colindex='" + columnIndex  + "'  data-column='" + this.Columns.GetColumnByIndex(columnIndex).Name + "'>" + formattedVal + "</a>" : formattedVal;
             return formattedVal;
         }
-        public bool EvaluateExpression(EbDataRow _datarow, ref Globals globals, AdvancedCondition condition, object value)
+
+        public void DoConditionalFormating(ref object formattedVal, long value, EbDataRow row)
+        {
+
+            foreach (ColumnCondition cond in ConditionalFormating)
+            {
+                if (cond is AdvancedCondition)
+                {
+                    bool result = EvaluateExpression(row, ref globals, (cond as AdvancedCondition), value);
+                    if ((cond as AdvancedCondition).RenderAS == AdvancedRenderType.Default)
+                    {
+                        if (result == (cond as AdvancedCondition).GetBoolValue())
+                            formattedVal = "<div class='conditionformat' style='background-color:" + cond.BackGroundColor + ";color:" + cond.FontColor + ";'>" + value + "</div>";
+                    }
+                    else
+                    {
+                        if (result == (cond as AdvancedCondition).GetBoolValue())
+                            formattedVal = "<i class='fa fa-check' aria-hidden='true'  style='color:green'></i>";
+                        else
+                            formattedVal = "<i class='fa fa-times' aria-hidden='true' style='color:red'></i>";
+                    }
+                }
+                if (cond.CompareValues(value))
+                {
+                    formattedVal = "<div class='conditionformat' style='background-color:" + cond.BackGroundColor + ";color:" + cond.FontColor + ";'>" + value + "</div>";
+                }
+            }
+        }
+
+        public bool EvaluateExpression(EbDataRow _datarow, ref Globals globals, AdvancedCondition condition, long value)
         {
             foreach (FormulaPart formulaPart in condition.FormulaParts)
             {
@@ -190,7 +215,7 @@ namespace ExpressBase.Objects.Objects
         {
             foreach (CalViewCol col in _innerDict.Keys)
             {
-                if(_innerDict[col]==index)
+                if (_innerDict[col] == index)
                     return col;
             }
 
@@ -214,12 +239,14 @@ namespace ExpressBase.Objects.Objects
         }
         public IEnumerable<int> GetKeys()
         {
-            IEnumerable<int> keys = _innerDict.Select(x => x.Key);
+            IEnumerable<int> keys = _innerDict.Select(x => x.Key).OrderBy(x => x);
             return keys;
         }
         public long GetValue(int index)
         {
-            return _innerDict[index];
+            if (_innerDict.ContainsKey(index))
+                return _innerDict[index];
+            else return 0;
         }
         public void Add(int columnKey, long value)
         {
