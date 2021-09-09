@@ -36,7 +36,7 @@ namespace ExpressBase.Objects
                 else if ((c.EbDbType).ToString() == "AnsiString")
                     val = "0";
                 else if ((c.EbDbType).ToString() == "String")
-                    val = "EB";
+                    val = "1";
                 else if (c is EbDate && (c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month)
                     val = "01/2018";
                 else if (c is EbDate && (c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month_Date)
