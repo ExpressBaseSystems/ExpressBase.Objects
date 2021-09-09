@@ -250,7 +250,7 @@ namespace ExpressBase.Objects
                     if (!(WebForm.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0))
                         continue;
 
-                    foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique))
+                    foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique && !e.Control.BypassParameterization))
                     {
                         SingleColumn cField = Table[0].GetColumn(_column.ColumnName);
 

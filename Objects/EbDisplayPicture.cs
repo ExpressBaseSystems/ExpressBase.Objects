@@ -80,7 +80,7 @@ namespace ExpressBase.Objects
         {
             return this.GetHtml().RemoveCR().GraveAccentQuoted();
         }
-        
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
@@ -126,7 +126,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript HiddenExpr { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }
@@ -174,7 +174,7 @@ namespace ExpressBase.Objects
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = Value,
+                Value = Convert.ToString(Value),
                 Control = this,
                 ObjType = this.ObjType,
                 F = "[]"

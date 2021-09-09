@@ -246,8 +246,8 @@ namespace ExpressBase.Objects
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
-            object _formattedData = Value == null ? null : Convert.ToString(Value);
-            string _displayMember = Value == null ? string.Empty : Value.ToString();
+            string _displayMember = Value == null ? string.Empty : Convert.ToString(Value);
+            object _formattedData = Value == null ? null : _displayMember;
 
             if (this.IsSqlExpr && !Default)
             {

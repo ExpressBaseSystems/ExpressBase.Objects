@@ -317,77 +317,74 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         public bool ParameterizeControl(ParameterizeCtrl_Params args, bool randomize, string crudContext)
         {
             string paramName = randomize ? (args.cField.Name + "_" + args.i) : (args.cField.Name + crudContext);
-            //try
-            //{
-            if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && this.IsNullable)
+            try
             {
-                DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
-                p.Value = DBNull.Value;
-                args.param.Add(p);
-            }
-            else
-            {
-                string strDate = Convert.ToString(args.cField.Value);
-                if (string.IsNullOrWhiteSpace(strDate))
-                    throw new FormException($"Unable to process [Date: {this.Label ?? this.Name}]", (int)HttpStatusCode.InternalServerError, "Null or empty string for Date: " + args.cField.Name, "EbDate => ParameterizeControl");
-
-                if (this.EbDateType == EbDateType.Date)
+                if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && this.IsNullable)
                 {
-                    if (this.ShowDateAs_ == DateShowFormat.Year)
-                        args.cField.Value = DateTime.ParseExact(strDate, "yyyy", CultureInfo.InvariantCulture);
-                    else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
-                        args.cField.Value = DateTime.ParseExact(strDate, "MM/yyyy", CultureInfo.InvariantCulture);
-                    else
-                        args.cField.Value = DateTime.ParseExact(strDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-
-                    if (this.RestrictionRule == DateRestrictionRule.FinancialYear || this.RestrictionRule == DateRestrictionRule.ActivePeriod)
-                    {
-                        EbFinancialYears fys = (args.webForm as EbWebForm)?.SolutionObj?.FinancialYears;
-                        if (fys != null && fys.List.Count > 0)
-                        {
-                            DateTime Date = Convert.ToDateTime(args.cField.Value);
-                            bool DateIsOk = false, IsSysUser = args.usr.RoleIds.Exists(e => e < 100);
-                            string finStartEnd = null, shtDtPtn = args.usr.Preference.GetShortDatePattern();
-                            foreach (EbFinancialYear fy in fys.List)
-                            {
-                                if (finStartEnd == null && !fy.Locked)
-                                    finStartEnd = GetFyDate(this.RestrictionRule, fy, true).ToString(shtDtPtn, CultureInfo.InvariantCulture) + " and " + GetFyDate(this.RestrictionRule, fy, false).ToString(shtDtPtn, CultureInfo.InvariantCulture);
-
-                                if ((!fy.Locked || IsSysUser) && GetFyDate(this.RestrictionRule, fy, true) <= Date && GetFyDate(this.RestrictionRule, fy, false) >= Date)
-                                {
-                                    DateIsOk = true;
-                                    break;
-                                }
-                            }
-                            if (!DateIsOk)
-                            {
-                                throw new FormException($"{this.Label ?? this.Name} must be between {finStartEnd ?? "Financial years"}", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
-                            }
-                        }
-                    }
+                    DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
+                    p.Value = DBNull.Value;
+                    args.param.Add(p);
                 }
                 else
                 {
-                    if (this.EbDateType == EbDateType.DateTime)
-                    {
-                        DateTime dt = DateTime.ParseExact(strDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                        args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
-                    }
-                    else//EbDateType.Time
-                        args.cField.Value = DateTime.ParseExact(strDate, "HH:mm:ss", CultureInfo.InvariantCulture);
-                }
+                    string strDate = Convert.ToString(args.cField.Value);
+                    if (string.IsNullOrWhiteSpace(strDate))
+                        throw new FormException($"Unable to process [Date: {this.Label ?? this.Name}]", (int)HttpStatusCode.InternalServerError, "Null or empty string for Date: " + args.cField.Name, "EbDate => ParameterizeControl");
 
-                args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
+                    if (this.EbDateType == EbDateType.Date)
+                    {
+                        if (this.ShowDateAs_ == DateShowFormat.Year)
+                            args.cField.Value = DateTime.ParseExact(strDate, "yyyy", CultureInfo.InvariantCulture);
+                        else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
+                            args.cField.Value = DateTime.ParseExact(strDate, "MM/yyyy", CultureInfo.InvariantCulture);
+                        else
+                            args.cField.Value = DateTime.ParseExact(strDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+                        if (this.RestrictionRule == DateRestrictionRule.FinancialYear || this.RestrictionRule == DateRestrictionRule.ActivePeriod)
+                        {
+                            EbFinancialYears fys = (args.webForm as EbWebForm)?.SolutionObj?.FinancialYears;
+                            if (fys != null && fys.List.Count > 0)
+                            {
+                                DateTime Date = Convert.ToDateTime(args.cField.Value);
+                                bool DateIsOk = false, IsSysUser = args.usr.RoleIds.Exists(e => e < 100);
+                                string finStartEnd = null, shtDtPtn = args.usr.Preference.GetShortDatePattern();
+                                foreach (EbFinancialYear fy in fys.List)
+                                {
+                                    if (finStartEnd == null && !fy.Locked)
+                                        finStartEnd = GetFyDate(this.RestrictionRule, fy, true).ToString(shtDtPtn, CultureInfo.InvariantCulture) + " and " + GetFyDate(this.RestrictionRule, fy, false).ToString(shtDtPtn, CultureInfo.InvariantCulture);
+
+                                    if ((!fy.Locked || IsSysUser) && GetFyDate(this.RestrictionRule, fy, true) <= Date && GetFyDate(this.RestrictionRule, fy, false) >= Date)
+                                    {
+                                        DateIsOk = true;
+                                        break;
+                                    }
+                                }
+                                if (!DateIsOk)
+                                {
+                                    throw new FormException($"{this.Label ?? this.Name} must be between {finStartEnd ?? "Financial years"}", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (this.EbDateType == EbDateType.DateTime)
+                        {
+                            DateTime dt = DateTime.ParseExact(strDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
+                        }
+                        else//EbDateType.Time
+                            args.cField.Value = DateTime.ParseExact(strDate, "HH:mm:ss", CultureInfo.InvariantCulture);
+                    }
+
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
+                }
             }
-            //}
-            //catch (Exception e)
-            //{
-            //    if (!this.IsNullable)
-            //        Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {args.cField.Name}\nValue : {args.cField.Value}\nMessage : {e.Message}"); ;
-            //    DbParameter p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
-            //    p.Value = DBNull.Value;
-            //    args.param.Add(p);
-            //}
+            catch (Exception e)
+            {
+                Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {args.cField.Name}\nValue : {args.cField.Value}\nMessage : {e.Message}"); ;
+                throw new FormException($"Unable to process {this.Name}(date control) with value: {args.cField.Value}", (int)HttpStatusCode.InternalServerError, e.Message, "From EbDate.ParameterizeControl()\n" + e.StackTrace);
+            }
 
             if (args.ins)
             {
@@ -434,57 +431,64 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             if (!skip)
             {
                 DateTime dt;
-                if (Value == null)
+                try
                 {
-                    dt = DateTime.UtcNow;
-                    if (_this.EbDateType == EbDateType.Time)
-                        dt = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
-                }
-                else
-                {
-                    if (Value.GetType() == typeof(TimeSpan))
-                        dt = DateTime.MinValue + (TimeSpan)Value;
+                    if (Value == null)
+                    {
+                        dt = DateTime.UtcNow;
+                        if (_this.EbDateType == EbDateType.Time)
+                            dt = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
+                    }
                     else
-                        dt = Convert.ToDateTime(Value);
-                }
+                    {
+                        if (Value.GetType() == typeof(TimeSpan))
+                            dt = DateTime.MinValue + (TimeSpan)Value;
+                        else
+                            dt = Convert.ToDateTime(Value);
+                    }
 
-                if (_this.EbDateType == EbDateType.Date)
-                {
-                    if (!(_this is EbDate)) //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
+                    if (_this.EbDateType == EbDateType.Date)
+                    {
+                        if (!(_this is EbDate)) //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
+                        {
+                            DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
+                            _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                        }
+                        else //EbDate
+                        {
+                            if (_this.ShowDateAs_ == DateShowFormat.Year)
+                            {
+                                _formattedData = dt.ToString("yyyy", CultureInfo.InvariantCulture);
+                                _displayMember = _formattedData.ToString();
+                            }
+                            else if (_this.ShowDateAs_ == DateShowFormat.Year_Month)
+                            {
+                                _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
+                                _displayMember = _formattedData.ToString();
+                            }
+                            else
+                            {
+                                _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                _displayMember = dt.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                            }
+                        }
+                    }
+                    else if (_this.EbDateType == EbDateType.DateTime)
                     {
                         DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
-                        _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                        _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                        _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                     }
-                    else //EbDate
+                    else// EbDateType.Time 
                     {
-                        if (_this.ShowDateAs_ == DateShowFormat.Year)
-                        {
-                            _formattedData = dt.ToString("yyyy", CultureInfo.InvariantCulture);
-                            _displayMember = _formattedData.ToString();
-                        }
-                        else if (_this.ShowDateAs_ == DateShowFormat.Year_Month)
-                        {
-                            _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
-                            _displayMember = _formattedData.ToString();
-                        }
-                        else
-                        {
-                            _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                            _displayMember = dt.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                        }
+                        _formattedData = dt.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                        _displayMember = dt.ToString(UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                     }
                 }
-                else if (_this.EbDateType == EbDateType.DateTime)
+                catch (Exception e)
                 {
-                    DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
-                    _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                    _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                }
-                else// EbDateType.Time 
-                {
-                    _formattedData = dt.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                    _displayMember = dt.ToString(UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                    throw new FormException($"Unable to process {_this.Name}(date control) with value: {Value}", (int)HttpStatusCode.InternalServerError, e.Message, "From EbDate.GetSingleColumn()\n" + e.StackTrace);
                 }
             }
 
