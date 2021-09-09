@@ -483,6 +483,10 @@ else{
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
         public string Name { get; set; }
+
+        [PropertyGroup("Core")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool CommentsRequired { get; set; }
     }
 
     public enum ApproverEntityTypes
