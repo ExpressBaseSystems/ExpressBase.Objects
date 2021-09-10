@@ -1733,7 +1733,7 @@ pg.HideProperty('IsDynamic');
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
-            return EbPowerSelect.ParameterizeControl(this, args, crudContext);
+            return EbPowerSelect.ParameterizeControl(this, args, true, crudContext);
         }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
