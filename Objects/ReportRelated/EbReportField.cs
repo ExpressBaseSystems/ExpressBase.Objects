@@ -61,6 +61,11 @@ namespace ExpressBase.Objects
         [UIproperty]
         public float Leading { get; set; } = 12;
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        public virtual bool Dotted { get; set; }
+
         [JsonIgnore]
         public float Llx
         {

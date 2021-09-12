@@ -21,6 +21,11 @@ namespace ExpressBase.Objects
         public override string ForeColor { get; set; }
 
         public override EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        public override bool Dotted { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -53,6 +58,8 @@ namespace ExpressBase.Objects
                 Rep.Canvas.SetColorStroke(GetColor(BorderColor));
                 Rep.Canvas.SetColorFill(GetColor(BackColor));
                 Rep.Canvas.SetLineWidth(Border);
+                if (Dotted)
+                    Rep.Canvas.SetLineDash(5, 5, 3);
                 Rep.Canvas.Circle(xval, yval, radius);
                 Rep.Canvas.FillStroke();
             }
@@ -63,6 +70,8 @@ namespace ExpressBase.Objects
                 Rep.Canvas.SetColorStroke(GetColor(BorderColor));
                 Rep.Canvas.SetColorFill(GetColor(BackColor));
                 Rep.Canvas.SetLineWidth(Border);
+                if (Dotted)
+                    Rep.Canvas.SetLineDash(5, 5, 3);
                 Rep.Canvas.Ellipse(Llx, y1, Urx, y2);
                 Rep.Canvas.FillStroke();
             }
@@ -92,6 +101,8 @@ namespace ExpressBase.Objects
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BackColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.Rectangle(Llx, y, WidthPt, HeightPt);
             Rep.Canvas.FillStroke();
         }
@@ -120,6 +131,8 @@ namespace ExpressBase.Objects
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Urx, y);
             Rep.Canvas.LineTo(Urx - 3, y - 3);
             Rep.Canvas.LineTo(Urx - 3, y + 3);
@@ -145,18 +158,18 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(printingTop,Rep, Linkparams, slno);
+            base.DrawMe(printingTop, Rep, Linkparams, slno);
             float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Llx, y);
             Rep.Canvas.LineTo(Llx + 3, y + 3);
             Rep.Canvas.LineTo(Llx + 3, y - 3);
             Rep.Canvas.ClosePathFillStroke();
         }
-
-
     }
     [EnableInBuilder(BuilderType.Report)]
     public class EbArrD : EbVl
@@ -177,11 +190,13 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(printingTop,  Rep, Linkparams, slno);
+            base.DrawMe(printingTop, Rep, Linkparams, slno);
             float y = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Llx, y);
             Rep.Canvas.LineTo(Llx - 3, y + 3);
             Rep.Canvas.LineTo(Llx + 3, y + 3);
@@ -207,17 +222,18 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(printingTop,Rep, Linkparams, slno);
+            base.DrawMe(printingTop, Rep, Linkparams, slno);
             float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Llx, y);
             Rep.Canvas.LineTo(Llx + 3, y - 3);
             Rep.Canvas.LineTo(Llx - 3, y - 3);
             Rep.Canvas.ClosePathFillStroke();
         }
-
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -244,6 +260,8 @@ namespace ExpressBase.Objects
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Urx, y1);
             Rep.Canvas.LineTo(Urx - 3, y1 - 3);
             Rep.Canvas.LineTo(Urx - 3, y1 + 3);
@@ -280,6 +298,8 @@ namespace ExpressBase.Objects
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Llx, y1);
             Rep.Canvas.LineTo(Llx + 3, y1 - 3);
             Rep.Canvas.LineTo(Llx - 3, y1 - 3);
@@ -309,13 +329,15 @@ namespace ExpressBase.Objects
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams,int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             float rowH = (TopPt > Rep.MultiRowTop) ? Rep.RowHeight : 0;
             float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop + rowH);
             float y2 = y1;
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Llx, y1);
             Rep.Canvas.LineTo(Urx, y2);
             Rep.Canvas.Stroke();
@@ -345,6 +367,8 @@ namespace ExpressBase.Objects
             float y2 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
+            if (Dotted)
+                Rep.Canvas.SetLineDash(5, 5, 3);
             Rep.Canvas.MoveTo(Llx, y1);
             Rep.Canvas.LineTo(Llx, y2);
             Rep.Canvas.Stroke();
