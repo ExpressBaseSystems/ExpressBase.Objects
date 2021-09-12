@@ -233,8 +233,14 @@ namespace ExpressBase.Objects.WebFormRelated
             insUpQ += this.GetApprovalLinesInsertQry(ref i);
             insUpQ += this.UpdateMyAction(ref i);
 
-            if (!(this.ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.Table[0]["stage_unique_id"])) is EbReviewStage currentStage))
+            if (!(this.ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.Table[0][FormConstants.stage_unique_id])) is EbReviewStage currentStage))
                 throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"eb_approval_lines contains an invalid stage_unique_id: {this.Table[0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
+
+            if (!(currentStage.StageActions.Find(e => e.EbSid == Convert.ToString(this.Table[0][FormConstants.action_unique_id])) is EbReviewAction currentAction))
+                throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"eb_approval_lines contains an invalid action_unique_id: {this.Table[0]["action_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
+
+            if (currentAction.CommentsRequired && string.IsNullOrWhiteSpace(Convert.ToString(this.Table[0]["comments"])))
+                throw new FormException("Comments required to complete the review", (int)HttpStatusCode.BadRequest, $"Comments required for stage: {currentStage.EbSid}, action: {currentAction.EbSid} ", "From GetMyActionInsertUpdateQuery");
 
             if (this.globals == null)
                 this.globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this.webForm, this.webForm.FormData, this.webForm.FormDataBackup, this.DataDB, null, false);

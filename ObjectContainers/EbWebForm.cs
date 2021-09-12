@@ -1801,7 +1801,7 @@ namespace ExpressBase.Objects
                 throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
             if (this.FormData.IsLocked && !reviewFlow)
                 throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
-            if (this.FormData.FormVersionId == 0)
+            if (this.FormData.FormVersionId == 0 && !reviewFlow)
                 throw new FormException("Edit is blocked - Invalid Form RefId!", (int)HttpStatusCode.Forbidden, "Invalid FormVersionId", "EbWebForm -> Save");
             if (this.FormData.IsCancelled)
                 throw new FormException("This form submission is CANCELLED!", (int)HttpStatusCode.Forbidden, "Cancelled record", "EbWebForm -> Save");

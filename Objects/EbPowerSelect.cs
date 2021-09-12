@@ -1050,12 +1050,12 @@ else// PS
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
-            return EbPowerSelect.ParameterizeControl(this, args, crudContext);
+            return EbPowerSelect.ParameterizeControl(this, args, false, crudContext);
         }
 
-        public static bool ParameterizeControl(dynamic _this, ParameterizeCtrl_Params args, string crudContext)
+        public static bool ParameterizeControl(dynamic _this, ParameterizeCtrl_Params args, bool randomize, string crudContext)
         {
-            string paramName = args.cField.Name + crudContext;
+            string paramName = randomize ? (args.cField.Name + "_" + args.i) : (args.cField.Name + crudContext);
             string _sv = Convert.ToString(args.cField.Value);
             if (args.cField.Value == null || _sv == string.Empty)
             {

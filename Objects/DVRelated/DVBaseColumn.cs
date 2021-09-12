@@ -919,7 +919,7 @@ else{
                 this.RenderType = this.Type;
         }
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        
+
         [PropertyGroup(PGConstants.EXTENDED)]
         [OnChangeExec(@"
 if(this.Type === 17){    pg.HideProperty('Format');pg.setSimpleProperty('Format', 1);}
@@ -1054,6 +1054,9 @@ pg.ShowProperty('SubTypeFormat');
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         [PropertyGroup(PGConstants.CORE)]
         public string FormRefid { get; set; }
+
+        [JsonIgnore]
+        public EbReview ReviewCtrl { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
@@ -1490,5 +1493,5 @@ else
         }
     }
 
-   
+
 }
