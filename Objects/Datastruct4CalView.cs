@@ -28,13 +28,19 @@ namespace ExpressBase.Objects.Objects
 
         public int InitialColumnsCount { get; set; }
 
+        public AttendanceType CalendarType { get; set; }
+
+        public bool ShowGrowthPercentage { get; set; }
+
         public DataStruct4CalView(EbCalendarView C)
         {
             this.KeyColumnName = C.PrimaryKey.Name;
             this.DateColumnName = C.LinesColumns.FirstOrDefault(col => !col.IsCustomColumn && (col.Type == EbDbTypes.Date || col.Type == EbDbTypes.DateTime))?.Name;
             this.ValueColumnName = C.DataColumns.FirstOrDefault(col => col.bVisible)?.Name;
             this.ConditionalFormating = C.DataColumns.FirstOrDefault(col => col.bVisible)?.ConditionalFormating;
-            ObjectLinks = C.ObjectLinks;
+            this.ObjectLinks = C.ObjectLinks;
+            this.CalendarType = C.CalendarType;
+            this.ShowGrowthPercentage = C.ShowGrowthPercentage;
         }
 
         public void Add(EbDataRow row)
@@ -73,8 +79,14 @@ namespace ExpressBase.Objects.Objects
                     IEnumerable<int> columnIndexes = _innerDict[_id].GetKeys();
                     foreach (int columnIndex in columnIndexes)
                     {
+                        prev_value = 0;
                         value = _innerDict[_id].GetValue(columnIndex);
-                        prev_value = (columnIndex > this.InitialColumnsCount && Columns.GetColumnByIndex(columnIndex).StartDate > Columns.GetColumnByIndex(columnIndex - 1).StartDate) ? _innerDict[_id].GetValue(columnIndex - 1) : 0;
+                        if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise)
+                        {
+                            if (columnIndex > this.InitialColumnsCount && Columns.GetColumnByIndex(columnIndex).StartDate > Columns.GetColumnByIndex(columnIndex - 1).StartDate)
+                                prev_value = _innerDict[_id].GetValue(columnIndex - 1);
+                        }
+
                         Row[columnIndex] = GetFormattedValue(value, Row, columnIndex, prev_value);
                         Row["Total"] = (long)(Row["Total"] ?? 0L) + value;
                         summary[columnIndex][0] = (long)summary[columnIndex][0] + value;
@@ -93,20 +105,18 @@ namespace ExpressBase.Objects.Objects
             }
             else
             {
-                formattedVal = value;
-                formattedVal = (this.ObjectLinks.Count == 1) ? "<a href = '#' oncontextmenu = 'return false' class ='tablelink4calendar' data-popup='true' data-link='" + ObjectLinks[0].ObjRefId + "' data-colindex='" + columnIndex + "'  data-column='" + this.Columns.GetColumnByIndex(columnIndex).Name + "'>" + formattedVal + "</a>" : formattedVal;
-                if (prev_value > 0 && value > 0)
+                formattedVal = (this.ObjectLinks.Count == 1) ? "<a href = '#' oncontextmenu = 'return false' class ='tablelink4calendar cal-data' data-popup='true' data-link='" + ObjectLinks[0].ObjRefId + "' data-colindex='" + columnIndex + "'  data-column='" + this.Columns.GetColumnByIndex(columnIndex).Name + "'>" + value + "</a>" : "<span class = 'cal-data'>" + value + "</span>";
+
+                if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise && prev_value > 0 && value > 0)
                 {
                     long percent = ((value - prev_value) * 100) / value;
                     if (percent < 0)
                     {
-                        formattedVal += "<span class ='cal-percent-caret-red'><i class='fa fa-caret-down' aria-hidden='true'></i></span></span>" +
-                                        "<span class='cal-percent-container'><span class ='cal-percent cal-percent-red'>" + Math.Abs(percent) + "%" + "</span>";
+                        formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-red'><i class='fa fa-caret-down' aria-hidden='true'></i></span><span class ='cal-percent cal-percent-red'>" + Math.Abs(percent) + "%" + "</span></span>";
                     }
                     else
                     {
-                        formattedVal += "<span class ='cal-percent-caret-green'><i class='fa fa-caret-up' aria-hidden='true'></i></span></span>" +
-                                        "<span class='cal-percent-container'><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span>";
+                        formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-green'><i class='fa fa-caret-up' aria-hidden='true'></i></span><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span></span>";
                     }
                 }
             }
@@ -239,7 +249,7 @@ namespace ExpressBase.Objects.Objects
         }
         public IEnumerable<int> GetKeys()
         {
-            IEnumerable<int> keys = _innerDict.Select(x => x.Key).OrderBy(x => x);
+            IEnumerable<int> keys = _innerDict.Select(x => x.Key);
             return keys;
         }
         public long GetValue(int index)

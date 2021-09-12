@@ -94,6 +94,10 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iWebForm, EbObjectTypes.iTableVisualization)]
         [HideForUser]
         public List<ObjectBasicInfo> ObjectLinks { get; set; }
+        
+        [EnableInBuilder(BuilderType.Calendar)]
+        [HideForUser]
+        public bool ShowGrowthPercentage { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
