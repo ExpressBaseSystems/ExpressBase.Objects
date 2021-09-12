@@ -98,7 +98,9 @@ namespace ExpressBase.Objects
                     }
                     if (!isDone)
                     {//if transalation is not done, continue...(Recursion comes in now!!)
-                        word = TranslateWholeNumber(number.Substring(0, pos)) + place + TranslateWholeNumber(number.Substring(pos));
+                        word = TranslateWholeNumber(number.Substring(0, pos));
+                        word += (word == "") ? "" : place;
+                        word += TranslateWholeNumber(number.Substring(pos));
                         //check for trailing zeros
                         if (beginsZero) word = " and " + word.Trim();
                     }
