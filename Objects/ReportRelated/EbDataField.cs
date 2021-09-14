@@ -181,8 +181,9 @@ namespace ExpressBase.Objects
         {
             if (_inWords)
             {
-                NumberToEnglish numToE = new NumberToEnglish();
-                column_val = numToE.changeCurrencyToWords(column_val);
+                //NumberToEnglishOld numToE = new NumberToEnglishOld();
+                //column_val = numToE.changeCurrencyToWords(column_val); 
+                column_val = NumberToWords.ConvertNumber(column_val);
             }
             else
             {
