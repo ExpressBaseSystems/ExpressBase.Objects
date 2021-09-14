@@ -383,7 +383,7 @@ namespace ExpressBase.Objects
         [OnChangeExec(@"
             pg.MakeReadOnly('Title');
         ")]
-        [EnableInBuilder(BuilderType.Report)]
+        [EnableInBuilder(BuilderType.Report)] 
         public override string Title { set; get; }
 
         public override string GetDesignHtml()

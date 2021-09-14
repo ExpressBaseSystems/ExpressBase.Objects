@@ -40,7 +40,7 @@ namespace ExpressBase.Objects
                         //endStr = (isCurrency) ? ("Dirhams " + endStr) : ("");
                         pointStr = translateCents(points);
                     }
-                }
+                } 
                 val = String.Format("{0} {1}{2} {3}", TranslateWholeNumber(wholeNo).Trim(), andStr, pointStr, endStr);
             }
             catch {; }
@@ -53,9 +53,9 @@ namespace ExpressBase.Objects
             {
                 bool beginsZero = false;//tests for 0XX
                 bool isDone = false;//test if already translated
-                double dblAmt = (Convert.ToDouble(number));
+                double dblAmt = Math.Abs(double.Parse(number));
                 //if ((dblAmt > 0) && number.StartsWith("0"))
-                if (dblAmt > 0)
+                 if (dblAmt > 0)
                 {//test for zero or digit zero in a nuemric
                     beginsZero = number.StartsWith("0");
                     int numDigits = number.Length;

@@ -648,7 +648,7 @@ namespace ExpressBase.Objects
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
-                    if (Groupheaders != null && Groupheaders.Count > 0)
+                    if (Groupheaders?.Count > 0)
                         foreach (KeyValuePair<string, ReportGroupItem> grp in Groupheaders)
                         {
                             ReportGroupItem grpitem = grp.Value;
@@ -797,7 +797,7 @@ namespace ExpressBase.Objects
 
         public void DrawGroupHeader(int order, int serialnumber)
         {
-            if (PreviousGheadersSlNo != serialnumber && GroupHeaderHeight + DetailHeight > DT_FillHeight - detailprintingtop)
+            if ((PreviousGheadersSlNo != serialnumber && GroupHeaderHeight + DetailHeight > DT_FillHeight - detailprintingtop) || (ReportGroups[order].GroupHeader.GroupInNewPage && serialnumber > 0))
             {
                 AddNewPage();
                 dt_Yposition = PageHeaderHeight + this.Margin.Top;
@@ -1301,6 +1301,10 @@ namespace ExpressBase.Objects
         [UIproperty]
         [MetaOnly]
         public int Order { set; get; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        public bool GroupInNewPage { get; set; }
 
         public override string GetDesignHtml()
         {
