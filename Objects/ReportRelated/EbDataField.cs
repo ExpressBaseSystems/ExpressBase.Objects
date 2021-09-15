@@ -133,7 +133,7 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetFormattedPhrase(this.Font, _reportFont, column_val);
 
-            if (this.RenderInMultiLine && column_val != string.Empty && column_type == System.Data.DbType.Decimal || column_type == System.Data.DbType.Double || column_type == System.Data.DbType.Int16 || column_type == System.Data.DbType.Int32 || column_type == System.Data.DbType.Int64 || column_type == System.Data.DbType.VarNumeric)
+            if (column_val != string.Empty)
             {
                 try
                 {
@@ -145,10 +145,10 @@ namespace ExpressBase.Objects
                         int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
                         if (numberofCharsInALine < column_val.Length)
                         {
-
-                            column_val = "###";
-                            //else if (column_type == System.Data.DbType.String)
-                            //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
+                            if (column_type == System.Data.DbType.Int32 || column_type == System.Data.DbType.Decimal || column_type == System.Data.DbType.Double || column_type == System.Data.DbType.Int16 || column_type == System.Data.DbType.Int64 || column_type == System.Data.DbType.VarNumeric)
+                                column_val = "###";
+                            else if (!this.RenderInMultiLine)
+                                column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
                         }
                     }
                 }
@@ -177,7 +177,7 @@ namespace ExpressBase.Objects
             return anchor;
         }
 
-        public string FormatDecimals(string column_val, bool _inWords, int _decimalPlaces, NumberFormatInfo _numberFormat)
+        public string FormatDecimals(string column_val, bool _inWords, int _decimalPlaces, NumberFormatInfo _numberFormat, bool formatUsingCulture)
         {
             if (_inWords)
             {
@@ -187,8 +187,10 @@ namespace ExpressBase.Objects
             }
             else
             {
-                column_val = Convert.ToDecimal(column_val).ToString("N", _numberFormat);
-                column_val = Convert.ToDecimal(column_val).ToString("F" + _decimalPlaces);
+                if (formatUsingCulture)
+                    column_val = Convert.ToDecimal(column_val).ToString("N", _numberFormat);
+                if (_numberFormat.NumberDecimalDigits != _decimalPlaces)
+                    column_val = Convert.ToDecimal(column_val).ToString("F" + _decimalPlaces);
             }
             return column_val;
         }
@@ -385,6 +387,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
+        public bool FormatUsingCulture { get; set; } = true;
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
         public int DecimalPlaces { get; set; } = 2;
 
 
@@ -420,7 +426,7 @@ namespace ExpressBase.Objects
                 column_val = String.Empty;
             else
             {
-                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
                 if (Prefix != "" || Suffix != "")
                     column_val = Prefix + " " + column_val + " " + Suffix;
             }
@@ -543,7 +549,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
                 Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val };
@@ -829,6 +835,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data Settings")]
         public bool SuppressIfZero { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        public bool FormatUsingCulture { get; set; } = true;
+
         private string[] _dataFieldsUsed;
         public string[] DataFieldsUsedInCalc
         {
@@ -913,7 +923,7 @@ namespace ExpressBase.Objects
             else
             {
                 if (dbtype == EbDbTypes.Decimal)
-                    column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+                    column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
                 if (Prefix != "" || Suffix != "")
                 {
                     column_val = Prefix + " " + column_val + " " + Suffix;
@@ -1054,7 +1064,7 @@ namespace ExpressBase.Objects
             if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
                 column_val = String.Empty;
             else
-                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
                 Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val };

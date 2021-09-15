@@ -441,7 +441,7 @@ namespace ExpressBase.Objects
                     if (Convert.ToInt32(points) > 0)
                     {
                         andStr = "and";// just to separate whole numbers from points/cents    
-                        endStr = "Fills " + endStr;//Cents    
+                        //endStr = "Fills " + endStr;//Cents    
                         pointStr = ConvertDecimals(points);
                     }
                 }
