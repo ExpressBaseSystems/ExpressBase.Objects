@@ -346,7 +346,7 @@ else
         [Alias("Data Reader")]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
