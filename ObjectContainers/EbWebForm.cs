@@ -314,7 +314,7 @@ namespace ExpressBase.Objects
                     _form = this;
                     _form.TableRowId = Convert.ToInt32(psColumn.Value);
                     _form.RefreshFormData(DataDB, Service);
-                    this.FormData = EbFormHelper.GetFilledNewFormData(_form);
+                    this.FormData = EbFormHelper.GetFilledNewFormData(_form, false);
                 }
                 else
                 {

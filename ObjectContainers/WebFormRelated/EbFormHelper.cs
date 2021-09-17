@@ -440,7 +440,7 @@ namespace ExpressBase.Objects
         //}
 
         //Create a NEW WebFormData version from EDIT mode WebFormData of 'same' form.
-        public static WebformData GetFilledNewFormData(EbWebForm FormSrc)// FormSrc = Source Form
+        public static WebformData GetFilledNewFormData(EbWebForm FormSrc, bool Clone)// FormSrc = Source Form
         {
             WebformData newFormData = new WebformData() { MasterTable = FormSrc.FormSchema.MasterTable };
             foreach (TableSchema _t in FormSrc.FormSchema.Tables)
@@ -459,6 +459,14 @@ namespace ExpressBase.Objects
                             {
                                 SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
                                 c_.Value = t.Value; c_.F = t.F;
+                            }
+                            if (Clone)
+                            {
+                                foreach (SingleColumn c__ in Table[0].Columns.FindAll(e => e.Control is EbDate _Date && _Date.RestrictionRule != DateRestrictionRule.None))
+                                {
+                                    SingleColumn t = c__.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
+                                    c__.Value = t.Value; c__.F = t.F;
+                                }
                             }
                             c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
                             if (c != null) c.Value = 0;
