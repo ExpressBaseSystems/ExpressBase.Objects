@@ -94,7 +94,7 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iWebForm, EbObjectTypes.iTableVisualization)]
         [HideForUser]
         public List<ObjectBasicInfo> ObjectLinks { get; set; }
-        
+
         [EnableInBuilder(BuilderType.Calendar)]
         [HideForUser]
         public bool ShowGrowthPercentage { get; set; }
@@ -155,10 +155,36 @@ namespace ExpressBase.Objects
         public override List<string> DiscoverRelatedRefids()
         {
             List<string> _refids = new List<string>();
-
+            if (!String.IsNullOrEmpty(DataSourceRefId))
+            {
+                _refids.Add(DataSourceRefId);
+            }
+            foreach (ObjectBasicInfo _col in ObjectLinks)
+            {
+                _refids.Add(_col.ObjRefId);
+            }
             return _refids;
         }
-
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (!String.IsNullOrEmpty(DataSourceRefId))
+            {
+                if (RefidMap.ContainsKey(DataSourceRefId))
+                    DataSourceRefId = RefidMap[DataSourceRefId];
+                else
+                    DataSourceRefId = "";
+            }
+            foreach (ObjectBasicInfo _col in ObjectLinks)
+            {
+                if (!String.IsNullOrEmpty(_col.ObjRefId))
+                {
+                    if (RefidMap.ContainsKey(_col.ObjRefId))
+                        _col.ObjRefId = RefidMap[_col.ObjRefId];
+                    else
+                        _col.ObjRefId = "";
+                }
+            }
+        }
 
     }
 }

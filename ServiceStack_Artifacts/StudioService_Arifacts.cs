@@ -210,7 +210,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbObjectExploreObjectResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public List<EbObjectWrapper> Data { get; set; }
+        public EbObjectWrapper Data { get; set; }
 
         [DataMember(Order = 2)]
         public string Token { get; set; }
@@ -226,7 +226,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbObjectUpdateDashboardResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public List<EbObjectWrapper> Data { get; set; }
+        public EbObjectWrapper Data { get; set; }
 
         [DataMember(Order = 2)]
         public string Token { get; set; }
@@ -625,7 +625,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    
+
     public class GetRefIdByVerIdRequest : EbServiceStackAuthRequest, IReturn<GetRefIdByVerIdResponse>
     {
         public int ObjVerId { get; set; }
@@ -773,7 +773,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 18)]
         public int PatchVersionNumber { get; set; }
 
+        [DataMember(Order = 19)]
+        public List<RelatedObject> Dependants { get; set; }
+
+        [DataMember(Order = 18)]
+        public List<RelatedObject> Dominants { get; set; }
+
         public EbObj_Dashboard() { }
+    }
+
+    public class RelatedObject
+    {
+        public string Refid { get; set; }
+
+        public string DisplayName { get; set; }
+
+        public string VersionNumber { get; set; }
+
+        public int Type { get; set; }
     }
 
     public class EbObjectTaggedRequest : EbServiceStackAuthRequest, IReturn<EbObjectTaggedResponse>
