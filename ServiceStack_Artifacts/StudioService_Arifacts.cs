@@ -790,7 +790,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string VersionNumber { get; set; }
 
-        public int Type { get; set; }
+        public int RelationType { get; set; }
+
+        public int ObjectType { get; set; }
     }
 
     public class EbObjectTaggedRequest : EbServiceStackAuthRequest, IReturn<EbObjectTaggedResponse>
