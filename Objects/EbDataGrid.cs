@@ -114,6 +114,10 @@ namespace ExpressBase.Objects
         public bool IsLoadDataSourceInEditMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [Alias("Merge imported data")]
+        public bool MergeData { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
         [Alias("Resizable Columns")]
