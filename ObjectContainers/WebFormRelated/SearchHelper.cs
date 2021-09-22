@@ -34,23 +34,47 @@ namespace ExpressBase.Objects.WebFormRelated
 
             foreach (TableSchema _table in _webForm.FormSchema.Tables)
             {
-                if (_table.TableType == WebFormTableTypes.Normal &&
-                    _webForm.FormData.MultipleTables.ContainsKey(_table.TableName) && _webForm.FormData.MultipleTables[_table.TableName].Count > 0)
+                if (_webForm.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table))
                 {
-                    foreach (SingleColumn Column in _webForm.FormData.MultipleTables[_table.TableName][0].Columns.FindAll(e => e.Control?.Index == true))
+                    if (_table.TableType == WebFormTableTypes.Normal || _table.TableType == WebFormTableTypes.Grid)
                     {
-                        if (!_data.ContainsKey(Column.Control.Label))
+                        foreach (SingleRow Row in Table)
                         {
-                            string _val = Convert.ToString(Column.Value);
-                            if (!string.IsNullOrEmpty(_val))
-                                _data.Add(Column.Control.Label, _val);
+                            foreach (SingleColumn Column in Row.Columns.FindAll(e => e.Control?.Index == true))
+                                AddValue(_data, Column);
                         }
                     }
                 }
+
             }
             if (_data.Count == 0)
                 return string.Empty;
             return JsonConvert.SerializeObject(_data);
+        }
+
+        private static void AddValue(Dictionary<string, string> _data, SingleColumn Column)
+        {
+            string _key, _val;
+            if (Column.Control is EbDGColumn DGCol)
+                _key = DGCol.Title ?? DGCol.Name;
+            else
+                _key = Column.Control.Label ?? Column.Control.Name;
+
+            if (Column.Control is IEbPowerSelect)
+            {
+                _val = Column.D.Select(e => e.Value.Select(_e => _e.Value).Join(", ")).Join(" \n");
+            }
+            else
+                _val = Convert.ToString(Column.Value);
+            if (string.IsNullOrWhiteSpace(_val))
+                return;
+
+            if (_data.ContainsKey(_key))
+            {
+                _data[_key] += " \n" + _val;
+            }
+            else
+                _data.Add(_key, _val);
         }
 
         public static void InsertOrUpdate(IDatabase DataDB, EbWebForm _webForm)
@@ -190,14 +214,14 @@ namespace ExpressBase.Objects.WebFormRelated
 
                         EbDataSet ds = DataDB.DoQueries(idxSelQry.ToString(), new DbParameter[] { DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId) });
 
-                        StringBuilder updateQry = new StringBuilder(); 
-                        StringBuilder insertQry = new StringBuilder(); 
+                        StringBuilder updateQry = new StringBuilder();
+                        StringBuilder insertQry = new StringBuilder();
                         DbParameter[] parameters = new DbParameter[]
                         {
                             DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
                             DataDB.GetNewParameter("disp_name", EbDbTypes.String, _webForm.DisplayName)
                         };
-                        
+
                         for (i = 0; i < dt.Rows.Count; i++)
                         {
                             EbDataRow dr = dt.Rows[i];
@@ -223,7 +247,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
                                 if (id > 0)
                                 {
-                                    updateQry.Append("UPDATE eb_index_table SET display_name = @disp_name, data_json = '" + json + 
+                                    updateQry.Append("UPDATE eb_index_table SET display_name = @disp_name, data_json = '" + json +
                                         "', modified_by = " + modBy + ", modified_at = '" + modAt + "' WHERE  id = " + id + ";");
                                 }
                                 else
@@ -272,41 +296,41 @@ namespace ExpressBase.Objects.WebFormRelated
             return Message;
         }
 
-//        private static string GetUpsertQuery(string json, string modBy, string modAt, string id, string creBy, string creAt)
-//        {
-//            return string.Join(string.Empty, new string[] { @"
-//UPDATE 
-//    eb_index_table 
-//SET 
-//    display_name = @disp_name, 
-//    data_json = '", json, @"', 
-//    modified_by = ", modBy, @", 
-//    modified_at = '", modAt, @"'
-//WHERE 
-//    ref_id = @ref_id AND 
-//    data_id = ", id, @" AND 
-//    COALESCE(eb_del, 'F') = 'F';
-//INSERT INTO eb_index_table 
-//(
-//    display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del
-//)
-//SELECT 
-//    @disp_name, '", json, "', @ref_id, ", id, ", ", creBy, ", '", creAt, "', ", modBy, ", '", modAt, @"', 'F'
-// WHERE NOT EXISTS 
-//(
-//    SELECT 1 FROM 
-//        eb_index_table 
-//    WHERE 
-//        ref_id = @ref_id AND 
-//        data_id = ", id, @" AND 
-//        COALESCE(eb_del, 'F') = 'F'
-//);" });
-//        }
+        //        private static string GetUpsertQuery(string json, string modBy, string modAt, string id, string creBy, string creAt)
+        //        {
+        //            return string.Join(string.Empty, new string[] { @"
+        //UPDATE 
+        //    eb_index_table 
+        //SET 
+        //    display_name = @disp_name, 
+        //    data_json = '", json, @"', 
+        //    modified_by = ", modBy, @", 
+        //    modified_at = '", modAt, @"'
+        //WHERE 
+        //    ref_id = @ref_id AND 
+        //    data_id = ", id, @" AND 
+        //    COALESCE(eb_del, 'F') = 'F';
+        //INSERT INTO eb_index_table 
+        //(
+        //    display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del
+        //)
+        //SELECT 
+        //    @disp_name, '", json, "', @ref_id, ", id, ", ", creBy, ", '", creAt, "', ", modBy, ", '", modAt, @"', 'F'
+        // WHERE NOT EXISTS 
+        //(
+        //    SELECT 1 FROM 
+        //        eb_index_table 
+        //    WHERE 
+        //        ref_id = @ref_id AND 
+        //        data_id = ", id, @" AND 
+        //        COALESCE(eb_del, 'F') = 'F'
+        //);" });
+        //        }
 
-//        private static string GetDeleteQueryDup(string id)
-//        {
-//            return string.Join(string.Empty, "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND data_id = ", id, " AND COALESCE(eb_del, 'F') = 'F';");
-//        }
+        //        private static string GetDeleteQueryDup(string id)
+        //        {
+        //            return string.Join(string.Empty, "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND data_id = ", id, " AND COALESCE(eb_del, 'F') = 'F';");
+        //        }
 
         private static string GetDeleteQuery(int i)
         {
@@ -469,6 +493,11 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             this.DisplayName = Convert.ToString(dr[1]);
             this.Data = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(dr[2]));
+            List<string> keys = this.Data.Keys.ToList();
+            foreach (string k in keys)
+            {
+                this.Data[k] = this.Data[k].Replace("\n", "<br>");
+            }
             int linkType = Convert.ToInt32(dr[9]);
             if (linkType == (int)SH_LinkType.LM)
             {

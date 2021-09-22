@@ -606,6 +606,9 @@ else {
             set { this.EbTextBox.Suggestions = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public override bool Index { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
@@ -1690,6 +1693,9 @@ pg.HideProperty('IsDynamic');
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool StrictSelect { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public override bool Index { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]

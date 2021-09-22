@@ -623,6 +623,9 @@ else// PS
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public List<Param> ParamsList { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public override bool Index { get; set; }
+
         private string VueSelectcode
         {
             get
