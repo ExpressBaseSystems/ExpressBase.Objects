@@ -5,12 +5,8 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 using QRCoder;
-using System.Data;
 using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using Newtonsoft.Json;
@@ -347,7 +343,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='date-time dropped' eb-type='DateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='date-time dropped' eb-type='DateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -388,7 +386,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='page-no dropped' eb-type='PageNo' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='page-no dropped' eb-type='PageNo' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -427,7 +427,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='page-x/y dropped' eb-type='PageXY' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='page-x/y dropped' eb-type='PageXY' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -465,7 +467,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='User-name dropped' eb-type='UserName' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='User-name dropped' eb-type='UserName' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -498,7 +502,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='Text-Field dropped' eb-type='Text' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='Text-Field dropped' eb-type='Text' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -537,7 +543,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='Parameter dropped' eb-type='Parameter' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='Parameter dropped' eb-type='Parameter' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -579,7 +587,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='Parameter dropped' eb-type='ParamNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='Parameter dropped' eb-type='ParamNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -621,7 +631,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='Parameter dropped' eb-type='ParamText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='Parameter dropped' eb-type='ParamText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -667,7 +679,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='Parameter dropped' eb-type='ParamDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='Parameter dropped' eb-type='ParamDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -711,7 +725,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='Parameter dropped' eb-type='ParamBoolean' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='Parameter dropped' eb-type='ParamBoolean' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -945,7 +961,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='Serial-Number dropped' eb-type='SerialNumber' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='Serial-Number dropped' eb-type='SerialNumber' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -1019,7 +1037,9 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='EbLocFieldText dropped' eb-type='LocFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return @"<div class='EbLocFieldText dropped' eb-type='LocFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> 
+                        <div onclick='$(this).parent().focus()' class='dropped-inner'> @Title </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {

@@ -1303,7 +1303,6 @@ namespace ExpressBase.Objects
         public int Order { set; get; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
         public bool GroupInNewPage { get; set; }
 
         public override string GetDesignHtml()
