@@ -14,6 +14,7 @@ using ServiceStack;
 using ExpressBase.Common.Constants;
 using ExpressBase.CoreBase.Globals;
 using FontStyle = ExpressBase.Common.FontStyle;
+using System.Globalization;
 
 namespace ExpressBase.Objects
 {
@@ -158,7 +159,7 @@ namespace ExpressBase.Objects
             else if (format == DateFormatReport.dd_MM_yyyy_slashed)
                 return string.Format("{0:dd/MM/yyyy}", dt);
             else if (format == DateFormatReport.from_culture)
-                return String.Format(Rep.CultureInfo.DateTimeFormat, dt.ToString());
+                return dt.ToString(Rep.CultureInfo.DateTimeFormat.ShortDatePattern + " " + Rep.CultureInfo.DateTimeFormat.LongTimePattern, CultureInfo.InvariantCulture);
             else if (format == DateFormatReport.dd_MMMM_yyyy)
                 return string.Format("{0:dd MMMM yyyy}", dt);
             return column_val;
