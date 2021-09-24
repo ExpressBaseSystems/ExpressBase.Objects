@@ -1900,7 +1900,7 @@ namespace ExpressBase.Objects
             if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
-            this.FormCollection.ExecUniqueCheck(DataDB);
+            this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
             this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
@@ -2007,7 +2007,7 @@ namespace ExpressBase.Objects
             if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
-            this.FormCollection.ExecUniqueCheck(DataDB);
+            this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;

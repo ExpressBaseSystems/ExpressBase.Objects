@@ -232,7 +232,7 @@ namespace ExpressBase.Objects
             args.CopyBack(ref _extqry, ref i);
         }
 
-        public void ExecUniqueCheck(IDatabase DataDB)
+        public void ExecUniqueCheck(IDatabase DataDB, DbConnection DbCon)
         {
             string fullQuery = string.Empty;
             List<DbParameter> Dbparams = new List<DbParameter>();
@@ -308,7 +308,12 @@ namespace ExpressBase.Objects
 
             if (fullQuery != string.Empty)
             {
-                EbDataSet ds = DataDB.DoQueries(fullQuery, Dbparams.ToArray());
+                EbDataSet ds;
+                if (DbCon == null)
+                    ds = DataDB.DoQueries(fullQuery, Dbparams.ToArray());
+                else
+                    ds = DataDB.DoQueries(DbCon, fullQuery, Dbparams.ToArray());
+
                 for (int i = 0; i < ds.Tables.Count; i++)
                 {
                     if (ds.Tables[i].Rows.Count > 0)
