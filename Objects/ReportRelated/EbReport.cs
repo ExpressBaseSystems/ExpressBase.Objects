@@ -614,7 +614,7 @@ namespace ExpressBase.Objects
             detailprintingtop = 0;
             foreach (EbReportHeader r_header in ReportHeaders)
             {
-                foreach (EbReportField field in r_header.Fields)
+                foreach (EbReportField field in r_header.GetFields())
                 {
                     DrawFields(field, rh_Yposition, 0);
                 }
@@ -630,7 +630,7 @@ namespace ExpressBase.Objects
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             foreach (EbPageHeader p_header in PageHeaders)
             {
-                foreach (EbReportField field in p_header.Fields)
+                foreach (EbReportField field in p_header.GetFields())
                 {
                     DrawFields(field, ph_Yposition, 0);
                 }
@@ -690,7 +690,7 @@ namespace ExpressBase.Objects
                 {
                     __fieldsNotSummaryPerDetail = new Dictionary<EbReportDetail, EbDataField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __fieldsNotSummaryPerDetail[detail] = detail.Fields.Where(x => (x is EbDataField && !(x is IEbDataFieldSummary))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
+                        __fieldsNotSummaryPerDetail[detail] = detail.GetFields().Where(x => (x is EbDataField && !(x is IEbDataFieldSummary))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
                 }
 
                 return __fieldsNotSummaryPerDetail;
@@ -706,7 +706,7 @@ namespace ExpressBase.Objects
                 {
                     __reportFieldsSortedPerDetail = new Dictionary<EbReportDetail, EbReportField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __reportFieldsSortedPerDetail[detail] = detail.Fields.OrderBy(o => o.Left).ToArray();
+                        __reportFieldsSortedPerDetail[detail] = detail.GetFields().OrderBy(o => o.Left).ToArray();
                 }
 
                 return __reportFieldsSortedPerDetail;
@@ -722,7 +722,7 @@ namespace ExpressBase.Objects
                     __reportFieldsSortedPerRFooter = new Dictionary<EbReportFooter, EbReportField[]>();
                     foreach (EbReportFooter _footer in ReportFooters)
                     {
-                        __reportFieldsSortedPerRFooter[_footer] = _footer.Fields.OrderBy(o => o.TopPt).ToArray();
+                        __reportFieldsSortedPerRFooter[_footer] = _footer.GetFields().OrderBy(o => o.TopPt).ToArray();
                     }
                 }
 
@@ -803,7 +803,7 @@ namespace ExpressBase.Objects
                 dt_Yposition = PageHeaderHeight + this.Margin.Top;
             }
 
-            foreach (EbReportField field in ReportGroups[order].GroupHeader.Fields)
+            foreach (EbReportField field in ReportGroups[order].GroupHeader.GetFields())
             {
                 DrawFields(field, dt_Yposition, serialnumber);
             }
@@ -822,7 +822,7 @@ namespace ExpressBase.Objects
             pf_Yposition = (float)detailEnd + /*DetailHeight +*/ dt_Yposition;
             foreach (EbPageFooter p_footer in PageFooters)
             {
-                foreach (EbReportField field in p_footer.Fields)
+                foreach (EbReportField field in p_footer.GetFields())
                 {
                     DrawFields(field, pf_Yposition, 0);
                 }
@@ -1029,7 +1029,7 @@ namespace ExpressBase.Objects
                     refids.Add(DataSourceRefId);
             }
             foreach (EbReportDetail dt in Detail)
-                foreach (EbReportField field in dt.Fields)
+                foreach (EbReportField field in dt.GetFields())
                     if (field is EbDataField)
                     {
                         EbDataField fd_org = field as EbDataField;
@@ -1048,7 +1048,7 @@ namespace ExpressBase.Objects
 
             foreach (EbReportDetail dt in Detail)
             {
-                foreach (EbReportField field in dt.Fields)
+                foreach (EbReportField field in dt.GetFields())
                 {
                     if (field is EbDataField)
                     {
@@ -1168,6 +1168,29 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public override string Width { get; set; }
+
+        private List<EbReportField> _list = null;
+        public List<EbReportField> GetFields()
+        {
+            if (_list == null)
+            {
+                _list = new List<EbReportField>();
+                foreach (EbReportField f in Fields)
+                {
+                    if (f is EbTable_Layout)
+                    {
+                        foreach (EbTableLayoutCell c in (f as EbTable_Layout).CellCollection)
+                        {
+                            foreach (EbReportField r in c.ControlCollection)
+                                _list.Add(r);
+                        }
+                    }
+                    else
+                        _list.Add(f);
+                }
+            }
+            return _list;
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
