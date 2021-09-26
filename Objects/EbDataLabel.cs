@@ -624,4 +624,5 @@ public enum LabelStyle
     Label_2,
     Label_3,
     Label_4,
+    Label_5,
 } 
