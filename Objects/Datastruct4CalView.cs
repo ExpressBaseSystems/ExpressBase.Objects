@@ -1,10 +1,13 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExpressBase.Security;
+using System.Globalization;
 
 namespace ExpressBase.Objects.Objects
 {
@@ -55,7 +58,7 @@ namespace ExpressBase.Objects.Objects
             }
         }
 
-        public void GetFormatedTable(ref EbDataTable _formattedTable, RowColletion masterRows, ref Dictionary<int, List<object>> summary)
+        public void GetFormatedTable(ref EbDataTable _formattedTable, RowColletion masterRows, ref Dictionary<int, List<object>> summary, User _user)
         {
             for (int i = 0; i < masterRows.Count; i++)//filling master data
             {
@@ -65,7 +68,8 @@ namespace ExpressBase.Objects.Objects
                     _formattedTable.Rows[i][j] = masterRows[i][j];
                 }
             }
-
+            CultureInfo _user_culture = CultureHelper.GetSerializedCultureInfo(_user.Preference.Locale).GetCultureInfo();
+            _user_culture.NumberFormat.NumberDecimalDigits = 0;
             EbDataRow Row;
             long value;
             long prev_value;
@@ -86,18 +90,19 @@ namespace ExpressBase.Objects.Objects
                                 prev_value = _innerDict[_id].GetValue(columnIndex - 1);
                         }
 
-                        Row[columnIndex] = GetFormattedValue(value, Row, columnIndex, prev_value);
-                        Row["Total"] = (long)(Row["Total"] ?? 0L) + value;
-                        summary[columnIndex][0] = (long)summary[columnIndex][0] + value;
-                        summary[summary_last_index][0] = (long)summary[summary_last_index][0] + value;
+                        Row[columnIndex] = GetFormattedValue(value, Row, columnIndex, prev_value, _user_culture);
+                        Row["Total"] = (Convert.ToDecimal(Row["Total"] ?? 0L) + Convert.ToDecimal(value)).ToString("N", _user_culture.NumberFormat);
+                        summary[columnIndex][0] = (Convert.ToDecimal(summary[columnIndex][0]) + Convert.ToDecimal(value)).ToString("N", _user_culture.NumberFormat);
+                        summary[summary_last_index][0] = (Convert.ToDecimal(summary[summary_last_index][0]) + Convert.ToDecimal(value)).ToString("N", _user_culture.NumberFormat); ;
                     }
                 }
             }
         }
 
-        private string GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value)
+        private string GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value, CultureInfo _user_culture)
         {
-            string formattedVal = string.Empty;
+            string formattedVal = (Convert.ToDecimal(value) == 0) ? string.Empty : Convert.ToDecimal(value).ToString("N", _user_culture.NumberFormat);
+            //string formattedVal = string.Empty;
             if (ConditionalFormating.Count > 0)
             {
                 DoConditionalFormating(ref formattedVal, value, row);
@@ -106,11 +111,11 @@ namespace ExpressBase.Objects.Objects
             {
                 if (this.ObjectLinks.Count == 1)
                 {
-                    formattedVal = "<a href ='#' class ='tablelink4calendar cal-data' idx='" + columnIndex + "'>" + value + "</a>";
+                    formattedVal = "<a href ='#' class ='tablelink4calendar cal-data' idx='" + columnIndex + "'>" + formattedVal + "</a>";
                 }
                 else
                 {
-                    formattedVal = "<span clas ='cal-data'>" + value + "</span>";
+                    formattedVal = "<span clas ='cal-data'>" + formattedVal + "</span>";
                 }
 
                 if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise && prev_value > 0 && value > 0)
@@ -127,9 +132,10 @@ namespace ExpressBase.Objects.Objects
                         color = "green";
                         direction = "up";
                     }
+                    var val = (percent == 0) ? "&nbsp;" : Math.Abs(percent).ToString() + "%";
                     formattedVal += @"  <span class='per-cont " + color + "'>" +
                                             "<i class='fa fa-caret-" + direction + "'></i>" +
-                                            "<span>" + Math.Abs(percent) + "%" + "</span>" +
+                                            "<div class='val-perc'>" + val + "</div>" +
                                         "</span>";
 
                     // formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-green'><i class='fa fa-caret-up'></i></span><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span></span>";
