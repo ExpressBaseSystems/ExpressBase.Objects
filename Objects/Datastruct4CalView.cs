@@ -76,8 +76,7 @@ namespace ExpressBase.Objects.Objects
                 int _id = (int)Row[KeyColumnName];
                 if (_innerDict.ContainsKey(_id))
                 {
-                    IEnumerable<int> columnIndexes = _innerDict[_id].GetKeys();
-                    foreach (int columnIndex in columnIndexes)
+                    foreach (int columnIndex in _innerDict[_id].GetKeys())
                     {
                         prev_value = 0;
                         value = _innerDict[_id].GetValue(columnIndex);
@@ -96,34 +95,50 @@ namespace ExpressBase.Objects.Objects
             }
         }
 
-        private object GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value)
+        private string GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value)
         {
-            object formattedVal = string.Empty;
+            string formattedVal = string.Empty;
             if (ConditionalFormating.Count > 0)
             {
                 DoConditionalFormating(ref formattedVal, value, row);
             }
             else
             {
-                formattedVal = (this.ObjectLinks.Count == 1) ? "<a href = '#' oncontextmenu = 'return false' class ='tablelink4calendar cal-data' data-popup='true' data-link='" + ObjectLinks[0].ObjRefId + "' data-colindex='" + columnIndex + "'  data-column='" + this.Columns.GetColumnByIndex(columnIndex).Name + "'>" + value + "</a>" : "<span class = 'cal-data'>" + value + "</span>";
+                if (this.ObjectLinks.Count == 1)
+                {
+                    formattedVal = "<a href ='#' class ='tablelink4calendar cal-data' idx='" + columnIndex + "'>" + value + "</a>";
+                }
+                else
+                {
+                    formattedVal = "<span clas ='cal-data'>" + value + "</span>";
+                }
 
                 if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise && prev_value > 0 && value > 0)
                 {
                     long percent = ((value - prev_value) * 100) / value;
+                    string color, direction;
                     if (percent < 0)
                     {
-                        formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-red'><i class='fa fa-caret-down' aria-hidden='true'></i></span><span class ='cal-percent cal-percent-red'>" + Math.Abs(percent) + "%" + "</span></span>";
+                        color = "red";
+                        direction = "down";
                     }
                     else
                     {
-                        formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-green'><i class='fa fa-caret-up' aria-hidden='true'></i></span><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span></span>";
+                        color = "green";
+                        direction = "up";
                     }
+                    formattedVal += @"  <span class='per-cont " + color + "'>" +
+                                            "<i class='fa fa-caret-" + direction + "'></i>" +
+                                            "<span>" + Math.Abs(percent) + "%" + "</span>" +
+                                        "</span>";
+
+                    // formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-green'><i class='fa fa-caret-up'></i></span><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span></span>";
                 }
             }
             return formattedVal;
         }
 
-        public void DoConditionalFormating(ref object formattedVal, long value, EbDataRow row)
+        public void DoConditionalFormating(ref string formattedVal, long value, EbDataRow row)
         {
 
             foreach (ColumnCondition cond in ConditionalFormating)
@@ -247,10 +262,9 @@ namespace ExpressBase.Objects.Objects
         {
             return _innerDict.Count;
         }
-        public IEnumerable<int> GetKeys()
+        public Dictionary<int, long>.KeyCollection GetKeys()
         {
-            IEnumerable<int> keys = _innerDict.Select(x => x.Key);
-            return keys;
+            return _innerDict.Keys;
         }
         public long GetValue(int index)
         {
