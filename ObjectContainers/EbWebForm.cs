@@ -923,9 +923,13 @@ namespace ExpressBase.Objects
                             this.FormData.CreatedAt = dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                             this.FormData.SrcVerId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsReadOnly = ebs.GetBooleanValue(SystemColumns.eb_ro, dataRow[i++]);
+                            this.FormData.ModifiedBy = Convert.ToInt32(dataRow[i++]);
+                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         }
                         else
-                            i += 9;// 9 => Count of above properties
+                            i += 11;// 9 => Count of above properties
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
                     if (_rowId <= 0)
@@ -1795,7 +1799,7 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        private void CheckConstraints(string wc, bool reviewFlow = false)
+        private void CheckConstraints(string wc, bool reviewFlow = false, string ts = null)
         {
             if (this.FormData.IsReadOnly)
                 throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
@@ -1809,6 +1813,20 @@ namespace ExpressBase.Objects
             if (!reviewFlow && wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                 throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+
+            if (!reviewFlow && !string.IsNullOrWhiteSpace(ts) && !string.IsNullOrWhiteSpace(this.FormData.ModifiedAt))
+            {
+                if (DateTime.TryParseExact(ts, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt1))
+                {
+                    if (DateTime.TryParseExact(this.FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 <= dt2)
+                    {
+                        string modBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? (" by " + this.SolutionObj.Users[this.FormData.ModifiedBy]) : string.Empty;
+                        string modAt = dt2.ToString(this.UserObj.Preference.GetLongTimePattern(), CultureInfo.InvariantCulture);
+                        string st = $"This form submission was modified{modBy} at {modAt}, while you were trying to edit it.  Please close and redo edit.";
+                        throw new FormException(st, (int)HttpStatusCode.Forbidden, st + ": " + this.FormData.ModifiedBy, "EbWebForm -> Save");
+                    }
+                }
+            }
         }
 
         //Normal save
@@ -1827,8 +1845,9 @@ namespace ExpressBase.Objects
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
+                    string ts = this.FormData.Ts;
                     this.RefreshFormData(DataDB, service, true, true);
-                    CheckConstraints(wc);
+                    CheckConstraints(wc, false, ts);
                     resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
