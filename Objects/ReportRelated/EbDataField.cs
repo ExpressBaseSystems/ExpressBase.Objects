@@ -453,6 +453,7 @@ namespace ExpressBase.Objects
     {
         object SummarizedValue { get; }
         void Summarize(object value);
+        void ResetSummary();
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -520,6 +521,19 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsNumeric.Sum)
+                Sum = 0;
+            else if (Function == SummaryFunctionsNumeric.Average && this.Count > 0)
+                Sum = Count = 0;
+            else if (Function == SummaryFunctionsNumeric.Count)
+                Count = 0;
+            else if (Function == SummaryFunctionsNumeric.Max)
+                Max = 0;
+            else if (Function == SummaryFunctionsNumeric.Min)
+                Min = 0;
+        }
         public override void NotifyNewPage(bool status)
         {
             if (status && ResetOnNewPage)
@@ -553,6 +567,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
+            ResetSummary();
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
@@ -619,6 +634,16 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsText.Count)
+                Count = 0;
+            else if (Function == SummaryFunctionsText.Max)
+                Max = string.Empty;
+            else if (Function == SummaryFunctionsText.Min)
+                Min = string.Empty;
+        }
+
         public override string GetDesignHtml()
         {
             return @"<div class='dropped' $type='@type' eb-type='DataFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign;'> 
@@ -645,6 +670,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
+            ResetSummary();
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
@@ -704,6 +730,15 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsDateTime.Count)
+                Count = 0;
+            else if (Function == SummaryFunctionsDateTime.Max)
+                Max = DateTime.MinValue;
+            else if (Function == SummaryFunctionsDateTime.Min)
+                Min = DateTime.MinValue;
+        }
         public override string GetDesignHtml()
         {
             return @"<div class='dropped' $type='@type' eb-type='DataFieldDateTimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign;'> 
@@ -729,6 +764,7 @@ namespace ExpressBase.Objects
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = FormatDate(SummarizedValue.ToString(), Format, Rep);
+            ResetSummary();
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
@@ -769,6 +805,11 @@ namespace ExpressBase.Objects
             Count++;
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsBoolean.Count)
+                Count = 0;
+        }
         public override string GetDesignHtml()
         {
             return @"<div class='dropped' $type='@type' eb-type='DataFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign ;'> 
@@ -795,6 +836,7 @@ namespace ExpressBase.Objects
 
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = SummarizedValue.ToString();
+            ResetSummary();
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
@@ -1041,6 +1083,19 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsNumeric.Sum)
+                Sum = 0;
+            else if (Function == SummaryFunctionsNumeric.Average && Count > 0)
+                Sum = Count = 0;
+            else if (Function == SummaryFunctionsNumeric.Count)
+                Count = 0;
+            else if (Function == SummaryFunctionsNumeric.Max)
+                Max = 0;
+            else if (Function == SummaryFunctionsNumeric.Min)
+                Min = 0;
+        }
         public override void NotifyNewPage(bool status)
         {
             if (status && ResetOnNewPage)
@@ -1074,6 +1129,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
+            ResetSummary();
 
             if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
                 column_val = String.Empty;
@@ -1152,6 +1208,15 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsText.Count)
+                Count = 0;
+            else if (Function == SummaryFunctionsText.Max)
+                Max = string.Empty;
+            else if (Function == SummaryFunctionsText.Min)
+                Min = string.Empty;
+        }
         public override string GetDesignHtml()
         {
             return @"<div class='dropped' eb-type='CalcFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign;'> 
@@ -1178,6 +1243,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
+            ResetSummary();
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
@@ -1246,6 +1312,15 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsDateTime.Count)
+                Count = 0;
+            else if (Function == SummaryFunctionsDateTime.Max)
+                Max = DateTime.MinValue;
+            else if (Function == SummaryFunctionsDateTime.Min)
+                Min = DateTime.MinValue;
+        }
         public override string GetDesignHtml()
         {
             return @"<div class='dropped' eb-type='CalcFieldDatetimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign;'> 
@@ -1272,7 +1347,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-
+            ResetSummary();
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
@@ -1317,6 +1392,12 @@ namespace ExpressBase.Objects
             Count++;
         }
 
+        public void ResetSummary()
+        {
+            if (Function == SummaryFunctionsBoolean.Count)
+                Count = 0;
+        }
+
         public override string GetDesignHtml()
         {
             return @"<div class='dropped' eb-type='CalcFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign ;'> 
@@ -1343,6 +1424,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
+            ResetSummary();
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
