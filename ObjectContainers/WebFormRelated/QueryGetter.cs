@@ -25,7 +25,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string _id = "id";
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
-                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, id",
+                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, id",
                         ebs[SystemColumns.eb_loc_id],//0
                         ebs[SystemColumns.eb_ver_id],//1
                         ebs[SystemColumns.eb_lock],//2
@@ -35,7 +35,9 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_void],//6
                         ebs[SystemColumns.eb_created_at],//7
                         ebs[SystemColumns.eb_src_ver_id],//8
-                        ebs[SystemColumns.eb_ro]);//9
+                        ebs[SystemColumns.eb_ro],//9
+                        ebs[SystemColumns.eb_lastmodified_by],//10
+                        ebs[SystemColumns.eb_lastmodified_at]);//11
                 else if (_table.TableType == WebFormTableTypes.Review)
                 {
                     _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
