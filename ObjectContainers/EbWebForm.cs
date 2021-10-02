@@ -924,9 +924,11 @@ namespace ExpressBase.Objects
                             this.FormData.SrcVerId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsReadOnly = ebs.GetBooleanValue(SystemColumns.eb_ro, dataRow[i++]);
                             this.FormData.ModifiedBy = Convert.ToInt32(dataRow[i++]);
-                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]);
+                            if (dt2 < DateTime.UtcNow)
+                                this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            dt2 = dt2.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         }
                         else
                             i += 11;// 9 => Count of above properties
