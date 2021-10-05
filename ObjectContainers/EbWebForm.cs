@@ -1947,7 +1947,7 @@ namespace ExpressBase.Objects
             {
                 if (e.SqlState == "23505" && RetryCount < 3 && handleUniqueErr)
                 {
-                    Console.WriteLine($"Retrying({++RetryCount}).... : " + e.Message);
+                    Console.WriteLine($"Retrying({++RetryCount}).... : " + e.Message + "\n" + e.Detail);
                     List<DbParameter> _params = new List<DbParameter>();
                     foreach (DbParameter p in param)
                         _params.Add(new NpgsqlParameter(p.ParameterName, p.DbType) { Value = p.Value });
