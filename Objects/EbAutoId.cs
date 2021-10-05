@@ -217,7 +217,7 @@ namespace ExpressBase.Objects
                             throw new FormException("Unable to process [Invalid AutoId lang]", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
                     }
 
-                    if ((string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && !this.IsSqlExpr) || this.Pattern.SerialLength == 0)
+                    if ((string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && !this.IsSqlExpr) || this.Pattern.SerialLength == 0 || (this.Pattern.PrefixLength == 0 && this.IsSqlExpr))
                         throw new FormException("Unable to process [Invalid AutoId pattern]", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
 
                     if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
@@ -228,12 +228,23 @@ namespace ExpressBase.Objects
                             args.tbl,
                             this.IsSqlExpr ? $"({SqlCode}) || '%'" : $"'args.cField.Value%'");
                     else
-                        args._vals += string.Format("(({1}) || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE ({4}) AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
-                            args.cField.Name,
-                            this.IsSqlExpr ? SqlCode : $"@{args.cField.Name}_{args.i}",
-                            this.Pattern.SerialLength,
-                            args.tbl,
-                            this.IsSqlExpr ? $"({SqlCode}) || '%'" : $"'{args.cField.Value}%'");
+                        args._vals += string.Format(@"
+(({1}) || 
+  COALESCE
+  (
+    (SELECT LPAD((MAX(SUBSTRING({0} FROM {5} FOR {2})) :: INTEGER + 1) :: TEXT, {2}, '0') 
+      FROM {3} 
+      WHERE {0} LIKE ({4}) AND 
+      LENGTH(REGEXP_REPLACE(SUBSTRING({0} FROM {5} FOR {2}), '\\D','','g')) = {2}), 
+    LPAD('1', {2}, '0')
+  )
+),".RemoveCR(),
+                            args.cField.Name,//0
+                            this.IsSqlExpr ? SqlCode : $"@{args.cField.Name}_{args.i}",//1
+                            this.Pattern.SerialLength,//2
+                            args.tbl,//3
+                            this.IsSqlExpr ? $"({SqlCode}) || '%'" : $"'{args.cField.Value}%'",//4
+                            this.IsSqlExpr ? (this.Pattern.PrefixLength + 1) : (Convert.ToString(args.cField.Value).Length + 1));//5
 
                     if (!this.IsSqlExpr)
                         args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, Convert.ToString(args.cField.Value)));
@@ -271,7 +282,11 @@ namespace ExpressBase.Objects
     public class EbAutoIdPattern
     {
         [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Prefix")]
         public string sPattern { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public int PrefixLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public int SerialLength { get; set; }

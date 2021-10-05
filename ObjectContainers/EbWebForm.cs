@@ -30,6 +30,7 @@ using System.Net;
 using System.Threading;
 using ExpressBase.Common.Security;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace ExpressBase.Objects
 {
@@ -924,9 +925,11 @@ namespace ExpressBase.Objects
                             this.FormData.SrcVerId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsReadOnly = ebs.GetBooleanValue(SystemColumns.eb_ro, dataRow[i++]);
                             this.FormData.ModifiedBy = Convert.ToInt32(dataRow[i++]);
-                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]);
+                            if (dt2 < DateTime.UtcNow)
+                                this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            dt2 = dt2.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         }
                         else
                             i += 11;// 9 => Count of above properties
@@ -1818,7 +1821,7 @@ namespace ExpressBase.Objects
             {
                 if (DateTime.TryParseExact(ts, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt1))
                 {
-                    if (DateTime.TryParseExact(this.FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 <= dt2)
+                    if (DateTime.TryParseExact(this.FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 < dt2)
                     {
                         string modBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? (" by " + this.SolutionObj.Users[this.FormData.ModifiedBy]) : string.Empty;
                         string modAt = dt2.ToString(this.UserObj.Preference.GetLongTimePattern(), CultureInfo.InvariantCulture);
@@ -1858,7 +1861,7 @@ namespace ExpressBase.Objects
                     if (this.IsDisable)
                         throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly form", "EbWebForm -> Save");
 
-                    this.TableRowId = this.Insert(DataDB, service);
+                    this.TableRowId = this.Insert(DataDB, service, true);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
@@ -1910,7 +1913,7 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        public int Insert(IDatabase DataDB, Service service)
+        public int Insert(IDatabase DataDB, Service service, bool handleUniqueErr)
         {
             string fullqry = string.Empty;
             string _extqry = string.Empty;
@@ -1932,10 +1935,34 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
+            int _rowid, RetryCount = 0;
+        Retry:
+            try
+            {
+                EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
+                EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
+                _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
+            }
+            catch (PostgresException e)
+            {
+                if (e.SqlState == "23505" && RetryCount < 3 && handleUniqueErr)
+                {
+                    Console.WriteLine($"Retrying({++RetryCount}).... : " + e.Message + "\n" + e.Detail);
+                    List<DbParameter> _params = new List<DbParameter>();
+                    foreach (DbParameter p in param)
+                        _params.Add(new NpgsqlParameter(p.ParameterName, p.DbType) { Value = p.Value });
+                    param = _params;
+                    this.DbTransaction.Rollback();
+                    this.DbConnection.Close();
+                    this.DbConnection = DataDB.GetNewConnection();
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+                    goto Retry;
+                }
+                else
+                    throw e;
+            }
 
-            EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
-            EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
-            int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             if (_rowid <= 0)
                 throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"SELECT eb_currval('{this.TableName}_id_seq') returned an invalid data: {_rowid}", "EbWebForm -> Insert");
             return _rowid;
@@ -2195,7 +2222,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    this.TableRowId = this.Insert(DataDB, service);
+                    this.TableRowId = this.Insert(DataDB, service, false);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
