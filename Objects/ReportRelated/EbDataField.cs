@@ -80,7 +80,7 @@ namespace ExpressBase.Objects
                 {
                     if (this.AppearExpression != null && this.AppearExpression.Code != null)
                     {
-                        IEnumerable<string> matches = Regex.Matches(this.AppearExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
+                        IEnumerable<string> matches = Regex.Matches(this.AppearExpression.Code, @"T[0-9]{1}\.\w+").OfType<Match>()
                                .Select(m => m.Groups[0].Value)
                                .Distinct();
 
@@ -571,9 +571,9 @@ namespace ExpressBase.Objects
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val });
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
@@ -899,7 +899,7 @@ namespace ExpressBase.Objects
                 if (_dataFieldsUsed == null)
                     if (ValExpression?.Code != null)
                     {
-                        IEnumerable<string> matches = Regex.Matches(ValExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
+                        IEnumerable<string> matches = Regex.Matches(ValExpression.Code, @"T[0-9]{1}\.\w+").OfType<Match>()
                              .Select(m => m.Groups[0].Value)
                              .Distinct();
 
@@ -1132,14 +1132,14 @@ namespace ExpressBase.Objects
             ResetSummary();
 
             if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
-                column_val = String.Empty;
+                column_val = string.Empty;
             else
                 column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title, Type = PdfEbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val });
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
