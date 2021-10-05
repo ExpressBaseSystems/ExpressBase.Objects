@@ -1154,7 +1154,7 @@ namespace ExpressBase.Objects
             if (SummaryValInRow.Count > 0)
                 foreach (string key in SummaryValInRow.Keys)
                 {
-                    globals["Summary"].Add(key, SummaryValInRow[key]);
+                    globals["Summary"].Add(key.Replace(".","_"), SummaryValInRow[key]);
                 }
         }
     }
