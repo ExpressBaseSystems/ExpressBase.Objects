@@ -13,9 +13,11 @@ namespace ExpressBase.Objects.Objects
 {
     public class DataStruct4CalView
     {
-        private string KeyColumnName { get; set; }
+        private string PrimaryKeyColumnName { get; set; }
 
-        private string ValueColumnName { get; set; }
+        private string ForeignKeyColumnName { get; set; }
+
+        private string DataColumnName { get; set; }
 
         private string DateColumnName { get; set; }
 
@@ -37,9 +39,10 @@ namespace ExpressBase.Objects.Objects
 
         public DataStruct4CalView(EbCalendarView C)
         {
-            this.KeyColumnName = C.PrimaryKey.Name;
+            this.PrimaryKeyColumnName = C.PrimaryKey.Name;
+            this.ForeignKeyColumnName = C.ForeignKey.Name;
             this.DateColumnName = C.LinesColumns.FirstOrDefault(col => !col.IsCustomColumn && (col.Type == EbDbTypes.Date || col.Type == EbDbTypes.DateTime))?.Name;
-            this.ValueColumnName = C.DataColumns.FirstOrDefault(col => col.bVisible)?.Name;
+            this.DataColumnName = C.DataColumns.FirstOrDefault(col => col.bVisible).Name;
             this.ConditionalFormating = C.DataColumns.FirstOrDefault(col => col.bVisible)?.ConditionalFormating;
             this.ObjectLinks = C.ObjectLinks;
             this.CalendarType = C.CalendarType;
@@ -48,13 +51,13 @@ namespace ExpressBase.Objects.Objects
 
         public void Add(EbDataRow row)
         {
-            if (!_innerDict.ContainsKey(Convert.ToInt32(row[this.KeyColumnName])))
-                _innerDict.Add(Convert.ToInt32(row[this.KeyColumnName]), new DataStruct4CalViewRow());
+            if (!_innerDict.ContainsKey(Convert.ToInt32(row[this.ForeignKeyColumnName])))
+                _innerDict.Add(Convert.ToInt32(row[this.ForeignKeyColumnName]), new DataStruct4CalViewRow());
             DateTime dt = Convert.ToDateTime(row[this.DateColumnName]);
             if (dt > DateTime.MinValue)
             {
-                _innerDict[Convert.ToInt32(row[this.KeyColumnName])]
-                    .Add(Columns.GetColumnKey(dt), Convert.ToInt64(row[this.ValueColumnName]));
+                _innerDict[Convert.ToInt32(row[this.ForeignKeyColumnName])]
+                    .Add(Columns.GetColumnKey(dt), Convert.ToInt64(row[this.DataColumnName]));
             }
         }
 
@@ -77,7 +80,7 @@ namespace ExpressBase.Objects.Objects
             for (int i = 0; i < _formattedTable.Rows.Count; i++)//filling consolidated data
             {
                 Row = _formattedTable.Rows[i];
-                int _id = (int)Row[KeyColumnName];
+                int _id = (int)Row[PrimaryKeyColumnName];
                 if (_innerDict.ContainsKey(_id))
                 {
                     foreach (int columnIndex in _innerDict[_id].GetKeys())
@@ -121,24 +124,17 @@ namespace ExpressBase.Objects.Objects
                 if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise && prev_value > 0 && value > 0)
                 {
                     long percent = ((value - prev_value) * 100) / value;
-                    string color, direction;
+                    string color = "green", direction = "up";
                     if (percent < 0)
                     {
                         color = "red";
                         direction = "down";
-                    }
-                    else
-                    {
-                        color = "green";
-                        direction = "up";
-                    }
-                    var val = (percent == 0) ? "&nbsp;" : Math.Abs(percent).ToString() + "%";
+                        percent *= -1;
+                    };
                     formattedVal += @"  <span class='per-cont " + color + "'>" +
                                             "<i class='fa fa-caret-" + direction + "'></i>" +
-                                            "<div class='val-perc'>" + val + "</div>" +
+                                            "<div class='val-perc'>" + percent + "% </div>" +
                                         "</span>";
-
-                    // formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-green'><i class='fa fa-caret-up'></i></span><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span></span>";
                 }
             }
             return formattedVal;
@@ -180,7 +176,7 @@ namespace ExpressBase.Objects.Objects
                 var __partType = _datarow.Table.Columns[formulaPart.FieldName].Type;
                 if (__partType == EbDbTypes.Decimal || __partType == EbDbTypes.Int32)
                 {
-                    if (formulaPart.FieldName == this.ValueColumnName)
+                    if (formulaPart.FieldName == this.DataColumnName)
                     {
                         __value = value;
                     }
