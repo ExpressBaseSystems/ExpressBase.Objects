@@ -374,12 +374,12 @@ this.Init = function(id)
                         {
                             if (userId == oProvUserId && oProvUserId > 0)
                             {
-                                _d.RemoveKey("phprimary");
+                                _d.Remove("phprimary");
                                 flag &= 1;
                             }
                             if (userId2 == oProvUserId && oProvUserId > 0)
                             {
-                                _d.RemoveKey("email");
+                                _d.Remove("email");
                                 flag &= 2;
                                 userId = oProvUserId;
                             }
@@ -390,7 +390,7 @@ this.Init = function(id)
                 }
                 else if (_d.ContainsKey("email") && _d["email"] != string.Empty && oProvUserId != userId2)
                 {
-                    _d.RemoveKey("phprimary");
+                    _d.Remove("phprimary");
                     flag &= 1;
                     return 0;
                 }
@@ -399,7 +399,7 @@ this.Init = function(id)
             }
             else if (flag == 1 && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty && oProvUserId != userId)
             {
-                _d.RemoveKey("email");
+                _d.Remove("email");
                 flag &= 2;
                 return 0;
             }
