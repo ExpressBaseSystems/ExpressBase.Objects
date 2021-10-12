@@ -14,6 +14,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Common.Data;
 using System.Globalization;
 using ExpressBase.CoreBase.Globals;
+using System.IO;
 
 namespace ExpressBase.Objects
 {
@@ -225,6 +226,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldText : EbDataField
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        public bool RenderAsHtml { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign ;'> 
@@ -253,7 +259,19 @@ namespace ExpressBase.Objects
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
-            if (!string.IsNullOrEmpty(LinkRefId))
+
+            if (RenderAsHtml)
+            {
+                using (StringReader sr = new StringReader(column_val))
+                {
+                    var elements = iTextSharp.text.html.simpleparser.HtmlWorker.ParseToList(sr, null);
+                    foreach (IElement e in elements)
+                    {
+                        ct.AddElement(e);
+                    }
+                }
+            }
+            else if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
@@ -262,6 +280,7 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
+
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
