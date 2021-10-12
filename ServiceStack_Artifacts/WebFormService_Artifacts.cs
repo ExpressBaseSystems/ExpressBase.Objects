@@ -600,6 +600,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string FormDatajson { get; set; }
+
+        [DataMember(Order = 4)]
+        public string DraftInfo { get; set; }
     }
 
     [DataContract]

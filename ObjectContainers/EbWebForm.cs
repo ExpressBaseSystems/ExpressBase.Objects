@@ -932,10 +932,10 @@ namespace ExpressBase.Objects
                             this.FormData.Info = new WebformDataInfo()
                             {
                                 CreAt = dt.ToString(p, CultureInfo.InvariantCulture),
-                                CreBy = this.SolutionObj.Users.ContainsKey(this.FormData.CreatedBy) ? this.SolutionObj.Users[this.FormData.CreatedBy] : "--",
+                                CreBy = this.SolutionObj.Users.ContainsKey(this.FormData.CreatedBy) ? this.SolutionObj.Users[this.FormData.CreatedBy] : string.Empty,
                                 ModAt = dt2.ToString(p, CultureInfo.InvariantCulture),
-                                ModBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? this.SolutionObj.Users[this.FormData.ModifiedBy] : "--",
-                                CreFrom = this.SolutionObj.Locations.ContainsKey(_locId) ? this.SolutionObj.Locations[_locId].ShortName : "--"
+                                ModBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? this.SolutionObj.Users[this.FormData.ModifiedBy] : string.Empty,
+                                CreFrom = this.SolutionObj.Locations.ContainsKey(_locId) ? this.SolutionObj.Locations[_locId].ShortName : string.Empty
                             };
                         }
                         else
