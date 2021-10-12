@@ -925,11 +925,18 @@ namespace ExpressBase.Objects
                             this.FormData.SrcVerId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsReadOnly = ebs.GetBooleanValue(SystemColumns.eb_ro, dataRow[i++]);
                             this.FormData.ModifiedBy = Convert.ToInt32(dataRow[i++]);
-                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]);
-                            if (dt2 < DateTime.UtcNow)
-                                this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            dt2 = dt2.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+                            string p = this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetLongTimePattern();
+                            this.FormData.Info = new WebformDataInfo()
+                            {
+                                CreAt = dt.ToString(p, CultureInfo.InvariantCulture),
+                                CreBy = this.SolutionObj.Users.ContainsKey(this.FormData.CreatedBy) ? this.SolutionObj.Users[this.FormData.CreatedBy] : "--",
+                                ModAt = dt2.ToString(p, CultureInfo.InvariantCulture),
+                                ModBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? this.SolutionObj.Users[this.FormData.ModifiedBy] : "--",
+                                CreFrom = this.SolutionObj.Locations.ContainsKey(_locId) ? this.SolutionObj.Locations[_locId].ShortName : "--"
+                            };
                         }
                         else
                             i += 11;// 9 => Count of above properties
@@ -1848,7 +1855,7 @@ namespace ExpressBase.Objects
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
-                    string ts = this.FormData.Ts;
+                    string ts = null;////////////
                     this.RefreshFormData(DataDB, service, true, true);
                     CheckConstraints(wc, false, ts);
                     resp = "Updated: " + this.Update(DataDB, service);
