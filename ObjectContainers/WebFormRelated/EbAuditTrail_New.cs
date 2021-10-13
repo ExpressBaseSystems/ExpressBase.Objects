@@ -312,6 +312,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         _column = _table.Columns.FirstOrDefault(col => col.ColumnName == Convert.ToString(dr["fieldname"]));
                         if (_column == null)//no such control - skipping invalid Audit Trail entry
                             continue;
+                        if (_column.Control.DoNotPersist || _column.Control.Hidden)
+                            continue;
                     }
                 }
 
@@ -346,9 +348,9 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                             if (_control.DoNotPersist || _control.Hidden)
                                 continue;
                             if (_control is EbDGColumn _dgcol)
-                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, _dgcol.Title ?? _control.Label);
+                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(new FormTransactionMetaInfo() { Index = i, Title = _dgcol.Title ?? _control.Label, IsNumeric = _dgcol is EbDGNumericColumn });
                             else
-                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, _control.Label);
+                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(new FormTransactionMetaInfo() { Index = i, Title = _control.Label, IsNumeric = _control is EbNumeric });
                         }
                     }
 
@@ -381,7 +383,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         string b = new_val_dict?.ContainsKey(__column.ColumnName) == true ? new_val_dict[__column.ColumnName] : null;
 
                         this.PreProcessTransationData(DictVmAll, _table, __column, ref a, ref b);
-                        curRow.Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = a, NewValue = b, IsModified = IsModified });
+                        curRow.Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = a, NewValue = b, IsModified = IsModified, IsNumeric = __column.Control is EbDGNumericColumn });
                     }
                 }
                 else
@@ -487,10 +489,17 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         {
             try
             {
-                if (ctrl is EbNumeric || ctrl is EbDGNumericColumn ||
-                    ctrl is EbBooleanSelect || ctrl is EbDGBooleanSelectColumn ||
-                    ctrl is EbDGBooleanColumn || ctrl is EbRadioButton)
+                if (ctrl is EbNumeric || ctrl is EbDGNumericColumn)
+                {
+                    if (float.TryParse(value, out float val) && val != 0)
+                        value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value, false).F;
+                    else
+                        value = string.Empty;
+                }
+                else if (ctrl is EbBooleanSelect || ctrl is EbDGBooleanSelectColumn || ctrl is EbDGBooleanColumn || ctrl is EbRadioButton || ctrl is EbTextBox)
+                {
                     value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value, false).F;
+                }
                 else if (value != null)
                 {
                     if (ctrl is EbDate || ctrl is EbDGDateColumn)
