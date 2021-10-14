@@ -91,7 +91,7 @@ namespace ExpressBase.Objects.Objects
             <input id='@ebsid@_datelbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_dateWraper' class='ctrl-cover' eb-readonly='false'>                    
                 <div class='input-group' style='width:100%;'>            
-                    <input id='date' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input' type='text' name='date' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <input id='date' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input' type='text' name='date' autocomplete='off' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
                     <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_dateTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
                 </div>
             </div>
@@ -102,7 +102,7 @@ namespace ExpressBase.Objects.Objects
             <input id='@ebsid@_monthlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_monthWraper' class='ctrl-cover' eb-readonly='false'>                    
                 <div class='input-group' style='width:100%;'>            
-                    <input id='month' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input' type='text' name='month' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <input id='month' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input' type='text' name='month' autocomplete='off' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
                     <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_monthTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
                 </div>
             </div>
@@ -113,7 +113,7 @@ namespace ExpressBase.Objects.Objects
             <input id='@ebsid@_yearlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_yearWraper' class='ctrl-cover' eb-readonly='false'>                    
                 <div class='input-group' style='width:100%;'>            
-                    <input id='year' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='year' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <input id='year' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='year' autocomplete='off' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
                     <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_yearTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
                 </div>
             </div>
