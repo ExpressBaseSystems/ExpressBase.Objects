@@ -218,7 +218,7 @@ namespace ExpressBase.Objects
                     }
 
                     if ((string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) && !this.IsSqlExpr) || this.Pattern.SerialLength == 0 || (this.Pattern.PrefixLength == 0 && this.IsSqlExpr))
-                        throw new FormException("Unable to process [Invalid AutoId pattern]", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
+                        throw new FormException("Unable to process [Invalid AutoId pattern]", (int)HttpStatusCode.InternalServerError, $"Invalid pattern for AutoId: {this.TableName}.{args.cField.Name}", "EbAutoId => ParameterizeControl");
 
                     if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
                         args._vals += string.Format("CONCAT(({1}), (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE ({4}))),",
