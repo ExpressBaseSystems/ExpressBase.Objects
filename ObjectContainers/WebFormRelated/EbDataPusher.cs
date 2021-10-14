@@ -280,6 +280,11 @@ else if (this.MultiPushIdType === 2)
                                 else
                                     val = string.Empty;
                             }
+                            else if (SrcWebForm.AutoId != null && _column.Control is EbAutoId && SrcWebForm.TableRowId > 0 && string.IsNullOrWhiteSpace(Convert.ToString(val)))
+                            {
+                                _column.Control.BypassParameterization = true;
+                                val = $"'{val}'";
+                            }
                             else if (Convert.ToString(val).Contains(FG_Constants.DataId_PlaceHolder))
                             {
                                 val = Convert.ToString(val).Replace(FG_Constants.DataId_PlaceHolder, string.Empty);

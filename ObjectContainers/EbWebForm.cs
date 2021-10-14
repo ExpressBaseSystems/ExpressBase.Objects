@@ -195,6 +195,10 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        public bool LockOnSave { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableExcelImport { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -925,11 +929,18 @@ namespace ExpressBase.Objects
                             this.FormData.SrcVerId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsReadOnly = ebs.GetBooleanValue(SystemColumns.eb_ro, dataRow[i++]);
                             this.FormData.ModifiedBy = Convert.ToInt32(dataRow[i++]);
-                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]);
-                            if (dt2 < DateTime.UtcNow)
-                                this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            dt2 = dt2.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+                            string p = this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetLongTimePattern();
+                            this.FormData.Info = new WebformDataInfo()
+                            {
+                                CreAt = dt.ToString(p, CultureInfo.InvariantCulture),
+                                CreBy = this.SolutionObj.Users.ContainsKey(this.FormData.CreatedBy) ? this.SolutionObj.Users[this.FormData.CreatedBy] : string.Empty,
+                                ModAt = dt2.ToString(p, CultureInfo.InvariantCulture),
+                                ModBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? this.SolutionObj.Users[this.FormData.ModifiedBy] : string.Empty,
+                                CreFrom = this.SolutionObj.Locations.ContainsKey(_locId) ? this.SolutionObj.Locations[_locId].ShortName : string.Empty
+                            };
                         }
                         else
                             i += 11;// 9 => Count of above properties
@@ -1848,7 +1859,7 @@ namespace ExpressBase.Objects
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
-                    string ts = this.FormData.Ts;
+                    string ts = this.FormData.ModifiedAt;
                     this.RefreshFormData(DataDB, service, true, true);
                     CheckConstraints(wc, false, ts);
                     resp = "Updated: " + this.Update(DataDB, service);
@@ -2595,9 +2606,10 @@ namespace ExpressBase.Objects
             return true;
         }
 
-        public int Cancel(IDatabase DataDB, bool Cancel)
+        public (int, string) Cancel(IDatabase DataDB, bool Cancel)
         {
             int status = -1;
+            string modifiedAt = null;
             if (this.CanCancel(DataDB))
             {
                 try
@@ -2607,13 +2619,15 @@ namespace ExpressBase.Objects
                     this.DbTransaction = this.DbConnection.BeginTransaction();
 
                     string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
-                    DbParameter[] param = new DbParameter[] {
+                    DbParameter[] param = new DbParameter[]
+                    {
                         DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                         DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
                     };
                     status = DataDB.DoNonQuery(this.DbConnection, query, param);
                     if (status > 0)
                     {
+                        modifiedAt = this.GetLastModifiedAt(DataDB);
                         EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                         ebAuditTrail.UpdateAuditTrail(Cancel ? DataModificationAction.Cancelled : DataModificationAction.CancelReverted);
                     }
@@ -2626,12 +2640,13 @@ namespace ExpressBase.Objects
                     Console.WriteLine("Exception in Cancel/RevokeCancel: " + ex.Message + "\n" + ex.StackTrace);
                 }
             }
-            return status;
+            return (status, modifiedAt);
         }
 
-        public int LockOrUnlock(IDatabase DataDB, bool Lock)
+        public (int, string) LockOrUnlock(IDatabase DataDB, bool Lock)
         {
             int status = -1;
+            string modifiedAt = null;
             try
             {
                 this.DbConnection = DataDB.GetNewConnection();
@@ -2639,13 +2654,15 @@ namespace ExpressBase.Objects
                 this.DbTransaction = this.DbConnection.BeginTransaction();
 
                 string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
-                DbParameter[] param = new DbParameter[] {
-                        DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                        DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-                    };
+                DbParameter[] param = new DbParameter[]
+                {
+                    DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                };
                 status = DataDB.DoNonQuery(this.DbConnection, query, param);
                 if (status > 0)
                 {
+                    modifiedAt = this.GetLastModifiedAt(DataDB);
                     EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                     ebAuditTrail.UpdateAuditTrail(Lock ? DataModificationAction.Locked : DataModificationAction.Unlocked);
                 }
@@ -2657,7 +2674,21 @@ namespace ExpressBase.Objects
                 this.DbTransaction.Rollback();
                 Console.WriteLine("Exception in Lock/Unlock: " + ex.Message + "\n" + ex.StackTrace);
             }
-            return status;
+            return (status, modifiedAt);
+        }
+
+        private string GetLastModifiedAt(IDatabase DataDB)
+        {
+            string ts = null;
+            EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
+            string query = $"SELECT {ebs[SystemColumns.eb_lastmodified_at]} FROM {this.TableName} WHERE id = {this.TableRowId};";
+            EbDataTable dt = DataDB.DoQuery(this.DbConnection, query);
+            if (dt.Rows.Count > 0)
+            {
+                DateTime dt2 = Convert.ToDateTime(dt.Rows[0][0]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                ts = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            }
+            return ts;
         }
 
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)

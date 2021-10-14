@@ -11,7 +11,7 @@ namespace ExpressBase.Objects
         public string CreatedAt { get; set; }
 
         public string ActionType { get; set; }
-        
+
         public Dictionary<string, FormTransactionRow> Tables { get; set; }//Key = Table name
 
         public Dictionary<string, FormTransactionTable> GridTables { get; set; }//Key = Table name
@@ -28,10 +28,10 @@ namespace ExpressBase.Objects
         public Dictionary<int, FormTransactionRow> NewRows { get; set; }//Key = Row id
 
         public Dictionary<int, FormTransactionRow> EditedRows { get; set; }//Key = Row id
-        
+
         public Dictionary<int, FormTransactionRow> DeletedRows { get; set; }//Key = Row id
 
-        public Dictionary<int, string> ColumnMeta { get; set; }
+        public List<FormTransactionMetaInfo> ColumnMeta { get; set; }
 
         public string Title { get; set; }
 
@@ -40,7 +40,7 @@ namespace ExpressBase.Objects
             this.NewRows = new Dictionary<int, FormTransactionRow>();
             this.EditedRows = new Dictionary<int, FormTransactionRow>();
             this.DeletedRows = new Dictionary<int, FormTransactionRow>();
-            this.ColumnMeta = new Dictionary<int, string>();
+            this.ColumnMeta = new List<FormTransactionMetaInfo>();
         }
     }
 
@@ -63,5 +63,16 @@ namespace ExpressBase.Objects
         public string Title { get; set; }
 
         public bool IsModified { get; set; }
+
+        public bool IsNumeric { get; set; }
+    }
+
+    public class FormTransactionMetaInfo
+    {
+        public int Index { get; set; }
+
+        public string Title { get; set; }
+
+        public bool IsNumeric { get; set; }
     }
 }
