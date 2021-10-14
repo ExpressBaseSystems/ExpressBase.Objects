@@ -30,6 +30,7 @@ using System.Net;
 using System.Threading;
 using ExpressBase.Common.Security;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace ExpressBase.Objects
 {
@@ -924,11 +925,18 @@ namespace ExpressBase.Objects
                             this.FormData.SrcVerId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsReadOnly = ebs.GetBooleanValue(SystemColumns.eb_ro, dataRow[i++]);
                             this.FormData.ModifiedBy = Convert.ToInt32(dataRow[i++]);
-                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]);
-                            if (dt2 < DateTime.UtcNow)
-                                this.FormData.Ts = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            dt2 = dt2.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+                            string p = this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetLongTimePattern();
+                            this.FormData.Info = new WebformDataInfo()
+                            {
+                                CreAt = dt.ToString(p, CultureInfo.InvariantCulture),
+                                CreBy = this.SolutionObj.Users.ContainsKey(this.FormData.CreatedBy) ? this.SolutionObj.Users[this.FormData.CreatedBy] : string.Empty,
+                                ModAt = dt2.ToString(p, CultureInfo.InvariantCulture),
+                                ModBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? this.SolutionObj.Users[this.FormData.ModifiedBy] : string.Empty,
+                                CreFrom = this.SolutionObj.Locations.ContainsKey(_locId) ? this.SolutionObj.Locations[_locId].ShortName : string.Empty
+                            };
                         }
                         else
                             i += 11;// 9 => Count of above properties
@@ -1820,7 +1828,7 @@ namespace ExpressBase.Objects
             {
                 if (DateTime.TryParseExact(ts, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt1))
                 {
-                    if (DateTime.TryParseExact(this.FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 <= dt2)
+                    if (DateTime.TryParseExact(this.FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 < dt2)
                     {
                         string modBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? (" by " + this.SolutionObj.Users[this.FormData.ModifiedBy]) : string.Empty;
                         string modAt = dt2.ToString(this.UserObj.Preference.GetLongTimePattern(), CultureInfo.InvariantCulture);
@@ -1847,7 +1855,7 @@ namespace ExpressBase.Objects
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
-                    string ts = this.FormData.Ts;
+                    string ts = this.FormData.ModifiedAt;
                     this.RefreshFormData(DataDB, service, true, true);
                     CheckConstraints(wc, false, ts);
                     resp = "Updated: " + this.Update(DataDB, service);
@@ -1860,7 +1868,7 @@ namespace ExpressBase.Objects
                     if (this.IsDisable)
                         throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly form", "EbWebForm -> Save");
 
-                    this.TableRowId = this.Insert(DataDB, service);
+                    this.TableRowId = this.Insert(DataDB, service, true);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
@@ -1912,7 +1920,7 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        public int Insert(IDatabase DataDB, Service service)
+        public int Insert(IDatabase DataDB, Service service, bool handleUniqueErr)
         {
             string fullqry = string.Empty;
             string _extqry = string.Empty;
@@ -1934,10 +1942,34 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
+            int _rowid, RetryCount = 0;
+        Retry:
+            try
+            {
+                EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
+                EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
+                _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
+            }
+            catch (PostgresException e)
+            {
+                if (e.SqlState == "23505" && RetryCount < 3 && handleUniqueErr)
+                {
+                    Console.WriteLine($"Retrying({++RetryCount}).... : " + e.Message + "\n" + e.Detail);
+                    List<DbParameter> _params = new List<DbParameter>();
+                    foreach (DbParameter p in param)
+                        _params.Add(new NpgsqlParameter(p.ParameterName, p.DbType) { Value = p.Value });
+                    param = _params;
+                    this.DbTransaction.Rollback();
+                    this.DbConnection.Close();
+                    this.DbConnection = DataDB.GetNewConnection();
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+                    goto Retry;
+                }
+                else
+                    throw e;
+            }
 
-            EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
-            EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
-            int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             if (_rowid <= 0)
                 throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"SELECT eb_currval('{this.TableName}_id_seq') returned an invalid data: {_rowid}", "EbWebForm -> Insert");
             return _rowid;
@@ -2197,7 +2229,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    this.TableRowId = this.Insert(DataDB, service);
+                    this.TableRowId = this.Insert(DataDB, service, false);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
@@ -2570,9 +2602,10 @@ namespace ExpressBase.Objects
             return true;
         }
 
-        public int Cancel(IDatabase DataDB, bool Cancel)
+        public (int, string) Cancel(IDatabase DataDB, bool Cancel)
         {
             int status = -1;
+            string modifiedAt = null;
             if (this.CanCancel(DataDB))
             {
                 try
@@ -2582,13 +2615,15 @@ namespace ExpressBase.Objects
                     this.DbTransaction = this.DbConnection.BeginTransaction();
 
                     string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
-                    DbParameter[] param = new DbParameter[] {
+                    DbParameter[] param = new DbParameter[]
+                    {
                         DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                         DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
                     };
                     status = DataDB.DoNonQuery(this.DbConnection, query, param);
                     if (status > 0)
                     {
+                        modifiedAt = this.GetLastModifiedAt(DataDB);
                         EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                         ebAuditTrail.UpdateAuditTrail(Cancel ? DataModificationAction.Cancelled : DataModificationAction.CancelReverted);
                     }
@@ -2601,12 +2636,13 @@ namespace ExpressBase.Objects
                     Console.WriteLine("Exception in Cancel/RevokeCancel: " + ex.Message + "\n" + ex.StackTrace);
                 }
             }
-            return status;
+            return (status, modifiedAt);
         }
 
-        public int LockOrUnlock(IDatabase DataDB, bool Lock)
+        public (int, string) LockOrUnlock(IDatabase DataDB, bool Lock)
         {
             int status = -1;
+            string modifiedAt = null;
             try
             {
                 this.DbConnection = DataDB.GetNewConnection();
@@ -2614,13 +2650,15 @@ namespace ExpressBase.Objects
                 this.DbTransaction = this.DbConnection.BeginTransaction();
 
                 string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
-                DbParameter[] param = new DbParameter[] {
-                        DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                        DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-                    };
+                DbParameter[] param = new DbParameter[]
+                {
+                    DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                };
                 status = DataDB.DoNonQuery(this.DbConnection, query, param);
                 if (status > 0)
                 {
+                    modifiedAt = this.GetLastModifiedAt(DataDB);
                     EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                     ebAuditTrail.UpdateAuditTrail(Lock ? DataModificationAction.Locked : DataModificationAction.Unlocked);
                 }
@@ -2632,7 +2670,21 @@ namespace ExpressBase.Objects
                 this.DbTransaction.Rollback();
                 Console.WriteLine("Exception in Lock/Unlock: " + ex.Message + "\n" + ex.StackTrace);
             }
-            return status;
+            return (status, modifiedAt);
+        }
+
+        private string GetLastModifiedAt(IDatabase DataDB)
+        {
+            string ts = null;
+            EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
+            string query = $"SELECT {ebs[SystemColumns.eb_lastmodified_at]} FROM {this.TableName} WHERE id = {this.TableRowId};";
+            EbDataTable dt = DataDB.DoQuery(this.DbConnection, query);
+            if (dt.Rows.Count > 0)
+            {
+                DateTime dt2 = Convert.ToDateTime(dt.Rows[0][0]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                ts = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            }
+            return ts;
         }
 
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)
