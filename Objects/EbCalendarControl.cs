@@ -108,13 +108,24 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <div id='@ebsid@_year' name='year'  ctype='Date' eb-hidden='false'>
-            <span class='eb-ctrl-label eb-label-editable' ui-label=''>Year</span>
-            <input id='@ebsid@_yearlbltxtb' class='eb-lbltxtb' type='text'> 
-            <div id='@ebsid@_yearWraper' class='ctrl-cover' eb-readonly='false'>                    
+        <div id='@ebsid@_fromyear' name='fromyear'  ctype='Date' eb-hidden='false'>
+            <span class='eb-ctrl-label eb-label-editable' ui-label=''>From Year</span>
+            <input id='@ebsid@_fromyearlbltxtb' class='eb-lbltxtb' type='text'> 
+            <div id='@ebsid@_fromyearWraper' class='ctrl-cover' eb-readonly='false'>                    
                 <div class='input-group' style='width:100%;'>            
-                    <input id='year' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='year' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
-                    <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_yearTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
+                    <input id='fromyear' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='fromyear' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_fromyearTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
+                </div>
+            </div>
+            <span class='helpText' ui-helptxt=''> </span>
+        </div>
+        <div id='@ebsid@_toyear' name='toyear'  ctype='Date' eb-hidden='false'>
+            <span class='eb-ctrl-label eb-label-editable' ui-label=''>To Year</span>
+            <input id='@ebsid@_toyearlbltxtb' class='eb-lbltxtb' type='text'> 
+            <div id='@ebsid@_toyearWraper' class='ctrl-cover' eb-readonly='false'>                    
+                <div class='input-group' style='width:100%;'>            
+                    <input id='toyear' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='toyear' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_toyearTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
                 </div>
             </div>
             <span class='helpText' ui-helptxt=''> </span>
