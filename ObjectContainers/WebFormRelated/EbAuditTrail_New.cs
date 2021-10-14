@@ -496,7 +496,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                     else
                         value = string.Empty;
                 }
-                else if (ctrl is EbBooleanSelect || ctrl is EbDGBooleanSelectColumn || ctrl is EbDGBooleanColumn || ctrl is EbRadioButton || ctrl is EbTextBox)
+                else if (ctrl is EbBooleanSelect || ctrl is EbDGBooleanSelectColumn || ctrl is EbDGBooleanColumn || ctrl is EbRadioButton || ctrl is EbTextBox || ctrl is EbDGStringColumn)
                 {
                     value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value, false).F;
                 }

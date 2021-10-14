@@ -731,6 +731,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int RowAffected { get; set; }
 
         [DataMember(Order = 2)]
+        public string ModifiedAt { get; set; }
+
+        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -754,6 +757,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Status { get; set; }
 
         [DataMember(Order = 2)]
+        public string ModifiedAt { get; set; }
+
+        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
