@@ -113,7 +113,7 @@ namespace ExpressBase.Objects.Objects
             <input id='@ebsid@_fromyearlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_fromyearWraper' class='ctrl-cover' eb-readonly='false'>                    
                 <div class='input-group' style='width:100%;'>            
-                    <input id='fromyear' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='fromyear' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <input id='fromyear' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='fromyear' autocomplete='off' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
                     <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_fromyearTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
                 </div>
             </div>
@@ -124,7 +124,7 @@ namespace ExpressBase.Objects.Objects
             <input id='@ebsid@_toyearlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_toyearWraper' class='ctrl-cover' eb-readonly='false'>                    
                 <div class='input-group' style='width:100%;'>            
-                    <input id='toyear' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='toyear' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <input id='toyear' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='toyear' autocomplete='off' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
                     <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_toyearTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
                 </div>
             </div>
