@@ -280,7 +280,7 @@ else if (this.MultiPushIdType === 2)
                                 else
                                     val = string.Empty;
                             }
-                            else if (SrcWebForm.AutoId != null && _column.Control is EbAutoId && SrcWebForm.TableRowId > 0 && string.IsNullOrWhiteSpace(Convert.ToString(val)))
+                            else if (SrcWebForm.AutoId != null && _column.Control is EbAutoId && SrcWebForm.TableRowId > 0 && !string.IsNullOrWhiteSpace(Convert.ToString(val)))
                             {
                                 _column.Control.BypassParameterization = true;
                                 val = $"'{val}'";
