@@ -839,6 +839,7 @@ namespace ExpressBase.Objects
         public int RenderMode { get; set; }
         public int RowId { get; set; }
         public int DraftId { get; set; }
+        public string DraftInfo { get; set; }
         public string Draft_FormData { get; set; }
         public string Mode { get; set; }
         public string FormDataWrap { get; set; }

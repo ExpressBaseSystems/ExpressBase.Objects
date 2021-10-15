@@ -25,7 +25,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string _id = "id";
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
-                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, id",
+                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, id",
                         ebs[SystemColumns.eb_loc_id],//0
                         ebs[SystemColumns.eb_ver_id],//1
                         ebs[SystemColumns.eb_lock],//2
@@ -35,7 +35,9 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_void],//6
                         ebs[SystemColumns.eb_created_at],//7
                         ebs[SystemColumns.eb_src_ver_id],//8
-                        ebs[SystemColumns.eb_ro]);//9
+                        ebs[SystemColumns.eb_ro],//9
+                        ebs[SystemColumns.eb_lastmodified_by],//10
+                        ebs[SystemColumns.eb_lastmodified_at]);//11
                 else if (_table.TableType == WebFormTableTypes.Review)
                 {
                     _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
@@ -236,7 +238,7 @@ WHERE
                 foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
                 {
                     string autoIdBckUp = string.Empty;
-                    //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName)
+                    //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName) // uncomment this and check the autoid reassignment
                     //    autoIdBckUp = string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", ebWebForm.AutoId.Name);
 
                     string Qry = string.Format("UPDATE {0} SET {1} = {6}, {2} = @eb_lastmodified_by, {3} = {4} {5} ",
@@ -425,7 +427,7 @@ WHERE
                         ebs[SystemColumns.eb_ro],//13
                         ebs.GetBoolFalse(SystemColumns.eb_void),//14
                         ebs.GetBoolFalse(SystemColumns.eb_del),//15
-                        ebs.GetBoolFalse(SystemColumns.eb_lock),//16
+                        _this.LockOnSave ? ebs.GetBoolTrue(SystemColumns.eb_lock) : ebs.GetBoolFalse(SystemColumns.eb_lock),//16
                         ebs.GetBoolFalse(SystemColumns.eb_ro),//17
                         "{0}",//18
                         "{1}");//19
@@ -521,13 +523,14 @@ VALUES (
             if (conf == null)
             {
                 if (tblName.Equals(_this.TableName))
-                    _qry = string.Format("UPDATE {0} SET {6} {1} = @eb_modified_by, {2} = {3} WHERE id = {7} AND COALESCE({4}, {5}) = {5}; ",
+                    _qry = string.Format("UPDATE {0} SET {7} {6}{1} = @eb_modified_by, {2} = {3} WHERE id = {8} AND COALESCE({4}, {5}) = {5}; ",
                         tblName,//0
                         ebs[SystemColumns.eb_lastmodified_by],//1
                         ebs[SystemColumns.eb_lastmodified_at],//2
                         DataDB.EB_CURRENT_TIMESTAMP,//3
                         ebs[SystemColumns.eb_del],//4
                         ebs.GetBoolFalse(SystemColumns.eb_del),//5
+                        _this.LockOnSave ? $"{ebs[SystemColumns.eb_lock]} = {ebs.GetBoolTrue(SystemColumns.eb_lock)}, " : string.Empty,
                         "{0}",
                         "{1}");
                 else

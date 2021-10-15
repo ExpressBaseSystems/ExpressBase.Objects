@@ -70,7 +70,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
-        [OSE_ObjectTypes(EbObjectTypes.iWebForm , EbObjectTypes.iDashBoard)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm , EbObjectTypes.iDashBoard, EbObjectTypes.iTableVisualization,EbObjectTypes.iChartVisualization,EbObjectTypes.iCalendarView)]
         public string Object_Selector { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]

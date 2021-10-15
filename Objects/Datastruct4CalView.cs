@@ -1,24 +1,31 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExpressBase.Security;
+using System.Globalization;
 
 namespace ExpressBase.Objects.Objects
 {
     public class DataStruct4CalView
     {
-        private string KeyColumnName { get; set; }
+        private string PrimaryKeyColumnName { get; set; }
 
-        private string ValueColumnName { get; set; }
+        private string ForeignKeyColumnName { get; set; }
+
+        private List<DVBaseColumn> DataColumns { get; set; }
 
         private string DateColumnName { get; set; }
 
         public DataStruct4CalViewCols Columns = new DataStruct4CalViewCols();
 
         private Dictionary<int, DataStruct4CalViewRow> _innerDict = new Dictionary<int, DataStruct4CalViewRow>();//dict<partyid, dict<int column_index, long value>
+
+        Dictionary<int, List<long>> Totals = new Dictionary<int, List<long>>();
 
         public List<ColumnCondition> ConditionalFormating { get; set; }
 
@@ -34,9 +41,10 @@ namespace ExpressBase.Objects.Objects
 
         public DataStruct4CalView(EbCalendarView C)
         {
-            this.KeyColumnName = C.PrimaryKey.Name;
+            this.PrimaryKeyColumnName = C.PrimaryKey.Name;
+            this.ForeignKeyColumnName = C.ForeignKey.Name;
             this.DateColumnName = C.LinesColumns.FirstOrDefault(col => !col.IsCustomColumn && (col.Type == EbDbTypes.Date || col.Type == EbDbTypes.DateTime))?.Name;
-            this.ValueColumnName = C.DataColumns.FirstOrDefault(col => col.bVisible)?.Name;
+            this.DataColumns = C.DataColumns.FindAll(col => col.bVisible);
             this.ConditionalFormating = C.DataColumns.FirstOrDefault(col => col.bVisible)?.ConditionalFormating;
             this.ObjectLinks = C.ObjectLinks;
             this.CalendarType = C.CalendarType;
@@ -45,17 +53,21 @@ namespace ExpressBase.Objects.Objects
 
         public void Add(EbDataRow row)
         {
-            if (!_innerDict.ContainsKey(Convert.ToInt32(row[this.KeyColumnName])))
-                _innerDict.Add(Convert.ToInt32(row[this.KeyColumnName]), new DataStruct4CalViewRow());
+            //dict<partyid, dict<int column_index, Dict<string datacolname,long value>>
+            if (!_innerDict.ContainsKey(Convert.ToInt32(row[this.ForeignKeyColumnName])))
+                _innerDict.Add(Convert.ToInt32(row[this.ForeignKeyColumnName]), new DataStruct4CalViewRow());
             DateTime dt = Convert.ToDateTime(row[this.DateColumnName]);
             if (dt > DateTime.MinValue)
             {
-                _innerDict[Convert.ToInt32(row[this.KeyColumnName])]
-                    .Add(Columns.GetColumnKey(dt), Convert.ToInt64(row[this.ValueColumnName]));
+                foreach (DVBaseColumn col in DataColumns)
+                {
+                    _innerDict[Convert.ToInt32(row[this.ForeignKeyColumnName])]
+                        .Add(Columns.GetColumnKey(dt), col.Name, Convert.ToInt64(row[col.Name]));
+                }
             }
         }
 
-        public void GetFormatedTable(ref EbDataTable _formattedTable, RowColletion masterRows, ref Dictionary<int, List<object>> summary)
+        public void GetFormatedTable(ref EbDataTable _formattedTable, RowColletion masterRows, ref Dictionary<int, List<object>> summary, User _user)
         {
             for (int i = 0; i < masterRows.Count; i++)//filling master data
             {
@@ -65,65 +77,106 @@ namespace ExpressBase.Objects.Objects
                     _formattedTable.Rows[i][j] = masterRows[i][j];
                 }
             }
-
+            CultureInfo _user_culture = CultureHelper.GetSerializedCultureInfo(_user.Preference.Locale).GetCultureInfo();
+            _user_culture.NumberFormat.NumberDecimalDigits = 0;
             EbDataRow Row;
             long value;
             long prev_value;
             int summary_last_index = summary.Keys.Last();
+            string total;
             for (int i = 0; i < _formattedTable.Rows.Count; i++)//filling consolidated data
             {
                 Row = _formattedTable.Rows[i];
-                int _id = (int)Row[KeyColumnName];
+                int _id = (int)Row[PrimaryKeyColumnName];
                 if (_innerDict.ContainsKey(_id))
                 {
-                    IEnumerable<int> columnIndexes = _innerDict[_id].GetKeys();
-                    foreach (int columnIndex in columnIndexes)
+                    if (!Totals.ContainsKey(_id))
                     {
-                        prev_value = 0;
-                        value = _innerDict[_id].GetValue(columnIndex);
-                        if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise)
-                        {
-                            if (columnIndex > this.InitialColumnsCount && Columns.GetColumnByIndex(columnIndex).StartDate > Columns.GetColumnByIndex(columnIndex - 1).StartDate)
-                                prev_value = _innerDict[_id].GetValue(columnIndex - 1);
-                        }
-
-                        Row[columnIndex] = GetFormattedValue(value, Row, columnIndex, prev_value);
-                        Row["Total"] = (long)(Row["Total"] ?? 0L) + value;
-                        summary[columnIndex][0] = (long)summary[columnIndex][0] + value;
-                        summary[summary_last_index][0] = (long)summary[summary_last_index][0] + value;
+                        Totals.Add(_id, new List<long>());
                     }
+                    total = string.Empty;
+                    foreach (int columnIndex in _innerDict[_id].GetKeys())
+                    {
+                        string val = string.Empty;
+                        int j = 0;
+                        foreach (DVBaseColumn col in DataColumns)
+                        {
+                            prev_value = 0;
+                            value = _innerDict[_id].GetValue(columnIndex, col.Name);
+                            if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise)
+                            {
+                                if (columnIndex > this.InitialColumnsCount && Columns.GetColumnByIndex(columnIndex).StartDate > Columns.GetColumnByIndex(columnIndex - 1).StartDate)
+                                    prev_value = _innerDict[_id].GetValue(columnIndex - 1, col.Name);
+                            }
+                            val += GetFormattedValue(value, Row, columnIndex, prev_value, _user_culture, col);
+                            try
+                            {
+                                if (Totals[_id].Count < j + 1)
+                                    Totals[_id].Add(value);
+                                else
+                                    Totals[_id][j] = Totals[_id][j] + value;
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e.Message + "   " + _id);
+                            }
+                            summary[columnIndex][j] = (Convert.ToDecimal(summary[columnIndex][0]) + Convert.ToDecimal(value)).ToString("N", _user_culture.NumberFormat);
+                            summary[summary_last_index][j] = (Convert.ToDecimal(summary[summary_last_index][0]) + Convert.ToDecimal(value)).ToString("N", _user_culture.NumberFormat); ;
+                            j++;
+                        }
+                        Row[columnIndex] = val;
+                    }
+                    for (int k = 0; k < DataColumns.Count; k++)
+                    {
+                        if (Totals[_id].Count > k)
+                            total += $"<div class='dataclass {DataColumns[k].Name}_class'>{Convert.ToDecimal(Totals[_id][k]).ToString("N", _user_culture.NumberFormat) }</div>";
+                    }
+                    Row["Total"] = total;
                 }
             }
+
         }
 
-        private object GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value)
+        private string GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value, CultureInfo _user_culture, DVBaseColumn col)
         {
-            object formattedVal = string.Empty;
+            string Val = (value == 0) ? string.Empty : Convert.ToDecimal(value).ToString("N", _user_culture.NumberFormat);
+            string formatteddata = string.Empty;
             if (ConditionalFormating.Count > 0)
             {
-                DoConditionalFormating(ref formattedVal, value, row);
+                DoConditionalFormating(ref formatteddata, value, row);
             }
             else
             {
-                formattedVal = (this.ObjectLinks.Count == 1) ? "<a href = '#' oncontextmenu = 'return false' class ='tablelink4calendar cal-data' data-popup='true' data-link='" + ObjectLinks[0].ObjRefId + "' data-colindex='" + columnIndex + "'  data-column='" + this.Columns.GetColumnByIndex(columnIndex).Name + "'>" + value + "</a>" : "<span class = 'cal-data'>" + value + "</span>";
+                if (this.ObjectLinks.Count == 1)
+                {
+                    formatteddata = "<a href ='#' class ='tablelink4calendar cal-data' idx='" + columnIndex + "'>" + Val + "</a>";
+                }
+                else
+                {
+                    formatteddata = "<span clas ='cal-data'>" + Val + "</span>";
+                }
 
                 if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise && prev_value > 0 && value > 0)
                 {
                     long percent = ((value - prev_value) * 100) / value;
+                    string color = "green", direction = "up";
                     if (percent < 0)
                     {
-                        formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-red'><i class='fa fa-caret-down' aria-hidden='true'></i></span><span class ='cal-percent cal-percent-red'>" + Math.Abs(percent) + "%" + "</span></span>";
-                    }
-                    else
-                    {
-                        formattedVal += "<span class='cal-percent-container'><span class ='cal-percent-caret-green'><i class='fa fa-caret-up' aria-hidden='true'></i></span><span class ='cal-percent cal-percent-green'>" + Math.Abs(percent) + "%" + "</span></span>";
-                    }
+                        color = "red";
+                        direction = "down";
+                        percent *= -1;
+                    };
+                    formatteddata += @"  <span class='per-cont " + color + "'>" +
+                                            "<i class='fa fa-caret-" + direction + "'></i>" +
+                                            "<div class='val-perc'>" + percent + "% </div>" +
+                                        "</span>";
                 }
             }
-            return formattedVal;
+            formatteddata = $"<div class='dataclass {col.Name}_class'>{formatteddata }</div>";
+            return formatteddata;
         }
 
-        public void DoConditionalFormating(ref object formattedVal, long value, EbDataRow row)
+        public void DoConditionalFormating(ref string formattedVal, long value, EbDataRow row)
         {
 
             foreach (ColumnCondition cond in ConditionalFormating)
@@ -159,7 +212,7 @@ namespace ExpressBase.Objects.Objects
                 var __partType = _datarow.Table.Columns[formulaPart.FieldName].Type;
                 if (__partType == EbDbTypes.Decimal || __partType == EbDbTypes.Int32)
                 {
-                    if (formulaPart.FieldName == this.ValueColumnName)
+                    if (formulaPart.FieldName == this.DataColumns[0].Name)
                     {
                         __value = value;
                     }
@@ -241,28 +294,31 @@ namespace ExpressBase.Objects.Objects
 
     public class DataStruct4CalViewRow
     {
-        private Dictionary<int, long> _innerDict = new Dictionary<int, long>();
+        private Dictionary<int, Dictionary<string, long>> _innerDict = new Dictionary<int, Dictionary<string, long>>();
 
         public int GetCount()
         {
             return _innerDict.Count;
         }
-        public IEnumerable<int> GetKeys()
+        public Dictionary<int, Dictionary<string, long>>.KeyCollection GetKeys()
         {
-            IEnumerable<int> keys = _innerDict.Select(x => x.Key);
-            return keys;
+            return _innerDict.Keys;
         }
-        public long GetValue(int index)
+        public long GetValue(int index, string name)
         {
             if (_innerDict.ContainsKey(index))
-                return _innerDict[index];
+                return _innerDict[index][name];
             else return 0;
         }
-        public void Add(int columnKey, long value)
+        public void Add(int columnKey, string name, long value)
         {
+            Dictionary<string, long> d = new Dictionary<string, long>();
+            d.Add(name, 0);
             if (!_innerDict.ContainsKey(columnKey))
-                _innerDict.Add(columnKey, 0);
-            _innerDict[columnKey] += value;
+                _innerDict.Add(columnKey, d);
+            if (!_innerDict[columnKey].ContainsKey(name))
+                _innerDict[columnKey].Add(name, 0);
+            _innerDict[columnKey][name] += value;
         }
     }
 }

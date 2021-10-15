@@ -246,33 +246,44 @@ else if (this.MultiPushIdType === 2)
                             if (jRow[_column.ColumnName] != null)
                                 val = this.GetValueFormOutDict(OutputDict, ref Index, CodeIdx);
 
-                            if (SrcWebForm.AutoId != null && Convert.ToString(val) == FG_Constants.AutoId_PlaceHolder)
+                            if (SrcWebForm.AutoId != null && Convert.ToString(val).Contains(FG_Constants.AutoId_PlaceHolder))
                             {
-                                val = string.Format("(SELECT {0} FROM {1} WHERE {2}id = (SELECT(eb_currval('{3}_id_seq'))))",
-                                    SrcWebForm.AutoId.Name,
-                                    SrcWebForm.AutoId.TableName,
-                                    SrcWebForm.AutoId.TableName == SrcWebForm.TableName ? string.Empty : (SrcWebForm.TableName + CharConstants.UNDERSCORE),
-                                    SrcWebForm.TableName);
-
                                 if (_column.Control is EbAutoId || _column.Control is EbTextBox)
+                                {
                                     _column.Control.BypassParameterization = true;
+                                    string[] val_s = Convert.ToString(val).Split(FG_Constants.AutoId_PlaceHolder);
+
+                                    val = string.Format("(SELECT {4}{0}{5} FROM {1} WHERE {2}id = (SELECT(eb_currval('{3}_id_seq'))))",
+                                        SrcWebForm.AutoId.Name,
+                                        SrcWebForm.AutoId.TableName,
+                                        SrcWebForm.AutoId.TableName == SrcWebForm.TableName ? string.Empty : (SrcWebForm.TableName + CharConstants.UNDERSCORE),
+                                        SrcWebForm.TableName,
+                                        string.IsNullOrWhiteSpace(val_s[0]) ? string.Empty : $"'{val_s[0]}' || ",
+                                        string.IsNullOrWhiteSpace(val_s[1]) ? string.Empty : $" || '{val_s[1]}'");
+                                }
                                 else
                                     val = string.Empty;
                             }
                             else if (SrcWebForm.AutoId != null && Convert.ToString(val).Contains(FG_Constants.AutoId_SerialNo_PlaceHolder))
                             {
-                                val = string.Format("(SELECT '{5}' || RIGHT({0}, {4}) FROM {1} WHERE {2}id = (SELECT(eb_currval('{3}_id_seq'))))",
-                                    SrcWebForm.AutoId.Name,
-                                    SrcWebForm.AutoId.TableName,
-                                    SrcWebForm.AutoId.TableName == SrcWebForm.TableName ? string.Empty : (SrcWebForm.TableName + CharConstants.UNDERSCORE),
-                                    SrcWebForm.TableName,
-                                    SrcWebForm.AutoId.Pattern.SerialLength,
-                                    Convert.ToString(val).Replace(FG_Constants.AutoId_SerialNo_PlaceHolder, string.Empty));
-
                                 if (_column.Control is EbAutoId || _column.Control is EbTextBox)
+                                {
                                     _column.Control.BypassParameterization = true;
+                                    val = string.Format("(SELECT '{5}' || RIGHT({0}, {4}) FROM {1} WHERE {2}id = (SELECT(eb_currval('{3}_id_seq'))))",
+                                        SrcWebForm.AutoId.Name,
+                                        SrcWebForm.AutoId.TableName,
+                                        SrcWebForm.AutoId.TableName == SrcWebForm.TableName ? string.Empty : (SrcWebForm.TableName + CharConstants.UNDERSCORE),
+                                        SrcWebForm.TableName,
+                                        SrcWebForm.AutoId.Pattern.SerialLength,
+                                        Convert.ToString(val).Replace(FG_Constants.AutoId_SerialNo_PlaceHolder, string.Empty));
+                                }
                                 else
                                     val = string.Empty;
+                            }
+                            else if (SrcWebForm.AutoId != null && _column.Control is EbAutoId && SrcWebForm.TableRowId > 0 && !string.IsNullOrWhiteSpace(Convert.ToString(val)))
+                            {
+                                _column.Control.BypassParameterization = true;
+                                val = $"'{val}'";
                             }
                             else if (Convert.ToString(val).Contains(FG_Constants.DataId_PlaceHolder))
                             {

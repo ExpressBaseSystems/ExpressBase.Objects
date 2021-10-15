@@ -307,12 +307,14 @@ else if(this.NotifyBy === 3)
                                         Title = message,
                                         UsersID = uid,
                                         User_AuthId = _this.UserObj.AuthId
-                                    });
+                                    }); 
                                 }
                                 catch (Exception ex)
                                 {
                                     string temp = $"Exception when tried to send EbFnSys_NotifyBy.Users\n Message: ${ex.Message} \nLink: ${link} \nTitle: ${message} \nUserId: ${uid} \nStackTrace: ${ex.StackTrace}";
-                                    //Console.WriteLine(temp);
+                                    Console.WriteLine("NotifyByUserIDRequest Inner Exception 1" + ex.InnerException?.Message + ex.InnerException?.StackTrace);
+                                    Console.WriteLine("NotifyByUserIDRequest Inner Exception 2 " + ex.InnerException?.InnerException?.Message + ex.InnerException?.InnerException?.StackTrace);
+
                                     throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
                                 }
                             }

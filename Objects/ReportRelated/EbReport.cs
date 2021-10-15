@@ -288,6 +288,9 @@ namespace ExpressBase.Objects
         public Dictionary<string, List<EbDataField>> ReportSummaryFields { get; set; }
 
         [JsonIgnore]
+        public Dictionary<string, List<EbDataField>> GroupSummaryFields { get; set; }
+
+        [JsonIgnore]
         public Dictionary<int, byte[]> WatermarkImages { get; set; }
 
         [JsonIgnore]
@@ -572,12 +575,9 @@ namespace ExpressBase.Objects
         public void CallSummerize(EbDataField field, int serialnumber)
         {
             string column_val = string.Empty;
-            EbPdfGlobals globals = new EbPdfGlobals
-            {
-                // CurrentField = field
-            };
-
+            EbPdfGlobals globals = new EbPdfGlobals();
             AddParamsNCalcsInGlobal(globals);
+
             if (field is EbCalcField)
             {
                 column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
@@ -587,10 +587,18 @@ namespace ExpressBase.Objects
                 column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
             }
             List<EbDataField> SummaryList;
+            if (GroupSummaryFields.ContainsKey(field.Name))
+            {
+                SummaryList = GroupSummaryFields[field.Name];
+                foreach (EbDataField item in SummaryList)
+                {
+                    (item as IEbDataFieldSummary).Summarize(column_val);
+                }
+            }
             if (PageSummaryFields.ContainsKey(field.Name))
             {
                 SummaryList = PageSummaryFields[field.Name];
-                foreach (object item in SummaryList)
+                foreach (EbDataField item in SummaryList)
                 {
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
@@ -598,7 +606,7 @@ namespace ExpressBase.Objects
             if (ReportSummaryFields.ContainsKey(field.Name))
             {
                 SummaryList = ReportSummaryFields[field.Name];
-                foreach (object item in SummaryList)
+                foreach (EbDataField item in SummaryList)
                 {
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
@@ -614,7 +622,7 @@ namespace ExpressBase.Objects
             detailprintingtop = 0;
             foreach (EbReportHeader r_header in ReportHeaders)
             {
-                foreach (EbReportField field in r_header.Fields)
+                foreach (EbReportField field in r_header.GetFields())
                 {
                     DrawFields(field, rh_Yposition, 0);
                 }
@@ -630,7 +638,7 @@ namespace ExpressBase.Objects
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             foreach (EbPageHeader p_header in PageHeaders)
             {
-                foreach (EbReportField field in p_header.Fields)
+                foreach (EbReportField field in p_header.GetFields())
                 {
                     DrawFields(field, ph_Yposition, 0);
                 }
@@ -649,19 +657,7 @@ namespace ExpressBase.Objects
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
                     if (Groupheaders?.Count > 0)
-                        foreach (KeyValuePair<string, ReportGroupItem> grp in Groupheaders)
-                        {
-                            ReportGroupItem grpitem = grp.Value;
-                            string column_val = GetDataFieldValue(grpitem.field.ColumnName, iDetailRowPos, grpitem.field.TableIndex);
-                            if (grpitem.PreviousValue != column_val)
-                            {
-                                DrawGroupHeader(grpitem.order, iDetailRowPos);
-                                grpitem.PreviousValue = column_val;
-                                int i;
-                                for (i = grpitem.order + 1; i < Groupheaders.Count; i++)
-                                    Groupheaders.Values.ElementAt(i).PreviousValue = string.Empty;
-                            }
-                        }
+                        DrawGroup();
                     if (detailprintingtop < DT_FillHeight && DT_FillHeight - detailprintingtop >= DetailHeight)
                     {
                         DoLoopInDetail(iDetailRowPos);
@@ -672,6 +668,8 @@ namespace ExpressBase.Objects
                         DoLoopInDetail(iDetailRowPos);
                     }
                 }
+                if (GroupFooters?.Count > 0)
+                    EndGroups();
                 IsLastpage = true;
             }
             else
@@ -680,7 +678,33 @@ namespace ExpressBase.Objects
                 DoLoopInDetail(0);
             }
         }
+        public void DrawGroup()
+        {
+            foreach (KeyValuePair<string, ReportGroupItem> grp in Groupheaders)
+            {
+                ReportGroupItem grpitem = grp.Value;
+                string column_val = GetDataFieldValue(grpitem.field.ColumnName, iDetailRowPos, grpitem.field.TableIndex);
 
+                if (grpitem.PreviousValue != column_val)
+                {
+                    if (iDetailRowPos > 0)
+                        DrawGroupFooter(grpitem.order, iDetailRowPos);
+                    DrawGroupHeader(grpitem.order, iDetailRowPos);
+                    grpitem.PreviousValue = column_val;
+                    int i;
+                    for (i = grpitem.order + 1; i < Groupheaders.Count; i++)
+                        Groupheaders.Values.ElementAt(i).PreviousValue = string.Empty;
+                }
+            }
+        }
+        public void EndGroups()
+        {
+            foreach (EbReportGroup  grp in this.ReportGroups)
+            { 
+                DrawGroupFooter(grp.GroupFooter.Order, iDetailRowPos); 
+                detailEnd += ReportGroups[grp.GroupFooter.Order].GroupFooter.HeightPt;
+            }
+        }
         private Dictionary<EbReportDetail, EbDataField[]> __fieldsNotSummaryPerDetail = null;
         private Dictionary<EbReportDetail, EbDataField[]> FieldsNotSummaryPerDetail
         {
@@ -690,7 +714,7 @@ namespace ExpressBase.Objects
                 {
                     __fieldsNotSummaryPerDetail = new Dictionary<EbReportDetail, EbDataField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __fieldsNotSummaryPerDetail[detail] = detail.Fields.Where(x => (x is EbDataField && !(x is IEbDataFieldSummary))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
+                        __fieldsNotSummaryPerDetail[detail] = detail.GetFields().Where(x => (x is EbDataField && !(x is IEbDataFieldSummary))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
                 }
 
                 return __fieldsNotSummaryPerDetail;
@@ -706,7 +730,7 @@ namespace ExpressBase.Objects
                 {
                     __reportFieldsSortedPerDetail = new Dictionary<EbReportDetail, EbReportField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __reportFieldsSortedPerDetail[detail] = detail.Fields.OrderBy(o => o.Left).ToArray();
+                        __reportFieldsSortedPerDetail[detail] = detail.GetFields().OrderBy(o => o.Left).ToArray();
                 }
 
                 return __reportFieldsSortedPerDetail;
@@ -722,7 +746,7 @@ namespace ExpressBase.Objects
                     __reportFieldsSortedPerRFooter = new Dictionary<EbReportFooter, EbReportField[]>();
                     foreach (EbReportFooter _footer in ReportFooters)
                     {
-                        __reportFieldsSortedPerRFooter[_footer] = _footer.Fields.OrderBy(o => o.TopPt).ToArray();
+                        __reportFieldsSortedPerRFooter[_footer] = _footer.GetFields().OrderBy(o => o.TopPt).ToArray();
                     }
                 }
 
@@ -803,12 +827,21 @@ namespace ExpressBase.Objects
                 dt_Yposition = PageHeaderHeight + this.Margin.Top;
             }
 
-            foreach (EbReportField field in ReportGroups[order].GroupHeader.Fields)
+            foreach (EbReportField field in ReportGroups[order].GroupHeader.GetFields())
             {
                 DrawFields(field, dt_Yposition, serialnumber);
             }
             detailprintingtop += ReportGroups[order].GroupHeader.HeightPt;
             PreviousGheadersSlNo = serialnumber;
+        }
+
+        public void DrawGroupFooter(int order, int serialnumber)
+        {
+            foreach (EbReportField field in ReportGroups[order].GroupFooter.GetFields())
+            {
+                DrawFields(field, dt_Yposition, serialnumber);
+            }
+            detailprintingtop += ReportGroups[order].GroupFooter.HeightPt;            
         }
 
         public void DrawPageFooter()
@@ -822,7 +855,7 @@ namespace ExpressBase.Objects
             pf_Yposition = (float)detailEnd + /*DetailHeight +*/ dt_Yposition;
             foreach (EbPageFooter p_footer in PageFooters)
             {
-                foreach (EbReportField field in p_footer.Fields)
+                foreach (EbReportField field in p_footer.GetFields())
                 {
                     DrawFields(field, pf_Yposition, 0);
                 }
@@ -880,7 +913,7 @@ namespace ExpressBase.Objects
                 if (field is EbDataField)
                 {
                     EbDataField field_org = field as EbDataField;
-                    if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.Name))
+                    if (GroupSummaryFields.ContainsKey(field.Name) || PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.Name))
                         CallSummerize(field_org, serialnumber);
                     if (AppearanceScriptCollection.ContainsKey(field.Name))
                         RunAppearanceExpression(field_org, serialnumber);
@@ -1029,7 +1062,7 @@ namespace ExpressBase.Objects
                     refids.Add(DataSourceRefId);
             }
             foreach (EbReportDetail dt in Detail)
-                foreach (EbReportField field in dt.Fields)
+                foreach (EbReportField field in dt.GetFields())
                     if (field is EbDataField)
                     {
                         EbDataField fd_org = field as EbDataField;
@@ -1048,7 +1081,7 @@ namespace ExpressBase.Objects
 
             foreach (EbReportDetail dt in Detail)
             {
-                foreach (EbReportField field in dt.Fields)
+                foreach (EbReportField field in dt.GetFields())
                 {
                     if (field is EbDataField)
                     {
@@ -1121,7 +1154,7 @@ namespace ExpressBase.Objects
             if (SummaryValInRow.Count > 0)
                 foreach (string key in SummaryValInRow.Keys)
                 {
-                    globals["Summary"].Add(key, SummaryValInRow[key]);
+                    globals["Summary"].Add(key.Replace(".","_"), SummaryValInRow[key]);
                 }
         }
     }
@@ -1168,6 +1201,29 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public override string Width { get; set; }
+
+        private List<EbReportField> _list = null;
+        public List<EbReportField> GetFields()
+        {
+            if (_list == null)
+            {
+                _list = new List<EbReportField>();
+                foreach (EbReportField f in Fields)
+                {
+                    if (f is EbTable_Layout)
+                    {
+                        foreach (EbTableLayoutCell c in (f as EbTable_Layout).CellCollection)
+                        {
+                            foreach (EbReportField r in c.ControlCollection)
+                                _list.Add(r);
+                        }
+                    }
+                    else
+                        _list.Add(f);
+                }
+            }
+            return _list;
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
