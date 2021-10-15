@@ -85,7 +85,7 @@ namespace ExpressBase.Objects.Objects
             int summary_last_index = summary.Keys.Last();
             string total;
             for (int i = 0; i < _formattedTable.Rows.Count; i++)//filling consolidated data
-            { 
+            {
                 Row = _formattedTable.Rows[i];
                 int _id = (int)Row[PrimaryKeyColumnName];
                 if (_innerDict.ContainsKey(_id))
@@ -128,7 +128,8 @@ namespace ExpressBase.Objects.Objects
                     }
                     for (int k = 0; k < DataColumns.Count; k++)
                     {
-                        total += $"<div class='dataclass {DataColumns[k].Name}_class'>{Convert.ToDecimal(Totals[_id][k]).ToString("N", _user_culture.NumberFormat) }</div>";
+                        if (Totals[_id].Count > k)
+                            total += $"<div class='dataclass {DataColumns[k].Name}_class'>{Convert.ToDecimal(Totals[_id][k]).ToString("N", _user_culture.NumberFormat) }</div>";
                     }
                     Row["Total"] = total;
                 }
