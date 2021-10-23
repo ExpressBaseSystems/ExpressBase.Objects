@@ -267,20 +267,50 @@ namespace ExpressBase.Objects
                             }
                         }
 
-                        fullQuery += string.Format("SELECT id FROM {0} WHERE {5}{1}{6} = {5}@{1}_{2}{6} AND COALESCE({3}, {4}) = {4};",
-                            _table.TableName,
-                            _column.ColumnName,
-                            paramCounter,
-                            SysCols[SystemColumns.eb_del],
-                            SysCols.GetBoolFalse(SystemColumns.eb_del),
-                            _column.Control.EbDbType == EbDbTypes.String ? "LOWER(TRIM(" : string.Empty,
-                            _column.Control.EbDbType == EbDbTypes.String ? "))" : string.Empty);
+                        fullQuery += string.Format("SELECT id FROM {0} WHERE {5}{1}{6} = {5}@{1}_{2}{6} AND COALESCE({3}, {4}) = {4} AND id <> {7};",//check eb_ver_id here!
+                            _table.TableName,//0
+                            _column.ColumnName,//1
+                            paramCounter,//2
+                            SysCols[SystemColumns.eb_del],//3
+                            SysCols.GetBoolFalse(SystemColumns.eb_del),//4
+                            _column.Control.EbDbType == EbDbTypes.String ? "LOWER(TRIM(" : string.Empty,//5
+                            _column.Control.EbDbType == EbDbTypes.String ? "))" : string.Empty,//6
+                            WebForm.TableRowId);//7
                         Dbparams.Add(DataDB.GetNewParameter($"{_column.ColumnName}_{paramCounter++}", _column.Control.EbDbType, cField.Value));
                         UniqueCtrls.Add(_column.Control);
                         if (WebForm == MasterForm)
                             mstrFormCtrls++;
                     }
                 }
+            }
+
+            if (fullQuery != string.Empty)
+            {
+                EbDataSet ds;
+                if (DbCon == null)
+                    ds = DataDB.DoQueries(fullQuery, Dbparams.ToArray());
+                else
+                    ds = DataDB.DoQueries(DbCon, fullQuery, Dbparams.ToArray());
+
+                for (int i = 0; i < ds.Tables.Count; i++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0)
+                    {
+                        if (mstrFormCtrls > i)
+                            throw new FormException($"{UniqueCtrls[i].Label} must be unique", (int)HttpStatusCode.BadRequest, $"Value of {UniqueCtrls[i].Label} is not unique. Control name: {UniqueCtrls[i].Name}", "EbWebFormCollection -> ExecUniqueCheck");
+                        else
+                            throw new FormException($"{UniqueCtrls[i].Label} in data pusher must be unique", (int)HttpStatusCode.BadRequest, $"Value of {UniqueCtrls[i].Label} in data pusher is not unique. Control name: {UniqueCtrls[i].Name}", "EbWebFormCollection -> ExecUniqueCheck");
+                    }
+                }
+            }
+        }
+
+        public void ExecDGUniqueCheck()
+        {
+            foreach (EbWebForm WebForm in this)
+            {
+                if (WebForm.DataPusherConfig?.AllowPush == false)
+                    continue;
 
                 foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Grid))
                 {
@@ -302,26 +332,6 @@ namespace ExpressBase.Objects
                                     CheckDGUniqe(RowBkUp, _column, _table, Vals, WebForm);
                             }
                         }
-                    }
-                }
-            }
-
-            if (fullQuery != string.Empty)
-            {
-                EbDataSet ds;
-                if (DbCon == null)
-                    ds = DataDB.DoQueries(fullQuery, Dbparams.ToArray());
-                else
-                    ds = DataDB.DoQueries(DbCon, fullQuery, Dbparams.ToArray());
-
-                for (int i = 0; i < ds.Tables.Count; i++)
-                {
-                    if (ds.Tables[i].Rows.Count > 0)
-                    {
-                        if (mstrFormCtrls > i)
-                            throw new FormException($"{UniqueCtrls[i].Label} must be unique", (int)HttpStatusCode.BadRequest, $"Value of {UniqueCtrls[i].Label} is not unique. Control name: {UniqueCtrls[i].Name}", "EbWebFormCollection -> ExecUniqueCheck");
-                        else
-                            throw new FormException($"{UniqueCtrls[i].Label} in data pusher must be unique", (int)HttpStatusCode.BadRequest, $"Value of {UniqueCtrls[i].Label} in data pusher is not unique. Control name: {UniqueCtrls[i].Name}", "EbWebFormCollection -> ExecUniqueCheck");
                     }
                 }
             }
