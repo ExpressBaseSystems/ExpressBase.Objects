@@ -104,7 +104,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [Route("/table")]
     [Route("/table/data/{RefId}")]
     [DataContract]
-    public class TableDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
+    public class TableDataRequest : EbServiceStackAuthRequest, IReturn<DataSourceDataResponse>
     {
         [DataMember(Order = 0)]
         public string RefId { get; set; }
@@ -126,12 +126,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public string rToken { get; set; }
-
-        [DataMember(Order = 8)]
-        public string SolnId { get; set; }
-
-        [DataMember(Order = 9)]
-        public int UserId { get; set; }
 
         [DataMember(Order = 10)]
         public List<Param> Params { get; set; }
