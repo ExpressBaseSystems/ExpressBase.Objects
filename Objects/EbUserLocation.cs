@@ -27,13 +27,13 @@ namespace ExpressBase.Objects.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
-        [DefaultPropValue("eb_location_id")]
+        [DefaultPropValue("eb_loc_id")]
         //[PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
-        public bool  LoadCurrentLocation { get; set; }
-        
+        public bool LoadCurrentLocation { get; set; }
+
 
         public EbUserLocation()
         {
@@ -47,44 +47,44 @@ namespace ExpressBase.Objects.Objects
             get
             {
                 return @"
-                    var value =( $('#' + this.EbSid_CtxId+'_checkbox').prop('checked') ) ?  -1 : $('#' + this.EbSid_CtxId).val();
-                    if(value !== null)
-                        return value.toString();
-                    else
-                        return null;
-                ";
+let $c = $('#' + this.EbSid_CtxId);
+let allsld = $c.next('div').find('[value=multiselect-all').prop('checked');
+if (allsld && $c.attr('isglobal') === 'y')
+    return '-1';
+if ($c.val())
+    return $c.val().toString();
+return '';";
             }
             set { }
         }
 
-        
+
         [JsonIgnore]// roby
-        public override string OnChangeBindJSFn 
-        { 
-            get 
-            { 
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
                 return @"$('#' + this.EbSid_CtxId).on('change', p1);";
-            } 
-            set { } 
+            }
+            set { }
         }
 
-        public override string SetValueJSfn 
+        public override string SetValueJSfn
         {
             get
             {
                 return @"
-                    if(p1 !== '-1'){
-                        $('#' + this.EbSid_CtxId).next('div').children().find('.active').children().find('input').trigger('click');
-                        var arr = p1.split(',');
-                        $.each(arr, function(i, val){
-                            $('#' + this.EbSid_CtxId).next('div').children().find('[value='+val+']').trigger('click');
-                        }.bind(this));
-                    }
-                    else{
-                        $('#' + this.EbSid_CtxId).next('div').children().find('[value=multiselect-all]').trigger('click');
-                        $('#' + this.EbSid_CtxId+'_checkbox').prop('checked', true);                           
-                    }
-                ";
+let $c = $('#' + this.EbSid_CtxId);
+if (p1) {
+    if (p1 === '-1')
+        $c.multiselect('selectAll').multiselect('refresh');
+    else {
+        let ar = p1.split(',');
+        $c.val(ar).multiselect('refresh');
+    }
+}
+else
+    $c.val([]).multiselect('refresh');";
             }
             set { }
         }
@@ -101,37 +101,34 @@ namespace ExpressBase.Objects.Objects
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-user'></i><i class='fa fa-map-marker'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
 
-        public void InitFromDataBase(JsonServiceClient ServiceClient, User _user, Eb_Solution _sol, string ParentRefid)
+        public bool IsGlobalLocAvail { get; set; }
+
+        public void InitFromDataBase(User _user, Eb_Solution _sol, string ParentRefid)
         {
             string _html = string.Empty;
             try
             {
-                List<int> locations = (ParentRefid == null) ? new List<int> { -1} : _user.GetLocationsByObject(ParentRefid);
-                if (locations.Contains(-1))
+                if (_sol?.Locations == null)
                 {
-                    Console.WriteLine("Location: Only -1 " + locations.ToString());
-                    if (_sol == null)
-                    {
-                        Console.WriteLine("Solution null");
-                        throw new Exception("Solution null");
-                    }
-                    else
-                    {
-                        foreach (var key in _sol.Locations)
-                        {
-                            _html += string.Format("<option value='{0}'>{1}</option>", key.Value.LocId, key.Value.ShortName);
-                        }
-                    }
+                    Console.WriteLine("Solution/Locations is null");
+                    throw new Exception("Solution/Locations is null");
+                }
+                List<int> locList = (ParentRefid == null) ? new List<int> { -1 } : _user.GetLocationsByObject(ParentRefid);
+                List<KeyValuePair<int, string>> pairs = new List<KeyValuePair<int, string>>();
+                if (locList.Contains(-1))
+                {
+                    this.IsGlobalLocAvail = true;
+                    foreach (KeyValuePair<int, EbLocation> item in _sol.Locations)
+                        pairs.Add(new KeyValuePair<int, string>(item.Value.LocId, item.Value.ShortName));
                 }
                 else
                 {
-                    Console.WriteLine("===========ObjectId: " + ParentRefid + "Locations: ");
-                    foreach (int loc in locations)
-                    {
-                        Console.WriteLine(loc +":"+ _sol.Locations[loc].LocId +":"+ _sol.Locations[loc].ShortName + "=====");
-                        _html += string.Format("<option value='{0}'>{1}</option>", _sol.Locations[loc].LocId, _sol.Locations[loc].ShortName);
-                    }
+                    foreach (int loc in locList)
+                        pairs.Add(new KeyValuePair<int, string>(_sol.Locations[loc].LocId, _sol.Locations[loc].ShortName));
                 }
+                pairs.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
+                foreach (KeyValuePair<int, string> item in pairs)
+                    _html += $"<option value='{item.Key}'>{item.Value}</option>";
             }
             catch (Exception ex)
             {
@@ -158,13 +155,12 @@ namespace ExpressBase.Objects.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='multiselect-ui form-control' multiple='multiple'>
+        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='multiselect-ui form-control' multiple='multiple' isglobal='@IsGlobal@'>
             @options@
-        </select>
-        <div id='@ebsid@_checkbox_div'>
-        <input type='checkbox' id='@ebsid@_checkbox' value='-1' class='userloc-checkbox'>Global</div>"
+        </select>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@IsGlobal@", this.IsGlobalLocAvail ? "y" : "n")
 .Replace("@options@", this.OptionHtml)
 .Replace("@data-ebtype@", "16");
         }
