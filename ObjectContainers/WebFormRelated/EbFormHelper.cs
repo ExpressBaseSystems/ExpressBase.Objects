@@ -751,9 +751,9 @@ namespace ExpressBase.Objects
 
                     SimpleSelectColumn.DBareHtml = SimpleSelectColumn.EbSimpleSelect.GetBareHtml();
                 }
-                else if (control is EbUserLocation)
+                else if (control is EbUserLocation uloc)
                 {
-                    (control as EbUserLocation).InitFromDataBase(ServiceClient, WebForm_L.UserObj, WebForm_L.SolutionObj, WebForm_L.RefId);
+                    uloc.InitFromDataBase(WebForm_L.UserObj, WebForm_L.SolutionObj, WebForm_L.RefId);
                 }
                 else if ((control is EbRadioButton) && control.Name.Equals("eb_default"))
                 {

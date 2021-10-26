@@ -1885,6 +1885,8 @@ namespace ExpressBase.Objects
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, in_data);
+                Console.WriteLine("EbWebForm.Save.ExecUniqueCheck start");
+                this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
                 resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
@@ -1933,7 +1935,7 @@ namespace ExpressBase.Objects
             if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
-            this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
+            this.FormCollection.ExecDGUniqueCheck();
             this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
@@ -2064,7 +2066,7 @@ namespace ExpressBase.Objects
             if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
-            this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
+            this.FormCollection.ExecDGUniqueCheck();
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
