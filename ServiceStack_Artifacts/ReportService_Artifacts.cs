@@ -21,6 +21,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ReadingUserAuthId { get; set; }
 
         public List<Param> Params { get; set; }
+
+        public string BToken { get; set; }
+
+        public string RToken { get; set; }
     }
 
     [DataContract]
