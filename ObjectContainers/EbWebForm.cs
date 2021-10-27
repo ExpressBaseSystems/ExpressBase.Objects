@@ -1078,8 +1078,7 @@ namespace ExpressBase.Objects
                             Dictionary<string, List<object>> Rows = new Dictionary<string, List<object>>();
                             //Dictionary<int, string[]> Disp = new Dictionary<int, string[]>();//original
                             Dictionary<int, Dictionary<string, string>> DispM_dup = new Dictionary<int, Dictionary<string, string>>();//duplicate
-                            string[] temp = Convert.ToString(Column.Value).Split(",");
-                            int[] vms = Array.ConvertAll<string, int>(temp, int.Parse);
+                            int[] vms = Convert.ToString(Column.Value).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
                             SingleTable tbl = _FormData.PsDm_Tables[EbSid];
 
                             for (int i = 0; i < vms.Length; i++)
@@ -1565,8 +1564,8 @@ namespace ExpressBase.Objects
                     foreach (SingleRow Row in psTable)
                     {
                         string temp = this.AddPsParams(psCtrl, _FormData, DataDB, param, Row, ref p_i, psqry);
-                        int.TryParse(Convert.ToString(Row[psCtrl.Name]), out int x);
-                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, x.ToString(), true);
+                        int[] nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
+                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, nums.Join(","), true);
                         p_i++;
                         row_ids[psCtrl.EbSid].Add(Row.RowId);
                     }
@@ -1576,8 +1575,11 @@ namespace ExpressBase.Objects
                     List<string> vms = new List<string>();
                     foreach (SingleRow Row in psTable)
                     {
-                        if (Row[psCtrl.Name] != null && int.TryParse(Convert.ToString(Row[psCtrl.Name]), out int x))
-                            vms.Add(x.ToString());
+                        if (Row[psCtrl.Name] != null)
+                        {
+                            int[] nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
+                            vms.Add(nums.Join(","));
+                        }
                     }
                     if (ParamsList.Exists(e => e.Name == psCtrl.Name))
                     {
@@ -1592,8 +1594,8 @@ namespace ExpressBase.Objects
                 }
                 else if (psTable?.Count > 0)
                 {
-                    int.TryParse(Convert.ToString(psTable[0][psCtrl.Name]), out int x);
-                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, x.ToString(), false);
+                    int[] nums = Convert.ToString(psTable[0][psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, nums.Join(","), false);
                     row_ids[psCtrl.EbSid].Add(0);
                     this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
                 }
