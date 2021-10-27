@@ -253,7 +253,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             User user = null;
             try
             {
-                if (userAuthId != string.Empty)
+                if (!string.IsNullOrEmpty(userAuthId))
                 {
                     string[] parts = userAuthId.Split(":"); // iSolutionId:UserId:WhichConsole
                     if (parts.Length == 3)
@@ -262,7 +262,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                         if (user == null || forceUpdate)
                         {
                             Gateway.Send<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId = Convert.ToInt32(parts[1]), UserAuthId = userAuthId, WC = parts[2] });
-                            user = this.Redis.Get<User>(userAuthId);  
+                            user = this.Redis.Get<User>(userAuthId);
                         }
                     }
                     else

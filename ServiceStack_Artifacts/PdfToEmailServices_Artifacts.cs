@@ -19,7 +19,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Param> Params { get; set; }
 
         [DataMember(Order = 3)]
-        public string RefId { get; set; }
+        public string RefId { get; set; } 
+        
+        [DataMember(Order = 4)]
+        public string BToken { get; set; } 
+        
+        [DataMember(Order = 5)]
+        public string RToken { get; set; }
 
     }
     [DataContract]
@@ -33,6 +39,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order =3)]
         public string RefId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string BToken { get; set; }
+
+        [DataMember(Order = 5)]
+        public string RToken { get; set; }
     }
     public  class EmailAttachmenResponse
     {
