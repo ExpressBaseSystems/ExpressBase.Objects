@@ -1653,7 +1653,8 @@ namespace ExpressBase.Objects
                         continue;
                     }
                 }
-                param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), _psParam.ValueTo));
+                if (!EbFormHelper.IsExtraSqlParam(_psParam.Name, this.TableName))
+                    param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), _psParam.ValueTo));
             }
             return qry;
         }
