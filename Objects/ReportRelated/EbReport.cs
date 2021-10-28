@@ -699,9 +699,9 @@ namespace ExpressBase.Objects
         }
         public void EndGroups()
         {
-            foreach (EbReportGroup  grp in this.ReportGroups)
-            { 
-                DrawGroupFooter(grp.GroupFooter.Order, iDetailRowPos); 
+            foreach (EbReportGroup grp in this.ReportGroups)
+            {
+                DrawGroupFooter(grp.GroupFooter.Order, iDetailRowPos);
                 detailEnd += ReportGroups[grp.GroupFooter.Order].GroupFooter.HeightPt;
             }
         }
@@ -841,7 +841,7 @@ namespace ExpressBase.Objects
             {
                 DrawFields(field, dt_Yposition, serialnumber);
             }
-            detailprintingtop += ReportGroups[order].GroupFooter.HeightPt;            
+            detailprintingtop += ReportGroups[order].GroupFooter.HeightPt;
         }
 
         public void DrawPageFooter()
@@ -1025,7 +1025,7 @@ namespace ExpressBase.Objects
             Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser?.FullName ?? "Machine User" + ", " + timestamp);
             phrase.Font.Size = 6;
             phrase.Font.Color = BaseColor.Gray;
-            ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt -/* Margin.Right*/20 - Margin.Left) - /*Margin.Right*/20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - 20 - Margin.Left) - 20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
 
@@ -1154,7 +1154,7 @@ namespace ExpressBase.Objects
             if (SummaryValInRow.Count > 0)
                 foreach (string key in SummaryValInRow.Keys)
                 {
-                    globals["Summary"].Add(key.Replace(".","_"), SummaryValInRow[key]);
+                    globals["Summary"].Add(key.Replace(".", "_"), SummaryValInRow[key]);
                 }
         }
     }
