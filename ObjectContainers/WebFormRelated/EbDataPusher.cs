@@ -572,9 +572,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 _form.LocationId = _this.LocationId;
                 _form.AfterRedisGet_All(service);
                 TableSchema _table = _this.FormSchema.Tables.Find(e => e.ContainerName == batchDp.SourceDG);
-                SingleTable Tbl_t = _this.FormData.MultipleTables[_table.TableName];
-                SingleTable Table = new SingleTable() { ParentRowId = Tbl_t.ParentRowId, ParentTable = Tbl_t.ParentRowId };
-                Table.AddRange(Tbl_t.FindAll(e => !e.IsDelete));
+                SingleTable Table = _this.FormData.MultipleTables[_table.TableName];
                 SingleTable TableBkUp = in_data.MultipleTables.ContainsKey(_table.TableName) ? in_data.MultipleTables[_table.TableName] : null;
                 _form.DataPusherConfig = new EbDataPusherConfig()
                 {

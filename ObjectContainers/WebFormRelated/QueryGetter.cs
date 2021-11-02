@@ -191,7 +191,9 @@ SELECT
     {ebs[SystemColumns.eb_created_at]},
     {ebs[SystemColumns.eb_src_ver_id]},
     {ebs[SystemColumns.eb_ro]},
-    id    
+    {ebs[SystemColumns.eb_lastmodified_by]},
+    {ebs[SystemColumns.eb_lastmodified_at]},
+    id 
     {_cols},
     {conf.GridTableName}_id
 FROM
