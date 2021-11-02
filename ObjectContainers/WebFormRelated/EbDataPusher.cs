@@ -572,7 +572,9 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 _form.LocationId = _this.LocationId;
                 _form.AfterRedisGet_All(service);
                 TableSchema _table = _this.FormSchema.Tables.Find(e => e.ContainerName == batchDp.SourceDG);
-                SingleTable Table = _this.FormData.MultipleTables[_table.TableName];
+                SingleTable Tbl_t = _this.FormData.MultipleTables[_table.TableName];
+                SingleTable Table = new SingleTable() { ParentRowId = Tbl_t.ParentRowId, ParentTable = Tbl_t.ParentRowId };
+                Table.AddRange(Tbl_t.FindAll(e => !e.IsDelete));
                 SingleTable TableBkUp = in_data.MultipleTables.ContainsKey(_table.TableName) ? in_data.MultipleTables[_table.TableName] : null;
                 _form.DataPusherConfig = new EbDataPusherConfig()
                 {
@@ -869,7 +871,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                                 if (_co.Contains($"form.{_table.ContainerName}.GetEnumerator()"))
                                 {
                                     if (this.WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
-                                        dupliCount = this.WebForm.FormData.MultipleTables[_table.TableName].Count;
+                                        dupliCount = this.WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => !e.IsDelete).Count;
                                     break;
                                 }
                             }
@@ -893,6 +895,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             }
         }
 
+        //ApiDataPusher
         public string GetProcessedCode()
         {
             this.CodeDict = new Dictionary<int, string>();
