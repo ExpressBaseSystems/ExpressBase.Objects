@@ -388,7 +388,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if ((_ctrl.Pattern == null || string.IsNullOrWhiteSpace(_ctrl.Pattern.sPattern)) &&
                         (string.IsNullOrEmpty(_ctrl.Script?.Code) || (_ctrl.Script?.Lang != ScriptingLanguage.CSharp && _ctrl.Script?.Lang != ScriptingLanguage.SQL)))
                         throw new FormException($"Please enter a valid pattern or script for AutoId control.");
-                    if (_ctrl.Pattern.PrefixLength <= 0 && _ctrl.Script.Lang == ScriptingLanguage.SQL && string.IsNullOrWhiteSpace(_ctrl.Script.Code))
+                    if (_ctrl.Pattern.PrefixLength <= 0 && _ctrl.Script?.Lang == ScriptingLanguage.SQL && string.IsNullOrWhiteSpace(_ctrl.Script?.Code))
                         throw new FormException($"Please enter a valid PrefixLength for AutoId control.");
                     if (_ctrl.Pattern.SerialLength <= 0)
                         throw new FormException($"Please enter a valid SerialLength for AutoId control.");
