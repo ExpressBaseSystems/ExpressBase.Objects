@@ -154,9 +154,13 @@ namespace ExpressBase.Objects
                         fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }
                 }
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+                string IdParamName = WebForm.TableName + FormConstants._id + (WebForm.DataPusherConfig != null ? WebForm.CrudContext : string.Empty);
+                param.Add(DataDB.GetNewParameter(IdParamName, EbDbTypes.Int32, WebForm.TableRowId));
+                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
+                {
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+                }
             }
             args.CopyBack(ref _extqry, ref i);
         }
