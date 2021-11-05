@@ -191,7 +191,9 @@ SELECT
     {ebs[SystemColumns.eb_created_at]},
     {ebs[SystemColumns.eb_src_ver_id]},
     {ebs[SystemColumns.eb_ro]},
-    id    
+    {ebs[SystemColumns.eb_lastmodified_by]},
+    {ebs[SystemColumns.eb_lastmodified_at]},
+    id 
     {_cols},
     {conf.GridTableName}_id
 FROM
@@ -550,12 +552,14 @@ VALUES (
                 // if isDel is true then consider lines table also
                 string parentTbl = _this.TableName;
                 string pushIdChk = string.Empty;
+                string cxt = _this.CrudContext;
                 if (tblName.Equals(_this.TableName))
                 {
+                    cxt = string.Empty;
                     parentTbl = conf.SourceTable;
                     pushIdChk = conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{conf.MultiPushId}'";
                 }
-                _qry = string.Format("UPDATE {0} SET {8} {1} = @eb_modified_by, {2} = {3} WHERE id = {9} AND {4}_id = @{4}_id AND COALESCE({5}, {6}) = {6} {7}; ",
+                _qry = string.Format("UPDATE {0} SET {8} {1} = @eb_modified_by, {2} = {3} WHERE id = {10} AND {4}_id = @{4}_id{9} AND COALESCE({5}, {6}) = {6} {7}; ",
                     tblName,//0
                     ebs[SystemColumns.eb_lastmodified_by],//1
                     ebs[SystemColumns.eb_lastmodified_at],//2
@@ -564,7 +568,8 @@ VALUES (
                     ebs[SystemColumns.eb_del],//5
                     ebs.GetBoolFalse(SystemColumns.eb_del),//6
                     pushIdChk,//7
-                    isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",
+                    isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",//8
+                    cxt,//9
                     "{1}");
             }
             return _qry;
@@ -644,7 +649,7 @@ VALUES
             }
             else
             {
-                parentTblChk = $"{_this.TableName}_id = @{_this.TableName}_id AND id = {id} AND";
+                parentTblChk = $"{_this.TableName}_id = {_this.TableRowId} AND id = {id} AND";
                 pushIdChk = string.Empty;
             }
 

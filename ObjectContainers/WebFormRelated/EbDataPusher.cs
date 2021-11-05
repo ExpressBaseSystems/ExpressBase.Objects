@@ -869,7 +869,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                                 if (_co.Contains($"form.{_table.ContainerName}.GetEnumerator()"))
                                 {
                                     if (this.WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
-                                        dupliCount = this.WebForm.FormData.MultipleTables[_table.TableName].Count;
+                                        dupliCount = this.WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => !e.IsDelete).Count;
                                     break;
                                 }
                             }
@@ -893,6 +893,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             }
         }
 
+        //ApiDataPusher
         public string GetProcessedCode()
         {
             this.CodeDict = new Dictionary<int, string>();

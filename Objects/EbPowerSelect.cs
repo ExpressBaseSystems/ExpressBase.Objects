@@ -626,17 +626,24 @@ else// PS
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public override bool Index { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.VALUE)]
+        [Alias("Refresh Dependency")]
+        public bool RefreshDpndcy { get; set; }
+
         private string VueSelectcode
         {
             get
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
+                int btnWdth = this.IsInsertable ? 25 : 0;
+                btnWdth += this.RefreshDpndcy ? 25 : 0;
                 string rs = @"
 <div id='@ebsid@srch_Wraper' class='search-wraper' data-toggle='tooltip' @addBtnRealtedWidthChange@ title='@tooltipText@'>
     <div class='input-group'>
         <div class='search-block-wraper'>"
-.Replace("@addBtnRealtedWidthChange@", IsInsertable ? "style='width: calc( 100% - 32px)'" : string.Empty);
+.Replace("@addBtnRealtedWidthChange@", btnWdth > 0 ? $"style='width: calc( 100% - {btnWdth}px)'" : string.Empty);
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
@@ -748,6 +755,7 @@ else// PS
                 return @"
 <div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;' form-link='@form-link@'>    
     @addbtn@
+    @rfshbtn@
     <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
     <center class='pow-center'>
@@ -766,6 +774,7 @@ else// PS
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
     .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn' id='" + EbSid_CtxId + "_addbtn'><i class='fa fa-plus' aria-hidden='true'></i></div>") : string.Empty)
+    .Replace("@rfshbtn@", this.RefreshDpndcy ? string.Concat("<div class='ps-rfshbtn' id='" + EbSid_CtxId + $"_rfshbtn' {(this.IsInsertable ? "style='right: 25px;'" : "")}><i class='fa fa-refresh' aria-hidden='true'></i></div>") : string.Empty)
     .Replace("@tooltipText@", this.ToolTipText ?? string.Empty)
     .Replace("@form-link@", string.IsNullOrWhiteSpace(this.FormRefId) ? "false" : "true");
             }

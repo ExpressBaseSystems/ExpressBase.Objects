@@ -352,6 +352,8 @@ namespace ExpressBase.Objects.WebFormRelated
             Dictionary<string, object> Metas = null;
             foreach (SingleRow Row in Table)
             {
+                if (Row.IsDelete)
+                    continue;
                 FG_Row fG_Row = new FG_Row() { id = Convert.ToInt32(Row[FormConstants.id]) };
                 foreach (EbControl _control in DG.Controls)
                 {
