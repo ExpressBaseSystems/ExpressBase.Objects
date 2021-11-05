@@ -34,7 +34,7 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.EmailBuilder)]
     [BuilderTypeEnum(BuilderType.EmailBuilder)]
-    public class EbEmailTemplate : EbEmailTemplateBase,IEBRootObject
+    public class EbEmailTemplate : EbEmailTemplateBase, IEBRootObject
     {
         public bool HideInMenu { get; set; }
 
@@ -60,7 +60,7 @@ namespace ExpressBase.Objects
         public override string Status { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
-        public EmailPriority Priority { get; set; }      
+        public EmailPriority Priority { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [HideInPropertyGrid]
@@ -77,6 +77,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [HideInPropertyGrid]
         public string Bcc { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
+        public string ReplyTo { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [JsonConverter(typeof(Base64Converter))]
@@ -206,5 +210,5 @@ namespace ExpressBase.Objects
         }
     }
     /// related to property grid
- public class StringList: List<string> { }
+    public class StringList : List<string> { }
 }

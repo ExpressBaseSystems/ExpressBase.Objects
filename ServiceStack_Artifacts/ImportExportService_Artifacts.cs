@@ -1,5 +1,8 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
+using Microsoft.AspNetCore.Http;
 using ServiceStack;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -8,7 +11,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ExportApplicationMqRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
         [DataMember(Order = 1)]
-        public Dictionary<int,List<string>> AppCollection { get; set; }
+        public Dictionary<int, List<string>> AppCollection { get; set; }
 
         [DataMember(Order = 2)]
         public string PackageName { get; set; }
@@ -67,6 +70,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public bool IsDemoApp { get; set; }
+
+        [DataMember(Order = 3)]
+        public ExportPackage Package { get; set; }
     }
 
     public class ImportApplicationRequest : EbMqRequest
@@ -82,6 +88,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string SubscriptionId { get; set; }
+
+        [DataMember(Order = 5)]
+        public ExportPackage Package { get; set; }
     }
 
     public class ImportApplicationResponse : IEbSSResponse

@@ -44,7 +44,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string BToken { get; set; }
 
         [DataMember(Order = 5)]
-        public string RToken { get; set; }
+        public string RToken { get; set; } 
+        
+        [DataMember(Order = 6)]
+        public string ReplyTo { get; set; }
     }
     public  class EmailAttachmenResponse
     {

@@ -1,14 +1,12 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Messaging;
 using ExpressBase.Objects.Objects.SmsRelated;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Text;
-using Twilio.Rest.Api.V2010.Account;
-using Twilio.Types;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -118,48 +116,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbSmsTemplate SmsTemplate { get; set; }
     }
 
-    [DataContract]
-    public class SMSSentStatus : EbServiceStackAuthRequest
-    {
-        [DataMember(Order = 1)]
-        public string To { get; set; }
 
-        [DataMember(Order = 2)]
-        public string From { get; set; }
-
-        [DataMember(Order = 3)]
-        public string MessageId { get; set; }
-
-        [DataMember(Order = 4)]
-        public string Body { get; set; }
-
-        [DataMember(Order = 5)]
-        public string Status { get; set; }
-
-        [DataMember(Order = 6)]
-        public DateTime SentTime { get; set; }
-
-        [DataMember(Order = 7)]
-        public DateTime ReceivedTime { get; set; }
-
-        [DataMember(Order = 8)]
-        public string ErrorMessage { get; set; }
-
-        [DataMember(Order = 9)]
-        public string Uri { get; set; }
-
-        [DataMember(Order = 10)]
-        public string Result { get; set; }
-
-        [DataMember(Order = 11)]
-        public int ConId { get; set; }
-
-    }
     [DataContract]
     public class SMSStatusLogMqRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
-        public SMSSentStatus SMSSentStatus { get; set; }
+        public SentStatus SentStatus { get; set; }
 
         [DataMember(Order = 2)]
         public string RefId { get; set; }
@@ -197,7 +159,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class RetrySmsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public ResponseStatus ResponseStatus { get; set; }       
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     public class RetrySmsRequest : EbServiceStackAuthRequest, IReturn<RetrySmsResponse>
