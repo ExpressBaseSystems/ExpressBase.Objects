@@ -485,7 +485,7 @@ WHERE
             //}
             else
             {
-                string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"@{_this.TableName}_id";
+                string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"@{_this.TableName}_id" + (conf == null ? string.Empty : _this.CrudContext);
                 _qry = $@"
 INSERT INTO {tblName} (
     {{0}} 
