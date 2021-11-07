@@ -34,6 +34,8 @@ namespace ExpressBase.Objects.Objects
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
         public bool LoadCurrentLocation { get; set; }
 
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
+        public bool TryToLoadGlobal { get; set; }
 
         public EbUserLocation()
         {
