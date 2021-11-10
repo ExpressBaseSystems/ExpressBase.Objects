@@ -44,6 +44,20 @@ namespace ExpressBase.Objects
         [PropDataSourceJsFn("return ebcontext.SupportingDataDB")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public int DataStore { get; set; }
+
+        public IDatabase GetDatastore(EbConnectionFactory EbConFactory)
+        {
+            IDatabase db;
+
+            if (EbConFactory.DataDB.ConId == this.DataStore)
+                db = EbConFactory.DataDB;
+            else if (EbConFactory.SupportingDataDB != null && EbConFactory.SupportingDataDB.TryGetValue(this.DataStore, out IDatabase supportDb))
+                db = supportDb;
+            else
+                db = EbConFactory.DataDB;
+
+            return db;
+        }
     }
 
     [BuilderTypeEnum(BuilderType.DataReader)]
