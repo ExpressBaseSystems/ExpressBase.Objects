@@ -1873,7 +1873,7 @@ namespace ExpressBase.Objects
                     //    throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
 
                     if (this.IsDisable)
-                        throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly form", "EbWebForm -> Save");
+                        throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, $"ReadOnly form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", "EbWebForm -> Save");
 
                     this.TableRowId = this.Insert(DataDB, service, true);
                     resp = "Inserted: " + this.TableRowId;
@@ -1923,7 +1923,7 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
-                throw new FormException("Exception in Form data save", (int)HttpStatusCode.InternalServerError, ex1.Message, ex1.StackTrace);
+                throw new FormException(FormErrors.E0130 + ex1.Message, (int)HttpStatusCode.InternalServerError, $"Exception in save form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", ex1.StackTrace);
             }
             this.DbConnection.Close();
             return resp;
