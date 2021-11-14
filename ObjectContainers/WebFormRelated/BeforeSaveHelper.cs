@@ -401,6 +401,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
         private static void PerformRequirdUpdate(EbControlContainer _cont, string _tbl)
         {
+            if (_cont is EbDataGrid _dg)
+                _dg.AdjustColumnWidth();
+
             if (_cont is EbDataGrid && _cont.IsDynamicTabChild)
             {
                 _cont.IsDynamicTabChild = false;

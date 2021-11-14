@@ -284,6 +284,27 @@ else {
             this.Eb__paramControls = _params;
         }
 
+        public void AdjustColumnWidth()
+        {
+            this.Controls.Where(e => (e as EbDGColumn).Width <= 0).ToList().ForEach(e => (e as EbDGColumn).Width = 10);
+            int widthSum = this.Controls.Where(e => !e.Hidden).Select(e => (e as EbDGColumn).Width).Sum();
+            if (widthSum == 100)//if sum of width is 100%
+                return;
+            int perSum = 0;
+            EbDGColumn lastCtrl = null;
+            foreach (EbDGColumn column in this.Controls)
+            {
+                if (!column.Hidden)
+                {
+                    column.Width = column.Width * 100 / widthSum;
+                    perSum += column.Width;
+                    lastCtrl = column;
+                }
+            }
+            if (lastCtrl != null && perSum < 100)
+                lastCtrl.Width = lastCtrl.Width + 100 - perSum;
+        }
+
         //Deprecated
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -304,12 +325,14 @@ else {
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>  
-                <th class='slno' style='width:32px'><span class='grid-col-title'>#</span></th>"
+                <th class='slno' style='width:30px'><span class='grid-col-title'>#</span></th>"
 .Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0' title='Add Row (Alt+R)'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty); ;
+            EbDGColumn lastCtrl = (EbDGColumn)Controls.FindLast(e => !e.Hidden);
+            this.AdjustColumnWidth();
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th class='ppbtn-cont ebResizable dg-th' ebsid='@ebsid@' name='@name@' style='width: @Width@; @type@ title='", col.Title, @"'>
+                    html += string.Concat("<th class='ppbtn-cont ebResizable dg-th' ebsid='@ebsid@' name='@name@' style='width: @Width@; display: inline-block;' @type@ title='", col.Title, @"'>
                                                 <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
                                                 <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
                                                 <div id='@ebsid@Lblic' tabindex='-1' class='label-infoCont'></div>
@@ -319,12 +342,13 @@ else {
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.IsRenderMode && col.IsDynamicTabChild ? "@" + col.EbSid_CtxId + "_ebsid@" : col.EbSid)
                         .Replace("@name@", col.Name)
-                        .Replace("@Width@", (col.Width <= 0 || (Controls[Controls.Count - 1] == col)) ? "auto" : col.Width.ToString() + "%")
+                        //.Replace("@Width@", lastCtrl == col ? $"calc({col.Width}% - 60px)" : $"{ col.Width}%")
+                        .Replace("@Width@", $"{col.Width}%")
                         .Replace("@type@", "type = '" + col.ObjType + "'");
             }
 
             html += @"
-                <th class='ctrlth'><span class='fa fa fa-cog'></span></th>
+                <th class='ctrlth' style='width:40px'><span class='fa fa fa-cog'></span></th>
               </tr>
             </thead>
         </table>
