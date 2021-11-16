@@ -392,7 +392,7 @@ WHERE
 
         public static string GetInsertQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
         {
-            string _qry;
+            string _qry = string.Empty;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             EbDataPusherConfig conf = _this.DataPusherConfig;
             string currencyCols = string.Empty, currencyVals = string.Empty;
@@ -413,8 +413,9 @@ WHERE
                 if (conf == null)
                 {
                     if (_this.AutoId != null)
-                        _qry = $"LOCK ${_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
-                    _qry = string.Format("INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({19} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
+                        _qry = $"LOCK TABLE {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
+
+                    _qry += string.Format("INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({19} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
