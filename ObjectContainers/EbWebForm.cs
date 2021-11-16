@@ -1850,14 +1850,10 @@ namespace ExpressBase.Objects
         public string Save(EbConnectionFactory EbConFactory, Service service, string wc)
         {
             IDatabase DataDB = EbConFactory.DataDB;
-            this.DbConnection = DataDB.GetNewConnection();
             string resp;
             try
             {
                 WebformData in_data = JsonConvert.DeserializeObject<WebformData>(JsonConvert.SerializeObject(this.FormData));
-                this.DbConnection.Open();
-                this.DbTransaction = this.DbConnection.BeginTransaction();
-
                 this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
@@ -1865,6 +1861,11 @@ namespace ExpressBase.Objects
                     string ts = this.FormData.ModifiedAt;
                     this.RefreshFormData(DataDB, service, true, true);
                     CheckConstraints(wc, false, ts);
+
+                    this.DbConnection = DataDB.GetNewConnection();
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+
                     resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
@@ -1874,6 +1875,10 @@ namespace ExpressBase.Objects
 
                     if (this.IsDisable)
                         throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, $"ReadOnly form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", "EbWebForm -> Save");
+
+                    this.DbConnection = DataDB.GetNewConnection();
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
 
                     this.TableRowId = this.Insert(DataDB, service, true);
                     resp = "Inserted: " + this.TableRowId;
@@ -1925,7 +1930,8 @@ namespace ExpressBase.Objects
                 }
                 throw new FormException(FormErrors.E0130 + ex1.Message, (int)HttpStatusCode.InternalServerError, $"Exception in save form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", ex1.StackTrace);
             }
-            this.DbConnection.Close();
+            if (this.DbConnection != null)
+                this.DbConnection.Close();
             return resp;
         }
 
