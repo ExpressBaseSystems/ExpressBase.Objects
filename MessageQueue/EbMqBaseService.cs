@@ -155,7 +155,7 @@ namespace ExpressBase.Objects.Services
                         user = this.Redis.Get<User>(userAuthId);
                         if (user == null || forceUpdate)
                         {
-                            this.ServiceStackClient.Post<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId = Convert.ToInt32(parts[1]), UserAuthId = userAuthId, WC = parts[2] });
+                            this.Gateway.Send<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId = Convert.ToInt32(parts[1]), UserAuthId = userAuthId, WC = parts[2] });
                             user = this.Redis.Get<User>(userAuthId);
                         }
                     }
