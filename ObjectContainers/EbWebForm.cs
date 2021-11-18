@@ -1564,21 +1564,21 @@ namespace ExpressBase.Objects
                     foreach (SingleRow Row in psTable)
                     {
                         string temp = this.AddPsParams(psCtrl, _FormData, DataDB, param, Row, ref p_i, psqry);
-                        int[] nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
-                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, nums.Join(","), true);
+                        List<int> nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, nums);
                         p_i++;
                         row_ids[psCtrl.EbSid].Add(Row.RowId);
                     }
                 }
                 else if (psCtrl is EbDGPowerSelectColumn && psTable?.Count > 0)
                 {
-                    List<string> vms = new List<string>();
+                    List<int> vms = new List<int>();
                     foreach (SingleRow Row in psTable)
                     {
                         if (Row[psCtrl.Name] != null)
                         {
-                            int[] nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
-                            vms.Add(nums.Join(","));
+                            List<int> nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                            vms.AddRange(nums);
                         }
                     }
                     if (ParamsList.Exists(e => e.Name == psCtrl.Name))
@@ -1588,14 +1588,14 @@ namespace ExpressBase.Objects
                         if (psqry.Contains("@" + psCtrl.Name))
                             psqry = psqry.Replace("@" + psCtrl.Name, $"ANY(STRING_TO_ARRAY('{vms.Join(",")}', ',')::INT[])");
                     }
-                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, vms.Join(","), false);
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, vms);
                     row_ids[psCtrl.EbSid].Add(0);
                     this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
                 }
                 else if (psTable?.Count > 0)
                 {
-                    int[] nums = Convert.ToString(psTable[0][psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
-                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, nums.Join(","), false);
+                    List<int> nums = Convert.ToString(psTable[0][psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, nums);
                     row_ids[psCtrl.EbSid].Add(0);
                     this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
                 }
@@ -1605,12 +1605,17 @@ namespace ExpressBase.Objects
             return psquery_all;
         }
 
-        private string GetPsDmSelectQuery(string psqry, IEbPowerSelect ipsCtrl, string vms, bool isStrict)
+        private string GetPsDmSelectQuery(string psqry, IEbPowerSelect ipsCtrl, List<int> vmArr)
         {
-            if (!(!ipsCtrl.MultiSelect && isStrict))
-                vms = $"ANY(STRING_TO_ARRAY('{vms}', ',')::INT[])";
+            string vms;
+            vmArr = vmArr.Distinct().ToList();
+            if (vmArr.Count == 0)
+                vms = "0";
+            else if (vmArr.Count == 1)
+                vms = $"{vmArr[0]}";
             else
-                vms = $"{vms}";
+                vms = $"ANY(STRING_TO_ARRAY('{vmArr.Join(",")}', ',')::INT[])";
+
             return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms};";
         }
 

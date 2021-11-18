@@ -232,10 +232,12 @@ namespace ExpressBase.Objects
 (({1}) || 
   COALESCE
   (
-    (SELECT LPAD((SUBSTRING(MAX({0}) FROM {5} FOR {2}) :: INTEGER + 1) :: TEXT, {2}, '0') 
+    (
+      SELECT LPAD((SUBSTRING(MAX({0}) FROM {5} FOR {2}) :: INTEGER + 1) :: TEXT, {2}, '0') 
       FROM {3} 
       WHERE {0} LIKE ({4}) AND 
-      LENGTH(REGEXP_REPLACE(SUBSTRING({0} FROM {5} FOR {2}), '\\D','','g')) = {2}), 
+      SUBSTRING({0} FROM {5} FOR {2}) ~ '^\d+$'
+    ), 
     LPAD('1', {2}, '0')
   )
 ),".RemoveCR(),
