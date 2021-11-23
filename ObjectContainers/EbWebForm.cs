@@ -966,7 +966,8 @@ namespace ExpressBase.Objects
                     for (int k = 0; k < _table.Columns.Count; k++)
                     {
                         EbControl _control = _table.Columns[k].Control;
-                        this.GetFormattedColumn(dataTable.Columns[_control.Name.ToLower()], dataRow, Row, _control);// card field has uppercase name, but datatable contains lower case column name
+                        string ctrlName = _control.IsSysControl ? ebs[_control.Name.ToLower()] : _control.Name.ToLower();// card field has uppercase name, but datatable contains lower case column name
+                        this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control);
                         if (_control is EbPhone && (_control as EbPhone).Sendotp)
                             (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
                     }

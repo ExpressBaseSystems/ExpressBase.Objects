@@ -52,7 +52,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl));
                 if (_columns.Count() > 0)
                 {
-                    _cols += ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+                    _cols += ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
                     IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
                     if (_ph_cols.Count() > 0)
                         _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
@@ -135,7 +135,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
                 IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl);
                 if (_columns.Count() > 0)
-                    _cols += ", " + string.Join(", ", _columns.Select(x => x.ColumnName));
+                    _cols += ", " + string.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
 
                 query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id AND {3}_id = @{3}_id AND COALESCE({4}, {6}) = {6} {5}; ",
                     _cols,
@@ -170,7 +170,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl);
                 if (_columns.Count() > 0)
                 {
-                    _cols = ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+                    _cols = ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
                     IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
                     if (_ph_cols.Count() > 0)
                         _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
