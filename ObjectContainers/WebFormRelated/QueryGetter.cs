@@ -49,7 +49,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_table.TableType == WebFormTableTypes.Grid)
                     _cols = $"{ebs[SystemColumns.eb_loc_id]}, id, {ebs[SystemColumns.eb_row_num]}";
 
-                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl));
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
                 if (_columns.Count() > 0)
                 {
                     _cols += ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
@@ -133,7 +133,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     ebs[SystemColumns.eb_loc_id],
                     ebs[SystemColumns.eb_row_num]);
 
-                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl);
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
                 if (_columns.Count() > 0)
                     _cols += ", " + string.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
 
@@ -167,7 +167,7 @@ namespace ExpressBase.Objects.WebFormRelated
             foreach (TableSchema _table in _this.FormSchema.Tables)
             {
                 string _cols = string.Empty;
-                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl);
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
                 if (_columns.Count() > 0)
                 {
                     _cols = ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));

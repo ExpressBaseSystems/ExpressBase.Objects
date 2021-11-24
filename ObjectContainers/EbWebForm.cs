@@ -960,14 +960,14 @@ namespace ExpressBase.Objects
                 SingleRow Row = new SingleRow() { RowId = _rowId, LocId = _locId };
                 if (_table != null)
                 {
-                    this.GetFormattedColumn(dataTable.Columns[FormConstants.id], dataRow, Row, null);
+                    this.GetFormattedColumn(dataTable.Columns[FormConstants.id], dataRow, Row, null, null);
                     if (_table.TableType == WebFormTableTypes.Grid)
-                        this.GetFormattedColumn(dataTable.Columns[ebs[SystemColumns.eb_row_num]], dataRow, Row, null);
+                        this.GetFormattedColumn(dataTable.Columns[ebs[SystemColumns.eb_row_num]], dataRow, Row, null, null);
                     for (int k = 0; k < _table.Columns.Count; k++)
                     {
                         EbControl _control = _table.Columns[k].Control;
                         string ctrlName = _control.IsSysControl ? ebs[_control.Name.ToLower()] : _control.Name.ToLower();// card field has uppercase name, but datatable contains lower case column name
-                        this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control);
+                        this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control, _table);
                         if (_control is EbPhone && (_control as EbPhone).Sendotp)
                             (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
                     }
@@ -976,21 +976,21 @@ namespace ExpressBase.Objects
                 {
                     for (int k = 0; k < dataTable.Columns.Count; k++)
                     {
-                        this.GetFormattedColumn(dataTable.Columns[k], dataRow, Row, null);
+                        this.GetFormattedColumn(dataTable.Columns[k], dataRow, Row, null, null);
                     }
                 }
                 Table.Add(Row);
             }
         }
 
-        private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control)
+        private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control, TableSchema _table)
         {
             if (dataColumn == null && _control == null)
                 throw new FormException("Something went wrong in our end", (int)HttpStatusCode.InternalServerError, "EbWebForm.GetFormattedColumn: dataColumn and _control is null", "RowId: " + Row.RowId);
 
             if (_control != null)
             {
-                if ((_control.DoNotPersist && !_control.IsSysControl) || dataColumn == null)
+                if ((_control.DoNotPersist && !_control.IsSysControl && _table.TableType != WebFormTableTypes.Review) || dataColumn == null)
                     Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
                 else
                 {
