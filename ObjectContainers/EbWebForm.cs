@@ -963,13 +963,20 @@ namespace ExpressBase.Objects
                     this.GetFormattedColumn(dataTable.Columns[FormConstants.id], dataRow, Row, null, null);
                     if (_table.TableType == WebFormTableTypes.Grid)
                         this.GetFormattedColumn(dataTable.Columns[ebs[SystemColumns.eb_row_num]], dataRow, Row, null, null);
-                    for (int k = 0; k < _table.Columns.Count; k++)
+                    if (_table.TableType == WebFormTableTypes.Review)
                     {
-                        EbControl _control = _table.Columns[k].Control;
-                        string ctrlName = _control.IsSysControl ? ebs[_control.Name.ToLower()] : _control.Name.ToLower();// card field has uppercase name, but datatable contains lower case column name
-                        this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control, _table);
-                        if (_control is EbPhone && (_control as EbPhone).Sendotp)
-                            (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                        this.GetFormattedReview(dataTable, dataRow, Row, _table);
+                    }
+                    else
+                    {
+                        for (int k = 0; k < _table.Columns.Count; k++)
+                        {
+                            EbControl _control = _table.Columns[k].Control;
+                            string ctrlName = _control.IsSysControl ? ebs[_control.Name.ToLower()] : _control.Name.ToLower();// card field has uppercase name, but datatable contains lower case column name
+                            this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control, _table);
+                            if (_control is EbPhone && (_control as EbPhone).Sendotp)
+                                (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                        }
                     }
                 }
                 else
@@ -980,6 +987,27 @@ namespace ExpressBase.Objects
                     }
                 }
                 Table.Add(Row);
+            }
+        }
+
+        private void GetFormattedReview(EbDataTable dataTable, EbDataRow dataRow, SingleRow Row, TableSchema _table)
+        {
+            for (int k = 0; k < _table.Columns.Count; k++)
+            {
+                EbControl _control = _table.Columns[k].Control;
+                if (_control.Name == FormConstants.eb_created_by)
+                {
+                    _control = new EbDGCreatedByColumn() { Name = FormConstants.eb_created_by, EbDbType = EbDbTypes.Decimal, DoNotPersist = true };
+                    EbDataColumn dataColumn = dataTable.Columns[_control.Name];
+                    object val = dataRow[dataColumn.ColumnIndex];
+                    if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                        val = null;
+                    SingleColumn Col = _control.GetSingleColumn(this.UserObj, this.SolutionObj, val, false);
+                    Col.Name = FormConstants.eb_created_by;
+                    Row.Columns.Add(Col);
+                }
+                else
+                    this.GetFormattedColumn(dataTable.Columns[_control.Name], dataRow, Row, _control, _table);
             }
         }
 
