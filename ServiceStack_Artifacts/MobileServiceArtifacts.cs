@@ -154,6 +154,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 7)]
         public bool IsPowerSelect { set; get; }
 
+        [DataMember(Order = 8)]
+        public bool NoWrap { set; get; }
+
         public MobileVisDataRequest()
         {
             Params = new List<Param>();
@@ -313,7 +316,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class EbMobileSolutionData 
+    public class EbMobileSolutionData
     {
         [DataMember(Order = 1)]
         public List<AppDataToMob> Applications { set; get; }
