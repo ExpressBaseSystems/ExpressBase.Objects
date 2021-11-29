@@ -42,6 +42,13 @@ namespace ExpressBase.Objects
         [Alias("Web Form")]
         [PropertyGroup("Core")]
         public string WebFormRefId { set; get; }
+               
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        [Alias("Print Documents")]
+        [PropertyGroup("Core")]
+        public List<ObjectBasicInfo> PrintDocs { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]

@@ -1044,27 +1044,27 @@ namespace ExpressBase.Objects
         public List<DVBaseColumn> Params { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar, BuilderType.MobilePage)]
     public class ObjectBasicInfo : EbObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar, BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string Name { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar, BuilderType.MobilePage)]
         public string ObjName { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar, BuilderType.MobilePage)]
         public string ObjDisplayName { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar, BuilderType.MobilePage)]
         public string Version { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar, BuilderType.MobilePage)]
         public string ObjRefId { get; set; }
     }
 
@@ -1112,10 +1112,10 @@ else {
 
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage)]
     public class ObjectBasicReport : ObjectBasicInfo
     {
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage)]
         public string Title { get; set; }
     }
 
