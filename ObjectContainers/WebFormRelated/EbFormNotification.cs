@@ -208,7 +208,10 @@ else if(this.NotifyBy === 3)
                     {
                         object soi = _this.ExecuteCSharpScriptNew(ebFn.SendOnlyIf.Code, globals);
                         if (!(soi is bool && Convert.ToBoolean(soi)))
+                        {
+                            Console.WriteLine($"SendNotifications [SendOnlyIf is not TRUE]: {ebFn.GetType().Name}({ebFn.Name}) skipped.");
                             continue;
+                        }
                     }
                     if (ebFn is EbFnSystem)
                     {

@@ -37,8 +37,8 @@ namespace ExpressBase.Objects
                 new EbDGStringColumn() { Name =  FormConstants.action_unique_id, EbDbType = EbDbTypes.String, Title = "Action"},
                 new EbDGNumericColumn() { Name =  FormConstants.eb_my_actions_id, EbDbType = EbDbTypes.Decimal, Title = "My_Action_Id", Hidden = true},
                 new EbDGStringColumn() { Name =  FormConstants.comments, EbDbType = EbDbTypes.String, Title = "Comments"},
-                new EbDGDateColumn() { Name =  FormConstants.eb_created_at, EbDbType = EbDbTypes.DateTime, EbDateType = EbDateType.DateTime, DoNotPersist = true, IsSysControl = true},
-                new EbDGCreatedByColumn() { Name =  FormConstants.eb_created_by, EbDbType = EbDbTypes.Decimal, DoNotPersist = true, IsSysControl = true}//,
+                new EbDGDateColumn() { Name =  FormConstants.eb_created_at, EbDbType = EbDbTypes.DateTime, EbDateType = EbDateType.DateTime, DoNotPersist = true},
+                new EbDGNumericColumn() { Name =  FormConstants.eb_created_by, EbDbType = EbDbTypes.Decimal, DoNotPersist = true}//,
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
             };
         }

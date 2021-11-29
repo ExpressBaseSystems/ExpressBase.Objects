@@ -960,36 +960,65 @@ namespace ExpressBase.Objects
                 SingleRow Row = new SingleRow() { RowId = _rowId, LocId = _locId };
                 if (_table != null)
                 {
-                    this.GetFormattedColumn(dataTable.Columns[FormConstants.id], dataRow, Row, null);
+                    this.GetFormattedColumn(dataTable.Columns[FormConstants.id], dataRow, Row, null, null);
                     if (_table.TableType == WebFormTableTypes.Grid)
-                        this.GetFormattedColumn(dataTable.Columns[ebs[SystemColumns.eb_row_num]], dataRow, Row, null);
-                    for (int k = 0; k < _table.Columns.Count; k++)
+                        this.GetFormattedColumn(dataTable.Columns[ebs[SystemColumns.eb_row_num]], dataRow, Row, null, null);
+                    if (_table.TableType == WebFormTableTypes.Review)
                     {
-                        EbControl _control = _table.Columns[k].Control;
-                        this.GetFormattedColumn(dataTable.Columns[_control.Name.ToLower()], dataRow, Row, _control);// card field has uppercase name, but datatable contains lower case column name
-                        if (_control is EbPhone && (_control as EbPhone).Sendotp)
-                            (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                        this.GetFormattedReview(dataTable, dataRow, Row, _table);
+                    }
+                    else
+                    {
+                        for (int k = 0; k < _table.Columns.Count; k++)
+                        {
+                            EbControl _control = _table.Columns[k].Control;
+                            string ctrlName = _control.IsSysControl ? ebs[_control.Name.ToLower()] : _control.Name.ToLower();// card field has uppercase name, but datatable contains lower case column name
+                            this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control, _table);
+                            if (_control is EbPhone && (_control as EbPhone).Sendotp)
+                                (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                        }
                     }
                 }
                 else
                 {
                     for (int k = 0; k < dataTable.Columns.Count; k++)
                     {
-                        this.GetFormattedColumn(dataTable.Columns[k], dataRow, Row, null);
+                        this.GetFormattedColumn(dataTable.Columns[k], dataRow, Row, null, null);
                     }
                 }
                 Table.Add(Row);
             }
         }
 
-        private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control)
+        private void GetFormattedReview(EbDataTable dataTable, EbDataRow dataRow, SingleRow Row, TableSchema _table)
+        {
+            for (int k = 0; k < _table.Columns.Count; k++)
+            {
+                EbControl _control = _table.Columns[k].Control;
+                if (_control.Name == FormConstants.eb_created_by)
+                {
+                    _control = new EbDGCreatedByColumn() { Name = FormConstants.eb_created_by, EbDbType = EbDbTypes.Decimal, DoNotPersist = true };
+                    EbDataColumn dataColumn = dataTable.Columns[_control.Name];
+                    object val = dataRow[dataColumn.ColumnIndex];
+                    if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                        val = null;
+                    SingleColumn Col = _control.GetSingleColumn(this.UserObj, this.SolutionObj, val, false);
+                    Col.Name = FormConstants.eb_created_by;
+                    Row.Columns.Add(Col);
+                }
+                else
+                    this.GetFormattedColumn(dataTable.Columns[_control.Name], dataRow, Row, _control, _table);
+            }
+        }
+
+        private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control, TableSchema _table)
         {
             if (dataColumn == null && _control == null)
                 throw new FormException("Something went wrong in our end", (int)HttpStatusCode.InternalServerError, "EbWebForm.GetFormattedColumn: dataColumn and _control is null", "RowId: " + Row.RowId);
 
             if (_control != null)
             {
-                if ((_control.DoNotPersist && !_control.IsSysControl) || dataColumn == null)
+                if ((_control.DoNotPersist && !_control.IsSysControl && _table.TableType != WebFormTableTypes.Review) || dataColumn == null)
                     Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, null, true));
                 else
                 {
@@ -1564,21 +1593,21 @@ namespace ExpressBase.Objects
                     foreach (SingleRow Row in psTable)
                     {
                         string temp = this.AddPsParams(psCtrl, _FormData, DataDB, param, Row, ref p_i, psqry);
-                        int[] nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
-                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, nums.Join(","), true);
+                        List<int> nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                        psquery_all += GetPsDmSelectQuery(temp, ipsCtrl, nums);
                         p_i++;
                         row_ids[psCtrl.EbSid].Add(Row.RowId);
                     }
                 }
                 else if (psCtrl is EbDGPowerSelectColumn && psTable?.Count > 0)
                 {
-                    List<string> vms = new List<string>();
+                    List<int> vms = new List<int>();
                     foreach (SingleRow Row in psTable)
                     {
                         if (Row[psCtrl.Name] != null)
                         {
-                            int[] nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
-                            vms.Add(nums.Join(","));
+                            List<int> nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                            vms.AddRange(nums);
                         }
                     }
                     if (ParamsList.Exists(e => e.Name == psCtrl.Name))
@@ -1588,14 +1617,14 @@ namespace ExpressBase.Objects
                         if (psqry.Contains("@" + psCtrl.Name))
                             psqry = psqry.Replace("@" + psCtrl.Name, $"ANY(STRING_TO_ARRAY('{vms.Join(",")}', ',')::INT[])");
                     }
-                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, vms.Join(","), false);
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, vms);
                     row_ids[psCtrl.EbSid].Add(0);
                     this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
                 }
                 else if (psTable?.Count > 0)
                 {
-                    int[] nums = Convert.ToString(psTable[0][psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToArray();
-                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, nums.Join(","), false);
+                    List<int> nums = Convert.ToString(psTable[0][psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                    psquery_all += GetPsDmSelectQuery(psqry, ipsCtrl, nums);
                     row_ids[psCtrl.EbSid].Add(0);
                     this.AddPsParams(psCtrl, _FormData, DataDB, param, null, ref p_i, null);
                 }
@@ -1605,12 +1634,17 @@ namespace ExpressBase.Objects
             return psquery_all;
         }
 
-        private string GetPsDmSelectQuery(string psqry, IEbPowerSelect ipsCtrl, string vms, bool isStrict)
+        private string GetPsDmSelectQuery(string psqry, IEbPowerSelect ipsCtrl, List<int> vmArr)
         {
-            if (!(!ipsCtrl.MultiSelect && isStrict))
-                vms = $"ANY(STRING_TO_ARRAY('{vms}', ',')::INT[])";
+            string vms;
+            vmArr = vmArr.Distinct().ToList();
+            if (vmArr.Count == 0)
+                vms = "0";
+            else if (vmArr.Count == 1)
+                vms = $"{vmArr[0]}";
             else
-                vms = $"{vms}";
+                vms = $"ANY(STRING_TO_ARRAY('{vmArr.Join(",")}', ',')::INT[])";
+
             return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms};";
         }
 
@@ -2826,11 +2860,11 @@ namespace ExpressBase.Objects
                         SingleColumn cField = Row.GetColumn(_column.ColumnName);
                         if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                         {
-                            string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
+                            string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                             if (_table.TableType == WebFormTableTypes.Grid)
-                                msg = $"'{(cField.Control as EbDGColumn).Title ?? cField.Control.Name}' in {_table.Title ?? _table.ContainerName} Grid {msg}";
+                                msg = $"'{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}' in {_table.Title ?? _table.ContainerName} Grid {msg}";
                             else
-                                msg = $"'{cField.Control.Label ?? cField.Control.Name}' {msg}";
+                                msg = $"'{_column.Control.Label ?? _column.Control.Name}' {msg}";
                             throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebForm -> DoRequiredCheck");
                         }
                     }

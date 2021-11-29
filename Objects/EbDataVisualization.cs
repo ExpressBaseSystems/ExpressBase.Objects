@@ -434,6 +434,10 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         public bool DisableCopy { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool DisableAutoSearch { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
         [PropertyGroup(PGConstants.APPEARANCE)]

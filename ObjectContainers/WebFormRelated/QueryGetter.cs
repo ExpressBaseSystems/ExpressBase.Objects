@@ -49,10 +49,10 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_table.TableType == WebFormTableTypes.Grid)
                     _cols = $"{ebs[SystemColumns.eb_loc_id]}, id, {ebs[SystemColumns.eb_row_num]}";
 
-                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl));
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
                 if (_columns.Count() > 0)
                 {
-                    _cols += ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+                    _cols += ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
                     IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
                     if (_ph_cols.Count() > 0)
                         _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
@@ -133,9 +133,9 @@ namespace ExpressBase.Objects.WebFormRelated
                     ebs[SystemColumns.eb_loc_id],
                     ebs[SystemColumns.eb_row_num]);
 
-                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl);
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
                 if (_columns.Count() > 0)
-                    _cols += ", " + string.Join(", ", _columns.Select(x => x.ColumnName));
+                    _cols += ", " + string.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
 
                 query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id AND {3}_id = @{3}_id AND COALESCE({4}, {6}) = {6} {5}; ",
                     _cols,
@@ -167,10 +167,10 @@ namespace ExpressBase.Objects.WebFormRelated
             foreach (TableSchema _table in _this.FormSchema.Tables)
             {
                 string _cols = string.Empty;
-                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl);
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
                 if (_columns.Count() > 0)
                 {
-                    _cols = ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+                    _cols = ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
                     IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
                     if (_ph_cols.Count() > 0)
                         _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
@@ -412,8 +412,8 @@ WHERE
             {
                 if (conf == null)
                 {
-                    if (_this.AutoId != null)
-                        _qry = $"LOCK TABLE ONLY {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
+                    //if (_this.AutoId != null)
+                    //    _qry = $"LOCK TABLE ONLY {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
 
                     _qry += string.Format("INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({19} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
                         tblName,//0

@@ -25,7 +25,7 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            //this.Name = "eb_loc_id";
+            this.Name = "eb_loc_id";
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -206,6 +206,27 @@ namespace ExpressBase.Objects
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
 
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
+        {
+            if (args.webForm is EbWebForm WebForm && WebForm.IsLocEditable)
+            {
+                string paramName = args.cField.Name + crudContext;
+                double val = 0;
+                if (double.TryParse(Convert.ToString(args.cField.Value), out double temp))
+                    val = temp;
+                args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, val));
+                EbSystemColumns ebs = WebForm.SolutionObj.SolutionSettings.SystemColumns;
+                if (args.ins)
+                {
+                    args._cols += ebs[args.cField.Name] + CharConstants.COMMA + CharConstants.SPACE;
+                    args._vals += CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+                }
+                else
+                    args._colvals += ebs[args.cField.Name] + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+                args.i++;
+            }
+            return true;
+        }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
@@ -213,7 +234,7 @@ namespace ExpressBase.Objects
             int loc_id = UserObj.Preference.CurrrentLocation;
             if (Value != null)
                 loc_id = Convert.ToInt32(Value);
-                        
+
             if (SoluObj.Locations.ContainsKey(loc_id))
                 _displayMember = SoluObj.Locations[loc_id].ShortName;
 
@@ -321,17 +342,17 @@ namespace ExpressBase.Objects
 
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override string GetValueFromDOMJSfn 
-        { 
-            get 
-            { 
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
                 return @"let uid = parseInt($('#' + this.EbSid_CtxId).attr('data-id'));
                         if (isNaN(uid))
                             return 0;
                         else
-                            return uid;"; 
-            } 
-            set { } 
+                            return uid;";
+            }
+            set { }
         }
 
         public override string SetValueJSfn

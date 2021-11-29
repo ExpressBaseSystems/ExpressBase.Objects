@@ -42,10 +42,10 @@ namespace ExpressBase.Objects.WebFormRelated
 
             foreach (EbControl control in _flatControls)
             {
-                if (control.IsSysControl && ebs != null && !(_container is EbReview))
-                {
-                    control.Name = ebs[control.Name];
-                }
+                //if (control.IsSysControl && ebs != null && !(_container is EbReview))
+                //{
+                //    control.Name = ebs[control.Name];
+                //}
 
                 if (control is EbFileUploader)
                     _schema.ExtendedControls.Add(control);
