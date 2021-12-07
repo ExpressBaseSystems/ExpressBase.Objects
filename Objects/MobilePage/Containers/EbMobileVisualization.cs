@@ -221,6 +221,19 @@ namespace ExpressBase.Objects
         [Alias("Context to controls map")]
         public List<EbCTCMapper> ContextToFabControlMap { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [HelpText("Data source to get online data to context")]
+        [PropertyGroup("Action Button Settings")]
+        public string ContextOnlineData { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("Sql query to get data from offline database to context")]
+        [PropertyGroup("Action Button Settings")]
+        public EbScript ContextOfflineData { set; get; }
+
         #endregion
 
         [EnableInBuilder(BuilderType.MobilePage)]
