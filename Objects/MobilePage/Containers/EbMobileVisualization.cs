@@ -229,7 +229,7 @@ namespace ExpressBase.Objects
         public string ContextOnlineData { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         [HelpText("Sql query to get data from offline database to context")]
         [PropertyGroup("Action Button Settings")]
         public EbScript ContextOfflineData { set; get; }
