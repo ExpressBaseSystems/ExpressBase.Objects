@@ -165,6 +165,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    [DataContract]
+    public class MobilePsDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string DataSourceRefId { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Limit { set; get; }
+
+        [DataMember(Order = 4)]
+        public int Offset { set; get; }
+
+        [DataMember(Order = 5)]
+        public string Search { set; get; }
+
+        public MobilePsDataRequest() { }
+    }
+
     //v2
     [DataContract]
     public class EbMobileDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
