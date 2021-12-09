@@ -42,7 +42,7 @@ namespace ExpressBase.Objects
         [Alias("Web Form")]
         [PropertyGroup("Core")]
         public string WebFormRefId { set; get; }
-               
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
         [OSE_ObjectTypes(EbObjectTypes.iReport)]
@@ -73,6 +73,25 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<Param> RenderValidatorParams { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Prefill Settings")]
+        [Alias("Context to controls map")]
+        public List<EbCTCMapper> ContextToFormControlMap { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [HelpText("Data source to get online data to context")]
+        [PropertyGroup("Prefill Settings")]
+        public string ContextOnlineData { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
+        [HelpText("Sql query to get data from offline database to context")]
+        [PropertyGroup("Prefill Settings")]
+        public EbScript ContextOfflineData { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
