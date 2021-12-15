@@ -181,6 +181,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
          [DataMember(Order = 22)]
         public string Source { get; set; }
 
+        [DataMember(Order = 23)]
+        public int counter { get; set; }
+
     }
 
     [Route("/table")]

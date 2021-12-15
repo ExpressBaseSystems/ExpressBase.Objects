@@ -274,6 +274,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 18)]
         public string error { get; set; }
 
+        [DataMember(Order = 19)]
+        public int counter { get; set; }
+
     }
 
     [DataContract]
