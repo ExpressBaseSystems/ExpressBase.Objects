@@ -1067,6 +1067,10 @@ else// PS
 
         public static bool ParameterizeControl(dynamic _this, ParameterizeCtrl_Params args, bool randomize, string crudContext)
         {
+            EbControl _ctrl = _this as EbControl;
+            if (_ctrl.BypassParameterization && args.cField.Value == null)
+                throw new Exception($"Unable to proceed/bypass with value '{args.cField.Value}' for {_ctrl.Name}");
+
             string paramName = randomize ? (args.cField.Name + "_" + args.i) : (args.cField.Name + crudContext);
             string _sv = Convert.ToString(args.cField.Value);
             if (args.cField.Value == null || _sv == string.Empty)
@@ -1075,7 +1079,7 @@ else// PS
                 p.Value = DBNull.Value;
                 args.param.Add(p);
             }
-            else
+            else if (!_ctrl.BypassParameterization)
             {
                 bool throwException = false;
                 if (_this.MultiSelect)
@@ -1096,10 +1100,18 @@ else// PS
             if (args.ins)
             {
                 args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
-                args._vals += CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+                if (_ctrl.BypassParameterization)
+                    args._vals += _sv + CharConstants.COMMA + CharConstants.SPACE;
+                else
+                    args._vals += CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
             }
             else
-                args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+            {
+                if (_ctrl.BypassParameterization)
+                    args._colvals += args.cField.Name + CharConstants.EQUALS + _sv + CharConstants.COMMA + CharConstants.SPACE;
+                else
+                    args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+            }
             args.i++;
             return true;
         }
