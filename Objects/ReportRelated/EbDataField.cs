@@ -323,27 +323,30 @@ namespace ExpressBase.Objects
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
             column_val = FormatDate(column_val, Format, Rep);
-            if (Prefix != "" || Suffix != "")
-                column_val = Prefix + " " + column_val + " " + Suffix;
-            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
-            if (!string.IsNullOrEmpty(LinkRefId))
+            if (column_val != string.Empty)
             {
-                Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
-                Paragraph p = new Paragraph
+                if (Prefix != "" || Suffix != "")
+                    column_val = Prefix + " " + column_val + " " + Suffix;
+                Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
+                if (!string.IsNullOrEmpty(LinkRefId))
+                {
+                    Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
+                    Paragraph p = new Paragraph
                 {
                     a
                 };
-                p.Font = GetItextFont(this.Font, Rep.Font);
-                ct.AddText(p);
+                    p.Font = GetItextFont(this.Font, Rep.Font);
+                    ct.AddText(p);
+                }
+                else
+                {
+                    ct.AddText(phrase);
+                }
+                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+                ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
+                ct.Go();
             }
-            else
-            {
-                ct.AddText(phrase);
-            }
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
-            ct.Go();
         }
     }
 
@@ -784,15 +787,18 @@ namespace ExpressBase.Objects
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = FormatDate(SummarizedValue.ToString(), Format, Rep);
             ResetSummary();
-            if (Prefix != "" || Suffix != "")
-                column_val = Prefix + " " + column_val + " " + Suffix;
-            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
+            if (column_val != string.Empty)
+            {
+                if (Prefix != "" || Suffix != "")
+                    column_val = Prefix + " " + column_val + " " + Suffix;
+                Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
 
-            ct.AddText(phrase);
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
-            ct.Go();
+                ct.AddText(phrase);
+                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+                ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
+                ct.Go();
+            }
         }
     }
 

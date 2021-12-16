@@ -39,10 +39,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public String ReportName { get; set; }
 
-        [DataMember (Order =4)]
+        [DataMember(Order = 4)]
         public byte[] ReportBytea { get; set; }
 
-        [DataMember(Order =5)]
+        [DataMember(Order = 5)]
         public DateTime CurrentTimestamp { get; set; }
     }
 

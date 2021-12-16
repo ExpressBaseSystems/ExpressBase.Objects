@@ -25,6 +25,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using static ExpressBase.CoreBase.Globals.PdfGEbFont;
 
 namespace ExpressBase.Objects
@@ -198,6 +199,39 @@ namespace ExpressBase.Objects
         [PropertyGroup("General")]
         [UIproperty]
         public string OwnerPassword { get; set; }
+
+        private string _docName = null;
+        public string DocumentName
+        {
+            get
+            {
+                if (DocumentNameString != string.Empty && _docName == null)
+                {
+                    _docName = DocumentNameString;
+                    string pattern = @"\{{(.*?)\}}";
+                    IEnumerable<string> matches = Regex.Matches(DocumentNameString, pattern).OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
+                    foreach (string _col in matches)
+                    {
+                        string str = _col.Replace("{{", "").Replace("}}", "");
+                        int tbl = Convert.ToInt32(str.Split('.')[0].Replace("T", ""));
+                        string colval = string.Empty;
+                        if (DataSet?.Tables[tbl]?.Rows.Count > 0)
+                            colval = DataSet?.Tables[tbl]?.Rows[0][str.Split('.')[1]].ToString();
+                        _docName = _docName.Replace(_col, colval);
+                    }
+                }
+                else if (_docName == null)
+                {
+                    _docName = DisplayName;
+                }
+                return _docName;
+            }
+        }
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        [Alias("Document Name")]
+        public string DocumentNameString { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
