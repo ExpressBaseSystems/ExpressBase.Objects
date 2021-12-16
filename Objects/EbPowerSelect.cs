@@ -1101,14 +1101,14 @@ else// PS
             {
                 args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
                 if (_ctrl.BypassParameterization)
-                    args._vals += Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
+                    args._vals += _sv + CharConstants.COMMA + CharConstants.SPACE;
                 else
                     args._vals += CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
             }
             else
             {
                 if (_ctrl.BypassParameterization)
-                    args._colvals += args.cField.Name + CharConstants.EQUALS + Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
+                    args._colvals += args.cField.Name + CharConstants.EQUALS + _sv + CharConstants.COMMA + CharConstants.SPACE;
                 else
                     args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
             }
