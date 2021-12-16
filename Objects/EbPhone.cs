@@ -107,6 +107,10 @@ namespace ExpressBase.Objects
         [Alias("Countries List(country code)")]
         public string CountriesList { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [Alias("Preferred countries(country code)")]
+        public string PreferredCountries { get; set; }
+
         //		[PropertyPriority(9)]
         //		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         //		[Unique]
