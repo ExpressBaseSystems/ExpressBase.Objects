@@ -31,16 +31,40 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Title { get; set; }
 
         public string User_AuthId { get; set; }
-		
-		public string BToken { get; set; }
 
-		public string RToken { get; set; }
+        public string BToken { get; set; }
 
-	}
+        public string RToken { get; set; }
+
+    }
 
     public class NotifyByUserIDResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+    }
+
+    public class NotifyByUserIDsRequest : EbServiceStackAuthRequest, IReturn<NotifyByUserIDsResponse>
+    {
+        public string UserIDs { get; set; }
+
+        public string Link { get; set; }
+
+        public string Title { get; set; }
+
+        public string BToken { get; set; }
+
+        public string RToken { get; set; }
+
+    }
+
+    public class NotifyByUserIDsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
 
     }
@@ -95,11 +119,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<NotificationInfo> Notifications { get; set; }
     }
 
-    public class Notifications 
+    public class Notifications
     {
         public List<NotificationInfo> Notification { get; set; }
     }
-    
+
     public class GetNotificationsRequest : EbServiceStackAuthRequest, IReturn<GetNotificationsResponse>
     {
         public User user { get; set; }
@@ -115,7 +139,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<PendingActionAndMeetingInfo> PendingActions { get; set; }
-        
+
         [DataMember(Order = 2)]
         public List<PendingActionAndMeetingInfo> MyMeetings { get; set; }
     }

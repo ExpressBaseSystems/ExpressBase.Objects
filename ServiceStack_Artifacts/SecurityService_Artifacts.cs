@@ -672,7 +672,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<Eb_Users> UsersList { get; set; }
-        
+
         [DataMember(Order = 3)]
         public List<Eb_Constraints1> IpConsList { get; set; }
 
@@ -1059,16 +1059,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class GetUserDetailsRequest : IReturn<GetUserDetailsResponse>, IEbSSRequest
+    public class GetUserDetailsRequest : EbServiceStackAuthRequest, IReturn<GetUserDetailsResponse>
     {
         [DataMember(Order = 1)]
         public string SearchText { get; set; }
-
-        [DataMember(Order = 2)]
-        public string SolnId { get; set; }
-
-        [DataMember(Order = 3)]
-        public int UserId { get; set; }
     }
     [DataContract]
     public class GetUserDetailsResponse : IEbSSResponse
@@ -1090,7 +1084,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, object> Colvalues { get; set; }
 
         [DataMember(Order = 2)]
-        public int Id { get; set; } 
+        public int Id { get; set; }
 
         [DataMember(Order = 3)]
         public string Token { get; set; }
@@ -1171,30 +1165,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SignOutDate { get; set; }
     }
 
-	public class BrowserExceptionMqRequest : EbServiceStackAuthRequest, IReturn<BrowserExceptionResponse>
+    public class BrowserExceptionMqRequest : EbServiceStackAuthRequest, IReturn<BrowserExceptionResponse>
     {
-		public string Device_info { get; set; }
+        public string Device_info { get; set; }
 
-		public string Ip_address { get; set; }
-		public string Error_msg { get; set; }
-		public string Network_info { get; set; }
+        public string Ip_address { get; set; }
+        public string Error_msg { get; set; }
+        public string Network_info { get; set; }
 
-	}
-	public class BrowserExceptionRequest : EbMqRequest
-	{
-		public string Device_info { get; set; }
-
-		public string Ip_address { get; set; }
-		public string Error_msg { get; set; }
-		public string Network_info { get; set; }
-
-	}
-
-	public class BrowserExceptionResponse : IEbSSResponse
+    }
+    public class BrowserExceptionRequest : EbMqRequest
     {
-		public bool Status { get; set; }
+        public string Device_info { get; set; }
 
-       public ResponseStatus ResponseStatus { get; set; }
+        public string Ip_address { get; set; }
+        public string Error_msg { get; set; }
+        public string Network_info { get; set; }
+
+    }
+
+    public class BrowserExceptionResponse : IEbSSResponse
+    {
+        public bool Status { get; set; }
+
+        public ResponseStatus ResponseStatus { get; set; }
 
     }
 }
