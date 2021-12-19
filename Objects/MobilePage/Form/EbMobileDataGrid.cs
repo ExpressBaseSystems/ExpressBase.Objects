@@ -43,6 +43,18 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data")]
         public EbScript OfflineQuery { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public bool DisableAdd { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public bool DisableDelete { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public bool DisableEdit { set; get; }
+
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
