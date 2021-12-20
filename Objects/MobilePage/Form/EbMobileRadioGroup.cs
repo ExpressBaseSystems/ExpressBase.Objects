@@ -83,7 +83,7 @@ namespace ExpressBase.Objects
         public override string DisplayName { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [Alias("Data")]
+        [PropertyGroup("Data")]
         public string Value { set; get; }
     }
 }
