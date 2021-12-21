@@ -28,6 +28,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data")]
         public List<EbMobileRGOption> Options { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public bool HorizontalAlign { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileRadioGroup' tabindex='1' onclick='$(this).focus()'>
