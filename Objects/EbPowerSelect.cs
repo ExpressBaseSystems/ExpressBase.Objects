@@ -934,6 +934,16 @@ else// PS
             return Sql;
         }
 
+        public (string, EbDataReader) GetSqlAndDr(Service service)
+        {
+            EbDataReader dr = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, null, service.Redis, service);
+            string Sql = dr.Sql.Trim();
+            if (Sql.LastIndexOf(";") == Sql.Length - 1)
+                Sql = Sql.Substring(0, Sql.Length - 1);
+
+            return (Sql, dr);
+        }
+
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
