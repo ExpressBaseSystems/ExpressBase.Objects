@@ -45,6 +45,9 @@ namespace ExpressBase.Objects.WebFormRelated
             int p_i = 0;
             EbDataReader dataReader;
 
+            if (this.ebForm.EbConnectionFactory == null)
+                throw new FormException("Something went wrong", (int)HttpStatusCode.InternalServerError, "ConnectionFactory is null", "PsDmHelper -> GetPsQueryAndParams");
+
             foreach (EbControl psCtrl in this.drPsList)
             {
                 row_ids.Add(psCtrl.EbSid, new List<int>());

@@ -337,6 +337,7 @@ namespace ExpressBase.Objects
                     _form.SolutionObj = this.SolutionObj;
                     _form.AfterRedisGet_All(Service);
                     _form.TableRowId = Convert.ToInt32(psColumn.Value);
+                    _form.SetConnectionFactory(this.EbConnectionFactory);
                     _form.RefreshFormData(DataDB, Service);
                     _form.FormatImportData(DataDB, Service, this);
                 }
