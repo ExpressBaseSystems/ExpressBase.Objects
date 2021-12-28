@@ -1740,9 +1740,9 @@ pg.HideProperty('IsDynamic');
             this.EbPowerSelect.UpdateParamsMeta(Service, Redis);
         }
 
-        public string GetSql(Service Service)
+        public (string, EbDataReader) GetSqlAndDr(Service Service)
         {
-            return this.EbPowerSelect.GetSql(Service);
+            return this.EbPowerSelect.GetSqlAndDr(Service);
         }
 
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls, Service service)
