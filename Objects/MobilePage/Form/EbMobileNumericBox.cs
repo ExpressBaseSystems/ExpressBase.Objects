@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
@@ -20,6 +21,10 @@ namespace ExpressBase.Objects
         public int DecimalPlaces { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public bool AllowNegative { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.VALIDATIONS)]
         [Alias("Maximum")]
         [HelpText("Maximum value allowed")]
@@ -33,7 +38,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Behavior")]
+        [OnChangeExec(@" if (this.RenderType === 1 ){ pg.ShowProperty('IncrementButtons'); }
+        else { pg.HideProperty('IncrementButtons'); } ")]
         public NumericBoxTypes RenderType { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Behavior")]
+        public List<EbMobileNumBoxButtons> IncrementButtons { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -84,5 +96,19 @@ namespace ExpressBase.Objects
             numeric.MaxLimit = this.MaxLimit;
             numeric.MinLimit = this.MinLimit;
         }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    [Alias("IncrementButton")]
+    public class EbMobileNumBoxButtons : EbMobilePageBase
+    {
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Core")]
+        [Alias("Increment value")]
+        public int Value { set; get; }
     }
 }
