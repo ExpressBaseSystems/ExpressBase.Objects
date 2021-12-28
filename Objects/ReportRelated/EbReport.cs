@@ -205,7 +205,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                if (DocumentNameString != string.Empty && _docName == null)
+                if (!string.IsNullOrEmpty(DocumentNameString) && _docName == null)
                 {
                     _docName = DocumentNameString;
                     string pattern = @"\{{(.*?)\}}";
