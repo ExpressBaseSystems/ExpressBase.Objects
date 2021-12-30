@@ -81,6 +81,10 @@ namespace ExpressBase.Objects
         [HelpText("Define default value of the control.")]
         public virtual EbScript DefaultValueExpression { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public virtual int Width { set; get; }
+
         public virtual string EbControlType => this.GetType().Name.Replace("Mobile", "");
 
         public virtual EbControl GetWebFormControl(int counter) { return null; }
