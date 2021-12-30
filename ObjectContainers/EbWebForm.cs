@@ -2710,7 +2710,7 @@ namespace ExpressBase.Objects
                         if (Row.IsDelete)
                             continue;
                         SingleColumn cField = Row.GetColumn(_column.ColumnName);
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+                        if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (cField.Type == (int)EbDbTypes.Decimal && Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                         {
                             string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                             if (_table.TableType == WebFormTableTypes.Grid)
