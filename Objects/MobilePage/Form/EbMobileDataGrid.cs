@@ -55,6 +55,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public bool DisableEdit { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Appearance")]
+        [Alias("Row Color Expression")]
+        public EbScript RowColorExpr { get; set; }
+
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
