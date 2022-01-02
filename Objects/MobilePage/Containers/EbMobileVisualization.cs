@@ -99,7 +99,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage, EbObjectTypes.iReport)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]
         [OnChangeExec(@"
