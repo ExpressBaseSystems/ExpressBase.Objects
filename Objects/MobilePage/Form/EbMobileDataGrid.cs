@@ -56,6 +56,7 @@ namespace ExpressBase.Objects
         public bool DisableEdit { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [PropertyGroup("Appearance")]
         [Alias("Row Color Expression")]
         public EbScript RowColorExpr { get; set; }
