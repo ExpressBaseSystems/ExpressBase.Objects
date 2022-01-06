@@ -16,7 +16,7 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         [HelpText("sql query to get data from offline database")]
         [PropertyGroup(PGConstants.DATA)]
         public EbScript OfflineQuery { set; get; }

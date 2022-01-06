@@ -151,7 +151,7 @@ namespace ExpressBase.Objects
         public override string Status { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         [HelpText("sql query to get data from offline database")]
         [Alias("Offline Query")]
         [PropertyGroup(PGConstants.DATA)]
