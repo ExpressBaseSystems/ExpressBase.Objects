@@ -724,7 +724,7 @@ namespace ExpressBase.Objects
                     bool isMobOfflineData = false;
                     if (this.UserObj.wc == TokenConstants.MC &&
                         this.FormData.MultipleTables.TryGetValue(this.TableName, out SingleTable MTable) &&
-                        MTable.Count > 0 && MTable[0].GetColumn("eb_created_at_device") == null)
+                        MTable.Count > 0 && MTable[0].GetColumn("eb_created_at_device") != null)
                         isMobOfflineData = true;
 
                     string patternVal = string.Empty;
