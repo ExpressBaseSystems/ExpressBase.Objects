@@ -720,11 +720,23 @@ namespace ExpressBase.Objects
                 {
                     if (!(this.FormData.MultipleTables.ContainsKey(_container.TableName) && this.FormData.MultipleTables[_container.TableName].Count > 0))
                         continue;
+
+                    bool isMobOfflineData = false;
+                    if (this.UserObj.wc == TokenConstants.MC &&
+                        this.FormData.MultipleTables.TryGetValue(this.TableName, out SingleTable MTable) &&
+                        MTable.Count > 0 && MTable[0].GetColumn("eb_created_at_device") == null)
+                        isMobOfflineData = true;
+
                     string patternVal = string.Empty;
                     EbAutoId ctrl = c as EbAutoId;
                     SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
                     if (ctrl.BypassParameterization)
                         patternVal = Convert.ToString(Row[ctrl.Name]);
+                    else if (this.TableRowId == 0 && isMobOfflineData && !string.IsNullOrWhiteSpace(Row[ctrl.Name]?.ToString()))
+                    {
+                        patternVal = $"'{Convert.ToString(Row[ctrl.Name])}'";
+                        ctrl.BypassParameterization = true;
+                    }
                     else if (this.TableRowId == 0)// if new mode and not data pusher slave
                     {
                         Dictionary<string, string> dict = new Dictionary<string, string>
