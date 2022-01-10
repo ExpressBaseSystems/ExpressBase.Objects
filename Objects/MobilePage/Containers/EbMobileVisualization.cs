@@ -155,6 +155,11 @@ namespace ExpressBase.Objects
         [Alias("Link Expression")]
         public EbScript LinkExpr { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Link Fail Message")]
+        public string LinkExprFailMsg { get; set; }
+
         #region FAB Settings Properties
 
         [EnableInBuilder(BuilderType.MobilePage)]
