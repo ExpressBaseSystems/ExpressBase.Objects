@@ -364,4 +364,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public bool Export { set; get; }
     }
+
+    [DataContract]
+    public class EbMobileAutoIdDataResponse
+    {
+        [DataMember(Order = 1)]
+        public EbDataTable OfflineData { set; get; }
+    }
+
+    public class EbMobileAutoIdData
+    {
+        public string Table { get; set; }
+
+        public string Column { get; set; }
+
+        public string Prefix { get; set; }
+    }
+
+    public class EbMobileAutoIdDataRequest : EbServiceStackAuthRequest, IReturn<EbMobileAutoIdDataResponse>
+    {
+        public string AutoIdData { set; get; }
+    }
 }

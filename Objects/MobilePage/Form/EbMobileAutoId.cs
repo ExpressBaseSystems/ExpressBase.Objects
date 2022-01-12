@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -26,6 +27,17 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-key"; } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
+        public int SerialLength { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
+        [PropertyGroup(PGConstants.CORE)]
+        [HelpText("sql query to get autoid prefix from offline database")]
+        [Alias("Prefix Expression")]
+        public EbScript PrefixExpr { get; set; }
 
         public override string GetDesignHtml()
         {

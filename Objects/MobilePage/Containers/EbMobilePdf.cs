@@ -19,7 +19,7 @@ namespace ExpressBase.Objects
         public string Template { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         [HelpText("sql query to get data from offline database")]
         [Alias("Offline Query")]
         public EbScript OfflineQuery { set; get; }

@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         [HelpText("sql query to get data from offline database")]
         [Alias("Offline Query")]
         [PropertyGroup("Data")]
@@ -154,6 +154,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Link Settings")]
         [Alias("Link Expression")]
         public EbScript LinkExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Link Fail Message")]
+        public string LinkExprFailMsg { get; set; }
 
         #region FAB Settings Properties
 
