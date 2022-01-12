@@ -15,6 +15,7 @@ using ExpressBase.Common.Data;
 using System.Globalization;
 using ExpressBase.CoreBase.Globals;
 using System.IO;
+using Microsoft.CodeAnalysis.Scripting;
 
 namespace ExpressBase.Objects
 {
@@ -965,24 +966,17 @@ namespace ExpressBase.Objects
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = string.Empty;
             EbDbTypes dbtype = EbDbTypes.String;
-            EbPdfGlobals globals = new EbPdfGlobals
-            {
-                //CurrentField = this
-            };
-
-            Rep.AddParamsNCalcsInGlobal(globals);
+            EbPdfGlobals globals = new EbPdfGlobals();
             try
             {
-                if (DataFieldsUsedInCalc != null && DataFieldsUsedInCalc.Count() > 0)
-                    foreach (string datafd in DataFieldsUsedInCalc)
-                    {
-                        string TName = datafd.Split('.')[0];
-                        int TableIndex = Convert.ToInt32(TName.Substring(1));
-                        string fName = datafd.Split('.')[1];
-                        int RowIndex = (TableIndex == Rep.DetailTableIndex) ? slno : 0;
-                        globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
-                    }
-                column_val = (Rep.ValueScriptCollection[Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                if (Rep.EvaluatorVersion == EvaluatorVersion.Version_1)
+                {
+                    column_val = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[Name], slno, globals, DataFieldsUsedInCalc).ToString();
+                }
+                else
+                {
+                    column_val = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), slno, globals, DataFieldsUsedInCalc, true).ToString();
+                }
 
                 dbtype = (EbDbTypes)CalcFieldIntType;
 
@@ -990,7 +984,6 @@ namespace ExpressBase.Objects
                     Rep.CalcValInRow[Title] = new PdfNTV { Name = Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val };
                 else
                     Rep.CalcValInRow.Add(Title, new PdfNTV { Name = Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val });
-                Rep.AddParamsNCalcsInGlobal(globals);
             }
             catch (Exception e)
             {
@@ -1030,15 +1023,15 @@ namespace ExpressBase.Objects
 
         public dynamic GetCalcFieldValue(EbPdfGlobals globals, EbDataSet DataSet, int serialnumber, EbReport Rep)
         {
-            dynamic value = null;
-            foreach (string calcfd in this.DataFieldsUsedInCalc)
+            dynamic value;
+            if (Rep.EvaluatorVersion == EvaluatorVersion.Version_1)
             {
-                string TName = calcfd.Split('.')[0];
-                string fName = calcfd.Split('.')[1];
-                int tableindex = Convert.ToInt32(TName.Substring(1));
-                globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
+                value = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[this.Name], serialnumber, globals, DataFieldsUsedInCalc).ToString();
             }
-            value = (Rep.ValueScriptCollection[this.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+            else
+            {
+                value = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), serialnumber, globals, DataFieldsUsedInCalc, true).ToString();
+            }
             return value;
         }
     }

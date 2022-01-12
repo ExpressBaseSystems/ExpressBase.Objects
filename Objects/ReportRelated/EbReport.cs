@@ -14,6 +14,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using ServiceStack;
@@ -66,6 +67,12 @@ namespace ExpressBase.Objects
         Baseline = 7,
         JustifiedAll = 8,
         Undefined = -1
+    }
+
+    public enum EvaluatorVersion
+    {
+        Version_1 = 0,
+        Version_2 = 1
     }
 
     public enum DateFormatReport
@@ -128,15 +135,15 @@ namespace ExpressBase.Objects
         public override string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup(PGConstants.GENERAL)]
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup(PGConstants.GENERAL)]
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup(PGConstants.GENERAL)]
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -191,14 +198,18 @@ namespace ExpressBase.Objects
         public float DesignPageHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup(PGConstants.GENERAL)]
         [UIproperty]
         public string UserPassword { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup(PGConstants.GENERAL)]
         [UIproperty]
         public string OwnerPassword { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup(PGConstants.GENERAL)]
+        public EvaluatorVersion EvaluatorVersion { get; set; }
 
         private string _docName = null;
         public string DocumentName
@@ -227,8 +238,9 @@ namespace ExpressBase.Objects
                 return _docName;
             }
         }
+
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup(PGConstants.GENERAL)]
         [UIproperty]
         [Alias("Document Name")]
         public string DocumentNameString { get; set; }
@@ -338,10 +350,16 @@ namespace ExpressBase.Objects
         public List<object> WaterMarkList { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, Script> ValueScriptCollection { get; set; }
+        public EbSciptEvaluator evaluator = new EbSciptEvaluator
+        {
+            OptionScriptNeedSemicolonAtTheEndOfLastExpression = false
+        };
 
         [JsonIgnore]
-        public Dictionary<string, Script> AppearanceScriptCollection { get; set; }
+        public Dictionary<string, object> ValueScriptCollection { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<string, object> AppearanceScriptCollection { get; set; }
 
         [JsonIgnore]
         public Dictionary<string, ReportGroupItem> Groupheaders { get; set; }
@@ -615,9 +633,8 @@ namespace ExpressBase.Objects
 
         public void CallSummerize(EbDataField field, int serialnumber)
         {
-            string column_val = string.Empty;
+            string column_val;
             EbPdfGlobals globals = new EbPdfGlobals();
-            AddParamsNCalcsInGlobal(globals);
 
             if (field is EbCalcField)
             {
@@ -827,7 +844,6 @@ namespace ExpressBase.Objects
                             CalcValInRow[field.Title] = new PdfNTV { Name = field.Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val };
                         else
                             CalcValInRow.Add(field.Title, new PdfNTV { Name = field.Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val });
-                        AddParamsNCalcsInGlobal(globals);
                     }
                     else
                     {
@@ -984,16 +1000,11 @@ namespace ExpressBase.Objects
                 CurrentField = new PdfGReportField(field.LeftPt, field.WidthPt, field.TopPt, field.HeightPt, field.BackColor, field.ForeColor, field.IsHidden, pg_font)
             };
 
-            AddParamsNCalcsInGlobal(globals);
+            if (this.EvaluatorVersion == EvaluatorVersion.Version_1)
+                ExecuteExpressionV1((Script)AppearanceScriptCollection[field.Name], slno, globals, field.DataFieldsUsedAppearance);
+            else
+                ExecuteExpressionV2(AppearanceScriptCollection[field.Name].ToString(), slno, globals, field.DataFieldsUsedAppearance, true);
 
-            foreach (string calcfd in field.DataFieldsUsedAppearance)
-            {
-                string TName = calcfd.Split('.')[0];
-                int TableIndex = Convert.ToInt32(TName.Substring(1));
-                string fName = calcfd.Split('.')[1];
-                globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[slno][fName] });
-            }
-            AppearanceScriptCollection[field.Name].RunAsync(globals);
             field.SetValuesFromGlobals(globals.CurrentField);
         }
 
@@ -1197,6 +1208,192 @@ namespace ExpressBase.Objects
                 {
                     globals["Summary"].Add(key.Replace(".", "_"), SummaryValInRow[key]);
                 }
+        }
+
+        public string[] GetDataFieldsUsed(string code)
+        {
+            int i = 0;
+            IEnumerable<string> matches = Regex.Matches(code, @"T[0-9]{1}\.\w+").OfType<Match>()
+                         .Select(m => m.Groups[0].Value)
+                         .Distinct();
+            string[] _dataFieldsUsed = new string[matches.Count()];
+            foreach (string match in matches)
+                _dataFieldsUsed[i++] = match;
+            return _dataFieldsUsed;
+        }
+
+        public Script CompileScriptV1(string code)
+        {
+            Script valscript = CSharpScript.Create<dynamic>(
+                code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System", "System.Collections.Generic", "System.Linq"),
+                globalsType: typeof(EbPdfGlobals));
+            valscript.Compile();
+            return valscript;
+        }
+
+        public dynamic ExecuteScriptV1(EbPdfGlobals globals, Script valscript)
+        {
+            return valscript.RunAsync(globals).Result?.ReturnValue;
+        }
+
+        public object ExecuteExpressionV1(Script valscript, int irow, EbPdfGlobals globals, string[] _dataFieldsUsed)
+        {
+            foreach (string calcfd in _dataFieldsUsed)
+            {
+                string TName = calcfd.Split('.')[0];
+                string fName = calcfd.Split('.')[1];
+                int tableIndex = Convert.ToInt32(TName.Substring(1));
+                int RowIndex = (tableIndex == this.DetailTableIndex) ? irow : 0;
+                globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)this.DataSet.Tables[tableIndex].Columns[fName].Type, Value = this.DataSet.Tables[tableIndex].Rows[RowIndex][fName] });
+            }
+
+            AddParamsNCalcsInGlobal(globals);
+
+            dynamic value = ExecuteScriptV1(globals, valscript);
+            return value;
+
+        }
+
+        public void ExecuteHideExpressionV1(EbReportField field)
+        {
+            EbPdfGlobals globals = new EbPdfGlobals();
+            string[] _dataFieldsUsed = GetDataFieldsUsed(field.HideExpression.Code);
+            dynamic value = ExecuteExpressionV1(CompileScriptV1(field.HideExpression.Code), 0, globals, _dataFieldsUsed);
+
+            if (value != null)
+                field.IsHidden = (bool)value;
+        }
+
+        public void ExecuteLayoutExpressionV1(EbReportField field)
+        {
+            EbPdfGlobals globals = new EbPdfGlobals
+            {
+                CurrentField = new PdfGReportField(field.LeftPt, field.WidthPt, field.TopPt, field.HeightPt, field.BackColor, field.ForeColor, field.IsHidden, null)
+            };
+
+            string[] _dataFieldsUsed = GetDataFieldsUsed(field.LayoutExpression.Code);
+            ExecuteExpressionV1(CompileScriptV1(field.LayoutExpression.Code), 0, globals, _dataFieldsUsed);
+
+            field.SetValuesFromGlobals(globals.CurrentField);
+
+        }
+
+        public string[] GetOtherGlobalFieldsUsedV2(string code)
+        {
+            if (code.Contains("Summary.GetValue"))
+            {
+                int q = 1;
+            }
+            if (code.Contains("Summary"))
+            {
+                int q = 1;
+            }
+            int i = 0;
+            IEnumerable<string> matches = Regex.Matches(code, @"Summary.\w+|Params.\w+|Calc.\w+").OfType<Match>()
+                         .Select(m => m.Groups[0].Value)
+                         .Distinct();
+            string[] _dataFieldsUsed = new string[matches.Count()];
+            foreach (string match in matches)
+                _dataFieldsUsed[i++] = match;
+            return _dataFieldsUsed;
+        }
+
+        public string GetProcessedCodeForScriptCollectionV2(string code)
+        {
+            string[] _dataFieldsUsed = GetDataFieldsUsed(code);
+            return GetProcessedCodeV2(code, _dataFieldsUsed);
+        }
+
+        public string GetProcessedCodeV2(string code, string[] _dataFieldsUsed)
+        {
+            String processedCode = code;
+
+            string[] others = GetOtherGlobalFieldsUsedV2(code);
+            _dataFieldsUsed = (_dataFieldsUsed.Concat(others).ToArray()).OrderByDescending(c => c).ToArray();
+
+            foreach (string calcfd in _dataFieldsUsed)
+            {
+                string fName = (calcfd.Split('.')[1]).Replace(";", "");
+                processedCode = processedCode.Replace("." + fName, ".GetValue(\"" + fName + "\")");
+            }
+
+            return processedCode;
+        }
+
+        public void SetVariableV2(EbPdfGlobals globals)
+        {
+            Dictionary<string, object> dict = new Dictionary<string, object>
+            {
+                {"T0", globals["T0"]},
+                {"T1", globals["T1"]},
+                {"T2", globals["T2"]},
+                {"T3", globals["T3"]},
+                {"T4", globals["T4"]},
+                {"T5", globals["T5"]},
+                {"T6", globals["T6"]},
+                {"T7", globals["T7"]},
+                {"T8", globals["T8"]},
+                {"T9", globals["T9"]},
+                {"Params", globals["Params"]},
+                {"Calc", globals["Calc"]},
+                {"Summary", globals["Summary"]},
+                { "CurrentField", globals["CurrentField"] }
+            };
+            evaluator.SetVariable(dict);
+        }
+
+        public object ExecuteExpressionV2(string code, int irow, EbPdfGlobals globals, string[] _dataFieldsUsed, bool Isprocessed)
+        {
+            object value = null;
+            try
+            {
+                string processedCode;
+                if (Isprocessed)
+                    processedCode = code;
+                else
+                    processedCode = GetProcessedCodeV2(code, _dataFieldsUsed);
+
+                foreach (string calcfd in _dataFieldsUsed)
+                {
+                    string TName = calcfd.Split('.')[0];
+                    string fName = calcfd.Split('.')[1];
+                    int tableIndex = Convert.ToInt32(TName.Substring(1));
+                    int RowIndex = (tableIndex == this.DetailTableIndex) ? irow : 0;
+                    globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)this.DataSet.Tables[tableIndex].Columns[fName].Type, Value = this.DataSet.Tables[tableIndex].Rows[RowIndex][fName] });
+                }
+                AddParamsNCalcsInGlobal(globals);
+                SetVariableV2(globals);
+
+                value = evaluator.Execute(processedCode);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
+            return value;
+        }
+
+        public void ExecuteHideExpressionV2(EbReportField field)
+        {
+            EbPdfGlobals globals = new EbPdfGlobals();
+
+            string[] _dataFieldsUsed = GetDataFieldsUsed(field.HideExpression.Code);
+            object value = ExecuteExpressionV2(field.HideExpression.Code, 0, globals, _dataFieldsUsed, false);
+
+            if (value != null)
+                field.IsHidden = (bool)value;
+        }
+
+        public void ExecuteLayoutExpressionV2(EbReportField field)
+        {
+            EbPdfGlobals globals = new EbPdfGlobals
+            {
+                CurrentField = new PdfGReportField(field.LeftPt, field.WidthPt, field.TopPt, field.HeightPt, field.BackColor, field.ForeColor, field.IsHidden, null)
+            };
+            string[] _dataFieldsUsed = GetDataFieldsUsed(field.LayoutExpression.Code);
+            ExecuteExpressionV2(field.LayoutExpression.Code, 0, globals, _dataFieldsUsed, false);
+
+            field.SetValuesFromGlobals(globals.CurrentField);
         }
     }
 
