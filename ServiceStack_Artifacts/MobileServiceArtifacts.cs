@@ -351,8 +351,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public User CurrentUser { set; get; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 5)]
         public Eb_Solution CurrentSolution { set; get; }
+
+        [DataMember(Order = 6)]
+        public DateTime last_sync_ts { set; get; }
 
         public EbMobileSolutionData()
         {
@@ -363,6 +366,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class MobileSolutionDataRequest : EbServiceStackAuthRequest, IReturn<EbMobileSolutionData>
     {
         public bool Export { set; get; }
+    }
+
+    public class MobileSolutionDataRequestV2 : EbServiceStackAuthRequest, IReturn<EbMobileSolutionData>
+    {
+        public string MetaData { get; set; }
     }
 
     [DataContract]
