@@ -18,5 +18,6 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string E0129 = "E0129: ";//500
         public const string E0130 = "E0130: ";//500
         public const string E0131 = "E0131: DataPusher config is invalid! Contact Admin.";
+        public const string E0132 = "E0132: ";//500
     }
 }
