@@ -44,6 +44,11 @@ namespace ExpressBase.Objects
         public EbScript OfflineQuery { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyGroup("Data")]
+        public EbScript PersistRowOnlyIf { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Behavior")]
         public bool DisableAdd { set; get; }
 
