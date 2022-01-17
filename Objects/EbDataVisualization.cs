@@ -150,6 +150,10 @@ namespace ExpressBase.Objects
         }")]
         public bool IsDataFromApi { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyGroup("Core")]
+        public EvaluatorVersion EvaluatorVersion { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyGroup("Api")]
         [HideForUser]
@@ -545,7 +549,7 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
-
+                
         public static EbOperations Operations = TVOperations.Instance;
 
         public EbTableVisualization()

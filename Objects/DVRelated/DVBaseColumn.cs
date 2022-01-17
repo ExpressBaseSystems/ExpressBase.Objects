@@ -5,6 +5,7 @@ using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.CoreBase.Globals;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -175,7 +176,6 @@ namespace ExpressBase.Objects.Objects.DVRelated
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
     public class DVBaseColumn : EbDataVisualizationObject
     {
-
         public DVBaseColumn()
         {
             _Formula = new EbScript();
@@ -484,6 +484,12 @@ else{
         public EbDataSet ApprovalData { get; set; }
 
         [JsonIgnore]
+        public EbSciptEvaluator evaluator = new EbSciptEvaluator
+        {
+            OptionScriptNeedSemicolonAtTheEndOfLastExpression = false
+        };
+
+        [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
         [JsonIgnore]
         public List<string> FormulaDataFieldsUsed
@@ -529,7 +535,7 @@ else{
         {
             if (__codeAnalysisScript == null && !string.IsNullOrEmpty(this._Formula.Code))
             {
-                __codeAnalysisScript = CSharpScript.Create<dynamic>(this._Formula.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq"), globalsType: typeof(Globals));
+                __codeAnalysisScript = CSharpScript.Create<dynamic>(this._Formula.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq"), globalsType: typeof(EbVisualizationGlobals));
                 __codeAnalysisScript.Compile();
             }
 
@@ -553,6 +559,86 @@ else{
                 return true;
             }
             return false;
+        }
+
+        public bool EvaluateExpression(EbDataRow _datarow, ref EbVisualizationGlobals globals, EvaluatorVersion EvaluatorVersion)
+        {
+            bool val;
+            foreach (FormulaPart formulaPart in this.FormulaParts)
+            {
+                object __value = null;
+                var __partType = _datarow.Table.Columns[formulaPart.FieldName].Type;
+                if (__partType == EbDbTypes.Decimal || __partType == EbDbTypes.Int32)
+                    __value = (_datarow[formulaPart.FieldName] != DBNull.Value) ? _datarow[formulaPart.FieldName] : 0;
+                else
+                    __value = _datarow[formulaPart.FieldName];
+
+                globals[formulaPart.TableName].Add(formulaPart.FieldName, new NTV
+                {
+                    Name = formulaPart.FieldName,
+                    Type = __partType,
+                    Value = __value
+                });
+            }
+            if (EvaluatorVersion == EvaluatorVersion.Version_1)
+            {
+                val = Convert.ToBoolean(this.GetCodeAnalysisScript().RunAsync(globals).Result.ReturnValue);
+            }
+            else
+            {
+                val = Convert.ToBoolean(this.ExecuteExpressionV2(globals, this.FormulaDataFieldsUsed));
+            }
+            return val;
+        }
+
+        public string GetProcessedCodeV2(string code, List<string> _dataFieldsUsed)
+        {
+            String processedCode = code;
+            _dataFieldsUsed = _dataFieldsUsed.OrderByDescending(c => c).ToList();
+
+            foreach (string calcfd in _dataFieldsUsed)
+            {
+                string fName = (calcfd.Split('.')[1]).Replace(";", "");
+                processedCode = processedCode.Replace("." + fName, ".GetValue(\"" + fName + "\")");
+            }
+            return processedCode;
+        }
+
+        public void SetVariableV2(EbVisualizationGlobals globals)
+        {
+            Dictionary<string, object> dict = new Dictionary<string, object>
+            {
+                {"T0", globals["T0"]},
+                {"T1", globals["T1"]},
+                {"T2", globals["T2"]},
+                {"T3", globals["T3"]},
+                {"T4", globals["T4"]},
+                {"T5", globals["T5"]},
+                {"T6", globals["T6"]},
+                {"T7", globals["T7"]},
+                {"T8", globals["T8"]},
+                {"T9", globals["T9"]},
+                {"Params", globals["Params"]},
+                {"Calc", globals["Calc"]},
+                {"Summary", globals["Summary"]}
+            };
+            evaluator.SetVariable(dict);
+        }
+
+        public object ExecuteExpressionV2(EbVisualizationGlobals globals,List< string> datafieldsUsed)
+        {
+            object value = null;
+            try
+            {
+                SetVariableV2(globals);
+                string code = GetProcessedCodeV2(this._Formula.Code, datafieldsUsed);
+                value = evaluator.Execute(code);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
+            return value;
         }
     }
 
@@ -1374,6 +1460,11 @@ else
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public AdvancedRenderType RenderAS { get; set; }
 
+        [JsonIgnore]
+        public EbSciptEvaluator evaluator = new EbSciptEvaluator
+        {
+            OptionScriptNeedSemicolonAtTheEndOfLastExpression = false
+        };
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -1422,15 +1513,16 @@ else
         {
             if (__codeAnalysisScript == null && !string.IsNullOrEmpty(this.Value.Code))
             {
-                __codeAnalysisScript = CSharpScript.Create<dynamic>(this.Value.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq"), globalsType: typeof(Globals));
+                __codeAnalysisScript = CSharpScript.Create<dynamic>(this.Value.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq"), globalsType: typeof(EbVisualizationGlobals));
                 __codeAnalysisScript.Compile();
             }
 
             return __codeAnalysisScript;
         }
 
-        public bool EvaluateExpression(EbDataRow _datarow, ref Globals globals)
+        public bool EvaluateExpression(EbDataRow _datarow, ref EbVisualizationGlobals globals, EvaluatorVersion EvaluatorVersion)
         {
+            bool val;
             foreach (FormulaPart formulaPart in this.FormulaParts)
             {
                 object __value = null;
@@ -1447,7 +1539,64 @@ else
                     Value = __value
                 });
             }
-            return Convert.ToBoolean(this.GetCodeAnalysisScript().RunAsync(globals).Result.ReturnValue);
+            if (EvaluatorVersion == EvaluatorVersion.Version_1)
+            {
+                val = Convert.ToBoolean(this.GetCodeAnalysisScript().RunAsync(globals).Result.ReturnValue);
+            }
+            else
+            {
+                val = Convert.ToBoolean(this.ExecuteExpressionV2(globals));
+            }
+            return val;
+        }
+
+        public string GetProcessedCodeV2(string code, string[] _dataFieldsUsed)
+        {
+            String processedCode = code;
+            _dataFieldsUsed = _dataFieldsUsed.OrderByDescending(c => c).ToArray();
+
+            foreach (string calcfd in _dataFieldsUsed)
+            {
+                string fName = (calcfd.Split('.')[1]).Replace(";", "");
+                processedCode = processedCode.Replace("." + fName, ".GetValue(\"" + fName + "\")");
+            }
+            return processedCode;
+        }
+
+        public void SetVariableV2(EbVisualizationGlobals globals)
+        {
+            Dictionary<string, object> dict = new Dictionary<string, object>
+            {
+                {"T0", globals["T0"]},
+                {"T1", globals["T1"]},
+                {"T2", globals["T2"]},
+                {"T3", globals["T3"]},
+                {"T4", globals["T4"]},
+                {"T5", globals["T5"]},
+                {"T6", globals["T6"]},
+                {"T7", globals["T7"]},
+                {"T8", globals["T8"]},
+                {"T9", globals["T9"]},
+                {"Params", globals["Params"]},
+                {"Calc", globals["Calc"]},
+                {"Summary", globals["Summary"]}
+            };
+            evaluator.SetVariable(dict);
+        }
+
+        public object ExecuteExpressionV2(EbVisualizationGlobals globals)
+        {
+            object value = null;
+            try
+            {
+                SetVariableV2(globals);
+                value = evaluator.Execute(this.Value.Code);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
+            return value;
         }
 
         public bool GetBoolValue()

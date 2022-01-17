@@ -602,10 +602,10 @@ namespace ExpressBase.Objects
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, PdfNTV> CalcValInRow { get; set; } = new Dictionary<string, PdfNTV>();
+        public Dictionary<string, GNTV> CalcValInRow { get; set; } = new Dictionary<string, GNTV>();
 
         [JsonIgnore]
-        public Dictionary<string, PdfNTV> SummaryValInRow { get; set; } = new Dictionary<string, PdfNTV>();
+        public Dictionary<string, GNTV> SummaryValInRow { get; set; } = new Dictionary<string, GNTV>();
 
         public dynamic GetDataFieldValue(string column_name, int i, int tableIndex)
         {
@@ -841,9 +841,9 @@ namespace ExpressBase.Objects
                         EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
 
                         if (CalcValInRow.ContainsKey(field.Title))
-                            CalcValInRow[field.Title] = new PdfNTV { Name = field.Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val };
+                            CalcValInRow[field.Title] = new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val };
                         else
-                            CalcValInRow.Add(field.Title, new PdfNTV { Name = field.Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val });
+                            CalcValInRow.Add(field.Title, new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val });
                     }
                     else
                     {
@@ -1200,7 +1200,7 @@ namespace ExpressBase.Objects
             if (Parameters != null)
                 foreach (Param p in Parameters) //adding Params to global
                 {
-                    globals["Params"].Add(p.Name, new PdfNTV { Name = p.Name, Type = (PdfEbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                    globals["Params"].Add(p.Name, new GNTV { Name = p.Name, Type = (GlobalDbType)Convert.ToInt32(p.Type), Value = p.Value });
                 }
 
             if (SummaryValInRow.Count > 0)
@@ -1244,7 +1244,7 @@ namespace ExpressBase.Objects
                 string fName = calcfd.Split('.')[1];
                 int tableIndex = Convert.ToInt32(TName.Substring(1));
                 int RowIndex = (tableIndex == this.DetailTableIndex) ? irow : 0;
-                globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)this.DataSet.Tables[tableIndex].Columns[fName].Type, Value = this.DataSet.Tables[tableIndex].Rows[RowIndex][fName] });
+                globals[TName].Add(fName, new GNTV { Name = fName, Type = (GlobalDbType)(int)this.DataSet.Tables[tableIndex].Columns[fName].Type, Value = this.DataSet.Tables[tableIndex].Rows[RowIndex][fName] });
             }
 
             AddParamsNCalcsInGlobal(globals);
@@ -1359,7 +1359,7 @@ namespace ExpressBase.Objects
                     string fName = calcfd.Split('.')[1];
                     int tableIndex = Convert.ToInt32(TName.Substring(1));
                     int RowIndex = (tableIndex == this.DetailTableIndex) ? irow : 0;
-                    globals[TName].Add(fName, new PdfNTV { Name = fName, Type = (PdfEbDbTypes)(int)this.DataSet.Tables[tableIndex].Columns[fName].Type, Value = this.DataSet.Tables[tableIndex].Rows[RowIndex][fName] });
+                    globals[TName].Add(fName, new GNTV { Name = fName, Type = (GlobalDbType)(int)this.DataSet.Tables[tableIndex].Columns[fName].Type, Value = this.DataSet.Tables[tableIndex].Rows[RowIndex][fName] });
                 }
                 AddParamsNCalcsInGlobal(globals);
                 SetVariableV2(globals);

@@ -594,9 +594,9 @@ namespace ExpressBase.Objects
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new GNTV { Name = Title.Replace(".", "_"), Type = GlobalDbType.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new GNTV { Name = Title.Replace(".", "_"), Type = GlobalDbType.Int32, Value = column_val });
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
@@ -981,9 +981,9 @@ namespace ExpressBase.Objects
                 dbtype = (EbDbTypes)CalcFieldIntType;
 
                 if (Rep.CalcValInRow.ContainsKey(Title))
-                    Rep.CalcValInRow[Title] = new PdfNTV { Name = Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val };
+                    Rep.CalcValInRow[Title] = new GNTV { Name = Title, Type = (GlobalDbType)(int)dbtype, Value = column_val };
                 else
-                    Rep.CalcValInRow.Add(Title, new PdfNTV { Name = Title, Type = (PdfEbDbTypes)(int)dbtype, Value = column_val });
+                    Rep.CalcValInRow.Add(Title, new GNTV { Name = Title, Type = (GlobalDbType)(int)dbtype, Value = column_val });
             }
             catch (Exception e)
             {
@@ -1155,9 +1155,9 @@ namespace ExpressBase.Objects
                 column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
-                Rep.SummaryValInRow[Title] = new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val };
+                Rep.SummaryValInRow[Title] = new GNTV { Name = Title.Replace(".", "_"), Type = GlobalDbType.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new PdfNTV { Name = Title.Replace(".", "_"), Type = PdfEbDbTypes.Int32, Value = column_val });
+                Rep.SummaryValInRow.Add(Title, new GNTV { Name = Title.Replace(".", "_"), Type = GlobalDbType.Int32, Value = column_val });
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))

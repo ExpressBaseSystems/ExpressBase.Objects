@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ExpressBase.Security;
 using System.Globalization;
+using ExpressBase.CoreBase.Globals;
 
 namespace ExpressBase.Objects.Objects
 {
@@ -31,7 +32,7 @@ namespace ExpressBase.Objects.Objects
 
         public List<ObjectBasicInfo> ObjectLinks { get; set; }
 
-        Globals globals = new Globals();
+        EbVisualizationGlobals globals = new EbVisualizationGlobals();
 
         public int InitialColumnsCount { get; set; }
 
@@ -204,7 +205,7 @@ namespace ExpressBase.Objects.Objects
             }
         }
 
-        public bool EvaluateExpression(EbDataRow _datarow, ref Globals globals, AdvancedCondition condition, long value)
+        public bool EvaluateExpression(EbDataRow _datarow, ref EbVisualizationGlobals globals, AdvancedCondition condition, long value)
         {
             foreach (FormulaPart formulaPart in condition.FormulaParts)
             {
