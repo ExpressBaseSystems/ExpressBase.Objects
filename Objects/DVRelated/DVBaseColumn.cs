@@ -573,10 +573,10 @@ else{
                 else
                     __value = _datarow[formulaPart.FieldName];
 
-                globals[formulaPart.TableName].Add(formulaPart.FieldName, new NTV
+                globals[formulaPart.TableName].Add(formulaPart.FieldName,new GNTV
                 {
                     Name = formulaPart.FieldName,
-                    Type = __partType,
+                    Type =(GlobalDbType) __partType,
                     Value = __value
                 });
             }
@@ -625,7 +625,7 @@ else{
             evaluator.SetVariable(dict);
         }
 
-        public object ExecuteExpressionV2(EbVisualizationGlobals globals,List< string> datafieldsUsed)
+        public object ExecuteExpressionV2(EbVisualizationGlobals globals, List<string> datafieldsUsed)
         {
             object value = null;
             try
@@ -1532,10 +1532,10 @@ else
                 else
                     __value = _datarow[formulaPart.FieldName];
 
-                globals[formulaPart.TableName].Add(formulaPart.FieldName, new NTV
+                globals[formulaPart.TableName].Add(formulaPart.FieldName, new GNTV
                 {
                     Name = formulaPart.FieldName,
-                    Type = __partType,
+                    Type = (GlobalDbType)__partType,
                     Value = __value
                 });
             }
@@ -1545,15 +1545,15 @@ else
             }
             else
             {
-                val = Convert.ToBoolean(this.ExecuteExpressionV2(globals));
+                val = Convert.ToBoolean(this.ExecuteExpressionV2(globals, FormulaDataFieldsUsed));
             }
             return val;
         }
 
-        public string GetProcessedCodeV2(string code, string[] _dataFieldsUsed)
+        public string GetProcessedCodeV2(string code, List<string> _dataFieldsUsed)
         {
             String processedCode = code;
-            _dataFieldsUsed = _dataFieldsUsed.OrderByDescending(c => c).ToArray();
+            _dataFieldsUsed = _dataFieldsUsed.OrderByDescending(c => c).ToList();
 
             foreach (string calcfd in _dataFieldsUsed)
             {
@@ -1584,13 +1584,14 @@ else
             evaluator.SetVariable(dict);
         }
 
-        public object ExecuteExpressionV2(EbVisualizationGlobals globals)
+        public object ExecuteExpressionV2(EbVisualizationGlobals globals, List<string> datafieldsUsed)
         {
             object value = null;
             try
             {
                 SetVariableV2(globals);
-                value = evaluator.Execute(this.Value.Code);
+                string code = GetProcessedCodeV2(this.Value.Code, datafieldsUsed);
+                value = evaluator.Execute(code);
             }
             catch (Exception e)
             {
