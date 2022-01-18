@@ -223,10 +223,10 @@ namespace ExpressBase.Objects.Objects
                 else
                     __value = _datarow[formulaPart.FieldName];
 
-                globals[formulaPart.TableName].Add(formulaPart.FieldName, new NTV
+                globals[formulaPart.TableName].Add(formulaPart.FieldName, new GNTV
                 {
                     Name = formulaPart.FieldName,
-                    Type = __partType,
+                    Type = (GlobalDbType)__partType,
                     Value = __value
                 });
             }
