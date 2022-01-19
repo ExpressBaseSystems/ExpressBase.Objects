@@ -123,80 +123,17 @@ namespace ExpressBase.Objects
             Dictionary<string, List<TableColumnMeta>> meta = new Dictionary<string, List<TableColumnMeta>>();
             try
             {
-                meta.Add(this.TableName, new List<TableColumnMeta>());
-
-                foreach (EbMobileControl ctrl in this.ChildControls)
-                {
-                    if (ctrl is INonPersistControl || ctrl.DoNotPersist)
-                        continue;
-                    else if (ctrl is EbMobileTableLayout tlayout)
-                    {
-                        foreach (EbMobileTableCell cell in tlayout.CellCollection)
-                        {
-                            foreach (EbMobileControl tctrl in cell.ControlCollection)
-                            {
-                                if (tctrl is INonPersistControl || ctrl.DoNotPersist)
-                                    continue;
-                                else
-                                    AppendMeta(meta[this.TableName], tctrl, vDbTypes);
-                            }
-                        }
-                    }
-                    else if (ctrl is EbMobileDataGrid grid)
-                    {
-                        meta.Add(grid.TableName, new List<TableColumnMeta>());
-                        meta[grid.TableName].Add(new TableColumnMeta
-                        {
-                            Name = this.TableName + "_id",
-                            Type = vDbTypes.GetVendorDbTypeStruct(EbDbTypes.Int32)
-                        });
-
-                        foreach (EbMobileControl gctrl in grid.ChildControls)
-                        {
-                            AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
-                        }
-                        AppendDefaultMeta(meta[grid.TableName], vDbTypes);
-                    }
-                    else
-                        AppendMeta(meta[this.TableName], ctrl, vDbTypes);
-                }
-                AppendDefaultMeta(meta[this.TableName], vDbTypes);
+                List<TableColumnMeta> metaList = new List<TableColumnMeta>();
+                metaList.Add(new TableColumnMeta { Name = "eb_device_id", Type = vDbTypes.String, Label = "Device Id" });
+                metaList.Add(new TableColumnMeta { Name = "eb_appversion", Type = vDbTypes.String, Label = "App Version" });
+                metaList.Add(new TableColumnMeta { Name = "eb_created_at_device", Type = vDbTypes.DateTime, Label = "Sync Time" });
+                meta.Add(this.TableName, metaList);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
             return meta;
-        }
-
-        private void AppendMeta(List<TableColumnMeta> source, EbMobileControl control, IVendorDbTypes vDbTypes)
-        {
-            source.Add(new TableColumnMeta
-            {
-                Name = control.Name,
-                Type = vDbTypes.GetVendorDbTypeStruct((EbDbTypes)control.EbDbType)
-            });
-        }
-
-        private void AppendDefaultMeta(List<TableColumnMeta> metaList, IVendorDbTypes vDbTypes)
-        {
-            try
-            {
-                metaList.Add(new TableColumnMeta { Name = "eb_created_by", Type = vDbTypes.Decimal, Label = "Created By" });
-                metaList.Add(new TableColumnMeta { Name = "eb_created_at", Type = vDbTypes.DateTime, Label = "Created At" });
-                metaList.Add(new TableColumnMeta { Name = "eb_lastmodified_by", Type = vDbTypes.Decimal, Label = "Last Modified By" });
-                metaList.Add(new TableColumnMeta { Name = "eb_lastmodified_at", Type = vDbTypes.DateTime, Label = "Last Modified At" });
-                metaList.Add(new TableColumnMeta { Name = "eb_del", Type = vDbTypes.Boolean, Default = "F" });
-                metaList.Add(new TableColumnMeta { Name = "eb_void", Type = vDbTypes.Boolean, Default = "F", Label = "Void ?" });
-                metaList.Add(new TableColumnMeta { Name = "eb_loc_id", Type = vDbTypes.Int32, Label = "Location" });
-                metaList.Add(new TableColumnMeta { Name = "eb_device_id", Type = vDbTypes.String, Label = "Device Id" });
-                metaList.Add(new TableColumnMeta { Name = "eb_appversion", Type = vDbTypes.String, Label = "App Version" });
-                metaList.Add(new TableColumnMeta { Name = "eb_created_at_device", Type = vDbTypes.DateTime, Label = "Sync Time" });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
         }
 
         public override List<string> DiscoverRelatedRefids()
