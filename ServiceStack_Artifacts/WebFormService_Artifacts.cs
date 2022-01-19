@@ -586,6 +586,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int DraftId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int CurrentLoc { get; set; }
     }
 
     [DataContract]

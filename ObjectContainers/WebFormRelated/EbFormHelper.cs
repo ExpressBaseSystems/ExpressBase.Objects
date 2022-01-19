@@ -523,6 +523,15 @@ namespace ExpressBase.Objects
                                         else
                                             psDict.Add(_columnDes.Control, _formattedData);
                                     }
+                                    try//temporary solution to avoid exception : 1$$text 
+                                    {
+                                        if (!psParams.Exists(e => e.ParameterName == _columnDes.ColumnName))
+                                            psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                                    }
                                 }
                             }
                             FormDes.FormData.MultipleTables[_tableDes.TableName].Add(RowDes);

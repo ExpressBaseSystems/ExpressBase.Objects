@@ -454,10 +454,10 @@ namespace ExpressBase.Objects
                 });
                 foreach (TableSchema _t in this.FormSchema.Tables)
                 {
-                    SingleTable Table = this.FormData.MultipleTables[_t.TableName];
                     if (_t.TableName == this.FormSchema.MasterTable)
                         continue;
-                    if (_t.TableType == WebFormTableTypes.Normal && Table.Count > 0)
+                    if (_t.TableType == WebFormTableTypes.Normal &&
+                        this.FormData.MultipleTables.TryGetValue(_t.TableName, out SingleTable Table) && Table.Count > 0)
                         this.FormData.MultipleTables[this.FormSchema.MasterTable][0].Columns.AddRange(Table[0].Columns);
                 }
             }
@@ -1894,7 +1894,8 @@ namespace ExpressBase.Objects
             if (this.DraftId > 0 && this.TableRowId == 0)
             {
                 Qry = $@"UPDATE eb_form_drafts SET is_submitted = 'T', form_data_id = eb_currval('{this.TableName}_id_seq'), eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}
-                        WHERE id = @draft_id_{i} AND form_ref_id = @{this.TableName}_form_ref_id AND eb_created_by = @eb_createdby AND is_submitted = 'F' AND eb_del = 'F'; ";
+                        WHERE id = @draft_id_{i} AND form_ref_id = @{this.TableName}_form_ref_id AND is_submitted = 'F' AND eb_del = 'F' AND
+                        ((eb_created_by = @eb_createdby AND COALESCE(draft_type, 0)={(int)FormDraftTypes.NormalDraft}) OR draft_type = {(int)FormDraftTypes.ErrorBin}); ";
 
                 param.Add(DataDB.GetNewParameter($"draft_id_{i++}", EbDbTypes.Int32, this.DraftId));
                 param.Add(DataDB.GetNewParameter($"{this.TableName}_form_ref_id", EbDbTypes.String, this.RefId));
