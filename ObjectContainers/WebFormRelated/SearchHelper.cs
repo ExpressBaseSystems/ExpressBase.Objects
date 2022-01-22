@@ -77,6 +77,31 @@ namespace ExpressBase.Objects.WebFormRelated
                 _data.Add(_key, _val);
         }
 
+        public static void InsertOrUpdateAsync(IDatabase DataDB, EbWebForm _webForm, Service service)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search Async start");
+                    _webForm.DbConnection = null;
+                    _webForm.RefreshFormData(DataDB, service, false, false);
+                    string _data = GetJsonData(_webForm);
+                    if (string.IsNullOrEmpty(_data))
+                    {
+                        if (ExistsIndexControls(_webForm))
+                            Delete(DataDB, _webForm.RefId, _webForm.TableRowId);
+                    }
+                    else
+                        InsertOrUpdate(DataDB, _data, _webForm.RefId, _webForm.TableRowId, _webForm.UserObj.UserId, _webForm.DisplayName);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception in async insert/update global search data. Message: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                }
+            });
+        }
+
         public static void InsertOrUpdate(IDatabase DataDB, EbWebForm _webForm)
         {
             try

@@ -28,7 +28,7 @@ namespace ExpressBase.Objects
                 this.MasterForm = ebWebFormList[0];/////////dummy master
         }
 
-        public void Insert(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
+        public void Insert(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i, bool pushAuditTrail)
         {
             ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
             foreach (EbWebForm WebForm in this)
@@ -73,6 +73,9 @@ namespace ExpressBase.Objects
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
                 }
+
+                if (pushAuditTrail)
+                    fullqry += EbAuditTrail.GetInsertModeQuery(DataDB, WebForm.RefId, WebForm.TableName);
             }
 
             args.CopyBack(ref _extqry, ref i);

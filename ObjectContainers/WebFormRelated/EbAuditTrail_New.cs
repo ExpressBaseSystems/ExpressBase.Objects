@@ -262,6 +262,11 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 return this.DataDB.GetNewParameter(Name, EbDbTypes.String, Value);
         }
 
+        public static string GetInsertModeQuery(IDatabase DataDB, string refId, string tableName)
+        {
+            return $@"INSERT INTO eb_audit_master(formid, dataid, actiontype, eb_createdby, eb_createdat) 
+                        VALUES ('{refId}', (SELECT eb_currval('{tableName}_id_seq')), {(int)DataModificationAction.Created}, @{FormConstants.eb_createdby}, {DataDB.EB_CURRENT_TIMESTAMP}); ";
+        }
 
         public string GetAuditTrail()
         {

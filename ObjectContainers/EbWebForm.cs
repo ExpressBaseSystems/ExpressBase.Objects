@@ -1754,6 +1754,7 @@ namespace ExpressBase.Objects
                 WebformData in_data = JsonConvert.DeserializeObject<WebformData>(JsonConvert.SerializeObject(this.FormData));
                 this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
+                bool IsMobInsert = !IsUpdate && wc == RoutingConstants.MC;
                 if (IsUpdate)
                 {
                     string ts = this.FormData.ModifiedAt;
@@ -1778,14 +1779,21 @@ namespace ExpressBase.Objects
                     this.DbConnection.Open();
                     this.DbTransaction = this.DbConnection.BeginTransaction();
 
-                    this.TableRowId = this.Insert(DataDB, service, true);
+                    this.TableRowId = this.Insert(DataDB, service, true, true);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
-                this.RefreshFormData(DataDB, service, false, true);
-                Console.WriteLine("EbWebForm.Save.UpdateAuditTrail start");
-                EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
-                resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
+
+                if (!IsMobInsert)
+                    this.RefreshFormData(DataDB, service, false, true);
+
+                if (IsUpdate)
+                {
+                    Console.WriteLine("EbWebForm.Save.UpdateAuditTrail start");
+                    EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                    resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
+                }
+
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
@@ -1801,7 +1809,10 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
                 EbFnGateway.SendMobileNotification(this, EbConFactory);
                 Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
-                SearchHelper.InsertOrUpdate(DataDB, this);
+                if (IsMobInsert)
+                    SearchHelper.InsertOrUpdateAsync(DataDB, this, service);
+                else
+                    SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
             }
             catch (FormException ex1)
@@ -1833,7 +1844,7 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        public int Insert(IDatabase DataDB, Service service, bool handleUniqueErr)
+        public int Insert(IDatabase DataDB, Service service, bool handleUniqueErr, bool pushAuditTrail)
         {
             string fullqry = string.Empty;
             string _extqry = string.Empty;
@@ -1843,7 +1854,7 @@ namespace ExpressBase.Objects
                 this.PrepareWebFormData();
 
             this.FormCollection.ExecDGUniqueCheck();
-            this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
+            this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i, pushAuditTrail);
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
@@ -2143,7 +2154,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    this.TableRowId = this.Insert(DataDB, service, false);
+                    this.TableRowId = this.Insert(DataDB, service, false, false);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
