@@ -357,9 +357,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public DateTime last_sync_ts { set; get; }
 
+        [DataMember(Order = 7)]
+        public List<Byte[]> Images { set; get; }
+
         public EbMobileSolutionData()
         {
             Applications = new List<AppDataToMob>();
+            Images = new List<byte[]>();
         }
     }
 
