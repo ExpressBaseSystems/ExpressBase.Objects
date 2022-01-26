@@ -214,6 +214,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbDataPusher> DataPushers { get; set; }
 
+        [PropertyGroup(PGConstants.DATA)]
+        [EnableInBuilder(BuilderType.WebForm)]
+
+        public EvaluatorVersion EvaluatorVersion { get; set; }
+
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
@@ -2290,20 +2295,27 @@ namespace ExpressBase.Objects
         {
             try
             {
-                Script valscript = CSharpScript.Create<dynamic>(
-                    code,
-                    ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System", "System.Collections.Generic", "System.Linq"),
-                    globalsType: typeof(FG_Root)
-                );
-                valscript.Compile();
-                //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-                return (valscript.RunAsync(globals)).Result.ReturnValue;
+                if (this.EvaluatorVersion == EvaluatorVersion.Version_2)
+                {
+                    return FG_Evaluator.ScriptEvaluate(code, globals);
+                }
+                else
+                {
+                    Script valscript = CSharpScript.Create<dynamic>(
+                        code,
+                        ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System", "System.Collections.Generic", "System.Linq"),
+                        globalsType: typeof(FG_Root)
+                    );
+                    valscript.Compile();
+                    //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                    return (valscript.RunAsync(globals)).Result.ReturnValue;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception in C# Expression evaluation:" + code + " \nMessage : " + ex.Message);
-                Console.WriteLine(ex.StackTrace);
-                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
+                string msg = "Exception in C# expression evaluation v" + ((int)this.EvaluatorVersion + 1);
+                Console.WriteLine($"{msg}: {code} \nMessage: {ex.Message} \nStackTrace: {ex.StackTrace}");
+                throw new FormException(msg, (int)HttpStatusCode.InternalServerError, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
             }
         }
 

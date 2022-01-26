@@ -430,7 +430,7 @@ else if (this.MultiPushIdType === 2)
             if (FnDef == string.Empty)
                 return string.Empty;
 
-            return FnDef + "\nDictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "\nreturn out_dict;";
+            return FnDef + "\nInitOutputDict();\n" + FnCall + "\nreturn out_dict;";
         }
 
         //Combining all c sharp scripts to be executed as a single program
@@ -496,17 +496,25 @@ else if (this.MultiPushIdType === 2)
             if (FnDef == string.Empty)
                 return string.Empty;
 
-            return FnDef + "Dictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "return out_dict;";
+            return FnDef + "InitOutputDict(); \n" + FnCall + "return out_dict;";
         }
 
         private string GetFunctionDefinition(string Code, int Index)
         {
-
-            return $@"
+            if (this.WebForm.EvaluatorVersion == EvaluatorVersion.Version_1)
+            {
+                return $@"
 public object fn_{Index}() 
 {{ 
-    {(Regex.IsMatch(Code, @"\breturn\b") ? string.Empty : "return ")} {Code} ;
+  {(Regex.IsMatch(Code, @"\breturn\b") ? string.Empty : "return ")} {Code} ;
 }}".RemoveCR() + "\n";
+            }
+
+            return $@"
+fn_{Index} = () => 
+{{ 
+  {(Regex.IsMatch(Code, @"\breturn\b") ? string.Empty : "return ")} {Code} ;
+}};".RemoveCR() + "\n";
         }
 
         private string GetFunctionCall(int Index, bool PlaceHolder = false)
@@ -779,7 +787,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             if (FnDef == string.Empty)
                 return string.Empty;
 
-            return FnDef + "Dictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "return out_dict;";
+            return FnDef + "InitOutputDict();\n" + FnCall + "return out_dict;";
         }
 
         public void CreateWebFormData_Demo(object out_dict, string Json)
@@ -923,7 +931,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             if (FnDef == string.Empty)
                 return string.Empty;
 
-            return FnDef + "Dictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "return out_dict;";
+            return FnDef + "InitOutputDict();\n" + FnCall + "return out_dict;";
         }
 
         private void GetFnDefinitionRec(JToken JTok, ref string FnDef, ref string PusherFnCall, ref int Index)
