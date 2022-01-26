@@ -55,7 +55,7 @@ VALUES
     {(int)FormDraftTypes.ErrorBin},
     {Form.UserObj.SignInLogId}
 ); 
-SELECT eb_currval('eb_error_submissions_id_seq');";
+SELECT eb_currval('eb_form_drafts_id_seq');";
 
                 DbParameter[] parameters = new DbParameter[]
                 {
