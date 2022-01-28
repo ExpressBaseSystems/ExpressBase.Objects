@@ -243,11 +243,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup("List Styles")]
+        [DefaultPropValue(5, 5, 5, 5)]
         public EbThickness Margin { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup("List Styles")]
+        [DefaultPropValue(10, 10, 10, 10)]
         public EbThickness Padding { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -262,17 +264,20 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
+        [DefaultPropValue("10")]
         public int BorderRadius { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
         [PropertyEditor(PropertyEditorType.Color)]
         [Alias("Border/Shadow Color")]
+        [DefaultPropValue("#eaedf0")]
         public string BorderColor { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#eaedf0")]
         public string BackgroundColor { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
