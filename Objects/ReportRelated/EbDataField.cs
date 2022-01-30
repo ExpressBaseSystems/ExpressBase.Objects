@@ -1021,16 +1021,16 @@ namespace ExpressBase.Objects
             ct.Go();
         }
 
-        public dynamic GetCalcFieldValue(EbPdfGlobals globals, EbDataSet DataSet, int serialnumber, EbReport Rep)
+        public string GetCalcFieldValue(EbPdfGlobals globals, EbDataSet DataSet, int serialnumber, EbReport Rep)
         {
-            dynamic value;
+            string value;
             if (Rep.EvaluatorVersion == EvaluatorVersion.Version_1)
             {
-                value = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[this.Name], serialnumber, globals, DataFieldsUsedInCalc).ToString();
+                value = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[this.Name], serialnumber, globals, DataFieldsUsedInCalc)?.ToString();
             }
             else
             {
-                value = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), serialnumber, globals, DataFieldsUsedInCalc, true).ToString();
+                value = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), serialnumber, globals, DataFieldsUsedInCalc, true)?.ToString();
             }
             return value;
         }
