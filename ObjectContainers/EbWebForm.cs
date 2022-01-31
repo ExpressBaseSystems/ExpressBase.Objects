@@ -1666,56 +1666,57 @@ namespace ExpressBase.Objects
         public string SaveReview(EbConnectionFactory EbConFactory, Service service, string wc)
         {
             IDatabase DataDB = EbConFactory.DataDB;
-            this.DbConnection = DataDB.GetNewConnection();
             string resp;
-            try
+            using (this.DbConnection = DataDB.GetNewConnection())
             {
-                this.DbConnection.Open();
-                this.DbTransaction = this.DbConnection.BeginTransaction();
-                this.RefreshFormData(DataDB, service, true, false);
-                CheckConstraints(wc, true);
+                try
+                {
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+                    this.RefreshFormData(DataDB, service, true, false);
+                    CheckConstraints(wc, true);
 
-                string fullqry = string.Empty;
-                string _extqry = string.Empty;
-                List<DbParameter> param = new List<DbParameter>();
-                int i = 0;
-                this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
-                fullqry += _extqry;
-                fullqry += EbReviewHelper.GetMyActionInsertUpdateQueryxx(this, DataDB, param, ref i, service);
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, this.UserObj.UserId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
-                resp = "Updated: " + DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
+                    string fullqry = string.Empty;
+                    string _extqry = string.Empty;
+                    List<DbParameter> param = new List<DbParameter>();
+                    int i = 0;
+                    this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
+                    fullqry += _extqry;
+                    fullqry += EbReviewHelper.GetMyActionInsertUpdateQueryxx(this, DataDB, param, ref i, service);
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, this.UserObj.UserId));
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
+                    resp = "Updated: " + DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
 
-                this.RefreshFormData(DataDB, service, false, true);
-                Console.WriteLine("EbWebForm.SaveReview.UpdateAuditTrail start");
-                EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
-                resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
-                Console.WriteLine("EbWebForm.SaveReview.AfterSave start");
-                resp += " - AfterSave: " + this.AfterSave(DataDB, true);
-                this.DbTransaction.Commit();
-                Console.WriteLine("EbWebForm.SaveReview.DbTransaction Committed");
-                Console.WriteLine("EbWebForm.SaveReview.SendNotifications start");
-                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
-                Console.WriteLine("EbWebForm.SaveReview.SendMobileNotification start");
-                EbFnGateway.SendMobileNotification(this, EbConFactory);
-                Console.WriteLine("EbWebForm.SaveReview.resp = " + resp);
+                    this.RefreshFormData(DataDB, service, false, true);
+                    Console.WriteLine("EbWebForm.SaveReview.UpdateAuditTrail start");
+                    EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                    resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
+                    Console.WriteLine("EbWebForm.SaveReview.AfterSave start");
+                    resp += " - AfterSave: " + this.AfterSave(DataDB, true);
+                    this.DbTransaction.Commit();
+                    Console.WriteLine("EbWebForm.SaveReview.DbTransaction Committed");
+                    Console.WriteLine("EbWebForm.SaveReview.SendNotifications start");
+                    resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                    Console.WriteLine("EbWebForm.SaveReview.SendMobileNotification start");
+                    EbFnGateway.SendMobileNotification(this, EbConFactory);
+                    Console.WriteLine("EbWebForm.SaveReview.resp = " + resp);
+                }
+                catch (FormException ex1)
+                {
+                    try { this.DbTransaction.Rollback(); }
+                    catch (Exception ex2) { Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}"); }
+                    throw ex1;
+                }
+                catch (Exception ex1)
+                {
+                    try { this.DbTransaction.Rollback(); }
+                    catch (Exception ex2) { Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}"); }
+                    throw new FormException("Review submission failed! [Internal server error]", (int)HttpStatusCode.InternalServerError, ex1.Message, ex1.StackTrace);
+                }
             }
-            catch (FormException ex1)
-            {
-                try { this.DbTransaction.Rollback(); }
-                catch (Exception ex2) { Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}"); }
-                throw ex1;
-            }
-            catch (Exception ex1)
-            {
-                try { this.DbTransaction.Rollback(); }
-                catch (Exception ex2) { Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}"); }
-                throw new FormException("Review submission failed! [Internal server error]", (int)HttpStatusCode.InternalServerError, ex1.Message, ex1.StackTrace);
-            }
-            this.DbConnection.Close();
             return resp;
         }
 
@@ -1830,6 +1831,8 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
+                if (this.DbConnection != null && this.DbConnection.State != System.Data.ConnectionState.Closed)
+                    this.DbConnection.Close();
                 throw ex1;
             }
             catch (Exception ex1)
@@ -1842,9 +1845,11 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
+                if (this.DbConnection != null && this.DbConnection.State != System.Data.ConnectionState.Closed)
+                    this.DbConnection.Close();
                 throw new FormException(FormErrors.E0130 + ex1.Message, (int)HttpStatusCode.InternalServerError, $"Exception in save form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", ex1.StackTrace);
             }
-            if (this.DbConnection != null)
+            if (this.DbConnection != null && this.DbConnection.State != System.Data.ConnectionState.Closed)
                 this.DbConnection.Close();
             return resp;
         }
@@ -2183,9 +2188,11 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
+                if (DbCon == null && this.DbConnection != null && this.DbConnection.State != System.Data.ConnectionState.Closed)
+                    this.DbConnection.Close();
                 throw new FormException("Exception in Form data save", (int)HttpStatusCode.InternalServerError, ex1.Message, ex1.StackTrace);
             }
-            if (DbCon == null)
+            if (DbCon == null && this.DbConnection != null && this.DbConnection.State != System.Data.ConnectionState.Closed)
                 this.DbConnection.Close();
             return resp;
         }
@@ -2468,30 +2475,32 @@ namespace ExpressBase.Objects
             int status = -1;
             if (this.CanDelete(DataDB))
             {
-                try
+                using (this.DbConnection = DataDB.GetNewConnection())
                 {
-                    this.DbConnection = DataDB.GetNewConnection();
-                    this.DbConnection.Open();
-                    this.DbTransaction = this.DbConnection.BeginTransaction();
-
-                    string query = QueryGetter.GetDeleteQuery(this, DataDB);
-                    DbParameter[] param = new DbParameter[] {
-                        DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                        DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-                    };
-                    status = DataDB.DoNonQuery(this.DbConnection, query, param);
-                    if (status > 0)
+                    try
                     {
-                        EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
-                        ebAuditTrail.UpdateAuditTrail(DataModificationAction.Deleted);
+                        this.DbConnection.Open();
+                        this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                        string query = QueryGetter.GetDeleteQuery(this, DataDB);
+                        DbParameter[] param = new DbParameter[] {
+                            DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                            DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                        };
+                        status = DataDB.DoNonQuery(this.DbConnection, query, param);
+                        if (status > 0)
+                        {
+                            EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                            ebAuditTrail.UpdateAuditTrail(DataModificationAction.Deleted);
+                        }
+                        this.DbTransaction.Commit();
+                        this.DbConnection.Close();
                     }
-                    this.DbTransaction.Commit();
-                    this.DbConnection.Close();
-                }
-                catch (Exception ex)
-                {
-                    this.DbTransaction.Rollback();
-                    Console.WriteLine("Exception in Delete/RevokeDelete: " + ex.Message + "\n" + ex.StackTrace);
+                    catch (Exception ex)
+                    {
+                        this.DbTransaction.Rollback();
+                        Console.WriteLine("Exception in Delete/RevokeDelete: " + ex.Message + "\n" + ex.StackTrace);
+                    }
                 }
             }
             return status;
@@ -2545,32 +2554,34 @@ namespace ExpressBase.Objects
             string modifiedAt = null;
             if (this.CanCancel(DataDB))
             {
-                try
+                using (this.DbConnection = DataDB.GetNewConnection())
                 {
-                    this.DbConnection = DataDB.GetNewConnection();
-                    this.DbConnection.Open();
-                    this.DbTransaction = this.DbConnection.BeginTransaction();
-
-                    string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
-                    DbParameter[] param = new DbParameter[]
+                    try
                     {
+                        this.DbConnection.Open();
+                        this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                        string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
+                        DbParameter[] param = new DbParameter[]
+                        {
                         DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                         DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-                    };
-                    status = DataDB.DoNonQuery(this.DbConnection, query, param);
-                    if (status > 0)
-                    {
-                        modifiedAt = this.GetLastModifiedAt(DataDB);
-                        EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
-                        ebAuditTrail.UpdateAuditTrail(Cancel ? DataModificationAction.Cancelled : DataModificationAction.CancelReverted);
+                        };
+                        status = DataDB.DoNonQuery(this.DbConnection, query, param);
+                        if (status > 0)
+                        {
+                            modifiedAt = this.GetLastModifiedAt(DataDB);
+                            EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                            ebAuditTrail.UpdateAuditTrail(Cancel ? DataModificationAction.Cancelled : DataModificationAction.CancelReverted);
+                        }
+                        this.DbTransaction.Commit();
+                        this.DbConnection.Close();
                     }
-                    this.DbTransaction.Commit();
-                    this.DbConnection.Close();
-                }
-                catch (Exception ex)
-                {
-                    this.DbTransaction.Rollback();
-                    Console.WriteLine("Exception in Cancel/RevokeCancel: " + ex.Message + "\n" + ex.StackTrace);
+                    catch (Exception ex)
+                    {
+                        this.DbTransaction.Rollback();
+                        Console.WriteLine("Exception in Cancel/RevokeCancel: " + ex.Message + "\n" + ex.StackTrace);
+                    }
                 }
             }
             return (status, modifiedAt);
@@ -2580,32 +2591,33 @@ namespace ExpressBase.Objects
         {
             int status = -1;
             string modifiedAt = null;
-            try
+            using (this.DbConnection = DataDB.GetNewConnection())
             {
-                this.DbConnection = DataDB.GetNewConnection();
-                this.DbConnection.Open();
-                this.DbTransaction = this.DbConnection.BeginTransaction();
-
-                string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
-                DbParameter[] param = new DbParameter[]
+                try
                 {
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                    string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
+                    DbParameter[] param = new DbParameter[]
+                    {
                     DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
-                };
-                status = DataDB.DoNonQuery(this.DbConnection, query, param);
-                if (status > 0)
-                {
-                    modifiedAt = this.GetLastModifiedAt(DataDB);
-                    EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
-                    ebAuditTrail.UpdateAuditTrail(Lock ? DataModificationAction.Locked : DataModificationAction.Unlocked);
+                    };
+                    status = DataDB.DoNonQuery(this.DbConnection, query, param);
+                    if (status > 0)
+                    {
+                        modifiedAt = this.GetLastModifiedAt(DataDB);
+                        EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                        ebAuditTrail.UpdateAuditTrail(Lock ? DataModificationAction.Locked : DataModificationAction.Unlocked);
+                    }
+                    this.DbTransaction.Commit();
                 }
-                this.DbTransaction.Commit();
-                this.DbConnection.Close();
-            }
-            catch (Exception ex)
-            {
-                this.DbTransaction.Rollback();
-                Console.WriteLine("Exception in Lock/Unlock: " + ex.Message + "\n" + ex.StackTrace);
+                catch (Exception ex)
+                {
+                    this.DbTransaction.Rollback();
+                    Console.WriteLine("Exception in Lock/Unlock: " + ex.Message + "\n" + ex.StackTrace);
+                }
             }
             return (status, modifiedAt);
         }
