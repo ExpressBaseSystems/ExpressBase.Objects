@@ -79,6 +79,10 @@ namespace ExpressBase.Objects
         public bool RenderAsFilterDialog { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Rendering")]
+        public bool AutoSyncOnLoad { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<Param> RenderValidatorParams { get; set; }
 
