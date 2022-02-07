@@ -73,8 +73,8 @@ SELECT eb_currval('eb_form_drafts_id_seq');";
                 return new InsertDataFromWebformResponse()
                 {
                     Message = "Error submission saved",
-                    RowId = -1,
-                    RowAffected = 1,
+                    RowId = _id,
+                    RowAffected = 1000,
                     AffectedEntries = "Error submission id: " + _id,
                     Status = (int)HttpStatusCode.OK,
                     MetaData = MetaData
