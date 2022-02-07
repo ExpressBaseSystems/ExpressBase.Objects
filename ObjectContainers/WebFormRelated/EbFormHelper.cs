@@ -494,7 +494,7 @@ namespace ExpressBase.Objects
         }
 
         //Copy FormData in form SOURCE to DESTINATION (Different form)
-        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams)
+        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams, bool CopyAutoId)
         {
             foreach (TableSchema _tableDes in FormDes.FormSchema.Tables)
             {
@@ -548,7 +548,7 @@ namespace ExpressBase.Objects
                         foreach (ColumnSchema _columnDes in _tableDes.Columns)
                         {
                             ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(_columnDes.ColumnName);
-                            if (ColumnSrc != null && !(_columnDes.Control is EbAutoId) && (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation))
+                            if (ColumnSrc != null && (!(_columnDes.Control is EbAutoId) || CopyAutoId) && (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation))
                             {
                                 FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                                 _formattedData = Convert.ToString(ColumnSrc.Value);
