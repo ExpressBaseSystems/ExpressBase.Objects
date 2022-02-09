@@ -747,12 +747,11 @@ namespace ExpressBase.Objects
                     else if (this.TableRowId == 0 && (isMobOfflineData || isDraftSave) && !string.IsNullOrWhiteSpace(Row[ctrl.Name]?.ToString()))
                     {
                         patternVal = $"'{Convert.ToString(Row[ctrl.Name])}'";
-                        ctrl.BypassParameterization = true;
+                        ctrl.BypassParameterization = true;//info: this will avoid unique check db hit
                     }
                     else if (this.TableRowId == 0 && isErrorDraftGet && !string.IsNullOrWhiteSpace(Row[ctrl.Name]?.ToString()))
                     {
                         patternVal = Convert.ToString(Row[ctrl.Name]);
-                        ctrl.BypassParameterization = true;///
                     }
                     else if (this.TableRowId == 0)// if new mode and not data pusher slave
                     {
@@ -1797,7 +1796,7 @@ namespace ExpressBase.Objects
                     this.DbConnection.Open();
                     this.DbTransaction = this.DbConnection.BeginTransaction();
 
-                    this.TableRowId = this.Insert(DataDB, service, true, true);
+                    this.TableRowId = this.Insert(DataDB, service, !IsMobInsert, true);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
@@ -1820,6 +1819,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.ExecUniqueCheck start");
                 this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
                 this.DbTransaction.Commit();
+                this.DbTransaction.Dispose();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
                 resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
@@ -1837,7 +1837,11 @@ namespace ExpressBase.Objects
             {
                 try
                 {
-                    this.DbTransaction.Rollback();
+                    if (this.DbTransaction != null)
+                    {
+                        this.DbTransaction.Rollback();
+                        this.DbTransaction.Dispose();
+                    }
                 }
                 catch (Exception ex2)
                 {
@@ -1851,7 +1855,11 @@ namespace ExpressBase.Objects
             {
                 try
                 {
-                    this.DbTransaction.Rollback();
+                    if (this.DbTransaction != null)
+                    {
+                        this.DbTransaction.Rollback();
+                        this.DbTransaction.Dispose();
+                    }
                 }
                 catch (Exception ex2)
                 {
@@ -1906,6 +1914,7 @@ namespace ExpressBase.Objects
                         _params.Add(new NpgsqlParameter(p.ParameterName, p.DbType) { Value = p.Value });
                     param = _params;
                     this.DbTransaction.Rollback();
+                    this.DbTransaction.Dispose();
                     this.DbConnection.Close();
                     this.DbConnection = DataDB.GetNewConnection();
                     this.DbConnection.Open();
