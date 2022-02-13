@@ -57,13 +57,25 @@ VALUES
 ); 
 SELECT eb_currval('eb_form_drafts_id_seq');";
 
+                string message, stackTrace;
+                if (ex is FormException formEx)
+                {
+                    message = formEx.Message + "; " + formEx.MessageInternal;
+                    stackTrace = formEx.StackTrace + "; " + formEx.StackTraceInternal;
+                }
+                else
+                {
+                    message = ex.Message;
+                    stackTrace = ex.StackTrace;
+                }
+
                 DbParameter[] parameters = new DbParameter[]
                 {
                     DataDB.GetNewParameter("title", EbDbTypes.String, Form.DisplayName),
                     DataDB.GetNewParameter("form_data_json", EbDbTypes.String, request.FormData),
                     DataDB.GetNewParameter("form_ref_id", EbDbTypes.String, Form.RefId),
-                    DataDB.GetNewParameter("error_message", EbDbTypes.String, ex.Message),
-                    DataDB.GetNewParameter("error_stacktrace", EbDbTypes.String, ex.StackTrace)
+                    DataDB.GetNewParameter("error_message", EbDbTypes.String, message),
+                    DataDB.GetNewParameter("error_stacktrace", EbDbTypes.String, stackTrace)
                 };
 
                 EbDataSet ds = DataDB.DoQueries(Qry, parameters);
