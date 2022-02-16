@@ -363,11 +363,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 8)]
         public List<int> DraftIds { get; set; }
 
+        [DataMember(Order = 9)]
+        public Dictionary<string, object> MetaData { get; set; }
+
         public EbMobileSolutionData()
         {
             Applications = new List<AppDataToMob>();
             Images = new Dictionary<int, Byte[]>();
             DraftIds = new List<int>();
+            MetaData = new Dictionary<string, object>();
         }
     }
 
