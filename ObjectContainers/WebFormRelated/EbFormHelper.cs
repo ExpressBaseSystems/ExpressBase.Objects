@@ -363,6 +363,8 @@ namespace ExpressBase.Objects
                 Op = EbReport.Operations.Get(ForWhat);
             else if (EbType.IntCode == EbObjectTypes.TableVisualization)
                 Op = EbTableVisualization.Operations.Get(ForWhat);
+            else if (EbType.IntCode == EbObjectTypes.MobilePage)
+                Op = EbMobilePage.Operations.Get(ForWhat);
 
             if (WC == TokenConstants.UC && !Op.IsAvailableInWeb)
                 return false;

@@ -1682,7 +1682,7 @@ namespace ExpressBase.Objects
             try
             {
                 this.RefreshFormData(DataDB, service, true, false);
-                CheckConstraints(wc, true);
+                CheckConstraints(wc, true, null, null);
 
                 string fullqry = string.Empty;
                 string _extqry = string.Empty;
@@ -1759,7 +1759,7 @@ namespace ExpressBase.Objects
                 DbCon.Close();
         }
 
-        private void CheckConstraints(string wc, bool reviewFlow = false, string ts = null)
+        private void CheckConstraints(string wc, bool reviewFlow, string ts, string mobPageRefId)
         {
             if (this.FormData.IsReadOnly)
                 throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> Save");
@@ -1773,6 +1773,17 @@ namespace ExpressBase.Objects
             if (!reviewFlow && wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                 throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+
+            if (!reviewFlow && wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(mobPageRefId))
+            {
+                if (this.TableRowId > 0)
+                {
+                    if (!EbFormHelper.HasPermission(this.UserObj, mobPageRefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent))
+                        throw new FormException("Access denied to edit!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                }
+                else if (!EbFormHelper.HasPermission(this.UserObj, mobPageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
+                    throw new FormException("Access denied to save!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+            }
 
             if (!reviewFlow && !string.IsNullOrWhiteSpace(ts) && !string.IsNullOrWhiteSpace(this.FormData.ModifiedAt))
             {
@@ -1790,7 +1801,7 @@ namespace ExpressBase.Objects
         }
 
         //Normal save
-        public string Save(EbConnectionFactory EbConFactory, Service service, string wc)
+        public string Save(EbConnectionFactory EbConFactory, Service service, string wc, string MobilePageRefId)
         {
             IDatabase DataDB = EbConFactory.DataDB;
             string resp;
@@ -1804,7 +1815,7 @@ namespace ExpressBase.Objects
                 {
                     string ts = this.FormData.ModifiedAt;
                     this.RefreshFormData(DataDB, service, true, true);
-                    CheckConstraints(wc, false, ts);
+                    CheckConstraints(wc, false, ts, MobilePageRefId);
 
                     this.DbConnection = DataDB.GetNewConnection();
                     this.DbConnection.Open();
