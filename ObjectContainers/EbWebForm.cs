@@ -1759,6 +1759,7 @@ namespace ExpressBase.Objects
                 DbCon.Close();
         }
 
+        //edit mode
         private void CheckConstraints(string wc, bool reviewFlow, string ts, string mobPageRefId)
         {
             if (this.FormData.IsReadOnly)
@@ -1776,13 +1777,8 @@ namespace ExpressBase.Objects
 
             if (!reviewFlow && wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(mobPageRefId))
             {
-                if (this.TableRowId > 0)
-                {
-                    if (!EbFormHelper.HasPermission(this.UserObj, mobPageRefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent))
-                        throw new FormException("Access denied to edit!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-                }
-                else if (!EbFormHelper.HasPermission(this.UserObj, mobPageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
-                    throw new FormException("Access denied to save!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                if (!EbFormHelper.HasPermission(this.UserObj, mobPageRefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent))
+                    throw new FormException("Access denied to edit!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
             }
 
             if (!reviewFlow && !string.IsNullOrWhiteSpace(ts) && !string.IsNullOrWhiteSpace(this.FormData.ModifiedAt))
@@ -1825,8 +1821,9 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    //if (wc == TokenConstants.UC && !EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
-                    //    throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                    if (wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(MobilePageRefId) &&
+                        !EbFormHelper.HasPermission(this.UserObj, MobilePageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
+                        throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
 
                     if (this.IsDisable)
                         throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, $"ReadOnly form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", "EbWebForm -> Save");
