@@ -1777,7 +1777,7 @@ namespace ExpressBase.Objects
 
             if (!reviewFlow && wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(mobPageRefId))
             {
-                if (!EbFormHelper.HasPermission(this.UserObj, mobPageRefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent))
+                if (!EbFormHelper.HasPermission(this.UserObj, mobPageRefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent, wc))
                     throw new FormException("Access denied to edit!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
             }
 
@@ -1822,7 +1822,7 @@ namespace ExpressBase.Objects
                 else
                 {
                     if (wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(MobilePageRefId) &&
-                        !EbFormHelper.HasPermission(this.UserObj, MobilePageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
+                        !EbFormHelper.HasPermission(this.UserObj, MobilePageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent, wc))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
 
                     if (this.IsDisable)
