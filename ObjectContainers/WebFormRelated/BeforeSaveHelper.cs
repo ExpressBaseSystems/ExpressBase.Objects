@@ -66,6 +66,10 @@ namespace ExpressBase.Objects.WebFormRelated
                         {
                             if (string.IsNullOrWhiteSpace(_batchdp.SourceDG))
                                 throw new FormException($"Required 'Source datagrid' for data pusher");
+
+                            EbControl __dg = Allctrls.FirstOrDefault(e => e is EbDataGrid && e.Name == _batchdp.SourceDG);
+                            if (__dg == null)
+                                throw new FormException($"Wrong Source datagrid '{_batchdp.SourceDG}' for data pusher");
                         }
                         else if (!(dp is EbFormDataPusher))
                         {
