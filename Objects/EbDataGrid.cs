@@ -255,6 +255,9 @@ else {
         [HelpText("Set true if you want to hide the control.")]
         public override bool Hidden { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public override bool DoNotPersist { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-table'></i>"; } set { } }
@@ -698,7 +701,7 @@ else {
         {
             get
             {
-                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ";" +
+                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = val || '0'; " +
                   " return parseFloat(val.replace(/,/g, ''))";
             }
 
@@ -710,12 +713,15 @@ else {
         {
             get
             {
-                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = parseFloat(val.replace(/,/g, '')); " +
+                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = val || '0'; val = parseFloat(val.replace(/,/g, '')); " +
                   "return this.InputMode == 1 ? val.toLocaleString('en-IN', { maximumFractionDigits: this.DecimalPlaces, minimumFractionDigits: this.DecimalPlaces }) : val.toFixed(this.DecimalPlaces);";
             }
 
             set { }
         }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid_CtxId }]`).on('keyup change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {

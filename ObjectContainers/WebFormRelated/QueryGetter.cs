@@ -19,7 +19,7 @@ namespace ExpressBase.Objects.WebFormRelated
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             foreach (TableSchema _table in _this.FormSchema.Tables)
             {
-                if (_table.IsDynamic)
+                if (_table.IsDynamic || _table.DoNotPersist)
                     continue;
                 string _cols = $"{ebs[SystemColumns.eb_loc_id]}, id";
                 string _id = "id";

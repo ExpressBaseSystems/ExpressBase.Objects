@@ -1273,7 +1273,7 @@ namespace ExpressBase.Objects
             foreach (TableSchema _table in _schema.Tables)
             {
                 SingleTable Table = new SingleTable();
-                if (!_table.IsDynamic)
+                if (!_table.IsDynamic && !_table.DoNotPersist)
                 {
                     EbDataTable dataTable = dataset.Tables[count++];////                
                     this.GetFormattedData(dataTable, Table, _table);

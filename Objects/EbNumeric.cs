@@ -68,6 +68,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).val();"; } set { } }
 
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('keyup change', p1);"; } set { } }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {

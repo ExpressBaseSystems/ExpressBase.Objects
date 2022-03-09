@@ -43,7 +43,7 @@ namespace ExpressBase.Objects
                     string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
                     fullqry += string.Format(_q, string.Empty, string.Empty);
                 }
-                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
                     if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
                         continue;
@@ -89,7 +89,7 @@ namespace ExpressBase.Objects
                 args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
                 WebForm.DoRequiredCheck(WebForm == MasterForm);
 
-                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
                     if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
                         continue;
