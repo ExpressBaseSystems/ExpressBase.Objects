@@ -537,22 +537,33 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
+            if (this.BypassParameterization && args.cField.Value == null)
+                throw new Exception($"Unable to proceed/bypass with value '{args.cField.Value}' for {this.Name} (dg)");
+
             if (args.cField.Value == null || (this.EbDbType == EbDbTypes.Decimal && Convert.ToString(args.cField.Value) == string.Empty))
             {
                 var p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
             }
-            else
+            else if (!this.BypassParameterization)
                 args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
 
             if (args.ins)
             {
                 args._cols += string.Concat(args.cField.Name, ", ");
-                args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
+                if (this.BypassParameterization)
+                    args._vals += Convert.ToString(args.cField.Value) + ", ";
+                else
+                    args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
             }
             else
-                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+            {
+                if (this.BypassParameterization)
+                    args._colvals += args.cField.Name + "=" + Convert.ToString(args.cField.Value) + ", ";
+                else
+                    args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+            }
             args.i++;
             return true;
         }
