@@ -26,7 +26,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public override string DisplayName { get; set; }
-        
+
         public bool HideInMenu { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -36,7 +36,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Core")]
         [PropertyEditor(PropertyEditorType.Color)]
-        [DefaultPropValue("#ffffff")]
         public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -73,12 +72,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Style")]
         [PropertyEditor(PropertyEditorType.Color)]
-        [DefaultPropValue("#333333")]
+        [DefaultPropValue("#eeeeee")]
         public string IconColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Style")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#0046bb")]
         public string IconBackground { get; set; }
 
         public override List<string> DiscoverRelatedRefids()

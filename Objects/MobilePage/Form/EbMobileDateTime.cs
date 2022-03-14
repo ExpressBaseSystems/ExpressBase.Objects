@@ -30,6 +30,11 @@ namespace ExpressBase.Objects
         public bool BlockFutureDatedEntry { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
+        public EbScript MinValueExpr { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-calendar"; } }
 

@@ -222,16 +222,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool GetLogEnabled(string _refId)
         {
+            //Add LogEnabled prop in dr obj instead of eb_objects table  
 
-            List<DbParameter> parameter = new List<DbParameter>();
+            //List<DbParameter> parameter = new List<DbParameter>();
 
-            string query = EbConnectionFactory.ObjectsDB.EB_GET_LOG_ENABLED;
+            //string query = EbConnectionFactory.ObjectsDB.EB_GET_LOG_ENABLED;
 
-            parameter.Add(EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String, _refId));
+            //parameter.Add(EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String, _refId));
 
-            EbDataTable dt = EbConnectionFactory.ObjectsDB.DoQuery(query, parameter.ToArray());
-            if (dt.Rows.Count > 0)
-                return ((dt.Rows[0][0].ToString()) == "T") ? true : false;
+            //EbDataTable dt = EbConnectionFactory.ObjectsDB.DoQuery(query, parameter.ToArray());
+            //if (dt.Rows.Count > 0)
+            //    return ((dt.Rows[0][0].ToString()) == "T") ? true : false;
             return false;
         }
 

@@ -358,12 +358,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public DateTime last_sync_ts { set; get; }
 
         [DataMember(Order = 7)]
-        public Dictionary<int,Byte[]> Images { set; get; }
+        public Dictionary<int, Byte[]> Images { set; get; }
+
+        [DataMember(Order = 8)]
+        public List<int> DraftIds { get; set; }
+
+        [DataMember(Order = 9)]
+        public Dictionary<string, object> MetaData { get; set; }
 
         public EbMobileSolutionData()
         {
             Applications = new List<AppDataToMob>();
             Images = new Dictionary<int, Byte[]>();
+            DraftIds = new List<int>();
+            MetaData = new Dictionary<string, object>();
         }
     }
 

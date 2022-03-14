@@ -33,8 +33,8 @@ namespace ExpressBase.Objects.WebFormRelated
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Review, Title = _container.Label, ContainerName = _container.Name };
                     _schema.ExtendedControls.Add(_container);
                 }
-                else if (_container is EbDataGrid)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name, IsDynamic = _container.IsDynamicTabChild, DescOdr = !(_container as EbDataGrid).AscendingOrder };
+                else if (_container is EbDataGrid dg)
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name, IsDynamic = _container.IsDynamicTabChild, DescOdr = !dg.AscendingOrder, DoNotPersist = dg.DoNotPersist };
                 else
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
                 _schema.Tables.Add(_table);

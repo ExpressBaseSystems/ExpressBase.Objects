@@ -255,6 +255,9 @@ else {
         [HelpText("Set true if you want to hide the control.")]
         public override bool Hidden { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public override bool DoNotPersist { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-table'></i>"; } set { } }
@@ -534,22 +537,33 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
+            if (this.BypassParameterization && args.cField.Value == null)
+                throw new Exception($"Unable to proceed/bypass with value '{args.cField.Value}' for {this.Name} (dg)");
+
             if (args.cField.Value == null || (this.EbDbType == EbDbTypes.Decimal && Convert.ToString(args.cField.Value) == string.Empty))
             {
                 var p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
             }
-            else
+            else if (!this.BypassParameterization)
                 args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
 
             if (args.ins)
             {
                 args._cols += string.Concat(args.cField.Name, ", ");
-                args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
+                if (this.BypassParameterization)
+                    args._vals += Convert.ToString(args.cField.Value) + ", ";
+                else
+                    args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
             }
             else
-                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+            {
+                if (this.BypassParameterization)
+                    args._colvals += args.cField.Name + "=" + Convert.ToString(args.cField.Value) + ", ";
+                else
+                    args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+            }
             args.i++;
             return true;
         }
@@ -698,7 +712,7 @@ else {
         {
             get
             {
-                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ";" +
+                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = val || '0'; " +
                   " return parseFloat(val.replace(/,/g, ''))";
             }
 
@@ -710,12 +724,15 @@ else {
         {
             get
             {
-                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = parseFloat(val.replace(/,/g, '')); " +
+                return "let val = " + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "; val = val || '0'; val = parseFloat(val.replace(/,/g, '')); " +
                   "return this.InputMode == 1 ? val.toLocaleString('en-IN', { maximumFractionDigits: this.DecimalPlaces, minimumFractionDigits: this.DecimalPlaces }) : val.toFixed(this.DecimalPlaces);";
             }
 
             set { }
         }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid_CtxId }]`).on('keyup change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
