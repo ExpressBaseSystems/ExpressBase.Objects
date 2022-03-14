@@ -264,7 +264,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
-    }    
+    }
 
     public class AddTLResponse : IEbSSResponse
     {
@@ -299,9 +299,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddSmtpRequest : IReturn<AddMongoResponse>, IEbTenentRequest
+    public class AddSmtpRequest : IReturn<AddSmtpResponse>, IEbTenentRequest
     {
         public EbSmtpConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+    }
+    public class AddImapRequest : IReturn<AddSmtpResponse>, IEbTenentRequest
+    {
+        public EbImapConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+    }
+    public class AddPop3Request : IReturn<AddSmtpResponse>, IEbTenentRequest
+    {
+        public EbPop3Config Config { get; set; }
 
         public int UserId { get; set; }
 
@@ -311,6 +329,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class AddSmtpResponse : IEbSSResponse
     {
+        public int Id { get; set; }
+
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -340,7 +360,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class AddGoogleMapResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
-    }    
+    }
     public class AddOpenStreetMapRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
     {
         public OpenStreetMapConfig Config { get; set; }

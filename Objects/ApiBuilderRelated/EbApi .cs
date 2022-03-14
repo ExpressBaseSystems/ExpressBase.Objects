@@ -410,4 +410,41 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
     }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbEmailRetriever : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public override string Reference { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropDataSourceJsFn("return ebcontext.EmailRetrieveConnections")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public int MailConnection { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='EmailRetriever' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+    }
 }
