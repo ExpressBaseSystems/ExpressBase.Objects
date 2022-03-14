@@ -836,7 +836,7 @@ return '✖';
 
             if (Value != null)
             {
-                if (Value.ToString() == "T")
+                if (Value.ToString().ToLower() == "t" || Value.ToString().ToLower() == "true")
                 {
                     _formattedData = true;
                     _displayMember = "true";
