@@ -162,6 +162,11 @@ namespace ExpressBase.Objects.Objects
             return Globals.GetResourceValue(index);
         }
 
+        public void GoTo(int index)
+        {
+            Globals.GoToResource(index);
+        }
+
         public void Exit()
         {
             throw new ExplicitExitException("Execution terminated explicitly!");
@@ -175,11 +180,15 @@ namespace ExpressBase.Objects.Objects
 
     public delegate dynamic GetResourceValueHandler(int index);
 
+    public delegate void GoToResourceHandler(int index);
+
     public class ApiGlobals
     {
         private readonly Dictionary<string, object> globalParams;
 
         public event GetResourceValueHandler ResourceValueHandler;
+
+        public event GoToResourceHandler GoToHandler;
 
         public ApiScriptHelper Api { set; get; }
 
@@ -263,6 +272,11 @@ namespace ExpressBase.Objects.Objects
         internal dynamic GetResourceValue(int index)
         {
             return ResourceValueHandler.Invoke(index);
+        }
+
+        internal void GoToResource(int index)
+        {
+            GoToHandler.Invoke(index);
         }
     }
 
