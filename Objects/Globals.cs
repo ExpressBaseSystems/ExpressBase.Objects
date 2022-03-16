@@ -164,7 +164,12 @@ namespace ExpressBase.Objects.Objects
 
         public void GoTo(int index)
         {
-            Globals.GoToResource(index);
+            Globals.GoToResourceByIndex(index);
+        }
+
+        public void GoTo(string name)
+        {
+            Globals.GoToResourceByName(name);
         }
 
         public void Exit()
@@ -180,7 +185,9 @@ namespace ExpressBase.Objects.Objects
 
     public delegate dynamic GetResourceValueHandler(int index);
 
-    public delegate void GoToResourceHandler(int index);
+    public delegate void GoToResourceByIndexHandler(int index);
+
+    public delegate void GoToResourceByNameHandler(string name);
 
     public class ApiGlobals
     {
@@ -188,7 +195,9 @@ namespace ExpressBase.Objects.Objects
 
         public event GetResourceValueHandler ResourceValueHandler;
 
-        public event GoToResourceHandler GoToHandler;
+        public event GoToResourceByIndexHandler GoToByIndexHandler;
+
+        public event GoToResourceByNameHandler GoToByNameHandler;
 
         public ApiScriptHelper Api { set; get; }
 
@@ -274,9 +283,14 @@ namespace ExpressBase.Objects.Objects
             return ResourceValueHandler.Invoke(index);
         }
 
-        internal void GoToResource(int index)
+        internal void GoToResourceByIndex(int index)
         {
-            GoToHandler.Invoke(index);
+            GoToByIndexHandler.Invoke(index);
+        }
+
+        internal void GoToResourceByName(string name)
+        {
+            GoToByNameHandler.Invoke(name);
         }
     }
 

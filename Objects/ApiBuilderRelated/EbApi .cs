@@ -16,6 +16,17 @@ namespace ExpressBase.Objects
         {
             this.Sort((x, y) => x.RouteIndex.CompareTo(y.RouteIndex));
         }
+
+        public int GetIndex(string name)
+        {
+            int index = 0;
+            foreach (ApiResources resource in this)
+            {
+                if (resource.Name == name)
+                    index = this.IndexOf(resource);
+            }
+            return index;
+        }
     }
 
     public class ApiParams
