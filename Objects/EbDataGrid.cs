@@ -732,6 +732,25 @@ else {
         }
 
         [JsonIgnore]
+        public override string SetDisplayMemberJSfn
+        {
+            get
+            {
+                return JSFnsConstants.DG_hiddenColCheckCode + @"
+{
+if(this.DataVals.ObjType === 'DGNumericColumn' && p1 === undefined)
+    p1 = 0;
+let ele = document.getElementById(this.EbSid_CtxId);
+let start = ele.selectionStart, end = ele.selectionEnd;
+ele.value = p1;
+ele.setSelectionRange(start, end);
+}";
+            }
+
+            set { }
+        }
+
+        [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid_CtxId }]`).on('keyup change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
@@ -836,7 +855,7 @@ return '✖';
 
             if (Value != null)
             {
-                if (Value.ToString() == "T")
+                if (Value.ToString().ToLower() == "t" || Value.ToString().ToLower() == "true")
                 {
                     _formattedData = true;
                     _displayMember = "true";
