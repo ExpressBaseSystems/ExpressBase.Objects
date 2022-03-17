@@ -96,6 +96,10 @@ namespace ExpressBase.Objects.WebFormRelated
                     (control as EbPhone).FormRefId = _this.RefId;
                     (control as EbPhone).RedisClient = _this.RedisClient;
                 }
+                else if (control is IEbPowerSelect iPs)
+                {
+                    iPs.TableName = curTbl;
+                }
             }
 
             foreach (EbControl _control in _container.Controls)
