@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using Newtonsoft.Json.Linq;
 using ServiceStack.Text;
+using ExpressBase.CoreBase.Globals;
 
 namespace ExpressBase.Objects.Objects
 {
@@ -162,6 +163,11 @@ namespace ExpressBase.Objects.Objects
             return Globals.GetResourceValue(index);
         }
 
+        public dynamic GetResourceValue(string name)
+        {
+            return Globals.GetResourceValue(name);
+        }
+
         public void GoTo(int index)
         {
             Globals.GoToResourceByIndex(index);
@@ -183,21 +189,9 @@ namespace ExpressBase.Objects.Objects
         }
     }
 
-    public delegate dynamic GetResourceValueHandler(int index);
-
-    public delegate void GoToResourceByIndexHandler(int index);
-
-    public delegate void GoToResourceByNameHandler(string name);
-
-    public class ApiGlobals
+    public class ApiGlobals : ApiGlobalParent
     {
         private readonly Dictionary<string, object> globalParams;
-
-        public event GetResourceValueHandler ResourceValueHandler;
-
-        public event GoToResourceByIndexHandler GoToByIndexHandler;
-
-        public event GoToResourceByNameHandler GoToByNameHandler;
 
         public ApiScriptHelper Api { set; get; }
 
@@ -276,21 +270,6 @@ namespace ExpressBase.Objects.Objects
                 Type = GetEbDbType(value),
                 Value = value
             });
-        }
-
-        internal dynamic GetResourceValue(int index)
-        {
-            return ResourceValueHandler.Invoke(index);
-        }
-
-        internal void GoToResourceByIndex(int index)
-        {
-            GoToByIndexHandler.Invoke(index);
-        }
-
-        internal void GoToResourceByName(string name)
-        {
-            GoToByNameHandler.Invoke(name);
         }
     }
 

@@ -8,6 +8,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.Objects;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using ExpressBase.CoreBase.Globals;
 
 namespace ExpressBase.Objects
 {
@@ -17,6 +18,15 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript Script { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public EvaluatorVersion EvaluatorVersion { get; set; }
+
+        [JsonIgnore]
+        public EbSciptEvaluator evaluator = new EbSciptEvaluator
+        {
+            OptionScriptNeedSemicolonAtTheEndOfLastExpression = false
+        };
 
         public override string GetDesignHtml()
         {
@@ -29,7 +39,7 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        private Script GetScriptEvaluator()
+        private Script GetScriptEvaluatorV1()
         {
             string code = this.Script.Code.Trim();
 
@@ -52,23 +62,32 @@ namespace ExpressBase.Objects
             return evaluator;
         }
 
-        public ApiScript Execute(ApiGlobals global)
+        public ApiScript Execute(ApiGlobalParent global)
         {
-            Script evaluator = GetScriptEvaluator();
-
             ApiScript script = new ApiScript();
 
             try
             {
-                ScriptState result = evaluator.RunAsync(global).Result;
-
-                if (result.ReturnValue != null)
+                if (this.EvaluatorVersion == EvaluatorVersion.Version_1)
                 {
-                    script.Data = JsonConvert.SerializeObject(result.ReturnValue);
+                    Script evaluator = GetScriptEvaluatorV1();
+
+                    ScriptState result = evaluator.RunAsync(global as ApiGlobals).Result;
+
+                    if (result.ReturnValue != null)
+                    {
+                        script.Data = JsonConvert.SerializeObject(result.ReturnValue);
+                    }
+                    else
+                    {
+                        script.Data = "script executed without any return";
+                    }
                 }
                 else
                 {
-                    script.Data = "script executed without any return";
+                    evaluator.Context = global as ApiGlobalsCoreBase;
+                    object o = evaluator.Execute(this.Script.Code.Trim());
+                    script.Data = JsonConvert.SerializeObject(o);
                 }
             }
             catch (Exception e)

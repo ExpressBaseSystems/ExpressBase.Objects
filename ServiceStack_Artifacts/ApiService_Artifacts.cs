@@ -274,13 +274,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ApiException(string message, Exception innerException) : base(message, innerException) { }
     }
 
-    [Serializable()]
-    public class ExplicitExitException : Exception
-    {
-        public ExplicitExitException() : base() { }
+    //[Serializable()]
+    //public class ExplicitExitException : Exception
+    //{
+    //    public ExplicitExitException() : base() { }
 
-        public ExplicitExitException(string message) : base(message) { }
-    }
+    //    public ExplicitExitException(string message) : base(message) { }
+    //}
 
     [RuntimeSerializable]
     public class ApiScript
