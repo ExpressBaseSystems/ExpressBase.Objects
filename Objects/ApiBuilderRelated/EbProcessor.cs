@@ -9,6 +9,8 @@ using ExpressBase.Objects.Objects;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using ExpressBase.CoreBase.Globals;
+using CodingSeb.ExpressionEvaluator;
+using Newtonsoft.Json.Linq;
 
 namespace ExpressBase.Objects
 {
@@ -86,6 +88,7 @@ namespace ExpressBase.Objects
                 else
                 {
                     evaluator.Context = global as ApiGlobalsCoreBase;
+                    evaluator.EvaluateVariable += EvaluateVariable;
                     object o = evaluator.Execute(this.Script.Code.Trim());
                     script.Data = JsonConvert.SerializeObject(o);
                 }
@@ -98,6 +101,14 @@ namespace ExpressBase.Objects
                     throw new Exception("Execution Error: " + e.Message);
             }
             return script;
+        }
+
+        private static void EvaluateVariable(object sender, VariableEvaluationEventArg e)
+        {
+            if (e.This is JObject jObj)
+            {
+                e.Value = jObj[e.Name];
+            }
         }
     }
 }
