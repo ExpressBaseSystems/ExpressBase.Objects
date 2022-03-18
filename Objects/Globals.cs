@@ -187,6 +187,10 @@ namespace ExpressBase.Objects.Objects
         {
             throw new ExplicitExitException(message);
         }
+        public void ExitWithResult(object obj)
+        {
+            Globals.ExitWithResult(obj);
+        }
     }
 
     public class ApiGlobals : ApiGlobalParent

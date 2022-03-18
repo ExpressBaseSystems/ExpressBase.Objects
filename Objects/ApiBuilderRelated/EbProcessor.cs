@@ -109,6 +109,10 @@ namespace ExpressBase.Objects
             {
                 e.Value = jObj[e.Name];
             }
+            else if (e.This is CoreBase.Globals.NTVDict p)
+            {
+                e.Value = p.TryGetMember(e.Name);
+            }
         }
     }
 }
