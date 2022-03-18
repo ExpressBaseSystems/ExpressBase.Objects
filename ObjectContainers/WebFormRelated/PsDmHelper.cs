@@ -61,8 +61,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (ParamsList == null)
                         throw new FormException($"Invalid ParamsList in '{psCtrl.Label ?? psCtrl.Name}'. Contact Admin", (int)HttpStatusCode.InternalServerError, "Save object in dev side", "EbWebForm");
                 }
-
-                TableSchema _pstable = this.ebForm.FormSchema.Tables.Find(e => e.Columns.Exists(ee => ee.ColumnName == psCtrl.Name));
+                TableSchema _pstable = this.ebForm.FormSchema.Tables.Find(e => e.TableName == ipsCtrl.TableName);
                 if (_pstable == null)
                     throw new FormException("Something went wrong", (int)HttpStatusCode.InternalServerError, "_pstable is null", "EbWebForm");
                 SingleTable psTable = this._FormData.MultipleTables.ContainsKey(_pstable.TableName) ? this._FormData.MultipleTables[_pstable.TableName] : null;
@@ -78,11 +77,14 @@ namespace ExpressBase.Objects.WebFormRelated
                     _PsDmDict.TryAdd(DataDB, psCtrl);
                     foreach (SingleRow Row in psTable)
                     {
-                        string temp = this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), Row, ref p_i, psqry);
-                        List<int> nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
-                        _PsDmDict.AppendQuery(DataDB, GetPsDmSelectQuery(temp, ipsCtrl, nums));
-                        p_i++;
-                        row_ids[psCtrl.EbSid].Add(Row.RowId);
+                        if (Row[psCtrl.Name] != null)
+                        {
+                            string temp = this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), Row, ref p_i, psqry);
+                            List<int> nums = Convert.ToString(Row[psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                            _PsDmDict.AppendQuery(DataDB, GetPsDmSelectQuery(temp, ipsCtrl, nums));
+                            p_i++;
+                            row_ids[psCtrl.EbSid].Add(Row.RowId);
+                        }
                     }
                 }
                 else if (psCtrl is EbDGPowerSelectColumn && psTable?.Count > 0)

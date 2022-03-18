@@ -568,6 +568,9 @@ else// PS
 ")]
         public bool RenderAsSimpleSelect { get; set; }
 
+        [JsonIgnore]
+        public string TableName { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[OnChangeExec(@"
         //    if(this.MultiSelect === true){

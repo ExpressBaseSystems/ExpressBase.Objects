@@ -1559,6 +1559,9 @@ pg.HideProperty('IsDynamic');
 ")]
         public bool RenderAsSimpleSelect { get { return this.EbPowerSelect.RenderAsSimpleSelect; } set { this.EbPowerSelect.RenderAsSimpleSelect = value; } }
 
+        [JsonIgnore]
+        public string TableName { get; set; }
+
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[HideInPropertyGrid]

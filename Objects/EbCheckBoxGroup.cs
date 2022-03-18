@@ -3,14 +3,10 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
-using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
@@ -32,35 +28,35 @@ namespace ExpressBase.Objects
             set { }
         }
         public override string GetValueFromDOMJSfn
-		{
-			get
-			{
-				return @"	
+        {
+            get
+            {
+                return @"	
 							var cval=[];
 						$('[name=' + this.EbSid_CtxId + ']:checked').each(function(){
 							cval.push($(this).val());
 						});
 					return cval.join();
                 ";
-			}
-			set { }
-		}
-		public override string GetDisplayMemberFromDOMJSfn
+            }
+            set { }
+        }
+        public override string GetDisplayMemberFromDOMJSfn
         {
-			get
-			{
-				return @"	
+            get
+            {
+                return @"	
 							var ctxt=[];
 						$('[name=' + this.EbSid_CtxId + ']:checked').each(function(){
 							ctxt.push($(this).next('span').text());
 						});
 					return ctxt.join('<br />');
                 ";
-			}
-			set { }
-		}
+            }
+            set { }
+        }
 
-		[OnDeserialized]
+        [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
@@ -69,9 +65,9 @@ namespace ExpressBase.Objects
         }
 
 
-		public override string DesignHtml4Bot
-		{
-			get => @"
+        public override string DesignHtml4Bot
+        {
+            get => @"
 <div style='padding:5px'>
     <div class='check-wraper'>
         <input class='bot-checkbox' type='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
@@ -83,14 +79,14 @@ namespace ExpressBase.Objects
     </div>
 </div>
 ";
-			set => base.DesignHtml4Bot = value;
-		}
+            set => base.DesignHtml4Bot = value;
+        }
 
 
-		public override string GetHtml4Bot()
-		{
-			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
-		}
+        public override string GetHtml4Bot()
+        {
+            return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -173,7 +169,7 @@ this.Init = function(id)
         public override string GetValueFromDOMJSfn { get { return @" return $('#' + this.EbSid_CtxId).is(':checked'); "; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn { get { return SetDisplayMemberJSfn+ @"$('#' + this.EbSid_CtxId).trigger('change'); "; } set { } }
+        public override string SetValueJSfn { get { return SetDisplayMemberJSfn + @"$('#' + this.EbSid_CtxId).trigger('change'); "; } set { } }
 
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
@@ -198,12 +194,12 @@ this.Init = function(id)
         {
             return @"<div class='radio-wrap' tabindex='1'  onclick=""event.stopPropagation(); $(this).children('[ui-inp]').trigger('click').trigger('change');"">
 						<input ui-inp onclick=""event.stopPropagation();"" class='bot-checkbox eb-chckbx' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
-						<span id='@name@Lbl' class='eb-chckbxspan'> @label@  </span>
+						@label@
 					<br>
 					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@gname@", this.GName)
-.Replace("@label@", this.Label)
+.Replace("@label@", string.IsNullOrWhiteSpace(this.Label) ? string.Empty : $"<span id='@name@Lbl' class='eb-chckbxspan'> {this.Label} </span>")
 .Replace("@value@", (this.Value == string.Empty ? "false" : this.Value));
         }
 

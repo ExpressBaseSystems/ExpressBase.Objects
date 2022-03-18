@@ -20,6 +20,7 @@ namespace ExpressBase.Objects
         bool IsInsertable { get; set; }
         string FormRefId { get; set; }
         bool MultiSelect { get; set; }
+        string TableName { get; set; }
 
         bool IsDataFromApi { get; set; }
         string Url { get; set; }
