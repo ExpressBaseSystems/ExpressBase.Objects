@@ -549,7 +549,7 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
-                
+
         public static EbOperations Operations = TVOperations.Instance;
 
         public EbTableVisualization()
@@ -1096,7 +1096,7 @@ else {
 }")]
         public WebFormDVModes FormMode { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
@@ -1112,6 +1112,65 @@ else {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public EbControl FormControl { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<DataFlowMapAbstract> DataFlowMap { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm)]
+    [HideInPropertyGrid]
+    public class DataFlowMapAbstract
+    {
+        public DataFlowMapAbstract() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Identity")]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.CORE)]
+        public virtual string SrcCtrlName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.CORE)]
+        public virtual string DestCtrlName { get; set; }
+    }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("Forward")]
+    public class DataFlowForwardMap : DataFlowMapAbstract
+    {
+        public DataFlowForwardMap() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Source control")]
+        public override string SrcCtrlName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Parameter name")]
+        public override string DestCtrlName { get; set; }
+    }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("Reverse")]
+    public class DataFlowReverseMap : DataFlowMapAbstract
+    {
+        public DataFlowReverseMap() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Source control")]
+        public override string SrcCtrlName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Destination control")]
+        public override string DestCtrlName { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
