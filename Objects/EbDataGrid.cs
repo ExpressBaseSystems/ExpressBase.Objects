@@ -102,9 +102,11 @@ namespace ExpressBase.Objects
         [OnChangeExec(@"
                 if (this.DataSourceId){
                     pg.ShowProperty('IsLoadDataSourceInEditMode');
+                    pg.ShowProperty('IsLoadDataSourceAlways');
                 }
                 else {
                     pg.HideProperty('IsLoadDataSourceInEditMode');
+                    pg.HideProperty('IsLoadDataSourceAlways');
                 }
             ")]
         public string DataSourceId { get; set; }
@@ -112,6 +114,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [Alias("Load datasource in edit mode ")]
         public bool IsLoadDataSourceInEditMode { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [Alias("Load datasource always ")]
+        public bool IsLoadDataSourceAlways { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [Alias("Merge imported data")]
