@@ -125,7 +125,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    return @"$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
+                    return @"$('#cont_' + this.EbSid_CtxId + ' *').removeAttr('disabled').css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
                 }
             }
             set { }

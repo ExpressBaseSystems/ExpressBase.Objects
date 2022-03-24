@@ -442,7 +442,7 @@ namespace ExpressBase.Objects
         public override string EnableJSfn
         {
             get { return @"this.__IsDisable = false; 
-			  $('#cont_' + this.EbSid_CtxId + ' *').prop('disabled', false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');
+			  $('#cont_' + this.EbSid_CtxId + ' *').removeAttr('disabled').css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');
 					$('#cont_' + this.EbSid_CtxId).find('.phnContextBtn').hide();"; }
             set { }
         }
@@ -530,11 +530,11 @@ namespace ExpressBase.Objects
                         Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(args.ocF.M);
                         if (_od[FormConstants.is_verified] == "true")
                         {
-							if(String.Equals(args.cField.Value , args.ocF.Value))// phone number changed
-								AvoidParam = true; 
+                            if (String.Equals(args.cField.Value, args.ocF.Value))// phone number changed
+                                AvoidParam = true;
                             else
-								this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
-						}
+                                this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
+                        }
                         else
                         {
                             this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
