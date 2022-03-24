@@ -2371,9 +2371,15 @@ namespace ExpressBase.Objects
                 foreach (EbRoutines e in this.AfterSaveRoutines)
                 {
                     if (IsUpdate && !e.IsDisabledOnEdit)
-                        q += e.Script.Code + ";";
+                    {
+                        if (this.CanExecuteAfterSave(DataDB, e))
+                            q += e.Script.Code + ";";
+                    }
                     else if (!IsUpdate && !e.IsDisabledOnNew)
-                        q += e.Script.Code + ";";
+                    {
+                        if (this.CanExecuteAfterSave(DataDB, e))
+                            q += e.Script.Code + ";";
+                    }
                 }
             }
             if (!q.Equals(string.Empty))
@@ -2401,6 +2407,19 @@ namespace ExpressBase.Objects
                 return DataDB.DoNonQuery(this.DbConnection, q, param.ToArray());
             }
             return 0;
+        }
+
+        private bool CanExecuteAfterSave(IDatabase DataDB, EbRoutines e)
+        {
+            if (string.IsNullOrWhiteSpace(e.ExecuteOnlyIf?.Code))
+                return true;
+
+            if (this.FormGlobals == null)
+                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
+            object result = this.ExecuteCSharpScriptNew(e.ExecuteOnlyIf.Code, this.FormGlobals);
+            if (bool.TryParse(result?.ToString(), out bool r))
+                return r;
+            return false;
         }
 
         public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc, Dictionary<string, string> MetaData)
