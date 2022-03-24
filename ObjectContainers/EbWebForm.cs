@@ -47,6 +47,8 @@ namespace ExpressBase.Objects
             this.DisableCancel = new List<EbSQLValidator>();
             this.BeforeSaveRoutines = new List<EbRoutines>();
             this.AfterSaveRoutines = new List<EbRoutines>();
+            this.AfterCancelRoutines = new List<EbRoutine_v2>();
+            this.AfterDeleteRoutines = new List<EbRoutine_v2>();
             this.DataPushers = new List<EbDataPusher>();
             this.TitleExpression = new EbScript();
             this.PrintDocs = new List<ObjectBasicInfo>();
@@ -163,6 +165,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> AfterSaveRoutines { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutine_v2> AfterCancelRoutines { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutine_v2> AfterDeleteRoutines { get; set; }
 
         [PropertyGroup("Miscellaneous")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -2538,6 +2550,12 @@ namespace ExpressBase.Objects
                         this.DbTransaction = this.DbConnection.BeginTransaction();
 
                         string query = QueryGetter.GetDeleteQuery(this, DataDB);
+                        foreach (EbRoutine_v2 routine in this.AfterDeleteRoutines)
+                        {
+                            if (!routine.IsDisabled && !string.IsNullOrWhiteSpace(routine.Script?.Code))
+                                query += routine.Script.Code + "; ";
+                        }
+
                         DbParameter[] param = new DbParameter[] {
                             DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                             DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
@@ -2624,6 +2642,12 @@ namespace ExpressBase.Objects
                         this.DbTransaction = this.DbConnection.BeginTransaction();
 
                         string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
+                        foreach (EbRoutine_v2 routine in this.AfterCancelRoutines)
+                        {
+                            if (!routine.IsDisabled && !string.IsNullOrWhiteSpace(routine.Script?.Code))
+                                query += routine.Script.Code + "; ";
+                        }
+
                         DbParameter[] param = new DbParameter[]
                         {
                         DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
