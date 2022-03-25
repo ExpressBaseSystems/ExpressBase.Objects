@@ -1589,9 +1589,9 @@ namespace ExpressBase.Objects
         public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
             this.FormData = this.GetEmptyModel();
-            Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             List<DbParameter> param = new List<DbParameter>();
             string DataImportPS = null;
+            List<EbControl> drPsList = new List<EbControl>();
             foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
             {
                 foreach (SingleRow Row in Table.Value)
@@ -1612,10 +1612,7 @@ namespace ExpressBase.Objects
                                     DataImportPS = psCtrl.Name;
 
                                 if (!psCtrl.IsDataFromApi && DataImportPS == null)
-                                {
-                                    string t = psCtrl.GetSelectQuery(DataDB, service, p.Value);
-                                    QrsDict.Add(psCtrl.EbSid, t);
-                                }
+                                    drPsList.Add(psCtrl);
                             }
                         }
                     }
@@ -1627,18 +1624,12 @@ namespace ExpressBase.Objects
                 this.FormDataBackup = this.FormData;
                 this.PsImportData(DataDB, service, DataImportPS);
             }
-            else if (QrsDict.Count > 0)
+            else if (drPsList.Count > 0)
             {
-                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
+                //this.LocationId = this.FormData.MultipleTables[this.FormData.MasterTable][0].LocId;
+                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, this.FormData, service);
+                dmHelper.UpdatePsDm_Tables();
 
-                EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
-                int i = 0;
-                foreach (KeyValuePair<string, string> item in QrsDict)
-                {
-                    SingleTable Table = new SingleTable();
-                    this.GetFormattedData(dataset.Tables[i++], Table);
-                    this.FormData.PsDm_Tables.Add(item.Key, Table);
-                }
                 this.PostFormatFormData(this.FormData);
             }
         }
