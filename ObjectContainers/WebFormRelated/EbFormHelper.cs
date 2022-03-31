@@ -21,6 +21,8 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Net;
+using ExpressBase.Common.LocationNSolution;
+using ServiceStack.RabbitMq;
 
 namespace ExpressBase.Objects
 {
@@ -811,6 +813,131 @@ namespace ExpressBase.Objects
                 {
                     (control as EbRenderQuestionsControl).InitFromDataBase(ServiceClient);
                 }
+            }
+        }
+
+        //change the redis get of soln and user objects if making this a common function
+        public static InsertOrUpdateFormDataResp InsertOrUpdateFormData(InsertOrUpdateFormDataRqst request, IDatabase DataDB, Service Service,
+            IRedisClient Redis, EbConnectionFactory ebConnectionFactory)
+        {
+            try
+            {
+                Console.WriteLine("InsertOrUpdateFormDataRqst Service start");
+                EbWebForm FormObj = GetWebFormObject(request.RefId, request.UserAuthId, request.SolnId, Redis, Service, ebConnectionFactory, request.LocId);
+                FormObj.TableRowId = request.RecordId;
+                Console.WriteLine("InsertOrUpdateFormDataRqst PrepareWebFormData start : " + DateTime.Now);
+                FormObj.PrepareWebFormData(DataDB, Service, request.PushJson, request.FormGlobals);
+                Console.WriteLine("InsertOrUpdateFormDataRqst Save start : " + DateTime.Now);
+                string r = FormObj.Save(DataDB, Service, request.TransactionConnection);
+                Console.WriteLine("InsertOrUpdateFormDataRqst returning");
+                return new InsertOrUpdateFormDataResp() { Status = (int)HttpStatusCode.OK, Message = "success", RecordId = FormObj.TableRowId };
+            }
+            catch (FormException ex)
+            {
+                Console.WriteLine("FormException in InsertOrUpdateFormDataRqst\nMessage : " + ex.Message + "\nMessageInternal : " + ex.MessageInternal + "\nStackTraceInternal : " + ex.StackTraceInternal + "\nStackTrace : " + ex.StackTrace);
+                return new InsertOrUpdateFormDataResp() { Status = ex.ExceptionCode, Message = ex.Message };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in InsertOrUpdateFormDataRqst\nMessage" + ex.Message + "\nStackTrace" + ex.StackTrace);
+                return new InsertOrUpdateFormDataResp() { Status = (int)HttpStatusCode.InternalServerError, Message = ex.Message };
+            }
+        }
+
+        public static EbWebForm GetWebFormObject(string RefId, string UserAuthId, string SolnId, IRedisClient Redis, Service service,
+            EbConnectionFactory EbConnectionFactory, int CurrrentLocation = 0)
+        {
+            EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>(RefId, null, Redis, service);
+            _form.LocationId = CurrrentLocation;
+            _form.SetRedisClient(Redis);
+            _form.SetConnectionFactory(EbConnectionFactory);
+            if (UserAuthId != null)
+            {
+                _form.UserObj = Redis.Get<User>(UserAuthId);
+                if (_form.UserObj == null)
+                    throw new Exception("User Object is null. AuthId: " + UserAuthId);
+                if (_form.UserObj.Preference != null)
+                    _form.UserObj.Preference.CurrrentLocation = CurrrentLocation;
+            }
+            if (SolnId != null)
+            {
+                _form.SolutionObj = Redis.Get<Eb_Solution>(String.Format("solution_{0}", SolnId));
+                if (_form.SolutionObj == null)
+                    throw new Exception("Solution Object is null. SolnId: " + SolnId);
+                if (_form.SolutionObj.SolutionSettings == null)
+                    _form.SolutionObj.SolutionSettings = new SolutionSettings() { SystemColumns = new EbSystemColumns(EbSysCols.Values) };
+                else if (_form.SolutionObj.SolutionSettings.SystemColumns == null)
+                    _form.SolutionObj.SolutionSettings.SystemColumns = new EbSystemColumns(EbSysCols.Values);
+            }
+            _form.AfterRedisGet_All(service);
+            return _form;
+        }
+
+        public static InsertDataFromWebformResponse InsertDataFromWebform(InsertDataFromWebformRequest request, IRedisClient Redis, Service service,
+            EbConnectionFactory EbConnectionFactory)
+        {
+            EbWebForm FormObj = null;
+            try
+            {
+                Dictionary<string, string> MetaData = new Dictionary<string, string>();
+                DateTime startdt = DateTime.Now;
+                Console.WriteLine("Insert/Update WebFormData : start - " + startdt);
+                FormObj = GetWebFormObject(request.RefId, request.UserAuthId, request.SolnId, Redis, service, EbConnectionFactory, request.CurrentLoc);
+                //CheckDataPusherCompatibility(FormObj);
+                FormObj.TableRowId = request.RowId;
+                FormObj.FormData = JsonConvert.DeserializeObject<WebformData>(request.FormData);
+                FormObj.DraftId = request.DraftId;
+                //CheckForMyProfileForms(FormObj, request.WhichConsole, request.MobilePageRefId);
+
+                Console.WriteLine("Insert/Update WebFormData : MergeFormData start - " + DateTime.Now);
+                FormObj.MergeFormData();
+                Console.WriteLine("Insert/Update WebFormData : Save start - " + DateTime.Now);
+                string r = FormObj.Save(EbConnectionFactory, service, request.WhichConsole, request.MobilePageRefId);
+                Console.WriteLine("Insert/Update WebFormData : AfterExecutionIfUserCreated start - " + DateTime.Now);
+                //FormObj.AfterExecutionIfUserCreated(this, EbConnectionFactory.EmailConnection, MessageProducer3, request.WhichConsole, MetaData);
+                Console.WriteLine("Insert/Update WebFormData end : Execution Time = " + (DateTime.Now - startdt).TotalMilliseconds);
+                bool isMobInsert = request.WhichConsole == RoutingConstants.MC;
+
+                return new InsertDataFromWebformResponse()
+                {
+                    Message = "Success",
+                    RowId = FormObj.TableRowId,
+                    FormData = isMobInsert ? null : JsonConvert.SerializeObject(FormObj.FormData),
+                    RowAffected = 1,
+                    AffectedEntries = r,
+                    Status = (int)HttpStatusCode.OK,
+                    MetaData = MetaData
+                };
+            }
+            catch (FormException ex)
+            {
+                Console.WriteLine("FormException in Insert/Update WebFormData\nMessage : " + ex.Message + "\nMessageInternal : " + ex.MessageInternal + "\nStackTraceInternal : " + ex.StackTraceInternal + "\nStackTrace" + ex.StackTrace);
+
+                //if (IsErrorDraftCandidate(request, FormObj))
+                //    return FormDraftsHelper.SubmitErrorAndGetResponse(this.EbConnectionFactory.DataDB, FormObj, request, ex);
+
+                return new InsertDataFromWebformResponse()
+                {
+                    Message = ex.Message,
+                    Status = ex.ExceptionCode,
+                    MessageInt = ex.MessageInternal,
+                    StackTraceInt = ex.StackTraceInternal
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in Insert/Update WebFormData\nMessage : " + ex.Message + "\nStackTrace : " + ex.StackTrace);
+
+                //if (IsErrorDraftCandidate(request, FormObj))
+                //    return FormDraftsHelper.SubmitErrorAndGetResponse(this.EbConnectionFactory.DataDB, FormObj, request, ex);
+
+                return new InsertDataFromWebformResponse()
+                {
+                    Message = FormErrors.E0129 + ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                    MessageInt = "Exception in InsertDataFromWebform[service]",
+                    StackTraceInt = ex.StackTrace
+                };
             }
         }
     }
