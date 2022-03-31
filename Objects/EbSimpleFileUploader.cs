@@ -121,7 +121,7 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override string EnableJSfn { get { return @"this.__IsDisable = false; 
-			$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'all');
+			$('#cont_' + this.EbSid_CtxId + ' *').removeAttr('disabled').css('pointer-events', 'all');
 			$(`#${this.EbSid_CtxId}`).find('.delete-image').css('display', '');"; } set { } }
 
 

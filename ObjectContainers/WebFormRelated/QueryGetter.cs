@@ -237,7 +237,7 @@ WHERE
             foreach (EbWebForm ebWebForm in _this.FormCollection)
             {
                 WebFormSchema _schema = ebWebForm.FormSchema;
-                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
+                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
                     string autoIdBckUp = string.Empty;
                     //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName) // uncomment this and check the autoid reassignment
@@ -311,7 +311,7 @@ WHERE
             foreach (EbWebForm ebWebForm in _this.FormCollection)
             {
                 WebFormSchema _schema = ebWebForm.FormSchema;
-                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review))
+                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
                     string Qry = string.Format("UPDATE {0} SET {1} = {5}, {2} = @eb_lastmodified_by, {3} = {4} ",
                         _table.TableName,//0

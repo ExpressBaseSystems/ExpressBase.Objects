@@ -47,6 +47,8 @@ namespace ExpressBase.Objects
             this.DisableCancel = new List<EbSQLValidator>();
             this.BeforeSaveRoutines = new List<EbRoutines>();
             this.AfterSaveRoutines = new List<EbRoutines>();
+            this.AfterCancelRoutines = new List<EbRoutine_v2>();
+            this.AfterDeleteRoutines = new List<EbRoutine_v2>();
             this.DataPushers = new List<EbDataPusher>();
             this.TitleExpression = new EbScript();
             this.PrintDocs = new List<ObjectBasicInfo>();
@@ -163,6 +165,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> AfterSaveRoutines { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutine_v2> AfterCancelRoutines { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutine_v2> AfterDeleteRoutines { get; set; }
 
         [PropertyGroup("Miscellaneous")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -1577,9 +1589,9 @@ namespace ExpressBase.Objects
         public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
             this.FormData = this.GetEmptyModel();
-            Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             List<DbParameter> param = new List<DbParameter>();
             string DataImportPS = null;
+            List<EbControl> drPsList = new List<EbControl>();
             foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
             {
                 foreach (SingleRow Row in Table.Value)
@@ -1600,10 +1612,7 @@ namespace ExpressBase.Objects
                                     DataImportPS = psCtrl.Name;
 
                                 if (!psCtrl.IsDataFromApi && DataImportPS == null)
-                                {
-                                    string t = psCtrl.GetSelectQuery(DataDB, service, p.Value);
-                                    QrsDict.Add(psCtrl.EbSid, t);
-                                }
+                                    drPsList.Add(psCtrl);
                             }
                         }
                     }
@@ -1615,18 +1624,12 @@ namespace ExpressBase.Objects
                 this.FormDataBackup = this.FormData;
                 this.PsImportData(DataDB, service, DataImportPS);
             }
-            else if (QrsDict.Count > 0)
+            else if (drPsList.Count > 0)
             {
-                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
+                //this.LocationId = this.FormData.MultipleTables[this.FormData.MasterTable][0].LocId;
+                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, this.FormData, service);
+                dmHelper.UpdatePsDm_Tables();
 
-                EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
-                int i = 0;
-                foreach (KeyValuePair<string, string> item in QrsDict)
-                {
-                    SingleTable Table = new SingleTable();
-                    this.GetFormattedData(dataset.Tables[i++], Table);
-                    this.FormData.PsDm_Tables.Add(item.Key, Table);
-                }
                 this.PostFormatFormData(this.FormData);
             }
         }
@@ -2371,9 +2374,15 @@ namespace ExpressBase.Objects
                 foreach (EbRoutines e in this.AfterSaveRoutines)
                 {
                     if (IsUpdate && !e.IsDisabledOnEdit)
-                        q += e.Script.Code + ";";
+                    {
+                        if (this.CanExecuteAfterSave(DataDB, e))
+                            q += e.Script.Code + ";";
+                    }
                     else if (!IsUpdate && !e.IsDisabledOnNew)
-                        q += e.Script.Code + ";";
+                    {
+                        if (this.CanExecuteAfterSave(DataDB, e))
+                            q += e.Script.Code + ";";
+                    }
                 }
             }
             if (!q.Equals(string.Empty))
@@ -2401,6 +2410,19 @@ namespace ExpressBase.Objects
                 return DataDB.DoNonQuery(this.DbConnection, q, param.ToArray());
             }
             return 0;
+        }
+
+        private bool CanExecuteAfterSave(IDatabase DataDB, EbRoutines e)
+        {
+            if (string.IsNullOrWhiteSpace(e.ExecuteOnlyIf?.Code))
+                return true;
+
+            if (this.FormGlobals == null)
+                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB, null, false);
+            object result = this.ExecuteCSharpScriptNew(e.ExecuteOnlyIf.Code, this.FormGlobals);
+            if (bool.TryParse(result?.ToString(), out bool r))
+                return r;
+            return false;
         }
 
         public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc, Dictionary<string, string> MetaData)
@@ -2519,6 +2541,12 @@ namespace ExpressBase.Objects
                         this.DbTransaction = this.DbConnection.BeginTransaction();
 
                         string query = QueryGetter.GetDeleteQuery(this, DataDB);
+                        foreach (EbRoutine_v2 routine in this.AfterDeleteRoutines)
+                        {
+                            if (!routine.IsDisabled && !string.IsNullOrWhiteSpace(routine.Script?.Code))
+                                query += routine.Script.Code + "; ";
+                        }
+
                         DbParameter[] param = new DbParameter[] {
                             DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                             DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
@@ -2605,6 +2633,12 @@ namespace ExpressBase.Objects
                         this.DbTransaction = this.DbConnection.BeginTransaction();
 
                         string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
+                        foreach (EbRoutine_v2 routine in this.AfterCancelRoutines)
+                        {
+                            if (!routine.IsDisabled && !string.IsNullOrWhiteSpace(routine.Script?.Code))
+                                query += routine.Script.Code + "; ";
+                        }
+
                         DbParameter[] param = new DbParameter[]
                         {
                         DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),

@@ -102,9 +102,11 @@ namespace ExpressBase.Objects
         [OnChangeExec(@"
                 if (this.DataSourceId){
                     pg.ShowProperty('IsLoadDataSourceInEditMode');
+                    pg.ShowProperty('IsLoadDataSourceAlways');
                 }
                 else {
                     pg.HideProperty('IsLoadDataSourceInEditMode');
+                    pg.HideProperty('IsLoadDataSourceAlways');
                 }
             ")]
         public string DataSourceId { get; set; }
@@ -112,6 +114,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [Alias("Load datasource in edit mode ")]
         public bool IsLoadDataSourceInEditMode { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [Alias("Load datasource always ")]
+        public bool IsLoadDataSourceAlways { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [Alias("Merge imported data")]
@@ -2408,6 +2414,145 @@ pg.HideProperty('IsDynamic');
         {
             this.EbUserSelect.Name = this.Name;
             return this.EbUserSelect.GetSingleColumn(UserObj, SoluObj, Value, Default);
+        }
+    }
+
+
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("Label Column")]
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    public class EbDGLabelColumn : EbDGColumn
+    {
+        [JsonIgnore]
+        public EbLabel EbLabel { get; set; }
+
+        public EbDGLabelColumn()
+        {
+            this.EbLabel = new EbLabel();
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            DBareHtml = "<div id='@div_ebsid@' class='ebdg-label-link'><input type='hidden' id='@ebsid@' ui-inp><span></span></div>";
+        }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string InputControlType { get { return "EbLabel"; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return this.EbLabel.EbDbType; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get { return this.EbLabel.DoNotPersist; } }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [UIproperty]
+        [Unique]
+        [OnChangeUIFunction("Common.LABEL")]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
+        [HelpText("Label for the control to identify it's purpose.")]
+        public override string Label
+        {
+            get { return this.EbLabel.Label; }
+            set { this.EbLabel.Label = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorSQ)]
+        [Alias("Text Expression")]
+        [HelpText("Expression for label text.")]
+        public override EbScript ValueExpr
+        {
+            get { return this.EbLabel.ValueExpr; }
+            set { this.EbLabel.ValueExpr = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorSQ)]
+        [Alias("Default Text Expression")]
+        [HelpText("Default expression for label text.")]
+        public override EbScript DefaultValueExpression
+        {
+            get { return this.EbLabel.DefaultValueExpression; }
+            set { this.EbLabel.DefaultValueExpression = value; }
+        }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public EbLabelRenderType RenderAs
+        {
+            get { return this.EbLabel.RenderAs; }
+            set { this.EbLabel.RenderAs = value; }
+        }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public List<ObjectBasicInfo> LinkedObjects
+        {
+            get { return this.EbLabel.LinkedObjects; }
+            set { this.EbLabel.LinkedObjects = value; }
+        }
+
+
+        #region HideInPropertyGrid
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string Info { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string InfoIcon { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string HelpText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string ToolTipText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool Required { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool SelfTrigger { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        #endregion
+
+        [JsonIgnore]
+        public override string SetDisplayMemberJSfn
+        {
+            get { return JSFnsConstants.DG_hiddenColCheckCode + @"
+{
+let ele = document.getElementById(this.EbSid_CtxId);
+ele.value = p1;
+$(ele).siblings('span').text(p1);
+$(ele).closest('td').find('.tdtxt span').text(p1);
+}"; }
+
+            set { }
         }
     }
 

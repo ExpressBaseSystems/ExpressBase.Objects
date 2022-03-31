@@ -38,11 +38,31 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool IsDisabledOnEdit { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript ExecuteOnlyIf { get; set; }
+
         public override bool IsWarningOnly { get; set; }
 
         public override string FailureMSG { get; set; }
 
         public override bool IsDisabled { get; set; }
+    }
+
+    public class EbRoutine_v2 : EbValidator
+    {
+        public EbRoutine_v2() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
+        public override EbScript Script { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override bool IsDisabled { get; set; }
+
+        public override bool IsWarningOnly { get; set; }
+
+        public override string FailureMSG { get; set; }
     }
 
     [UsedWithTopObjectParent(typeof(EbObject))]
