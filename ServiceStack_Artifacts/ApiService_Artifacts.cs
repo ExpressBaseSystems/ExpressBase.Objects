@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ExpressBase.Security;
 using System.Net;
+using ExpressBase.Common.Structures;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -73,9 +74,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string RefId { set; get; }
 
+       public EbJobArguments JobArgs { set; get; }
+
         public bool HasRefId()
         {
             return !string.IsNullOrEmpty(RefId);
+        }
+    }
+
+     public class ApiMqRequest : EbMqRequest, IReturn<ApiResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Version { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Name { set; get; }
+
+        [DataMember(Order = 3)]
+        public Dictionary<string, object> Data { set; get; }
+
+        [DataMember(Order = 4)]
+        public string RefId { set; get; }
+        public EbJobArguments JobArgs { set; get; }
+        
+        public bool HasRefId()
+        {
+            return !string.IsNullOrEmpty(JobArgs?.RefId);
         }
     }
 
