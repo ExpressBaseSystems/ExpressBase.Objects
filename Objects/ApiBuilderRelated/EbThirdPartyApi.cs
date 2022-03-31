@@ -5,6 +5,10 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Data;
 using RestSharp;
 using ExpressBase.Common.Structures;
+using System;
+using System.Text.RegularExpressions;
+using System.Linq;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 
 namespace ExpressBase.Objects
 {
@@ -106,6 +110,75 @@ namespace ExpressBase.Objects
                 }
             }
             return parameters;
+        }
+
+        public object ExecuteThirdPartyApi(EbThirdPartyApi thirdPartyResource, EbApi Api)
+        {
+            Uri uri = new Uri(ReplacePlaceholders(thirdPartyResource.Url, Api));
+
+            object result;
+
+            try
+            {
+                RestClient client = new RestClient(uri.GetLeftPart(UriPartial.Authority));
+
+                RestRequest request = thirdPartyResource.CreateRequest(uri.PathAndQuery, Api.GlobalParams);
+
+                List<Param> parameters = thirdPartyResource.GetParameters(Api.GlobalParams) ?? new List<Param>();
+
+                if (thirdPartyResource.Method == ApiMethods.POST && thirdPartyResource.RequestFormat == ApiRequestFormat.Raw)
+                {
+                    if (parameters.Count > 0)
+                    {
+                        request.AddJsonBody(parameters[0].Value);
+                    }
+                }
+                else
+                {
+                    foreach (Param param in parameters)
+                    {
+                        request.AddParameter(param.Name, param.ValueTo);
+                    }
+                }
+
+                IRestResponse resp = client.Execute(request);
+
+                if (resp.IsSuccessful)
+                    result = resp.Content;
+                else
+                    throw new Exception($"Failed to execute api [{thirdPartyResource.Url}], {resp.ErrorMessage}, {resp.Content}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("[ExecuteThirdPartyApi], " + ex.Message);
+            }
+            return result;
+        }
+
+        public string ReplacePlaceholders(string text, EbApi Api)
+        {
+            if (!String.IsNullOrEmpty(text))
+            {
+                string pattern = @"\{{(.*?)\}}";
+                IEnumerable<string> matches = Regex.Matches(text, pattern).OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
+                foreach (string _col in matches)
+                {
+                    try
+                    {
+                        string parameter_name = _col.Replace("{{", "").Replace("}}", "");
+                        if (Api.GlobalParams.ContainsKey(parameter_name))
+                        {
+                            string value = Api.GlobalParams[parameter_name].ToString();
+                            text = text.Replace(_col, value);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ApiException("[Replace Placeholders in Url], parameter - " + _col + ". " + ex.Message);
+                    }
+                }
+            }
+            return text;
         }
     }
 

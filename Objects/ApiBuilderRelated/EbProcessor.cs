@@ -11,6 +11,10 @@ using Microsoft.CodeAnalysis.Scripting;
 using ExpressBase.CoreBase.Globals;
 using CodingSeb.ExpressionEvaluator;
 using Newtonsoft.Json.Linq;
+using ExpressBase.Common.Helpers;
+using ServiceStack.RabbitMq;
+using ServiceStack;
+using ExpressBase.Common.ServiceClients;
 
 namespace ExpressBase.Objects
 {
@@ -62,6 +66,90 @@ namespace ExpressBase.Objects
             }
 
             return evaluator;
+        }
+
+        public object ExecuteScript(EbApi Api, RabbitMqProducer mqp, Service service, EbStaticFileClient Fileclient)
+        {
+            ApiGlobalParent global;
+
+            if (this.EvaluatorVersion == EvaluatorVersion.Version_1)
+                global = new ApiGlobals(Api.GlobalParams);
+            else
+                global = new ApiGlobalsCoreBase(Api.GlobalParams);
+
+            global.ResourceValueByIndexHandler += (index) =>
+            {
+                object resourceValue = Api.Resources[index].Result;
+
+                if (resourceValue != null && resourceValue is string converted)
+                {
+                    if (converted.StartsWith("{") && converted.EndsWith("}") || converted.StartsWith("[") && converted.EndsWith("]"))
+                    {
+                        string formated = converted.Replace(@"\", string.Empty);
+                        return JObject.Parse(formated);
+                    }
+                }
+                return resourceValue;
+            };
+
+            global.ResourceValueByNameHandler += (name) =>
+            {
+                int index = Api.Resources.GetIndex(name);
+
+                object resourceValue = Api.Resources[index].Result;
+
+                if (resourceValue != null && resourceValue is string converted)
+                {
+                    if (converted.StartsWith("{") && converted.EndsWith("}") || converted.StartsWith("[") && converted.EndsWith("]"))
+                    {
+                        string formated = converted.Replace(@"\", string.Empty);
+                        return JObject.Parse(formated);
+                    }
+                }
+                return resourceValue;
+            };
+
+            global.GoToByIndexHandler += (index) =>
+            {
+                Api.Step = index;
+                Api.Resources[index].Result = EbApiHelper.GetResult(Api.Resources[index], Api, mqp, service, Fileclient);
+            };
+
+            global.GoToByNameHandler += (name) =>
+            {
+                int index = Api.Resources.GetIndex(name);
+                Api.Step = index;
+                Api.Resources[index].Result = EbApiHelper.GetResult(Api.Resources[index], Api, mqp, service, Fileclient);
+            };
+
+            global.ExitResultHandler += (obj) =>
+            {
+                ApiScript script = new ApiScript
+                {
+                    Data = JsonConvert.SerializeObject(obj),
+                };
+                Api.ApiResponse.Result = script;
+                Api.Step = Api.Resources.Count - 1;
+            };
+
+            ApiResources lastResource = Api.Step == 0 ? null : Api.Resources[Api.Step - 1];
+
+            if (this.EvaluatorVersion == EvaluatorVersion.Version_1 && lastResource?.Result is EbDataSet dataSet)
+            {
+                (global as ApiGlobals).Tables = dataSet.Tables;
+            }
+
+            ApiScript result;
+
+            try
+            {
+                result = this.Execute(global);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return result;
         }
 
         public ApiScript Execute(ApiGlobalParent global)

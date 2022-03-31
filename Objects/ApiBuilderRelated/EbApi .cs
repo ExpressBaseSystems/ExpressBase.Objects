@@ -7,6 +7,20 @@ using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.Objects;
+using System;
+using System.Data.Common;
+using ServiceStack;
+using ServiceStack.Redis;
+using ExpressBase.Security;
+using ExpressBase.Common.Constants;
+using System.Linq;
+using ExpressBase.Objects.Helpers;
+using ExpressBase.Common.Helpers;
+using ServiceStack.RabbitMq;
+using System.Net;
+using ExpressBase.Common.Messaging;
+using ExpressBase.Objects.WebFormRelated;
+using ExpressBase.Common.ServiceClients;
 
 namespace ExpressBase.Objects
 {
@@ -94,6 +108,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public ApiMethods Method { set; get; }
 
+        public ApiResponse ApiResponse { set; get; }
+
+        public new IRedisClient Redis { get; set; }
+
+        public int Step = 0;
+
         public override List<string> DiscoverRelatedRefids()
         {
             List<string> refids = new List<string>();
@@ -120,6 +140,97 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+        }
+
+        public User UserObject { set; get; }
+
+        public string SolutionId { set; get; }
+
+        public Dictionary<string, object> GlobalParams { set; get; }
+
+        public IDatabase ObjectsDB { get; set; }
+
+        public IDatabase DataDB { get; set; }
+
+        public T GetEbObject<T>(string refId, IRedisClient Redis, IDatabase ObjectsDB)
+        {
+
+            T ebObject = EbApiHelper.GetEbObject<T>(refId, Redis, ObjectsDB);
+
+            if (ebObject == null)
+            {
+                string message = $"{typeof(T).Name} not found";
+                this.ApiResponse.Message.Description = message;
+
+                throw new ApiException(message);
+            }
+            return ebObject;
+        }
+
+        public void FillParams(List<Param> inputParam)
+        {
+            try
+            {
+                foreach (Param p in inputParam)
+                {
+                    object value = this.GetParameterValue(p.Name);
+
+                    if (IsRequired(p.Name))
+                    {
+                        if (value == null || string.IsNullOrEmpty(value.ToString()))
+                        {
+                            this.ApiResponse.Message.ErrorCode = ApiErrorCode.ParameterNotFound;
+                            this.ApiResponse.Message.Status = $"Parameter Error";
+
+                            throw new ApiException($"Parameter '{p.Name}' must be set");
+                        }
+                        else p.Value = value.ToString();
+                    }
+                    else
+                    {
+                        if (value == null || string.IsNullOrEmpty(value.ToString()))
+                            p.Value = null;
+                        else
+                            p.Value = value.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[Params], " + ex.Message);
+            }
+        }
+
+        private object GetParameterValue(string name)
+        {
+            if (this.GlobalParams.ContainsKey(name))
+            {
+                return this.GlobalParams[name];
+            }
+            return null;
+        }
+
+        private bool IsRequired(string name)
+        {
+            if (this.Request == null)
+                return true;
+
+            Param p = this.Request.GetParam(name);
+
+            return p == null || p.Required;
+        }
+
+        public EbApi GetApi(string RefId, IRedisClient Redis, IDatabase ObjectsDB, IDatabase DataDB)
+        {
+            EbApi Api = GetEbObject<EbApi>(RefId, Redis, ObjectsDB);
+            Api.Redis = Redis;
+            Api.ObjectsDB = ObjectsDB;
+            Api.DataDB = DataDB;
+            return Api;
+        }
+
+        public EbApi()
+        {
         }
     }
 
@@ -201,6 +312,33 @@ namespace ExpressBase.Objects
             else
                 return this.Result;
         }
+
+        public object ExecuteDataReader(EbApi Api)
+        {
+            EbDataSet dataSet;
+            try
+            {
+                EbDataReader dataReader = Api.GetEbObject<EbDataReader>(this.Reference, Api.Redis, Api.ObjectsDB);
+
+                List<DbParameter> dbParameters = new List<DbParameter>();
+
+                List<Param> InputParams = dataReader.GetParams((RedisClient)Api.Redis);
+
+                Api.FillParams(InputParams);
+
+                foreach (Param param in InputParams)
+                {
+                    dbParameters.Add(Api.DataDB.GetNewParameter(param.Name, (EbDbTypes)Convert.ToInt32(param.Type), param.ValueTo));
+                }
+
+                dataSet = Api.DataDB.DoQueries(dataReader.Sql, dbParameters.ToArray());
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteDataReader], " + ex.Message);
+            }
+            return dataSet;
+        }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -231,6 +369,26 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public object ExecuteSqlFunction(EbApi Api)
+        {
+            SqlFuncTestResponse response;
+            try
+            {
+                EbSqlFunction sqlFunc = Api.GetEbObject<EbSqlFunction>(this.Reference, Api.Redis, Api.ObjectsDB);
+
+                List<Param> InputParams = sqlFunc.GetParams(null);
+
+                Api.FillParams(InputParams);
+
+                response = EbObjectsHelper.SqlFuncTest(InputParams, sqlFunc.Name, Api.ObjectsDB);
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteSqlFunction], " + ex.Message);
+            }
+            return response;
         }
     }
 
@@ -263,6 +421,42 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
+
+        public object ExecuteDataWriter(EbApi Api)
+        {
+            List<DbParameter> dbParams = new List<DbParameter>();
+            try
+            {
+                EbDataWriter dataWriter = Api.GetEbObject<EbDataWriter>(Reference, Api.Redis, Api.ObjectsDB);
+
+                List<Param> InputParams = dataWriter.GetParams(null);
+
+                Api.FillParams(InputParams);
+
+                foreach (Param param in InputParams)
+                {
+                    dbParams.Add(Api.DataDB.GetNewParameter(param.Name, (EbDbTypes)Convert.ToInt32(param.Type), param.ValueTo));
+                }
+
+                int status = Api.DataDB.DoNonQuery(dataWriter.Sql, dbParams.ToArray());
+
+                if (status > 0)
+                {
+                    Api.ApiResponse.Message.Description = status + "row inserted";
+                    return true;
+                }
+                else
+                {
+                    Api.ApiResponse.Message.Description = status + "row inserted";
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteDataWriter], " + ex.Message);
+            }
+        }
+
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -294,6 +488,42 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
+
+        public bool ExecuteEmail(EbApi Api, RabbitMqProducer MessageProducer3)
+        {
+            bool status;
+
+            try
+            {
+                EbEmailTemplate emailTemplate = Api.GetEbObject<EbEmailTemplate>(this.Reference, Api.Redis, Api.ObjectsDB);
+
+                List<Param> InputParams = EbApiHelper.GetEmailParams(emailTemplate, Api.Redis, Api.ObjectsDB);
+
+                Api.FillParams(InputParams);
+
+                MessageProducer3.Publish(new EmailAttachmentRequest()
+                {
+                    ObjId = Convert.ToInt32(this.Reference.Split(CharConstants.DASH)[3]),
+                    Params = InputParams,
+                    UserId = Api.UserObject.UserId,
+                    UserAuthId = Api.UserObject.AuthId,
+                    SolnId = Api.SolutionId,
+                    RefId = this.Reference
+                });
+
+                status = true;
+
+                string msg = $"The mail has been sent successfully to {emailTemplate.To} with subject {emailTemplate.Subject} and cc {emailTemplate.Cc}";
+
+                Api.ApiResponse.Message.Description = msg;
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteEmail], " + ex.Message);
+            }
+            return status;
+        }
+
     }
 
 
@@ -363,6 +593,58 @@ namespace ExpressBase.Objects
         {
             return (this.Result as ApiResponse).Result;
         }
+
+        public object ExecuteConnectApi(EbApi Api, Service Service)
+        {
+            ApiResponse resp = null;
+
+            try
+            {
+                EbApi apiObject = Api.GetEbObject<EbApi>(this.Reference, Api.Redis, Api.ObjectsDB);
+
+                if (apiObject.Name.Equals(Api.Name))
+                {
+                    Api.ApiResponse.Message.ErrorCode = ApiErrorCode.ResourceCircularRef;
+                    Api.ApiResponse.Message.Description = "Calling Api from the same not allowed, terminated due to circular reference";
+
+                    throw new ApiException("[ExecuteConnectApi], Circular refernce");
+                }
+                else
+                {
+                    List<Param> InputParam = EbApiHelper.GetReqJsonParameters(apiObject.Resources, Api.Redis, Api.ObjectsDB);
+
+
+                    Api.FillParams(InputParam);
+
+                    Dictionary<string, object> d = InputParam.Select(p => new { prop = p.Name, val = p.Value }).ToDictionary(x => x.prop, x => x.val as object);
+
+                    string version = this.Version.Replace(".w", "");
+
+                    resp = Service.Gateway.Send(new ApiMqRequest
+                    {
+                        Name = this.RefName,
+                        Version = version,
+                        Data = d,
+                        SolnId = Api.SolutionId,
+                        UserAuthId = Api.UserObject.AuthId,
+                        UserId = Api.UserObject.UserId
+                    });
+
+                    if (resp.Message.ErrorCode == ApiErrorCode.NotFound)
+                    {
+                        Api.ApiResponse.Message.ErrorCode = ApiErrorCode.ResourceNotFound;
+                        Api.ApiResponse.Message.Description = resp.Message.Description;
+
+                        throw new ApiException("[ExecuteConnectApi], resource api not found");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteConnectApi], " + ex.Message);
+            }
+            return resp;
+        }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -400,6 +682,54 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public object ExecuteFormResource(EbApi Api, Service Service)
+        {
+            try
+            {
+                int RecordId = 0;
+                NTVDict _params = new NTVDict();
+                foreach (KeyValuePair<string, object> p in Api.GlobalParams)
+                {
+                    EbDbTypes _type;
+                    if (p.Value is int)
+                        _type = EbDbTypes.Int32;
+                    else //check other types here if required
+                        _type = EbDbTypes.String;
+                    _params.Add(p.Key, new NTV() { Name = p.Key, Type = _type, Value = p.Value });
+                }
+
+                if (!string.IsNullOrWhiteSpace(this.DataIdParam) && Api.GlobalParams.ContainsKey(this.DataIdParam))
+                {
+                    int.TryParse(Convert.ToString(Api.GlobalParams[this.DataIdParam]), out RecordId);
+                }
+                InsertOrUpdateFormDataRqst request = new InsertOrUpdateFormDataRqst
+                {
+                    RefId = this.Reference,
+                    PushJson = this.PushJson,
+                    UserId = Api.UserObject.UserId,
+                    UserAuthId = Api.UserObject.AuthId,
+                    RecordId = RecordId,
+                    LocId = Convert.ToInt32(Api.GlobalParams["eb_loc_id"]),
+                    SolnId = Api.SolutionId,
+                    WhichConsole = "uc",
+                    FormGlobals = new FormGlobals { Params = _params },
+                    //TransactionConnection = TransactionConnection
+                };
+
+                EbConnectionFactory ebConnection = new EbConnectionFactory(Api.SolutionId, Api.Redis);
+                InsertOrUpdateFormDataResp resp = EbFormHelper.InsertOrUpdateFormData(request, Api.DataDB, Service, Api.Redis, ebConnection);
+
+                if (resp.Status == (int)HttpStatusCode.OK)
+                    return resp.RecordId;
+                else
+                    throw new Exception(resp.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteFormResource], " + ex.Message);
+            }
         }
     }
 
@@ -446,6 +776,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.DropDown)]
         public int MailConnection { get; set; }
 
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.DateTime)]
+        public DateTime DefaultSyncDate { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='apiPrcItem dropped' eb-type='EmailRetriever' id='@id'>
@@ -455,6 +789,77 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public object ExecuteEmailRetriever(EbApi Api, Service Service, EbStaticFileClient FileClient)
+        {
+            try
+            {
+                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
+                int mailcon = this.MailConnection;
+                RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[mailcon]?.Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId);
+
+                EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
+                SchemaHelper.GetWebFormSchema(_form);
+                if (!(_form is null))
+                {
+                    WebformData data = _form.GetEmptyModel();
+
+                    foreach (RetrieverMessage _m in retrieverResponse?.RetrieverMessages)
+                    {
+                        InsertFormData(_form, data, _m, this.Reference, Api.SolutionId, Api.UserObject, Api.Redis, Service, EbConnectionFactory);
+                    }
+                }
+                else
+                {
+                    throw new ApiException("[ExecuteEmailRetriever], for objects is not in redis." + this.Reference);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteEmailRetriever], " + ex.Message);
+            }
+            return 0;
+        }
+
+        public int InsertFormData(EbWebForm _form, WebformData data, RetrieverMessage _m, string refid,
+            string SolnId, User UserObject, IRedisClient Redis, Service Service, EbConnectionFactory EbConnectionFactory)
+        {
+            data.MultipleTables[_form.TableName][0]["mail_subject"] = _m.Message.Subject;
+            data.MultipleTables[_form.TableName][0]["mail_body"] = _m.Message.Body;
+            data.MultipleTables[_form.TableName][0]["mail_from"] = _m.Message.From.Address;
+            data.MultipleTables[_form.TableName][0]["mail_to"] = _m.Message.To.ToString();
+            data.MultipleTables[_form.TableName][0]["mail_cc"] = _m.Message.CC.ToString();
+            data.MultipleTables[_form.TableName][0]["mail_bcc"] = _m.Message.Bcc.ToString();
+
+            foreach (int _att in _m.Attachemnts)
+            {
+                if (!data.ExtendedTables.ContainsKey("mail_attachments"))
+                    data.ExtendedTables.Add("mail_attachments", new SingleTable());
+
+                SingleRow r = new SingleRow();
+                r.Columns.Add(new SingleColumn
+                {
+                    Value = _att,
+                    Type = 7
+                });
+
+                data.ExtendedTables["mail_attachments"].Add(r);
+            }
+
+            InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
+            {
+                RefId = refid,
+                FormData = EbSerializers.Json_Serialize(data),
+                SolnId = SolnId,
+                UserAuthId = UserObject?.AuthId,
+                CurrentLoc = UserObject.Preference.DefaultLocation,
+            };
+
+            InsertDataFromWebformResponse response = EbFormHelper.InsertDataFromWebform(request, Redis, Service, EbConnectionFactory);
+
+
+            return response.RowId;
         }
 
     }
