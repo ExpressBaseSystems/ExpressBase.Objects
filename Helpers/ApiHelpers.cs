@@ -161,7 +161,7 @@ namespace ExpressBase.Common.Helpers
                     res.Result = (form as EbFormResource).ExecuteFormResource(Api, service);
                     break;
                 case EbEmailRetriever retriever:
-                    res.Result = (retriever as EbEmailRetriever).ExecuteEmailRetriever(Api, service, FileClient);
+                    res.Result = (retriever as EbEmailRetriever).ExecuteEmailRetriever(Api, service, FileClient, true);
                     break;
                 default:
                     res.Result = null;

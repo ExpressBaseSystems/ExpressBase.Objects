@@ -791,13 +791,13 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public object ExecuteEmailRetriever(EbApi Api, Service Service, EbStaticFileClient FileClient)
+        public object ExecuteEmailRetriever(EbApi Api, Service Service, EbStaticFileClient FileClient, bool isMq)
         {
             try
             {
                 EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
                 int mailcon = this.MailConnection;
-                RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[mailcon]?.Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId);
+                RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[mailcon]?.Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId, isMq);
 
                 EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
                 SchemaHelper.GetWebFormSchema(_form);
