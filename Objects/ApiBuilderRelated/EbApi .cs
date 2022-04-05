@@ -780,6 +780,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.DateTime)]
         public DateTime DefaultSyncDate { get; set; }
 
+        [EnableInBuilder(BuilderType.ApiBuilder)] 
+        public bool SubmitAttachmentAsMultipleForm { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='apiPrcItem dropped' eb-type='EmailRetriever' id='@id'>
@@ -795,24 +798,30 @@ namespace ExpressBase.Objects
         {
             try
             {
-                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
-                int mailcon = this.MailConnection;
-                RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[mailcon]?.Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId, isMq);
-
-                EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
-                SchemaHelper.GetWebFormSchema(_form);
-                if (!(_form is null))
+                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis); 
+                if (EbConnectionFactory.EmailRetrieveConnection[this.MailConnection] != null)
                 {
-                    WebformData data = _form.GetEmptyModel();
+                    RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection]?.Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
 
-                    foreach (RetrieverMessage _m in retrieverResponse?.RetrieverMessages)
+                    EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
+                    SchemaHelper.GetWebFormSchema(_form);
+                    if (!(_form is null))
                     {
-                        InsertFormData(_form, data, _m, this.Reference, Api.SolutionId, Api.UserObject, Api.Redis, Service, EbConnectionFactory);
+                        WebformData data = _form.GetEmptyModel();
+
+                        foreach (RetrieverMessage _m in retrieverResponse?.RetrieverMessages)
+                        {
+                            InsertFormData(_form, data, _m, this.Reference, Api.SolutionId, Api.UserObject, Api.Redis, Service, EbConnectionFactory);
+                        }
+                    }
+                    else
+                    {
+                        throw new ApiException("[ExecuteEmailRetriever], form objects is not in redis.");
                     }
                 }
                 else
                 {
-                    throw new ApiException("[ExecuteEmailRetriever], for objects is not in redis." + this.Reference);
+                    throw new ApiException("[ExecuteEmailRetriever], mail connection doesn't exist.");
                 }
             }
             catch (Exception ex)
