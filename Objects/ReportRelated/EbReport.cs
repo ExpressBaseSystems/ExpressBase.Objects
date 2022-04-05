@@ -319,6 +319,8 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        public bool HidePrintDetails { get; set; }
         //[JsonIgnore]
         //public ColumnColletion ColumnColletion { get; set; }
 
@@ -1072,13 +1074,16 @@ namespace ExpressBase.Objects
 
         public void SetDetail()
         {
-            string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
-            ColumnText ct = new ColumnText(Canvas);
-            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser?.FullName ?? "Machine User" + ", " + timestamp);
-            phrase.Font.Size = 6;
-            phrase.Font.Color = BaseColor.Gray;
-            ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - 20 - Margin.Left) - 20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
-            ct.Go();
+            if (!this.HidePrintDetails)
+            {
+                string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
+                ColumnText ct = new ColumnText(Canvas);
+                Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser?.FullName ?? "Machine User" + ", " + timestamp);
+                phrase.Font.Size = 6;
+                phrase.Font.Color = BaseColor.Gray;
+                ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - 20 - Margin.Left) - 20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
+                ct.Go();
+            }
         }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
