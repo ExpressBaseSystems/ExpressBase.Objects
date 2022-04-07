@@ -425,6 +425,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("Paging")]
         public int PageLength { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        [PropertyGroup(PGConstants.CORE)]
+        public List<ObjectBasicInfo> PrintDocs { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public bool DisableRowGrouping { get; set; }
@@ -1179,10 +1185,10 @@ else {
 
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage, BuilderType.DVBuilder)]
     public class ObjectBasicReport : ObjectBasicInfo
     {
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage, BuilderType.DVBuilder)]
         public string Title { get; set; }
     }
 
