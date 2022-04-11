@@ -801,7 +801,7 @@ namespace ExpressBase.Objects
                 EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis); 
                 if (EbConnectionFactory.EmailRetrieveConnection[this.MailConnection] != null)
                 {
-                    RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection]?.Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
+                    RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection].Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
 
                     EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
                     SchemaHelper.GetWebFormSchema(_form);
@@ -840,6 +840,8 @@ namespace ExpressBase.Objects
             data.MultipleTables[_form.TableName][0]["mail_to"] = _m.Message.To.ToString();
             data.MultipleTables[_form.TableName][0]["mail_cc"] = _m.Message.CC.ToString();
             data.MultipleTables[_form.TableName][0]["mail_bcc"] = _m.Message.Bcc.ToString();
+            data.MultipleTables[_form.TableName][0]["mail_bcc"] = _m.Message.Bcc.ToString();
+            data.MultipleTables[_form.TableName][0]["mail_attachment_names"] = _m.AttachmentsName.ToString();
 
             foreach (int _att in _m.Attachemnts)
             {
