@@ -26,6 +26,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string RToken { get; set; }
     }
+    public class ReportRenderMultipleRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
+    {
+        public string Refid { get; set; }
+
+        public string RenderingUserAuthId { get; set; }
+
+        public string ReadingUserAuthId { get; set; }
+
+        public string Params { get; set; }
+
+        public string BToken { get; set; }
+
+        public string RToken { get; set; }
+    }
 
     [DataContract]
     public class ReportRenderResponse : IEbSSResponse

@@ -418,8 +418,6 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public PdfStamper Stamp { get; set; }
 
-        [JsonIgnore]
-        public MemoryStream Ms1 { get; set; }
 
         [JsonIgnore]
         public Eb_Solution Solution { get; set; }
@@ -569,9 +567,6 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public EbStaticFileClient FileClient { get; set; }
-
-        [JsonIgnore]
-        public string SolutionId { get; set; }
 
         [JsonIgnore]
         public float RowHeight { get; set; }
@@ -853,7 +848,7 @@ namespace ExpressBase.Objects
                     }
 
                     if (field.RenderInMultiLine)
-                        field.DoRenderInMultiLine(column_val, this);
+                        field.DoRenderInMultiLine(column_val, this, false);
                 }
                 EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
                 if (SortedReportFields.Length > 0)
@@ -1060,16 +1055,19 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void SetPassword()
+        public void SetPassword(MemoryStream Ms1)
         {
-            Ms1.Position = 0;
-            PdfReader = new PdfReader(Ms1);
-            Stamp = new PdfStamper(PdfReader, Ms1);
-            byte[] USER = Encoding.ASCII.GetBytes(UserPassword);
-            byte[] OWNER = Encoding.ASCII.GetBytes(OwnerPassword);
-            Stamp.SetEncryption(USER, OWNER, 0, PdfWriter.ENCRYPTION_AES_128);
-            Stamp.FormFlattening = true;
-            Stamp.Close();
+            if (this.UserPassword != string.Empty || this.OwnerPassword != string.Empty)
+            {
+                Ms1.Position = 0;
+                PdfReader = new PdfReader(Ms1);
+                Stamp = new PdfStamper(PdfReader, Ms1);
+                byte[] USER = Encoding.ASCII.GetBytes(UserPassword);
+                byte[] OWNER = Encoding.ASCII.GetBytes(OwnerPassword);
+                Stamp.SetEncryption(USER, OWNER, 0, PdfWriter.ENCRYPTION_AES_128);
+                Stamp.FormFlattening = true;
+                Stamp.Close();
+            }
         }
 
         public void SetDetail()
@@ -1078,10 +1076,10 @@ namespace ExpressBase.Objects
             {
                 string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
                 ColumnText ct = new ColumnText(Canvas);
-                Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser?.FullName ?? "Machine User" + ", " + timestamp);
+                Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " +( RenderingUser?.FullName ?? "Machine User" )+ ", " + timestamp);
                 phrase.Font.Size = 6;
                 phrase.Font.Color = BaseColor.Gray;
-                ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - 20 - Margin.Left) - 20, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
+                ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - 20 - Margin.Left) - 20, 20 + Margin.Bottom, 15, Element.ALIGN_LEFT);
                 ct.Go();
             }
         }
