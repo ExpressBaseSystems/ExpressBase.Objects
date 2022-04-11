@@ -143,8 +143,9 @@ namespace ExpressBase.Objects
                         int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
                         if (numberofCharsInALine < column_val.Length)
                         {
-                            if (column_type == System.Data.DbType.Int32 || column_type == System.Data.DbType.Decimal || column_type == System.Data.DbType.Double || column_type == System.Data.DbType.Int16 || column_type == System.Data.DbType.Int64 || column_type == System.Data.DbType.VarNumeric)
+                            if (!this.RenderInMultiLine && (column_type == System.Data.DbType.Int32 || column_type == System.Data.DbType.Decimal || column_type == System.Data.DbType.Double || column_type == System.Data.DbType.Int16 || column_type == System.Data.DbType.Int64 || column_type == System.Data.DbType.VarNumeric))
                                 column_val = "###";
+
                             else if (!this.RenderInMultiLine)
                                 column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
                         }
@@ -193,7 +194,7 @@ namespace ExpressBase.Objects
             return column_val;
         }
 
-        public void DoRenderInMultiLine(string column_val, EbReport Report)
+        public void DoRenderInMultiLine(string column_val, EbReport Report, bool _inwords)
         {
             //Report.RowHeight = 0;
             Report.MultiRowTop = 0;
@@ -204,7 +205,7 @@ namespace ExpressBase.Objects
             if (calculatedValueSize > this.WidthPt)
             {
                 int rowsneeded;
-                if (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16 || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric)
+                if (!_inwords && (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16 || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric))
                     rowsneeded = 1;
                 else
                     rowsneeded = Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
@@ -444,9 +445,6 @@ namespace ExpressBase.Objects
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-
             if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
                 column_val = String.Empty;
             else
@@ -456,6 +454,9 @@ namespace ExpressBase.Objects
                     column_val = Prefix + " " + column_val + " " + Suffix;
             }
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
+            if (RenderInMultiLine && AmountInWords)
+                DoRenderInMultiLine(column_val, Rep, this.AmountInWords);
+
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
@@ -466,6 +467,11 @@ namespace ExpressBase.Objects
             else
                 ct.AddText(phrase);
             ct.Canvas.SetColorFill(GetColor(ForeColor));
+
+
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
