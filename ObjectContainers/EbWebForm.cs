@@ -1824,8 +1824,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    if (wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(MobilePageRefId) &&
-                        !EbFormHelper.HasPermission(this.UserObj, MobilePageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent, wc))
+                    if (!this.HasMcPagePermission(wc, MobilePageRefId))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
 
                     if (this.IsDisable)
@@ -1890,6 +1889,24 @@ namespace ExpressBase.Objects
                 throw new FormException(FormErrors.E0130 + ex1.Message, (int)HttpStatusCode.InternalServerError, $"Exception in save form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", ex1.StackTrace);
             }
             return resp;
+        }
+
+        private bool HasMcPagePermission(string wc, string MobilePageRefId)
+        {
+            if (wc == TokenConstants.MC)
+            {
+                if (!string.IsNullOrWhiteSpace(MobilePageRefId))
+                {
+                    if (MobilePageRefId != this.SolutionObj?.SolutionSettings?.MobileAppSettings?.SignUpPageRefId)
+                    {
+                        if (!EbFormHelper.HasPermission(this.UserObj, MobilePageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent, wc))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
 
         public int Insert(IDatabase DataDB, Service service, bool handleUniqueErr, bool pushAuditTrail)
