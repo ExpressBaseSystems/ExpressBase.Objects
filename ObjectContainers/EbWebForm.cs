@@ -1810,6 +1810,7 @@ namespace ExpressBase.Objects
                 this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
                 bool IsMobInsert = !IsUpdate && wc == RoutingConstants.MC;
+                bool IsMobSignUp = IsMobInsert && !string.IsNullOrWhiteSpace(MobilePageRefId) && MobilePageRefId == this.SolutionObj?.SolutionSettings?.MobileAppSettings?.SignUpPageRefId;
                 if (IsUpdate)
                 {
                     string ts = this.FormData.ModifiedAt;
@@ -1839,7 +1840,7 @@ namespace ExpressBase.Objects
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
 
-                if (!IsMobInsert)
+                if (!IsMobInsert || IsMobSignUp)
                     this.RefreshFormData(DataDB, service, false, true);
 
                 if (IsUpdate)
