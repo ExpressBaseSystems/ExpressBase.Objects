@@ -2840,15 +2840,28 @@ namespace ExpressBase.Objects
             Dictionary<int, List<int>> _perm = new Dictionary<int, List<int>>();
             //New View Edit Delete Cancel Print AuditTrail
 
-            foreach (int locid in this.SolutionObj.Locations.Keys)
+            if (this.IsLocIndependent)
             {
                 List<int> _temp = new List<int>();
                 foreach (EbOperation op in Operations.Enumerator)
                 {
-                    if (EbFormHelper.HasPermission(this.UserObj, RefId, op.Name, locid))
+                    if (EbFormHelper.HasPermission(this.UserObj, RefId, op.Name, 0, true))
                         _temp.Add(op.IntCode);
                 }
-                _perm.Add(locid, _temp);
+                _perm.Add(0, _temp);
+            }
+            else
+            {
+                foreach (int locid in this.SolutionObj.Locations.Keys)
+                {
+                    List<int> _temp = new List<int>();
+                    foreach (EbOperation op in Operations.Enumerator)
+                    {
+                        if (EbFormHelper.HasPermission(this.UserObj, RefId, op.Name, locid))
+                            _temp.Add(op.IntCode);
+                    }
+                    _perm.Add(locid, _temp);
+                }
             }
             return _perm;
         }
