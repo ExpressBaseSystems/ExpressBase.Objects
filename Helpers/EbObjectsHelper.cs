@@ -69,6 +69,13 @@ namespace ExpressBase.Objects.Helpers
             return resp;
         }
 
-       
+        public static string GetRefIdByVerId(IDatabase ObjectsDB, int ObjVerId)
+        {
+            string sql = "SELECT refid FROM eb_objects_ver WHERE id = @id";
+            DbParameter[] p = { ObjectsDB.GetNewParameter("id", EbDbTypes.Int32, ObjVerId) };
+            EbDataTable _tbl = ObjectsDB.DoQuery(sql, p);
+            return _tbl.Rows.Count > 0 ? Convert.ToString(_tbl.Rows[0][0]) : null;
+        }
+
     }
 }

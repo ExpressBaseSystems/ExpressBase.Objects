@@ -64,13 +64,33 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Authenticate2FAResponse EmailVerifCode { get; set; }
     }
 
+    public class SendVerificationCodeRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
+    {
+        public string Email { get; set; }
+
+        public string Mobile { get; set; }
+
+        public string Key { get; set; }
+    }
+
+    public class VerifyVerificationCodeRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
+    {
+        public string Email { get; set; }
+
+        public string Mobile { get; set; }
+
+        public string Otp { get; set; }
+
+        public string Key { get; set; }
+    }
+
     public class SendUserVerifCodeRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
     {
         public int UserId { get; set; }
 
         public string WC { get; set; }
-    } 
-    
+    }
+
     public class SetForgotPWInRedisRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
     {
         public string UName { get; set; }
@@ -79,7 +99,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string WhichConsole { get; set; }
     }
-    
+
 
     public class VerifyUserConfirmationRequest : EbServiceStackNoAuthRequest, IReturn<Authenticate2FAResponse>
     {
@@ -90,17 +110,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string UserAuthId { get; set; }
     }
 
-	public class GetOTPRequest : EbServiceStackAuthRequest, IReturn<GetOTPResponse>
-	{
-	}
-	public class GetOTPResponse
-	{
+    public class GetOTPRequest : EbServiceStackAuthRequest, IReturn<GetOTPResponse>
+    {
+    }
+    public class GetOTPResponse
+    {
 
-		public string OTP { get; set; }
-	}
+        public string OTP { get; set; }
+    }
 
 
-	public enum OtpType
+    public enum OtpType
     {
         Sms = 1,
         Email = 2

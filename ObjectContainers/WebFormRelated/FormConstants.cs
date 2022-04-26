@@ -72,10 +72,11 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string consadd = "consadd";
         //Globals - DataPusher
         public const string __eb_loop_through = "__eb_loop_through";
-        //EbPhone ctrl
+        //EbPhone/EbEmail ctrl
         public const string _verified = "_verified";
         public const string is_verified = "is_verified";
         public const string phone_no = "phone_no";
+        public const string email_id = "email_id";
         public const string otp = "otp";
         public const string timestamp = "timestamp";
         //PowerSelect

@@ -392,6 +392,72 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class SubmitFormDataApiRequest : EbServiceStackAuthRequest, IReturn<SubmitFormDataApiResponse>
+    {
+        [DataMember(Order = 1)]
+        public string FormData { get; set; }
+
+        [DataMember(Order = 2)]
+        public int VerId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int DataId { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CurrentLoc { get; set; }
+    }
+
+
+    [DataContract]
+    public class SubmitFormDataApiResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public int DataId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string FormData { get; set; }
+    }
+
+    [DataContract]
+    public class SendOtpApiResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool EmailOtpSent { get; set; }
+
+        [DataMember(Order = 4)]
+        public bool MobileOtpSent { get; set; }
+    }
+
+    [DataContract]
+    public class VerifyOtpApiResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool EmailOtpMatched { get; set; }
+
+        [DataMember(Order = 4)]
+        public bool MobileOtpMatched { get; set; }
+    }
+
+
+    [DataContract]
     public class ExecuteReviewRequest : EbServiceStackAuthRequest, IReturn<ExecuteReviewResponse>
     {
         [DataMember(Order = 1)]

@@ -53,9 +53,10 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_columns.Count() > 0)
                 {
                     _cols += ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
-                    IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
-                    if (_ph_cols.Count() > 0)
-                        _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
+                    IEnumerable<ColumnSchema> _ph_em_cols =
+                        _columns.Where(x => (x.Control is EbPhone _phCtrl && _phCtrl.Sendotp) || (x.Control is EbEmailControl _emCtrl && _emCtrl.Sendotp));
+                    if (_ph_em_cols.Count() > 0)
+                        _cols += ", " + String.Join(", ", _ph_em_cols.Select(x => x.ColumnName + FormConstants._verified));
                 }
 
                 if (_this.DataPusherConfig == null)// master form
@@ -171,9 +172,9 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_columns.Count() > 0)
                 {
                     _cols = ", " + String.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
-                    IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
-                    if (_ph_cols.Count() > 0)
-                        _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
+                    IEnumerable<ColumnSchema> _em_ph_cols = _columns.Where(x => (x.Control is EbPhone _phCtrl && _phCtrl.Sendotp) || (x.Control is EbEmailControl _emCtrl && _emCtrl.Sendotp));
+                    if (_em_ph_cols.Count() > 0)
+                        _cols += ", " + String.Join(", ", _em_ph_cols.Select(x => x.ColumnName + FormConstants._verified));
                 }
 
                 if (_table.TableName == _this.FormSchema.MasterTable)

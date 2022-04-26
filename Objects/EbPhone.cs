@@ -380,10 +380,8 @@ namespace ExpressBase.Objects
         public bool SendMessage { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [DefaultPropValue("false")]
         [Alias("Send OTP")]
         public bool Sendotp { get; set; }
-
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("false")]
@@ -481,13 +479,14 @@ namespace ExpressBase.Objects
             };
         }
 
-        private void VerifyOTP(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, int i, User usr)
+        private static void VerifyOTP(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, int i, User usr, string formRefId, string ctrlName, IRedisClient RedisClient)
         {
+            if (cField.M == null) cField.M = "{}";
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(cField.M);
-            if (_d.ContainsKey(FormConstants.otp) && _d.ContainsKey(FormConstants.timestamp))
+            if (_d.ContainsKey(FormConstants.otp))
             {
-                string otpKey = this.FormRefId + this.EbSid + usr.UserId + _d[FormConstants.timestamp];
-                string otpInRedis = this.RedisClient.Get<string>(otpKey);
+                string otpKey = formRefId + "-" + ctrlName + "-" + usr.UserId + cField.Value?.ToString().RemoveSpecialCharacters();
+                string otpInRedis = RedisClient.Get<string>(otpKey);
                 if (otpInRedis == null)
                     throw new FormException("OTP expired. Please try again.", (int)HttpStatusCode.BadRequest, $"Otp is not found. timestamp: {_d[FormConstants.timestamp]}", "EbPhone => ParameterizeControl");
 
@@ -502,7 +501,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
+        public static bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext, string formRefId, string ctrlName, IRedisClient RedisClient, bool SendOtp)
         {
             bool AvoidParam = false;
 
@@ -511,7 +510,7 @@ namespace ExpressBase.Objects
                 var p = args.DataDB.GetNewParameter(args.cField.Name + crudContext, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
                 args.param.Add(p);
-                if (this.Sendotp)
+                if (SendOtp)
                 {
                     args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + FormConstants._verified + "_" + args.i, EbDbTypes.Boolean, false));
                 }
@@ -519,11 +518,11 @@ namespace ExpressBase.Objects
             else
             {
                 args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + crudContext, (EbDbTypes)args.cField.Type, args.cField.Value));
-                if (this.Sendotp)
+                if (SendOtp)
                 {
                     if (args.ins)
                     {
-                        this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
+                        EbPhone.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr, formRefId, ctrlName, RedisClient);
                     }
                     else
                     {
@@ -533,11 +532,11 @@ namespace ExpressBase.Objects
                             if (String.Equals(args.cField.Value, args.ocF.Value))// phone number changed
                                 AvoidParam = true;
                             else
-                                this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
+                                EbPhone.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr, formRefId, ctrlName, RedisClient);
                         }
                         else
                         {
-                            this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
+                            EbPhone.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr, formRefId, ctrlName, RedisClient);
                         }
                     }
                 }
@@ -547,7 +546,7 @@ namespace ExpressBase.Objects
             {
                 args._cols += string.Concat(args.cField.Name, ", ");
                 args._vals += string.Concat("@", args.cField.Name + crudContext, ", ");
-                if (this.Sendotp)
+                if (SendOtp)
                 {
                     args._cols += string.Concat(args.cField.Name, FormConstants._verified, ", ");
                     args._vals += string.Concat("@", args.cField.Name, FormConstants._verified, "_", args.i, ", ");
@@ -556,13 +555,18 @@ namespace ExpressBase.Objects
             else
             {
                 args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name + crudContext, ", ");
-                if (this.Sendotp && !AvoidParam)
+                if (SendOtp && !AvoidParam)
                 {
                     args._colvals += string.Concat(args.cField.Name, FormConstants._verified, "=@", args.cField.Name, FormConstants._verified, "_", args.i, ", ");
                 }
             }
             args.i++;
             return true;
+        }
+
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
+        {
+            return EbPhone.ParameterizeControl(args, crudContext, this.FormRefId, this.Name, this.RedisClient, this.Sendotp);
         }
     }
 }

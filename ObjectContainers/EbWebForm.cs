@@ -1023,8 +1023,10 @@ namespace ExpressBase.Objects
                             EbControl _control = _table.Columns[k].Control;
                             string ctrlName = _control.IsSysControl ? ebs[_control.Name.ToLower()] : _control.Name.ToLower();// card field has uppercase name, but datatable contains lower case column name
                             this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control, _table);
-                            if (_control is EbPhone && (_control as EbPhone).Sendotp)
-                                (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                            if (_control is EbPhone _phCtrl && _phCtrl.Sendotp)
+                                _phCtrl.GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                            else if (_control is EbEmailControl _emCtrl && _emCtrl.Sendotp)
+                                _emCtrl.GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
                         }
                     }
                 }
