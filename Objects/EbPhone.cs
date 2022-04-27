@@ -488,12 +488,12 @@ namespace ExpressBase.Objects
                 string otpKey = formRefId + "-" + ctrlName + "-" + usr.UserId + cField.Value?.ToString().RemoveSpecialCharacters();
                 string otpInRedis = RedisClient.Get<string>(otpKey);
                 if (otpInRedis == null)
-                    throw new FormException("OTP expired. Please try again.", (int)HttpStatusCode.BadRequest, $"Otp is not found. timestamp: {_d[FormConstants.timestamp]}", "EbPhone => ParameterizeControl");
+                    throw new FormException("OTP expired. Please try again.", (int)HttpStatusCode.BadRequest, $"Otp is not found. otpKey: {otpKey}", "EbPhone => ParameterizeControl");
 
                 if (otpInRedis == _d[FormConstants.otp])
                     param.Add(DataDB.GetNewParameter(cField.Name + FormConstants._verified + "_" + i, EbDbTypes.Boolean, true));
                 else
-                    throw new FormException("OTP mismatch. Please try again.", (int)HttpStatusCode.BadRequest, $"Otp verification failed due to mismatch. timestamp: {_d[FormConstants.timestamp]}", "EbPhone => ParameterizeControl");
+                    throw new FormException("OTP mismatch. Please try again.", (int)HttpStatusCode.BadRequest, $"Otp verification failed due to mismatch. otpKey: {otpKey}", "EbPhone => ParameterizeControl");
             }
             else
             {
