@@ -152,6 +152,7 @@ namespace ExpressBase.Objects
             try
             {
                 RestClient client = new RestClient(uri.GetLeftPart(UriPartial.Authority));
+                client.RemoteCertificateValidationCallback= (sender, cert, chain, sslPolicyErrors) => { return true; };
 
                 RestRequest request = thirdPartyResource.CreateRequest(uri.PathAndQuery, Api.GlobalParams);
 
