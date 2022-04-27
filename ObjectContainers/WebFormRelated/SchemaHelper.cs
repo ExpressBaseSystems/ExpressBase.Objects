@@ -91,10 +91,15 @@ namespace ExpressBase.Objects.WebFormRelated
                     (control as IEbExtraQryCtrl).TableName = curTbl;
                     _schema.ExtendedControls.Add(control);
                 }
-                else if (control is EbPhone && (control as EbPhone).Sendotp)
+                else if (control is EbPhone _phCtrl && _phCtrl.Sendotp)
                 {
-                    (control as EbPhone).FormRefId = _this.RefId;
-                    (control as EbPhone).RedisClient = _this.RedisClient;
+                    _phCtrl.FormRefId = _this.RefId;
+                    _phCtrl.RedisClient = _this.RedisClient;
+                }
+                else if (control is EbEmailControl _emCtrl && _emCtrl.Sendotp)
+                {
+                    _emCtrl.FormRefId = _this.RefId;
+                    _emCtrl.RedisClient = _this.RedisClient;
                 }
                 else if (control is IEbPowerSelect iPs)
                 {

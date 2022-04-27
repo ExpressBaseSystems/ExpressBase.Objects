@@ -1023,8 +1023,10 @@ namespace ExpressBase.Objects
                             EbControl _control = _table.Columns[k].Control;
                             string ctrlName = _control.IsSysControl ? ebs[_control.Name.ToLower()] : _control.Name.ToLower();// card field has uppercase name, but datatable contains lower case column name
                             this.GetFormattedColumn(dataTable.Columns[ctrlName], dataRow, Row, _control, _table);
-                            if (_control is EbPhone && (_control as EbPhone).Sendotp)
-                                (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                            if (_control is EbPhone _phCtrl && _phCtrl.Sendotp)
+                                _phCtrl.GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
+                            else if (_control is EbEmailControl _emCtrl && _emCtrl.Sendotp)
+                                _emCtrl.GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
                         }
                     }
                 }
@@ -1810,6 +1812,7 @@ namespace ExpressBase.Objects
                 this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
                 bool IsMobInsert = !IsUpdate && wc == RoutingConstants.MC;
+                bool IsMobSignUp = IsMobInsert && !string.IsNullOrWhiteSpace(MobilePageRefId) && MobilePageRefId == this.SolutionObj?.SolutionSettings?.MobileAppSettings?.SignUpPageRefId;
                 if (IsUpdate)
                 {
                     string ts = this.FormData.ModifiedAt;
@@ -1824,8 +1827,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    if (wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(MobilePageRefId) &&
-                        !EbFormHelper.HasPermission(this.UserObj, MobilePageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent, wc))
+                    if (!this.HasMcPagePermission(wc, MobilePageRefId))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
 
                     if (this.IsDisable)
@@ -1840,7 +1842,7 @@ namespace ExpressBase.Objects
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
 
-                if (!IsMobInsert)
+                if (!IsMobInsert || IsMobSignUp)
                     this.RefreshFormData(DataDB, service, false, true);
 
                 if (IsUpdate)
@@ -1890,6 +1892,24 @@ namespace ExpressBase.Objects
                 throw new FormException(FormErrors.E0130 + ex1.Message, (int)HttpStatusCode.InternalServerError, $"Exception in save form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", ex1.StackTrace);
             }
             return resp;
+        }
+
+        private bool HasMcPagePermission(string wc, string MobilePageRefId)
+        {
+            if (wc == TokenConstants.MC)
+            {
+                if (!string.IsNullOrWhiteSpace(MobilePageRefId))
+                {
+                    if (MobilePageRefId != this.SolutionObj?.SolutionSettings?.MobileAppSettings?.SignUpPageRefId)
+                    {
+                        if (!EbFormHelper.HasPermission(this.UserObj, MobilePageRefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent, wc))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
 
         public int Insert(IDatabase DataDB, Service service, bool handleUniqueErr, bool pushAuditTrail)
@@ -2820,15 +2840,28 @@ namespace ExpressBase.Objects
             Dictionary<int, List<int>> _perm = new Dictionary<int, List<int>>();
             //New View Edit Delete Cancel Print AuditTrail
 
-            foreach (int locid in this.SolutionObj.Locations.Keys)
+            if (this.IsLocIndependent)
             {
                 List<int> _temp = new List<int>();
                 foreach (EbOperation op in Operations.Enumerator)
                 {
-                    if (EbFormHelper.HasPermission(this.UserObj, RefId, op.Name, locid))
+                    if (EbFormHelper.HasPermission(this.UserObj, RefId, op.Name, 0, true))
                         _temp.Add(op.IntCode);
                 }
-                _perm.Add(locid, _temp);
+                _perm.Add(0, _temp);
+            }
+            else
+            {
+                foreach (int locid in this.SolutionObj.Locations.Keys)
+                {
+                    List<int> _temp = new List<int>();
+                    foreach (EbOperation op in Operations.Enumerator)
+                    {
+                        if (EbFormHelper.HasPermission(this.UserObj, RefId, op.Name, locid))
+                            _temp.Add(op.IntCode);
+                    }
+                    _perm.Add(locid, _temp);
+                }
             }
             return _perm;
         }
