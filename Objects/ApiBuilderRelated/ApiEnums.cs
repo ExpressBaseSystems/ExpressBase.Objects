@@ -43,4 +43,16 @@ namespace ExpressBase.Objects
         None = 1,
         Bearer = 2
     }
+
+    public enum EncryptionAlgorithm
+    {
+        RSA = 1
+    }
+
+    public enum KeySource
+    {
+        Api = 1,
+        DataReader = 2,
+        StaticValue = 3
+    }
 }
