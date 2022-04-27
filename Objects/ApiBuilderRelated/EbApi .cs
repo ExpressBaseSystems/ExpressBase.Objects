@@ -21,7 +21,15 @@ using System.Net;
 using ExpressBase.Common.Messaging;
 using ExpressBase.Objects.WebFormRelated;
 using ExpressBase.Common.ServiceClients;
-
+using System.IO;
+using System.Security.Cryptography;
+using System.Xml.Serialization;
+using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Encodings;
+using Org.BouncyCastle.Crypto.Engines;
+using System.Text;
+using Org.BouncyCastle.Crypto.Parameters;
 namespace ExpressBase.Objects
 {
     public class ListOrdered : List<ApiResources>
@@ -780,7 +788,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.DateTime)]
         public DateTime DefaultSyncDate { get; set; }
 
-        [EnableInBuilder(BuilderType.ApiBuilder)] 
+        [EnableInBuilder(BuilderType.ApiBuilder)]
         public bool SubmitAttachmentAsMultipleForm { get; set; }
 
         public override string GetDesignHtml()
@@ -798,7 +806,7 @@ namespace ExpressBase.Objects
         {
             try
             {
-                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis); 
+                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
                 if (EbConnectionFactory.EmailRetrieveConnection[this.MailConnection] != null)
                 {
                     RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection].Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
@@ -873,5 +881,81 @@ namespace ExpressBase.Objects
             return response.RowId;
         }
 
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbEncrypt : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyGroup("Data Settings")]
+        public EncryptionAlgorithm EncryptionAlgorithm { get; set; }
+
+        [PropertyGroup("Data Settings")]
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public KeySource KeySource { set; get; }
+
+        [PropertyGroup("Data Settings")]
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public String DataParameterName { set; get; }
+
+        [PropertyGroup("Static")]
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string PublicKey { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.String)]
+        [PropertyGroup("Api")]
+        public string Url { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("DataReader")]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        public string KeyReference { get; set; }
+
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='Encrypt' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }          
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbDecrypt : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyGroup("Data Settings")]
+        public EncryptionAlgorithm EncryptionAlgorithm { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyGroup("Static")]
+        public string PrivateKey { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public KeySource KeySource { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.String)]
+        [PropertyGroup("Api")]
+        public string Url { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("DataReader")]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        public string KeyReference { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='Decrypt' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
     }
 }
