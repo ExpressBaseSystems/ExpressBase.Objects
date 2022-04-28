@@ -22,6 +22,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using ServiceStack.Redis;
 using System.Data.Common;
 using ExpressBase.Common;
+using Newtonsoft.Json;
 
 namespace ExpressBase.Objects
 {
@@ -151,8 +152,15 @@ namespace ExpressBase.Objects
 
             try
             {
+                Console.WriteLine("-- Security Protocol: " + System.Net.ServicePointManager.SecurityProtocol);
                 RestClient client = new RestClient(uri.GetLeftPart(UriPartial.Authority));
-                client.RemoteCertificateValidationCallback= (sender, cert, chain, sslPolicyErrors) => { return true; };
+                client.RemoteCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                {
+                    Console.WriteLine("Validation callback reached . sslPolicyErrors - " +
+                        (sslPolicyErrors));
+                    return true;
+                };
+                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls11;
 
                 RestRequest request = thirdPartyResource.CreateRequest(uri.PathAndQuery, Api.GlobalParams);
 
