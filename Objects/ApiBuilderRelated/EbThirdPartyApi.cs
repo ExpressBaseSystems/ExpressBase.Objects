@@ -151,16 +151,8 @@ namespace ExpressBase.Objects
             object result;
 
             try
-            {
-                Console.WriteLine("-- Security Protocol: " + System.Net.ServicePointManager.SecurityProtocol);
-                RestClient client = new RestClient(uri.GetLeftPart(UriPartial.Authority));
-                client.RemoteCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
-                {
-                    Console.WriteLine("Validation callback reached . sslPolicyErrors - " +
-                        (sslPolicyErrors));
-                    return true;
-                };
-                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls11 | System.Net.SecurityProtocolType.Tls11;
+            { 
+                RestClient client = new RestClient(uri.GetLeftPart(UriPartial.Authority)); 
 
                 RestRequest request = thirdPartyResource.CreateRequest(uri.PathAndQuery, Api.GlobalParams);
 
