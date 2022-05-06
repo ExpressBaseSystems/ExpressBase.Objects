@@ -1187,24 +1187,33 @@ namespace ExpressBase.Objects
         public byte[] GetImage(int refId)
         {
             DownloadFileResponse dfs = null;
-
             byte[] fileByte = new byte[0];
-            if (FileClient.BearerToken != string.Empty)
+
+            try
             {
-                dfs = FileClient.Get
-                    (new DownloadImageByIdRequest
-                    {
-                        ImageInfo = new ImageMeta
-                        {
-                            FileRefId = refId,
-                            FileCategory = Common.Enums.EbFileCategory.Images
-                        }
-                    });
-                if (dfs.StreamWrapper != null)
+                if (FileClient?.BearerToken != string.Empty)
                 {
-                    dfs.StreamWrapper.Memorystream.Position = 0;
-                    fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+                    dfs = FileClient.Get
+                        (new DownloadImageByIdRequest
+                        {
+                            ImageInfo = new ImageMeta
+                            {
+                                FileRefId = refId,
+                                FileCategory = Common.Enums.EbFileCategory.Images
+                            }
+                        });
+                    if (dfs.StreamWrapper != null)
+                    {
+                        dfs.StreamWrapper.Memorystream.Position = 0;
+                        fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(FileClient?.BaseUri);
+
+                Console.WriteLine(e.Message + e.StackTrace);
             }
             return fileByte;
         }
