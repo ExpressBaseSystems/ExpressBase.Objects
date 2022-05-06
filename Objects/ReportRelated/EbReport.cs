@@ -1211,8 +1211,6 @@ namespace ExpressBase.Objects
             }
             catch (Exception e)
             {
-                Console.WriteLine(FileClient?.BaseUri);
-
                 Console.WriteLine(e.Message + e.StackTrace);
             }
             return fileByte;
