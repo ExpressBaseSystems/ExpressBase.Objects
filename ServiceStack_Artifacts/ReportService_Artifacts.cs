@@ -39,6 +39,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string BToken { get; set; }
 
         public string RToken { get; set; }
+
+        public string SubscriptionId { get; set; }
+    }
+
+      public class ReportRenderMultipleMQRequest: EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
+    {
+        public string RefId { get; set; }
+
+        public string RenderingUserAuthId { get; set; }
+
+        public string ReadingUserAuthId { get; set; }
+
+        public string Params { get; set; }
+
+        public string BToken { get; set; }
+
+        public string RToken { get; set; }
+
+        public string SubscriptionId { get; set; }
     }
 
     [DataContract]

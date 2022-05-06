@@ -10,6 +10,7 @@ using ExpressBase.Security;
 using System;
 using ExpressBase.Common;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects.Services
 {
@@ -77,7 +78,18 @@ namespace ExpressBase.Objects.Services
             this.FileClient = _sfc as EbStaticFileClient;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
 
+        } 
+
+        public EbMqBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc, IServiceClient _ssclient, IEbServerEventClient _sec)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.FileClient = _sfc as EbStaticFileClient;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.MessageQueueClient = _mqc as RabbitMqQueueClient; 
+            this.ServiceStackClient = _ssclient as JsonServiceClient;
+            this.ServerEventClient = _sec as EbServerEventClient;
         }
+
         public EbMqBaseService(IEbConnectionFactory _dbf, IServiceClient _ssclient)
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
@@ -177,6 +189,26 @@ namespace ExpressBase.Objects.Services
             }
             catch (Exception e) { Console.WriteLine(e.Message + e.StackTrace); }
             return user;
+        }
+
+        public Eb_Solution GetSolutionObject(string cid)
+        {
+            Eb_Solution s_obj = null;
+            try
+            {
+                s_obj = this.Redis.Get<Eb_Solution>(String.Format("solution_{0}", cid));
+
+                if (s_obj == null)
+                {
+                    Gateway.Send<UpdateSolutionObjectResponse>(new UpdateSolutionObjectRequest() { SolnId = cid });
+                    s_obj = this.Redis.Get<Eb_Solution>(String.Format("solution_{0}", cid));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
+            return s_obj;
         }
 
     }

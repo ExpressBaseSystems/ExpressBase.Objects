@@ -7,12 +7,15 @@ using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.ServiceClients;
+using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.CoreBase.Globals;
+using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
 using iTextSharp.text;
+using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -28,6 +31,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static ExpressBase.CoreBase.Globals.PdfGEbFont;
+using HeaderFooter = ExpressBase.Objects.Helpers.HeaderFooter;
 
 namespace ExpressBase.Objects
 {
@@ -337,19 +341,19 @@ namespace ExpressBase.Objects
         public int iDetailRowPos { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, List<EbDataField>> PageSummaryFields { get; set; }
+        public Dictionary<string, List<EbDataField>> PageSummaryFields { get; set; } = new Dictionary<string, List<EbDataField>>();
 
         [JsonIgnore]
-        public Dictionary<string, List<EbDataField>> ReportSummaryFields { get; set; }
+        public Dictionary<string, List<EbDataField>> ReportSummaryFields { get; set; } = new Dictionary<string, List<EbDataField>>();
 
         [JsonIgnore]
-        public Dictionary<string, List<EbDataField>> GroupSummaryFields { get; set; }
+        public Dictionary<string, List<EbDataField>> GroupSummaryFields { get; set; } = new Dictionary<string, List<EbDataField>>();
 
         [JsonIgnore]
-        public Dictionary<int, byte[]> WatermarkImages { get; set; }
+        public Dictionary<int, byte[]> WatermarkImages = new Dictionary<int, byte[]>();
 
         [JsonIgnore]
-        public List<object> WaterMarkList { get; set; }
+        public List<object> WaterMarkList { get; set; } = new List<object>();
 
         [JsonIgnore]
         public EbSciptEvaluator evaluator = new EbSciptEvaluator
@@ -358,22 +362,22 @@ namespace ExpressBase.Objects
         };
 
         [JsonIgnore]
-        public Dictionary<string, object> ValueScriptCollection { get; set; }
+        public Dictionary<string, object> ValueScriptCollection { get; set; } = new Dictionary<string, object>();
 
         [JsonIgnore]
-        public Dictionary<string, object> AppearanceScriptCollection { get; set; }
+        public Dictionary<string, object> AppearanceScriptCollection { get; set; } = new Dictionary<string, object>();
 
         [JsonIgnore]
-        public Dictionary<string, ReportGroupItem> Groupheaders { get; set; }
+        public Dictionary<string, ReportGroupItem> Groupheaders { get; set; } = new Dictionary<string, ReportGroupItem>();
 
         [JsonIgnore]
-        public Dictionary<string, ReportGroupItem> GroupFooters { get; set; }
+        public Dictionary<string, ReportGroupItem> GroupFooters { get; set; } = new Dictionary<string, ReportGroupItem>();
 
         [JsonIgnore]
         public EbDataSet DataSet { get; set; }
 
         [JsonIgnore]
-        public bool IsLastpage { get; set; }
+        public bool IsLastpage { get; set; } = false;
 
         [JsonIgnore]
         public int PageNumber { get; set; }
@@ -562,8 +566,8 @@ namespace ExpressBase.Objects
             }
         }
 
-        [JsonIgnore]
-        public EbBaseService ReportService { get; set; }
+        //[JsonIgnore]
+        //public EbBaseService ReportService { get; set; }
 
         [JsonIgnore]
         public EbStaticFileClient FileClient { get; set; }
@@ -596,13 +600,19 @@ namespace ExpressBase.Objects
         private int PreviousGheadersSlNo { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
+        public Dictionary<string, List<EbControl>> LinkCollection { get; set; } = new Dictionary<string, List<Common.Objects.EbControl>>();
 
         [JsonIgnore]
         public Dictionary<string, GNTV> CalcValInRow { get; set; } = new Dictionary<string, GNTV>();
 
         [JsonIgnore]
         public Dictionary<string, GNTV> SummaryValInRow { get; set; } = new Dictionary<string, GNTV>();
+
+        [JsonIgnore]
+        public IDatabase ObjectsDB { get; set; }
+
+        [JsonIgnore]
+        public IRedisClient Redis { get; set; }
 
         public dynamic GetDataFieldValue(string column_name, int i, int tableIndex)
         {
@@ -733,6 +743,7 @@ namespace ExpressBase.Objects
                 DoLoopInDetail(0);
             }
         }
+
         public void DrawGroup()
         {
             foreach (KeyValuePair<string, ReportGroupItem> grp in Groupheaders)
@@ -752,6 +763,7 @@ namespace ExpressBase.Objects
                 }
             }
         }
+
         public void EndGroups()
         {
             foreach (EbReportGroup grp in this.ReportGroups)
@@ -760,6 +772,7 @@ namespace ExpressBase.Objects
                 detailEnd += ReportGroups[grp.GroupFooter.Order].GroupFooter.HeightPt;
             }
         }
+
         private Dictionary<EbReportDetail, EbDataField[]> __fieldsNotSummaryPerDetail = null;
         private Dictionary<EbReportDetail, EbDataField[]> FieldsNotSummaryPerDetail
         {
@@ -791,6 +804,7 @@ namespace ExpressBase.Objects
                 return __reportFieldsSortedPerDetail;
             }
         }
+
         private Dictionary<EbReportFooter, EbReportField[]> __reportFieldsSortedPerRFooter = null;
         private Dictionary<EbReportFooter, EbReportField[]> ReportFieldsSortedPerRFooter
         {
@@ -1076,7 +1090,7 @@ namespace ExpressBase.Objects
             {
                 string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
                 ColumnText ct = new ColumnText(Canvas);
-                Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " +( RenderingUser?.FullName ?? "Machine User" )+ ", " + timestamp);
+                Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + (RenderingUser?.FullName ?? "Machine User") + ", " + timestamp);
                 phrase.Font.Size = 6;
                 phrase.Font.Color = BaseColor.Gray;
                 ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - 20 - Margin.Left) - 20, 20 + Margin.Bottom, 15, Element.ALIGN_LEFT);
@@ -1175,21 +1189,23 @@ namespace ExpressBase.Objects
             DownloadFileResponse dfs = null;
 
             byte[] fileByte = new byte[0];
-            dfs = FileClient.Get
-                 (new DownloadImageByIdRequest
-                 {
-                     ImageInfo = new ImageMeta
-                     {
-                         FileRefId = refId,
-                         FileCategory = Common.Enums.EbFileCategory.Images
-                     }
-                 });
-            if (dfs.StreamWrapper != null)
+            if (FileClient.BearerToken != string.Empty)
             {
-                dfs.StreamWrapper.Memorystream.Position = 0;
-                fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+                dfs = FileClient.Get
+                    (new DownloadImageByIdRequest
+                    {
+                        ImageInfo = new ImageMeta
+                        {
+                            FileRefId = refId,
+                            FileCategory = Common.Enums.EbFileCategory.Images
+                        }
+                    });
+                if (dfs.StreamWrapper != null)
+                {
+                    dfs.StreamWrapper.Memorystream.Position = 0;
+                    fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+                }
             }
-
             return fileByte;
         }
 
@@ -1398,6 +1414,336 @@ namespace ExpressBase.Objects
 
             field.SetValuesFromGlobals(globals.CurrentField);
         }
+
+        public void ExecuteRendering(string BToken, string RToken, Document Document, MemoryStream Ms1, List<Param> _params, EbConnectionFactory EbConnectionFactory)
+        {
+            this.InitializeReportObects(BToken, RToken);
+
+            this.InitializePdfObjects(Document, Ms1);
+
+            this.Doc.NewPage();
+            this.GetData4Pdf(_params, EbConnectionFactory);
+
+            if (this.DataSet != null)
+                this.Draw();
+            else
+                throw new Exception();
+        }
+
+        public void GetData4Pdf(List<Param> _params, EbConnectionFactory EbConnectionFactory)
+        {
+            DataSourceDataSetResponse resp = EbObjectsHelper.ExecuteDataset(this.DataSourceRefId, this.RenderingUser.Id, _params, EbConnectionFactory, this.Redis);
+            this.Parameters = _params;
+            this.DataSet = resp.DataSet;
+
+            if (this.DataSet != null)
+                FillingCollections(this);
+
+        }
+
+        public void InitializeReportObects(string BToken, string RToken)
+        {
+            if (string.IsNullOrEmpty(FileClient.BearerToken) && !string.IsNullOrEmpty(BToken))
+            {
+                FileClient.BearerToken = BToken;
+                FileClient.RefreshToken = RToken;
+            }
+
+            this.CultureInfo = CultureHelper.GetSerializedCultureInfo(this.ReadingUser?.Preference.Locale ?? "en-US").GetCultureInfo();
+
+            this.GetWatermarkImages();
+        }
+
+        public void InitializePdfObjects(Document Document, MemoryStream Ms1)
+        {
+            float _width = this.WidthPt - this.Margin.Left;// - Report.Margin.Right;
+            float _height = this.HeightPt - this.Margin.Top - this.Margin.Bottom;
+            this.HeightPt = _height;
+
+            Rectangle rec = new Rectangle(_width, _height);
+            if (Document == null)
+            {
+                this.Doc = new Document(rec);
+                this.Doc.SetMargins(this.Margin.Left, this.Margin.Right, this.Margin.Top, this.Margin.Bottom);
+                this.Writer = PdfWriter.GetInstance(this.Doc, Ms1);
+                this.Writer.Open();
+                this.Doc.Open();
+                this.Doc.AddTitle(this.DocumentName);
+                this.Writer.PageEvent = new HeaderFooter(this);
+                this.Writer.CloseStream = true;//important
+                this.Canvas = this.Writer.DirectContent;
+                this.PageNumber = this.Writer.PageNumber;
+                Document = this.Doc;
+                this.Writer = this.Writer;
+                this.Canvas = this.Canvas;
+            }
+            else
+            {
+                this.Doc = Document;
+                this.Writer = this.Writer;
+                this.Canvas = this.Canvas;
+                this.PageNumber = 1/*Report.Writer.PageNumber*/;
+            }
+        }
+
+        public void Draw()
+        {
+            this.DrawReportHeader();
+
+            if (this?.DataSet?.Tables[this.DetailTableIndex]?.Rows.Count > 0)
+            {
+                this.DrawDetail();
+            }
+            else
+            {
+                this.DrawPageHeader();
+                this.detailEnd += 30;
+                this.DrawPageFooter();
+                this.DrawReportFooter();
+                throw new Exception("Dataset is null, refid " + this.DataSourceRefId);
+            }
+
+            this.DrawReportFooter();
+        }
+
+        public void HandleExceptionPdf()
+        {
+            ColumnText ct = new ColumnText(this.Canvas);
+            Phrase phrase;
+            if (this?.DataSet?.Tables[this.DetailTableIndex]?.Rows.Count > 0)
+                phrase = new Phrase("Something went wrong. Please check the parameters or contact admin");
+            else
+                phrase = new Phrase("No Data available. Please check the parameters or contact admin");
+
+            phrase.Font.Size = 10;
+            float y = this.HeightPt - (this.ReportHeaderHeight + this.Margin.Top + this.PageHeaderHeight);
+
+            ct.SetSimpleColumn(phrase, this.LeftPt + 30, y - 30, this.WidthPt - 30, y, 15, Element.ALIGN_CENTER);
+            ct.Go();
+        }
+
+        private Paragraph CreateSimpleHtmlParagraph(String text)
+        {
+
+            // Report.Doc.Add(CreateSimpleHtmlParagraph("this is <b>bold</b> text"));
+            // Report.Doc.Add(CreateSimpleHtmlParagraph("this is <i>italic</i> text"));
+            //Our return object
+            Paragraph p = new Paragraph();
+
+            //ParseToList requires a StreamReader instead of just text
+            using (StringReader sr = new StringReader(text))
+            {
+                //Parse and get a collection of elements
+                var elements = HtmlWorker.ParseToList(sr, null);
+                foreach (IElement e in elements)
+                {
+                    //Add those elements to the paragraph
+                    p.Add(e);
+                }
+            }
+            //Return the paragraph
+            return p;
+        }
+
+        public void FillingCollections(EbReport Report)
+        {
+            foreach (EbReportHeader r_header in Report.ReportHeaders)
+                Fill(Report, r_header.GetFields(), EbReportSectionType.ReportHeader);
+
+            foreach (EbReportFooter r_footer in Report.ReportFooters)
+                Fill(Report, r_footer.GetFields(), EbReportSectionType.ReportFooter);
+
+            foreach (EbPageHeader p_header in Report.PageHeaders)
+                Fill(Report, p_header.GetFields(), EbReportSectionType.PageHeader);
+
+            foreach (EbReportDetail detail in Report.Detail)
+                Fill(Report, detail.GetFields(), EbReportSectionType.Detail);
+
+            foreach (EbPageFooter p_footer in Report.PageFooters)
+                Fill(Report, p_footer.GetFields(), EbReportSectionType.PageFooter);
+
+            foreach (EbReportGroup group in Report.ReportGroups)
+            {
+                Fill(Report, group.GroupHeader.GetFields(), EbReportSectionType.ReportGroups);
+                Fill(Report, group.GroupFooter.GetFields(), EbReportSectionType.ReportGroups);
+                foreach (EbReportField field in group.GroupHeader.GetFields())
+                {
+                    if (field is EbDataField)
+                    {
+                        Report.Groupheaders.Add((field as EbDataField).ColumnName, new ReportGroupItem
+                        {
+                            field = field as EbDataField,
+                            PreviousValue = string.Empty,
+                            order = group.GroupHeader.Order
+                        });
+                    }
+                }
+                foreach (EbReportField field in group.GroupFooter.GetFields())
+                {
+                    if (field is EbDataField)
+                    {
+                        Report.GroupFooters.Add((field as EbDataField).Name, new ReportGroupItem
+                        {
+                            field = field as EbDataField,
+                            PreviousValue = string.Empty,
+                            order = group.GroupHeader.Order
+                        });
+                    }
+                }
+            }
+
+        }
+
+        private void Fill(EbReport Report, List<EbReportField> fields, EbReportSectionType section_typ)
+        {
+            foreach (EbReportField field in fields)
+            {
+                if (!String.IsNullOrEmpty(field.HideExpression?.Code))
+                {
+                    if (Report.EvaluatorVersion == EvaluatorVersion.Version_1)
+                        Report.ExecuteHideExpressionV1(field);
+                    else
+                        Report.ExecuteHideExpressionV2(field);
+                }
+                if (!field.IsHidden && !String.IsNullOrEmpty(field.LayoutExpression?.Code))
+                {
+                    if (Report.EvaluatorVersion == EvaluatorVersion.Version_1)
+                        Report.ExecuteLayoutExpressionV1(field);
+                    else
+                        Report.ExecuteLayoutExpressionV2(field);
+                }
+                if (field is EbDataField)
+                {
+                    EbDataField field_org = field as EbDataField;
+                    if (!string.IsNullOrEmpty(field_org.LinkRefId) && !Report.LinkCollection.ContainsKey(field_org.LinkRefId))
+                        FindControls(Report, field_org, ObjectsDB, Redis);//Finding the link's parameter controls
+
+                    if (section_typ == EbReportSectionType.Detail)
+                        FindLargerDataTable(Report, field_org);// finding the table of highest rowcount from dataset
+
+                    if (field is IEbDataFieldSummary)
+                        FillSummaryCollection(Report, field_org, section_typ);
+
+                    if (field is EbCalcField && !Report.ValueScriptCollection.ContainsKey(field.Name) && !string.IsNullOrEmpty((field_org as EbCalcField).ValExpression?.Code))
+                    {
+                        if (Report.EvaluatorVersion == EvaluatorVersion.Version_1)
+                        {
+                            Script valscript = Report.CompileScriptV1((field as EbCalcField).ValExpression.Code);
+                            Report.ValueScriptCollection.Add(field.Name, valscript);
+                        }
+                        else
+                        {
+                            string processedCode = Report.GetProcessedCodeForScriptCollectionV2((field as EbCalcField).ValExpression.Code);
+                            Report.ValueScriptCollection.Add(field.Name, processedCode);
+                        }
+                    }
+
+                    if (!field.IsHidden && !Report.AppearanceScriptCollection.ContainsKey(field.Name) && !string.IsNullOrEmpty(field_org.AppearExpression?.Code))
+                    {
+                        Script appearscript = Report.CompileScriptV1(field_org.AppearExpression.Code);
+                        Report.AppearanceScriptCollection.Add(field.Name, appearscript);
+                    }
+                }
+            }
+        }
+
+        public void FindLargerDataTable(EbReport Report, EbDataField field)
+        {
+            if (!Report.HasRows || field.TableIndex != Report.DetailTableIndex)
+            {
+                if (Report.DataSet?.Tables.Count > 0)
+                {
+                    if (Report.DataSet.Tables[field.TableIndex].Rows != null)
+                    {
+                        Report.HasRows = true;
+                        int r_count = Report.DataSet.Tables[field.TableIndex].Rows.Count;
+                        Report.DetailTableIndex = (r_count > Report.MaxRowCount) ? field.TableIndex : Report.DetailTableIndex;
+                        Report.MaxRowCount = (r_count > Report.MaxRowCount) ? r_count : Report.MaxRowCount;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Report.DataSet.Tables[field.TableIndex].Rows is null");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Report.DataSet.Tables.Count is 0");
+                }
+            }
+        }
+
+        public void FindControls(EbReport report, EbDataField field, IDatabase ObjectsDB, IRedisClient Redis)
+        {
+            string LinkRefid = field.LinkRefId;
+            string linkDsRefid = string.Empty;
+
+            List<EbObjectWrapper> res = EbObjectsHelper.GetParticularVersion(ObjectsDB, LinkRefid);
+            if (res[0].EbObjectType == 3)
+                linkDsRefid = EbSerializers.Json_Deserialize<EbReport>(res[0].Json).DataSourceRefId;//Getting the linked report
+            else if (res[0].EbObjectType == 16)
+                linkDsRefid = EbSerializers.Json_Deserialize<EbTableVisualization>(res[0].Json).DataSourceRefId;//Getting the linked table viz
+            else if (res[0].EbObjectType == 17)
+                linkDsRefid = EbSerializers.Json_Deserialize<EbChartVisualization>(res[0].Json).DataSourceRefId;//Getting the linked chart viz
+
+            EbDataReader LinkDatasource = Redis.Get<EbDataReader>(linkDsRefid);
+            if (LinkDatasource == null || LinkDatasource.Sql == null || LinkDatasource.Sql == string.Empty)
+            {
+                List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ObjectsDB, linkDsRefid);
+                LinkDatasource = EbSerializers.Json_Deserialize(result[1].Json);
+                Redis.Set<EbDataReader>(linkDsRefid, LinkDatasource);
+            }
+
+            if (!string.IsNullOrEmpty(LinkDatasource.FilterDialogRefId))
+            {
+                LinkDatasource.FilterDialog = Redis.Get<EbFilterDialog>(LinkDatasource.FilterDialogRefId);
+                if (LinkDatasource.FilterDialog == null)
+                {
+                    List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ObjectsDB, LinkDatasource.FilterDialogRefId);
+
+                    LinkDatasource.FilterDialog = EbSerializers.Json_Deserialize(result[1].Json);
+                    Redis.Set<EbFilterDialog>(LinkDatasource.FilterDialogRefId, LinkDatasource.FilterDialog);
+                }
+                report.LinkCollection[LinkRefid] = LinkDatasource.FilterDialog.Controls;
+            }
+        }
+
+        public void FillSummaryCollection(EbReport report, EbDataField field, EbReportSectionType section_typ)
+        {
+            if (section_typ == EbReportSectionType.ReportGroups)
+            {
+                if (!report.GroupSummaryFields.ContainsKey(field.SummaryOf))
+                {
+                    report.GroupSummaryFields.Add(field.SummaryOf, new List<EbDataField> { field });
+                }
+                else
+                {
+                    report.GroupSummaryFields[field.SummaryOf].Add(field);
+                }
+            }
+            if (section_typ == EbReportSectionType.PageFooter)
+            {
+                if (!report.PageSummaryFields.ContainsKey(field.SummaryOf))
+                {
+                    report.PageSummaryFields.Add(field.SummaryOf, new List<EbDataField> { field });
+                }
+                else
+                {
+                    report.PageSummaryFields[field.SummaryOf].Add(field);
+                }
+            }
+            if (section_typ == EbReportSectionType.ReportFooter)
+            {
+                if (!report.ReportSummaryFields.ContainsKey(field.SummaryOf))
+                {
+                    report.ReportSummaryFields.Add(field.SummaryOf, new List<EbDataField> { field });
+                }
+                else
+                {
+                    report.ReportSummaryFields[field.SummaryOf].Add(field);
+                }
+            }
+        }
+
     }
 
     [EnableInBuilder(BuilderType.Report)]
