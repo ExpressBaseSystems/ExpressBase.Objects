@@ -1049,6 +1049,9 @@ namespace ExpressBase.Objects
             return RowParams;
         }
 
+
+        public Dictionary<int, byte[]> ImageCollection = new Dictionary<int, byte[]>();
+
         public void GetWatermarkImages()
         {
             if (this.ReportObjects != null)
@@ -1186,34 +1189,45 @@ namespace ExpressBase.Objects
 
         public byte[] GetImage(int refId)
         {
-            DownloadFileResponse dfs = null;
-            byte[] fileByte = new byte[0];
+            if (ImageCollection.ContainsKey(refId))
+            {
+                return ImageCollection[refId];
+            }
+            else
+            {
+                DownloadFileResponse dfs = null;
+                byte[] fileByte = new byte[0];
 
-            try
-            {
-                if (FileClient?.BearerToken != string.Empty)
+                try
                 {
-                    dfs = FileClient.Get
-                        (new DownloadImageByIdRequest
-                        {
-                            ImageInfo = new ImageMeta
-                            {
-                                FileRefId = refId,
-                                FileCategory = Common.Enums.EbFileCategory.Images
-                            }
-                        });
-                    if (dfs.StreamWrapper != null)
+                    if (FileClient?.BearerToken != string.Empty)
                     {
-                        dfs.StreamWrapper.Memorystream.Position = 0;
-                        fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+                        dfs = FileClient.Get
+                            (new DownloadImageByIdRequest
+                            {
+                                ImageInfo = new ImageMeta
+                                {
+                                    FileRefId = refId,
+                                    FileCategory = Common.Enums.EbFileCategory.Images
+                                }
+                            });
+                        if (dfs.StreamWrapper != null)
+                        {
+                            dfs.StreamWrapper.Memorystream.Position = 0;
+                            fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+                        }
                     }
+
+                    ImageCollection.Add(refId, fileByte);
+
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message + e.StackTrace);
+                }
+
+                return fileByte;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message + e.StackTrace);
-            }
-            return fileByte;
         }
 
         public void AddParamsNCalcsInGlobal(EbPdfGlobals globals)
