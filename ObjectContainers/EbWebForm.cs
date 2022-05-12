@@ -1368,6 +1368,19 @@ namespace ExpressBase.Objects
                                     if (Row_U[pArr[k].Name] != null)
                                         _d.Add(pArr[k].Name, Row_U[pArr[k].Name]);
                                 }
+                                if (!string.IsNullOrWhiteSpace(Row_U["consids"]?.ToString()) && !string.IsNullOrWhiteSpace(Row_U["consvals"]?.ToString()))
+                                {
+                                    int[] conIds = Row_U["consids"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
+                                    int[] conVals = Row_U["consvals"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
+                                    Dictionary<int, int> cons = new Dictionary<int, int>();
+                                    for (int x = 0; x < conIds.Length; x++)
+                                    {
+                                        if (!cons.ContainsKey(conIds[x]))
+                                            cons.Add(conIds[x], conVals[x]);
+                                    }
+                                    if (cons.Count > 0)
+                                        _d.Add(FormConstants.locConstraint, JsonConvert.SerializeObject(cons));
+                                }
                             }
                             SingleTable map_Table = new SingleTable();
                             this.GetFormattedData(dataset.Tables[tableIndex], map_Table);

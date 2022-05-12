@@ -70,6 +70,8 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string statusid = "statusid";
         public const string roles = "roles";
         public const string consadd = "consadd";
+        public const string consdel = "consdel";
+        public const string locConstraint = "locConstraint";
         //Globals - DataPusher
         public const string __eb_loop_through = "__eb_loop_through";
         //EbPhone/EbEmail ctrl
