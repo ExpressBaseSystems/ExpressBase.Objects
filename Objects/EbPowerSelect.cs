@@ -361,6 +361,12 @@ else
         [PropertyGroup(PGConstants.DATA_INSERT)]
         public bool OpenInNewTab { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [HideInPropertyGrid]
+        public List<DataFlowMapAbstract> DataFlowMap { get; set; }
+
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible", true)]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]

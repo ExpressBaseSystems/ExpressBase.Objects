@@ -1602,11 +1602,15 @@ pg.HideProperty('IsDynamic');
         [PropertyPriority(98)]
         public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
 
-
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
         [PropertyPriority(98)]
         public bool OpenInNewTab { get { return this.EbPowerSelect.OpenInNewTab; } set { this.EbPowerSelect.OpenInNewTab = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<DataFlowMapAbstract> DataFlowMap { get { return this.EbPowerSelect.DataFlowMap; } set { this.EbPowerSelect.DataFlowMap = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Api")]
