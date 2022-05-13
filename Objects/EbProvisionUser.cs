@@ -578,7 +578,8 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                     this.AddOrChange(_d, FormConstants.usertype, _od[FormConstants.usertype]);
                     int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
                     this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));
-                    this.AddOrChange(_d, FormConstants.locConstraint, _od[FormConstants.locConstraint]);
+                    if (_od.ContainsKey(FormConstants.locConstraint))
+                        this.AddOrChange(_d, FormConstants.locConstraint, _od[FormConstants.locConstraint]);
 
                     if (oldStatus == (int)EbUserStatus.Unapproved)
                     {
