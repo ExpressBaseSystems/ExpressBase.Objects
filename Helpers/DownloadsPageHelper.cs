@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.ServiceStack.ReqNRes;
 using ExpressBase.Common.Structures;
 using System;
@@ -107,8 +108,7 @@ namespace ExpressBase.Objects.Helpers
                             Id = Convert.ToInt32(dt.Rows[i][0]),
                             Filename = dt.Rows[i][1].ToString(),
                             CreatedBy = Convert.ToInt32(dt.Rows[i][2]),
-                            CreatedAt = TimeZoneInfo.ConvertTime(Convert.ToDateTime(dt.Rows[i][3]), TimeZoneInfo.FindSystemTimeZoneById(timezone)),
-                            //CreatedAt = Convert.ToDateTime(dt.Rows[i][3]),
+                            CreatedAt = (Convert.ToDateTime(dt.Rows[i][3])).ConvertFromUtc(timezone),
                             IsDeleted = ((char)dt.Rows[i][4] == 'F') ? false : true,
                             IsGenerating = (bool)dt.Rows[i][5],
                         });
