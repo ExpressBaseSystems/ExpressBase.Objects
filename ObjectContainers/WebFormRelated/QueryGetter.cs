@@ -97,7 +97,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 _qryCount++;
             }
-            bool MuCtrlFound = false;
+            bool MuCtrlFound = false;//multiple ctrl found
             foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)
             {
                 if (Ctrl is EbProvisionUser)

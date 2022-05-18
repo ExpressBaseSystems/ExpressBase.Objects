@@ -18,6 +18,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.LocationNSolution;
 using System.Net;
 using ExpressBase.Objects.WebFormRelated;
+using ServiceStack;
 
 namespace ExpressBase.Objects
 {
@@ -291,11 +292,21 @@ this.Init = function(id)
         public string GetSelectQuery(IDatabase DataDB, string masterTbl)
         {
             //if multiple user ctrl placed in form then one select query is enough // imp
-            return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid, u.forcepwreset,
-                            STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups
-                        FROM eb_users u LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
-                        WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
-        }
+            return $@"
+SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid, u.forcepwreset,
+    STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups, 
+    STRING_AGG(cons.id::TEXT, ',') AS consids, STRING_AGG(cons.c_value::TEXT, ',') AS consvals
+FROM eb_users u 
+LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id 
+LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
+LEFT JOIN 
+(   SELECT m.id, m.key_id, l.c_value
+    FROM eb_constraints_master m, eb_constraints_line l
+    WHERE m.id = l.master_id AND m.key_type = {(int)EbConstraintKeyTypes.User} AND 
+    l.c_type = {(int)EbConstraintTypes.User_Location} AND eb_del = 'F' ORDER BY m.id
+) cons ON u.id = cons.key_id 
+WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
+        }//EbConstraintKeyTypes.User, EbConstraintTypes.User_Location    
 
         public string GetMappedUserQuery(string MasterTable, string eb_del, string false_val)
         {
@@ -424,7 +435,7 @@ this.Init = function(id)
                 _d.Add(Key, Value);
         }
 
-        public void SetUserType_Role_Status(Dictionary<string, string> _d, int nProvUserId)
+        private void SetUserType_Role_Status(Dictionary<string, string> _d, int nProvUserId)
         {
             this.UserCredentials = new UserCredentials()
             {
@@ -453,6 +464,71 @@ this.Init = function(id)
                         this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Unapproved).ToString());
                     else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
                         this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
+                }
+            }
+        }
+
+        private void MergeConstraints(Dictionary<string, string> _d, int nProvUserId)
+        {
+            List<int> nCons = new List<int>();
+            Dictionary<int, int> oConsDict = null;//old constraints// key -> consMasterId, val -> locId
+
+            if (_d.TryGetValue(FormConstants.consadd, out string nwLocIds))
+            {
+                string[] loc_ids = nwLocIds.Split(CharConstants.COMMA);//only loc constraint is considered
+                for (int i = 0; i < loc_ids.Length; i++)
+                {
+                    if (int.TryParse(loc_ids[i], out int locId) && locId > 0 && !nCons.Contains(locId))
+                        nCons.Add(locId);
+                }
+                _d[FormConstants.consadd] = string.Empty;
+            }
+
+            if (_d.ContainsKey(FormConstants.locConstraint))
+                oConsDict = JsonConvert.DeserializeObject<Dictionary<int, int>>(_d[FormConstants.locConstraint]);
+
+            if (nProvUserId <= 0)
+            {
+                if (nCons.Count > 0)
+                {
+                    EbConstraints consObj = new EbConstraints(nCons.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                    _d[FormConstants.consadd] = consObj.GetDataAsString();
+                }
+            }
+            else
+            {
+                if (oConsDict != null && nCons.Count > 0)
+                {
+                    List<int> addLocIds = new List<int>();
+                    List<int> delIds = new List<int>();
+
+                    foreach (int consId in nCons)
+                    {
+                        if (!oConsDict.ContainsValue(consId))
+                            addLocIds.Add(consId);
+                    }
+                    foreach (KeyValuePair<int, int> item in oConsDict)
+                    {
+                        if (!nCons.Contains(item.Value))
+                            delIds.Add(item.Key);
+                    }
+
+                    if (addLocIds.Count > 0)
+                    {
+                        EbConstraints consObj = new EbConstraints(addLocIds.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                        _d[FormConstants.consadd] = consObj.GetDataAsString();
+                    }
+                    if (delIds.Count > 0)
+                        this.AddOrChange(_d, FormConstants.consdel, delIds.Join(","));
+                }
+                else if (oConsDict == null && nCons.Count > 0)
+                {
+                    EbConstraints consObj = new EbConstraints(nCons.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                    _d[FormConstants.consadd] = consObj.GetDataAsString();
+                }
+                else if (oConsDict != null && nCons.Count == 0)
+                {
+                    this.AddOrChange(_d, FormConstants.consdel, oConsDict.Keys.Join(","));
                 }
             }
         }
@@ -502,6 +578,8 @@ this.Init = function(id)
                     this.AddOrChange(_d, FormConstants.usertype, _od[FormConstants.usertype]);
                     int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
                     this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));
+                    if (_od.ContainsKey(FormConstants.locConstraint))
+                        this.AddOrChange(_d, FormConstants.locConstraint, _od[FormConstants.locConstraint]);
 
                     if (oldStatus == (int)EbUserStatus.Unapproved)
                     {
@@ -544,29 +622,7 @@ this.Init = function(id)
             }
             if (!doNotUpdate || insertOnUpdate)
             {
-                if (_d.ContainsKey(FormConstants.consadd))
-                {
-                    if (nProvUserId <= 0)
-                    {
-                        if (_d[FormConstants.consadd].Length > 0)
-                        {
-                            string[] loc_ids = _d[FormConstants.consadd].Split(CharConstants.COMMA);
-                            int h = 0;
-                            for (; h < loc_ids.Length; h++)
-                            {
-                                if (!int.TryParse(loc_ids[h], out int temp) || temp <= 0)
-                                    break;
-                            }
-                            if (h >= loc_ids.Length)
-                            {
-                                EbConstraints consObj = new EbConstraints(loc_ids, EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
-                                _d[FormConstants.consadd] = consObj.GetDataAsString();
-                            }
-                        }
-                    }
-                    else
-                        _d[FormConstants.consadd] = string.Empty;
-                }
+                this.MergeConstraints(_d, nProvUserId);
 
                 string p_email = string.Empty, p_phone = string.Empty;
                 for (int k = 0; k < this.FuncParam.Length; k++, args.i++)
