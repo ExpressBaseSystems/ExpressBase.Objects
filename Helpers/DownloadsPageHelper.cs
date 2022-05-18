@@ -2,6 +2,7 @@
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.ServiceStack.ReqNRes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Security;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -73,7 +74,7 @@ namespace ExpressBase.Objects.Helpers
                         Filename = dt.Rows[0][0].ToString(),
                         FileBytea = (byte[])dt.Rows[0][1],
                         CreatedBy = Convert.ToInt32(dt.Rows[0][2]),
-                        CreatedAt = Convert.ToDateTime(dt.Rows[0][3]),
+                        //CreatedAt = Convert.ToDateTime(dt.Rows[0][3]),
                     };
 
                 }
@@ -85,7 +86,7 @@ namespace ExpressBase.Objects.Helpers
             return FileDownloadObject;
         }
 
-        public List<FileDownloadObject> GetAllDownloadFiles(IDatabase Datadb, int createdBy, string timezone)
+        public List<FileDownloadObject> GetAllDownloadFiles(IDatabase Datadb, int createdBy, Preferences preference)
         {
             List<FileDownloadObject> FileDownloadObjects = new List<FileDownloadObject>(); ;
             try
@@ -99,16 +100,15 @@ namespace ExpressBase.Objects.Helpers
                 EbDataTable dt = Datadb.DoQuery(s, parameters);
                 if (dt.Rows.Count > 0)
                 {
-                    if (timezone == string.Empty)
-                        timezone = "";
+
                     for (int i = 0; i < dt.Rows.Count; i++)
-                    {
+                    { DateTime _date = Convert.ToDateTime(dt.Rows[i][3]);
                         FileDownloadObjects.Add(new FileDownloadObject
                         {
                             Id = Convert.ToInt32(dt.Rows[i][0]),
                             Filename = dt.Rows[i][1].ToString(),
                             CreatedBy = Convert.ToInt32(dt.Rows[i][2]),
-                            CreatedAt = (Convert.ToDateTime(dt.Rows[i][3])).ConvertFromUtc(timezone),
+                            CreatedAt = (_date).ConvertFromUtc(preference.TimeZone).ToString(preference.GetShortDatePattern()) + " " + _date.ConvertFromUtc(preference.TimeZone).ToString(preference.GetShortTimePattern()),
                             IsDeleted = ((char)dt.Rows[i][4] == 'F') ? false : true,
                             IsGenerating = (bool)dt.Rows[i][5],
                         });
