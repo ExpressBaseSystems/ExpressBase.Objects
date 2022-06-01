@@ -133,11 +133,22 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (!string.IsNullOrWhiteSpace(this.ebReview.EntryCriteria?.Code))
                 {
                     this.globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this.webForm, this.webForm.FormData, this.webForm.FormDataBackup, this.DataDB, null, false);
-                    object status = this.webForm.ExecuteCSharpScriptNew(this.ebReview.EntryCriteria.Code, this.globals);
-                    bool.TryParse(Convert.ToString(status), out entryCriteriaRslt);
+                    object retval = this.webForm.ExecuteCSharpScriptNew(this.ebReview.EntryCriteria.Code, this.globals);//status or stage
+
+                    if (retval is bool)
+                    {
+                        bool.TryParse(Convert.ToString(retval), out entryCriteriaRslt);
+                    }
+                    else if (retval is FG_Review_Stage fg_stage)
+                    {
+                        nextStage = this.ebReview.FormStages.Find(e => e.Name == fg_stage.name);
+                    }
                 }
                 if (entryCriteriaRslt)
-                    nextStage = this.ebReview.FormStages[0];
+                {
+                    if (nextStage == null)
+                        nextStage = this.ebReview.FormStages[0];
+                }
                 else if (this.TableBkUp.Find(e => e.RowId > 0) != null)
                 {
                     insUpQ += this.GetApprovalUpdateQry(null, true, false);
@@ -175,15 +186,23 @@ namespace ExpressBase.Objects.WebFormRelated
             if (!string.IsNullOrWhiteSpace(this.ebReview.EntryCriteria?.Code))
             {
                 this.globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this.webForm, this.webForm.FormData, this.webForm.FormDataBackup, this.DataDB, null, false);
-                object status = this.webForm.ExecuteCSharpScriptNew(this.ebReview.EntryCriteria.Code, this.globals);
-                bool.TryParse(Convert.ToString(status), out entryCriteriaRslt);
+                object retval = this.webForm.ExecuteCSharpScriptNew(this.ebReview.EntryCriteria.Code, this.globals);
+                if (retval is bool)
+                {
+                    bool.TryParse(Convert.ToString(retval), out entryCriteriaRslt);
+                }
+                else if (retval is FG_Review_Stage fg_stage)
+                {
+                    nextStage = this.ebReview.FormStages.Find(e => e.Name == fg_stage.name);
+                }
             }
             if (this.isInsert)
             {
                 if (entryCriteriaRslt)
                 {
                     masterId = $"(SELECT eb_currval('{this.webForm.TableName}_id_seq'))";
-                    nextStage = this.ebReview.FormStages[0];
+                    if (nextStage == null)
+                        nextStage = this.ebReview.FormStages[0];
                 }
                 else
                     return string.Empty;
@@ -203,7 +222,8 @@ namespace ExpressBase.Objects.WebFormRelated
                         if (this.TableBkUp.Count == 0)
                         {
                             insInEdit = true;
-                            nextStage = this.ebReview.FormStages[0];
+                            if (nextStage == null)
+                                nextStage = this.ebReview.FormStages[0];
                         }
                         if (!insInEdit)
                         {
