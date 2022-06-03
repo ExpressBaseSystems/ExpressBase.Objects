@@ -162,7 +162,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             if (nextStage != null)
             {
-                string[] _col_val = this.GetApproverEntityValues(ref i, nextStage);
+                string[] _col_val = this.GetApproverEntityValues(ref i, nextStage, out _);
                 string autoId = this.GetAutoId(masterId);
                 string description = this.GetDescription(nextStage, autoId);
 
@@ -203,6 +203,11 @@ namespace ExpressBase.Objects.WebFormRelated
                     masterId = $"(SELECT eb_currval('{this.webForm.TableName}_id_seq'))";
                     if (nextStage == null)
                         nextStage = this.ebReview.FormStages[0];
+                    else
+                    {
+                        if (this.IsAutoApproveRequired(ref i, ref insUpQ, nextStage, masterId))
+                            return insUpQ;
+                    }
                 }
                 else
                     return string.Empty;
@@ -238,7 +243,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             if (this.isInsert || insMyActRequired || insInEdit)// first save or insert myaction required in edit
             {
-                string[] _col_val = this.GetApproverEntityValues(ref i, nextStage);
+                string[] _col_val = this.GetApproverEntityValues(ref i, nextStage, out _);
                 string autoId = this.GetAutoId(masterId);
                 string description = this.GetDescription(nextStage, autoId);
                 insUpQ += this.InsertMyActionAndApproval(nextStage, _col_val, masterId, description, insInEdit);
@@ -299,6 +304,142 @@ namespace ExpressBase.Objects.WebFormRelated
             return nextStage;
         }
 
+        private bool IsAutoApproveRequired(ref int i, ref string query, EbReviewStage _stage, string masterId)
+        {
+            EbReviewAction _action;
+            string comments;
+            if (this.globals.form.review._ReviewStatus == "AutoCompleted")
+            {
+                if (this.globals.form.review?._Action == null)
+                    return false;
+
+                _action = _stage.StageActions.Find(e => e.Name == this.globals.form.review._Action);
+                if (_action == null)
+                    return false;
+
+                if (this.globals.form.review?._Comments == null)
+                    comments = "Auto approved";
+                else
+                    comments = Convert.ToString(this.globals.form.review._Comments);
+            }
+            else
+                return false;
+
+            string autoId = this.GetAutoId(masterId);
+            string description = this.GetDescription(_stage, autoId);
+            string[] _col_val = this.GetApproverEntityValues(ref i, _stage, out bool hasPerm);
+            if (!hasPerm)
+                return false;
+
+            query += $@"
+INSERT INTO eb_my_actions(
+    {_col_val[0]}, 
+    from_datetime, 
+    is_completed, 
+    eb_stages_id, 
+    form_ref_id, 
+    form_data_id, 
+    eb_del, 
+    description, 
+    is_form_data_editable, 
+    my_action_type,
+    action_type,
+    hide,
+    completed_at,
+    completed_by
+)
+VALUES (
+    {_col_val[1]}, 
+    {this.DataDB.EB_CURRENT_TIMESTAMP}, 
+    'T', 
+    (SELECT id FROM eb_stages WHERE stage_unique_id = '{_stage.EbSid}' AND form_ref_id = '{this.webForm.RefId}' AND eb_del = 'F'), 
+    '{this.webForm.RefId}', 
+    {masterId}, 
+    'F', 
+    '{description}', 
+    '{(_stage.IsFormEditable ? "T" : "F")}', 
+    '{MyActionTypes.Approval}',
+    {(int)MyActionTypes.Approval},
+    '{(_stage.HideNotification ? "T" : "F")}',
+    {this.DataDB.EB_CURRENT_TIMESTAMP},
+    @eb_createdby
+); ";
+
+            query += $@"
+INSERT INTO eb_approval(
+    review_status, 
+    status,
+    eb_my_actions_id, 
+    eb_src_id, 
+    eb_ver_id, 
+    eb_created_by, 
+    eb_created_at, 
+    eb_del,
+    eb_lastmodified_by,
+    eb_lastmodified_at
+)
+VALUES(
+    '{ReviewStatus.Completed}', 
+    {(int)ReviewStatusEnum.Completed},
+    (SELECT eb_currval('eb_my_actions_id_seq')), 
+    {masterId}, 
+    @{this.webForm.TableName}_eb_ver_id, 
+    @eb_createdby, 
+    {this.DataDB.EB_CURRENT_TIMESTAMP}, 
+    'F',
+    @eb_createdby,
+    {this.DataDB.EB_CURRENT_TIMESTAMP}
+); ";
+
+            query += $@"
+INSERT INTO eb_approval_lines (
+    stage_unique_id,
+    action_unique_id,
+    eb_my_actions_id,
+    comments,
+    eb_created_by, 
+    eb_created_at, 
+    eb_loc_id, 
+    eb_src_id, 
+    eb_ver_id, 
+    eb_signin_log_id,
+    eb_approval_id
+) 
+VALUES (
+    @stage_unique_id_{i},
+    @action_unique_id_{i},
+    (SELECT eb_currval('eb_my_actions_id_seq')),
+    @comments_{i},
+    @eb_createdby, 
+    {DataDB.EB_CURRENT_TIMESTAMP}, 
+    @eb_loc_id, 
+    {masterId},
+    @{this.webForm.TableName}_eb_ver_id, 
+    @eb_signin_log_id, 
+    (SELECT eb_currval('eb_approval_id_seq'))
+);
+
+UPDATE 
+    eb_my_actions 
+SET 
+    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq'))
+WHERE
+    id = (SELECT eb_currval('eb_my_actions_id_seq'));
+
+UPDATE 
+    eb_approval 
+SET 
+    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq'))
+WHERE
+    id = (SELECT eb_currval('eb_approval_id_seq'));";
+
+            this.param.Add(this.DataDB.GetNewParameter($"stage_unique_id_{i}", EbDbTypes.String, _stage.EbSid));
+            this.param.Add(this.DataDB.GetNewParameter($"action_unique_id_{i}", EbDbTypes.String, _action.EbSid));
+            this.param.Add(this.DataDB.GetNewParameter($"comments_{i++}", EbDbTypes.String, comments));
+
+            return true;
+        }
+
         private string InsertMyActionAndApproval(EbReviewStage nextStage, string[] _col_val, string masterId, string description, bool insInEdit)
         {
             string insUpQ = this.GetMyActionInsertQry(_col_val, nextStage, masterId, description);
@@ -351,7 +492,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return autoId;
         }
 
-        private string[] GetApproverEntityValues(ref int i, EbReviewStage nextStage)
+        private string[] GetApproverEntityValues(ref int i, EbReviewStage nextStage, out bool hasPerm)
         {
             string _col = string.Empty, _val = string.Empty;
             this.webForm.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
@@ -362,6 +503,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string roles = nextStage.ApproverRoles == null ? string.Empty : nextStage.ApproverRoles.Join(",");
                 this.param.Add(this.DataDB.GetNewParameter($"role_ids_{i++}", EbDbTypes.String, roles));
                 this.webForm.MyActNotification.RoleIds = nextStage.ApproverRoles;
+                hasPerm = this.webForm.UserObj.RoleIds.Any(e => nextStage.ApproverRoles.Contains(e));
             }
             else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
             {
@@ -369,6 +511,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 _val = $"@usergroup_id_{i}";
                 this.param.Add(this.DataDB.GetNewParameter($"usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
                 this.webForm.MyActNotification.UserGroupId = nextStage.ApproverUserGroup;
+                hasPerm = this.webForm.UserObj.UserGroupIds.Any(e => e == nextStage.ApproverUserGroup);
             }
             else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
             {
@@ -413,9 +556,12 @@ namespace ExpressBase.Objects.WebFormRelated
                 _col = "user_ids";
                 _val = $"'{uids.Join(",")}'";
                 this.webForm.MyActNotification.UserIds = uids;
+                hasPerm = uids.Any(e => e == this.webForm.UserObj.UserId);
             }
             else
                 throw new FormException("Unable to process review control", (int)HttpStatusCode.InternalServerError, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
+            if (this.webForm.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || this.webForm.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
+                hasPerm = true;
 
             return new string[] { _col, _val };
         }
