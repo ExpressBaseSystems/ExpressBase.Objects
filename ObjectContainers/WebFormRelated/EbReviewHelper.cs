@@ -201,13 +201,11 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (entryCriteriaRslt)
                 {
                     masterId = $"(SELECT eb_currval('{this.webForm.TableName}_id_seq'))";
+
+                    if (this.IsAutoApproveRequired(ref i, ref insUpQ, masterId))
+                        return insUpQ;
                     if (nextStage == null)
                         nextStage = this.ebReview.FormStages[0];
-                    else
-                    {
-                        if (this.IsAutoApproveRequired(ref i, ref insUpQ, nextStage, masterId))
-                            return insUpQ;
-                    }
                 }
                 else
                     return string.Empty;
@@ -304,15 +302,19 @@ namespace ExpressBase.Objects.WebFormRelated
             return nextStage;
         }
 
-        private bool IsAutoApproveRequired(ref int i, ref string query, EbReviewStage _stage, string masterId)
+        private bool IsAutoApproveRequired(ref int i, ref string query, string masterId)
         {
             EbReviewAction _action;
+            EbReviewStage _stage;
             string comments;
             if (this.globals.form.review._ReviewStatus == "AutoCompleted")
             {
-                if (this.globals.form.review?._Action == null)
+                if (this.globals.form.review?._Stage?.name == null || this.globals.form.review?._Action == null)
                     return false;
 
+                _stage = this.ebReview.FormStages.Find(e => e.Name == this.globals.form.review?._Stage?.name);
+                if (_stage == null)
+                    return false;
                 _action = _stage.StageActions.Find(e => e.Name == this.globals.form.review._Action);
                 if (_action == null)
                     return false;
