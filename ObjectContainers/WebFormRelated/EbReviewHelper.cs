@@ -181,7 +181,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public string GetMyActionInsertUpdateQuery(ref int i)
         {
             string insUpQ = string.Empty, masterId = $"@{this.webForm.TableName}_id";
-            bool insMyActRequired = false, insInEdit = false, entryCriteriaRslt = true;
+            bool insMyActRequired = false, insInEdit = false, entryCriteriaRslt = true, entryCriteriaExecuted = false;
             EbReviewStage nextStage = null;
             if (!string.IsNullOrWhiteSpace(this.ebReview.EntryCriteria?.Code))
             {
@@ -195,6 +195,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     nextStage = this.ebReview.FormStages.Find(e => e.Name == fg_stage.name);
                 }
+                entryCriteriaExecuted = true;
             }
             if (this.isInsert)
             {
@@ -202,7 +203,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     masterId = $"(SELECT eb_currval('{this.webForm.TableName}_id_seq'))";
 
-                    if (this.IsAutoApproveRequired(ref i, ref insUpQ, masterId))
+                    if (entryCriteriaExecuted && this.IsAutoApproveRequired(ref i, ref insUpQ, masterId))
                         return insUpQ;
                     if (nextStage == null)
                         nextStage = this.ebReview.FormStages[0];
