@@ -310,7 +310,7 @@ else if(this.NotifyBy === 3)
                                         Title = message,
                                         UsersID = uid,
                                         User_AuthId = _this.UserObj.AuthId
-                                    }); 
+                                    });
                                 }
                                 catch (Exception ex)
                                 {
@@ -392,13 +392,15 @@ else if(this.NotifyBy === 3)
                     {
                         userIds = _this.MyActNotification.UserIds;
                     }
-                    else if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Role || _this.MyActNotification.ApproverEntity == ApproverEntityTypes.UserGroup)
+                    else if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.StaticRole ||
+                        _this.MyActNotification.ApproverEntity == ApproverEntityTypes.DynamicRole ||
+                        _this.MyActNotification.ApproverEntity == ApproverEntityTypes.UserGroup)
                     {
                         string Qry;
-                        if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Role)
-                            Qry = $"SELECT user_id FROM eb_role2user WHERE role_id = ANY(STRING_TO_ARRAY('{_this.MyActNotification.RoleIds.Join(",")}'::TEXT, ',')::INT[]) AND COALESCE(eb_del, 'F') = 'F'; ";
-                        else
+                        if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.UserGroup)
                             Qry = $"SELECT userid FROM eb_user2usergroup WHERE groupid = {_this.MyActNotification.UserGroupId} AND COALESCE(eb_del, 'F') = 'F'; ";
+                        else// static/dynamic role
+                            Qry = $"SELECT user_id FROM eb_role2user WHERE role_id = ANY(STRING_TO_ARRAY('{_this.MyActNotification.RoleIds.Join(",")}'::TEXT, ',')::INT[]) AND COALESCE(eb_del, 'F') = 'F'; ";
 
                         EbDataTable dt = EbConFactory.DataDB.DoQuery(Qry);
                         foreach (EbDataRow dr in dt.Rows)

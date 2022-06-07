@@ -380,12 +380,15 @@ if (this.ApproverEntity === 0) this.ApproverEntity = 1;
 pg.HideProperty('ApproverRoles');
 pg.HideProperty('ApproverUserGroup');
 pg.HideProperty('ApproverUsers');
+pg.HideProperty('ApproverRoleQuery');
 if (this.ApproverEntity === 1)
     pg.ShowProperty('ApproverRoles');
 else if (this.ApproverEntity === 2)
     pg.ShowProperty('ApproverUserGroup');
 else if (this.ApproverEntity === 3)
-    pg.ShowProperty('ApproverUsers');
+    pg.ShowProperty('ApproverUsers')
+else if (this.ApproverEntity === 4)
+    pg.ShowProperty('ApproverRoleQuery');
 ")]
         public ApproverEntityTypes ApproverEntity { get; set; }
 
@@ -402,6 +405,12 @@ else if (this.ApproverEntity === 3)
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> ApproverRoles { get; set; }
+
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(9)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
+        public EbScript ApproverRoleQuery { get; set; }
 
         [PropertyGroup("Behavior")]
         [PropertyPriority(7)]
@@ -491,8 +500,9 @@ else{
 
     public enum ApproverEntityTypes
     {
-        Role = 1,
+        StaticRole = 1,
         UserGroup,
-        Users
+        Users,
+        DynamicRole
     }
 }

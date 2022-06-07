@@ -499,7 +499,7 @@ WHERE
         {
             string _col = string.Empty, _val = string.Empty;
             this.webForm.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
-            if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
+            if (nextStage.ApproverEntity == ApproverEntityTypes.StaticRole)
             {
                 _col = "role_ids";
                 _val = $"@role_ids_{i}";
@@ -516,7 +516,7 @@ WHERE
                 this.webForm.MyActNotification.UserGroupId = nextStage.ApproverUserGroup;
                 hasPerm = this.webForm.UserObj.UserGroupIds.Any(e => e == nextStage.ApproverUserGroup);
             }
-            else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
+            else if (nextStage.ApproverEntity == ApproverEntityTypes.Users || nextStage.ApproverEntity == ApproverEntityTypes.DynamicRole)
             {
                 string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
                 List<DbParameter> _params = new List<DbParameter>();
@@ -547,19 +547,29 @@ WHERE
                     _idx = args.i;
                     _params[_idx - 1].ParameterName = p.Key;
                 }
-                List<int> uids = new List<int>();
+                List<int> ids = new List<int>();
                 EbFormHelper.AddExtraSqlParams(_params, this.DataDB, this.webForm.TableName, this.webForm.TableRowId, this.webForm.LocationId, this.webForm.UserObj.UserId);
-                EbDataTable dt = this.DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
+                string qry = nextStage.ApproverEntity == ApproverEntityTypes.Users ? nextStage.ApproverUsers.Code : nextStage.ApproverRoleQuery.Code;
+                EbDataTable dt = this.DataDB.DoQuery(qry, _params.ToArray());
                 foreach (EbDataRow dr in dt.Rows)
                 {
                     int.TryParse(dr[0].ToString(), out int temp);
-                    if (!uids.Contains(temp))
-                        uids.Add(temp);
+                    if (!ids.Contains(temp))
+                        ids.Add(temp);
                 }
-                _col = "user_ids";
-                _val = $"'{uids.Join(",")}'";
-                this.webForm.MyActNotification.UserIds = uids;
-                hasPerm = uids.Any(e => e == this.webForm.UserObj.UserId);
+                _val = $"'{ids.Join(",")}'";
+                if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
+                {
+                    _col = "user_ids";
+                    this.webForm.MyActNotification.UserIds = ids;
+                    hasPerm = ids.Any(e => e == this.webForm.UserObj.UserId);
+                }
+                else
+                {
+                    _col = "role_ids";
+                    this.webForm.MyActNotification.RoleIds = ids;
+                    hasPerm = this.webForm.UserObj.RoleIds.Any(e => ids.Contains(e));
+                }
             }
             else
                 throw new FormException("Unable to process review control", (int)HttpStatusCode.InternalServerError, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");

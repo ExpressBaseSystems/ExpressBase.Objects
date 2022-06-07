@@ -110,10 +110,14 @@ namespace ExpressBase.Objects.WebFormRelated
             for (int i = 0; i < ebReviewCtrl.FormStages.Count; i++)
             {
                 EbReviewStage stage = ebReviewCtrl.FormStages[i];
-                if (stage.ApproverEntity == ApproverEntityTypes.Users)
+                if (stage.ApproverEntity == ApproverEntityTypes.Users || stage.ApproverEntity == ApproverEntityTypes.DynamicRole)
                 {
                     Dictionary<string, string> QryParms = new Dictionary<string, string>();//<param, table>
-                    string code = stage.ApproverUsers.Code;
+                    string code;
+                    if (stage.ApproverEntity == ApproverEntityTypes.Users)
+                        code = stage.ApproverUsers.Code;
+                    else// DynamicRole
+                        code = stage.ApproverRoleQuery.Code;
                     if (string.IsNullOrEmpty(code))
                         throw new FormException($"Required SQL query for {ebReviewCtrl.Name}(review) control stage {stage.Name}");
 
@@ -140,7 +144,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (stage.ApproverUserGroup <= 0)
                         throw new FormException($"Required a usergroup for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
                 }
-                else if (stage.ApproverEntity == ApproverEntityTypes.Role)
+                else if (stage.ApproverEntity == ApproverEntityTypes.StaticRole)
                 {
                     if (stage.ApproverRoles == null || stage.ApproverRoles?.FindAll(e => e > 0).Count() == 0)
                         throw new FormException($"Required roles for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
