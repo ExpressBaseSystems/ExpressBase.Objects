@@ -499,7 +499,7 @@ WHERE
         {
             string _col = string.Empty, _val = string.Empty;
             this.webForm.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
-            if (nextStage.ApproverEntity == ApproverEntityTypes.StaticRole)
+            if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
             {
                 _col = "role_ids";
                 _val = $"@role_ids_{i}";

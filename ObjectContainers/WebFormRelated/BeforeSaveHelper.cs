@@ -144,7 +144,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (stage.ApproverUserGroup <= 0)
                         throw new FormException($"Required a usergroup for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
                 }
-                else if (stage.ApproverEntity == ApproverEntityTypes.StaticRole)
+                else if (stage.ApproverEntity == ApproverEntityTypes.Role)
                 {
                     if (stage.ApproverRoles == null || stage.ApproverRoles?.FindAll(e => e > 0).Count() == 0)
                         throw new FormException($"Required roles for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");

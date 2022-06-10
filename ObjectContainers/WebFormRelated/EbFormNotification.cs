@@ -392,7 +392,7 @@ else if(this.NotifyBy === 3)
                     {
                         userIds = _this.MyActNotification.UserIds;
                     }
-                    else if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.StaticRole ||
+                    else if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Role ||
                         _this.MyActNotification.ApproverEntity == ApproverEntityTypes.DynamicRole ||
                         _this.MyActNotification.ApproverEntity == ApproverEntityTypes.UserGroup)
                     {

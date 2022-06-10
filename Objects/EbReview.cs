@@ -500,7 +500,7 @@ else{
 
     public enum ApproverEntityTypes
     {
-        StaticRole = 1,
+        Role = 1,
         UserGroup,
         Users,
         DynamicRole
