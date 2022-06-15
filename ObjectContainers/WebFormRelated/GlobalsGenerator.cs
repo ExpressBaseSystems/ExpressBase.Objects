@@ -432,7 +432,15 @@ namespace ExpressBase.Objects.WebFormRelated
                 SendSystemNotifications(_this, _globals, services);
 
             if (_globals.system.EmailNotifications.Count > 0)
-                SendEmailNotifications(_this, _globals, services);
+            {
+                if (_this.Notifications == null)
+                    _this.Notifications = new List<EbFormNotification>();
+
+                foreach (FG_EmailNotification notification in _globals.system.EmailNotifications)
+                {
+                    _this.Notifications.Add(new EbFnEmail() { RefId = notification.RefId });
+                }
+            }
         }
 
         private static void SendSystemNotifications(EbWebForm _this, FG_Root _globals, Service services)
@@ -484,27 +492,5 @@ namespace ExpressBase.Objects.WebFormRelated
             }
         }
 
-        private static void SendEmailNotifications(EbWebForm _this, FG_Root _globals, Service services)
-        {
-            List<Param> _p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
-            foreach (FG_EmailNotification notification in _globals.system.EmailNotifications)
-            {
-                try
-                {
-                    services.Gateway.Send<EmailAttachmenResponse>(new EmailTemplateWithAttachmentMqRequest
-                    {
-                        RefId = notification.RefId,
-                        Params = _p,
-                        SolnId = _this.SolutionObj.SolutionID,
-                        UserAuthId = _this.UserObj.AuthId,
-                        UserId = _this.UserObj.UserId
-                    });
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception in PostProcessGlobals: EmailNotification\nMessage: " + e.Message + "\nStackTrace: " + e.StackTrace);
-                }
-            }
-        }
     }
 }
