@@ -198,12 +198,12 @@ namespace ExpressBase.Objects
                 <table class='table table-bordered fs-tblhead'>
                     <thead>
                         <tr>
-                        <th class='slno rc-slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
+                        <th class='slno rc-slno' style='width:50px'><span class='grid-col-title'>#</span></th>
                         <th class='grid-col-title rc-stage'><span class='grid-col-title'>Stage</span></th>
-                        <th class='grid-col-title rc-status'><span class='grid-col-title'> Status</span></th>
+                        <th class='grid-col-title rc-status'><span class='grid-col-title'>Status</span></th>
                         <th class='grid-col-title rc-by'><span class='grid-col-title'>Reviewed by/At</span></th>
                         <th class='grid-col-title rc-remarks'><span class='grid-col-title'>Remarks</span></th>
-                        ".Replace("@_height@", (this.Height + 74).ToString());
+                        ".Replace("@_height@", this.Height.ToString());
             html += @"
                         </tr>
                     </thead>
@@ -284,6 +284,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyPriority(6)]
+        [DefaultPropValue("true")]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool RenderAsTable { get; set; }
 
