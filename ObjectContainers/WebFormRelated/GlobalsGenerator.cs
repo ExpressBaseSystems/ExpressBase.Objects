@@ -422,12 +422,21 @@ namespace ExpressBase.Objects.WebFormRelated
         //send notifications and email etc
         public static void PostProcessGlobals(EbWebForm _this, FG_Root _globals, Service services)
         {
-            if (_globals.system == null || _globals.system.Notifications.Count == 0)
+            if (_globals.system == null)
                 return;
 
             if (string.IsNullOrEmpty(_this.RefId) || _this.TableRowId <= 0)
                 return;
 
+            if (_globals.system.Notifications.Count > 0)
+                SendSystemNotifications(_this, _globals, services);
+
+            if (_globals.system.EmailNotifications.Count > 0)
+                SendEmailNotifications(_this, _globals, services);
+        }
+
+        private static void SendSystemNotifications(EbWebForm _this, FG_Root _globals, Service services)
+        {
             List<Param> p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
             string _params = JsonConvert.SerializeObject(p).ToBase64();
             string link = $"/WebForm/Index?_r={_this.RefId}&_p={_params}&_m=1";
@@ -470,7 +479,30 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception in PostProcessGlobals\nMessage: " + e.Message + "\nStackTrace: " + e.StackTrace);
+                    Console.WriteLine("Exception in PostProcessGlobals: SystemNotification\nMessage: " + e.Message + "\nStackTrace: " + e.StackTrace);
+                }
+            }
+        }
+
+        private static void SendEmailNotifications(EbWebForm _this, FG_Root _globals, Service services)
+        {
+            List<Param> _p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
+            foreach (FG_EmailNotification notification in _globals.system.EmailNotifications)
+            {
+                try
+                {
+                    services.Gateway.Send<EmailAttachmenResponse>(new EmailTemplateWithAttachmentMqRequest
+                    {
+                        RefId = notification.RefId,
+                        Params = _p,
+                        SolnId = _this.SolutionObj.SolutionID,
+                        UserAuthId = _this.UserObj.AuthId,
+                        UserId = _this.UserObj.UserId
+                    });
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception in PostProcessGlobals: EmailNotification\nMessage: " + e.Message + "\nStackTrace: " + e.StackTrace);
                 }
             }
         }
