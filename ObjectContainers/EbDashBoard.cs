@@ -172,6 +172,10 @@ namespace ExpressBase.Objects
         [DefaultPropValue("#3b7273")]
         public string GradientColor2 { get; set; }
 
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public int BackgroundImage { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup(PGConstants.APPEARANCE)]
