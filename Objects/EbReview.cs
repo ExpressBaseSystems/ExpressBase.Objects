@@ -115,6 +115,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> ResetterRoles { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript HideRowExpr { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-stack-exchange'></i>"; } set { } }
@@ -248,7 +253,7 @@ namespace ExpressBase.Objects
                                     </div>
                                 </div>
                             </td>
-                            <td class='fs-ctrl-td rc-remarks' col='remarks'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
+                            <td class='fs-ctrl-td rc-remarks' col='remarks'><div class='fstd-div'> <textarea class='fs-textarea' style ='@bg@ @bgimg@'>@comment@</textarea> </div></td>
                         </tr>";
 
                 _FormStage_RS.Html = _html;
