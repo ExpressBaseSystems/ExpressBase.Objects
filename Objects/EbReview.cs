@@ -477,6 +477,11 @@ else{
     pg.HideProperty('StageActions');
 }")]
         public bool IsAdvanced { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [HelpText("List of validators will be executed before the submission of review control.")]
+        public List<EbValidator> Validators { get; set; }
     }
 
     public abstract class ReviewActionAbstract { }

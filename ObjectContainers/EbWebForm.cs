@@ -1452,7 +1452,7 @@ namespace ExpressBase.Objects
                                             new SingleColumn{ Name = FormConstants.comments, Type = (int)EbDbTypes.String, Value = ""},
                                             new SingleColumn{ Name = FormConstants.eb_created_at, Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null, F = hasPerm ? f_dt : null},
                                             new SingleColumn{ Name = FormConstants.eb_created_by, Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId : 0, F = hasPerm ? this.UserObj.FullName : string.Empty},
-                                            new SingleColumn{ Name = FormConstants.is_form_data_editable, Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0][FormConstants.is_form_data_editable])},
+                                            new SingleColumn{ Name = FormConstants.is_form_data_editable, Type = (int)EbDbTypes.String, Value = hasPerm ? Convert.ToString(Table[0][FormConstants.is_form_data_editable]) : "F"},
                                             new SingleColumn{ Name = FormConstants.has_permission, Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
                                         }
                                     });
