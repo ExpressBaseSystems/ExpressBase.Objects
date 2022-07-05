@@ -70,14 +70,14 @@ namespace ExpressBase.Objects
         public virtual string Icon { get { return string.Empty; } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorSQ)]
         [Alias("Value Expression")]
         [PropertyGroup(PGConstants.VALUE)]
         public virtual EbScript ValueExpr { get; set; }
 
         [PropertyGroup(PGConstants.VALUE)]
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorSQ)]
         [HelpText("Define default value of the control.")]
         public virtual EbScript DefaultValueExpression { get; set; }
 
