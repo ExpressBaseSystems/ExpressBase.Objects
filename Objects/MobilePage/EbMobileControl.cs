@@ -77,7 +77,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.VALUE)]
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorSQ)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [HelpText("Define default value of the control.")]
         public virtual EbScript DefaultValueExpression { get; set; }
 
