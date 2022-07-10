@@ -32,6 +32,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 { typeof(EbReview), false },
                 { typeof(EbSubmitButton), false },
                 { typeof(EbProvisionLocation), false },
+                { typeof(EbProvisionRole), false },
                 { typeof(EbSysLocation), false }
             };
             if (_this.MakeEbSidUnique)
@@ -389,6 +390,21 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     }
                     if (_cont is EbWebForm Form)
                         Form.IsLocIndependent = true;
+                }
+                else if (Allctrls[i] is EbProvisionRole provRol)//One ctrl
+                {
+                    foreach (UsrLocFieldAbstract fld in provRol.Fields)
+                    {
+                        UsrLocField _field = fld as UsrLocField;
+                        if (string.IsNullOrEmpty(_field.ControlName))
+                        {
+                            if (_field.IsRequired)
+                                throw new FormException($"Please map a control for {_field.Name} in ProvisionRole control({provRol.Name}).");
+                            continue;
+                        }
+                        if (Allctrls.FirstOrDefault(e => e.Name == _field.ControlName) == null)
+                            throw new FormException($"Invalid control name '{_field.ControlName}' for {_field.Name} in ProvisionRole control({provRol.Name}).");
+                    }
                 }
                 else if (Allctrls[i] is EbAutoId)//One ctrl
                 {

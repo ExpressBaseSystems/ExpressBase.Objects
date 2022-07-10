@@ -61,6 +61,11 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string is_group = "is_group";
         public const string parent_id = "parent_id";
         public const string eb_location_types_id = "eb_location_types_id";
+        //Prov Role
+        public const string role_name = "role_name";
+        public const string applicationid = "applicationid";
+        public const string description = "description";
+        public const string is_primary = "is_primary";
         //Prov User
         public const string email = "email";
         public const string phprimary = "phprimary";
