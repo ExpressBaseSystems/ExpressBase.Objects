@@ -182,6 +182,7 @@ this.Init = function(id)
         {
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.cField.F));
             Dictionary<string, string> _od = args.ocF == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
+            string paramName = args.cField.Name + crudContext;
             if (string.IsNullOrEmpty(_d[FormConstants.role_name]))
                 return false;
             string selQry = "SELECT id FROM eb_roles WHERE LOWER(role_name) LIKE LOWER(@role_name) AND COALESCE(eb_del, 'F') = 'F';";
@@ -190,39 +191,66 @@ this.Init = function(id)
             if (dt.Rows.Count > 0)
                 nProvRolId = Convert.ToInt32(dt.Rows[0][0]);
             string temp = string.Empty;
+            bool InsertEbRole = false;
             if (args.ins)
             {
-                bool doInsert = true;
                 if (nProvRolId > 0)
                 {
                     if (!this.AllowExistingRole)
                         throw new FormException(_d[FormConstants.role_name] + " is not unique.", (int)HttpStatusCode.BadRequest, "Given role_name is already exists in eb_roles", "EbProvisionRole -> ParameterizeControl");
                     else
-                        doInsert = false;
+                    {
+                        args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
+                        args._vals += CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+                        args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, nProvRolId));
+                    }
                 }
-                if (doInsert)
+                else
                 {
-                    temp += $@"INSERT INTO eb_roles(role_name, applicationid, description,is_primary, eb_ver_id, eb_data_id, eb_del) 
-                    VALUES(@role_name_{args.i}, @applicationid_{args.i}, @description_{args.i}, @is_primary_{args.i}, @{args.tbl}_eb_ver_id, eb_currval('{args.tbl}_id_seq'), 'F');";
+                    InsertEbRole = true;
+                    temp = $"eb_currval('{args.tbl}_id_seq')";
                 }
-
-                temp += $"UPDATE {this.TableName} SET {this.Name} = {(doInsert ? "eb_currval('eb_roles_id_seq') + 100" : nProvRolId.ToString())} WHERE {(this.TableName == args.tbl ? "id" : (args.tbl + "_id"))} = eb_currval('{args.tbl}_id_seq'); ";
             }
             else
             {
                 int oProvRolId = args.ocF == null ? 0 : Convert.ToInt32(args.ocF.Value);
-                if (nProvRolId > 0 && nProvRolId != oProvRolId)
-                    throw new FormException(_d[FormConstants.role_name] + " is not unique.", (int)HttpStatusCode.BadRequest, "Given role_name is already exists in eb_roles", "EbProvisionRole -> ParameterizeControl");
 
-                temp = $@"UPDATE eb_roles SET role_name = @role_name_{args.i}, applicationid = @applicationid_{args.i}, description = @description_{args.i}, is_primary = @is_primary_{args.i}
-                            WHERE eb_ver_id = :{args.tbl}_eb_ver_id AND eb_data_id = :{args.tbl}_id AND COALESCE(eb_del, 'F') = 'F';";
+                if (_od != null && _od.ContainsKey(FormConstants.id) && Convert.ToInt32(_od[FormConstants.id]) == oProvRolId)// role created by this ctrl
+                {
+                    temp = $"UPDATE eb_roles SET role_name = @role_name_{args.i}, applicationid = @applicationid_{args.i}, description = @description_{args.i}, is_primary = @is_primary_{args.i} WHERE id=@{paramName}; ";
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, oProvRolId));
+                }
+                else if (nProvRolId > 0)
+                {
+                    if (!this.AllowExistingRole)
+                    {
+                        throw new FormException(_d[FormConstants.role_name] + " is not unique.", (int)HttpStatusCode.BadRequest, "Given role_name is already exists in eb_roles", "EbProvisionRole -> ParameterizeControl");
+                    }
+                    else
+                    {
+                        args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
+                        args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, nProvRolId));
+                    }
+                }
+                else
+                {
+                    InsertEbRole = true;
+                    temp = $"@{args.tbl}_id";
+                }
             }
+            if (InsertEbRole)
+            {
+                temp = $"INSERT INTO eb_roles(role_name, applicationid, description,is_primary, eb_ver_id, eb_data_id, eb_del) " +
+                        $"VALUES(@role_name_{args.i}, @applicationid_{args.i}, @description_{args.i}, @is_primary_{args.i}, @{args.tbl}_eb_ver_id, {temp}, 'F'); " +
+                        $"UPDATE {this.TableName} SET {this.Name} = {"eb_currval('eb_roles_id_seq') + 100"} WHERE {(this.TableName == args.tbl ? "id" : (args.tbl + "_id"))} = {temp};";
+            }
+
             args.param.Add(args.DataDB.GetNewParameter("role_name_" + args.i, EbDbTypes.String, _d[FormConstants.role_name]));
             AddParam(args.DataDB, args.param, args.i, EbDbTypes.Int32, _d, _od, FormConstants.applicationid, 0);
             AddParam(args.DataDB, args.param, args.i, EbDbTypes.String, _d, _od, FormConstants.description, string.Empty);
             AddParam(args.DataDB, args.param, args.i, EbDbTypes.String, _d, _od, FormConstants.is_primary, "F");
 
-            args._extqry = temp + args._extqry;
+            args._extqry += temp;
             args.i++;
             return true;
         }
