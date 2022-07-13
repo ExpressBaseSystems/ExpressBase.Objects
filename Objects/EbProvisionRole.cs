@@ -242,7 +242,7 @@ this.Init = function(id)
             {
                 temp = $"INSERT INTO eb_roles(role_name, applicationid, description,is_primary, eb_ver_id, eb_data_id, eb_del) " +
                         $"VALUES(@role_name_{args.i}, @applicationid_{args.i}, @description_{args.i}, @is_primary_{args.i}, @{args.tbl}_eb_ver_id, {temp}, 'F'); " +
-                        $"UPDATE {this.TableName} SET {this.Name} = {"eb_currval('eb_roles_id_seq') + 100"} WHERE {(this.TableName == args.tbl ? "id" : (args.tbl + "_id"))} = {temp};";
+                        $"UPDATE {this.TableName} SET {this.Name} = {"eb_currval('eb_roles_id_seq')"} WHERE {(this.TableName == args.tbl ? "id" : (args.tbl + "_id"))} = {temp};";
             }
 
             args.param.Add(args.DataDB.GetNewParameter("role_name_" + args.i, EbDbTypes.String, _d[FormConstants.role_name]));
