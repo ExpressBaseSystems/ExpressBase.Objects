@@ -77,6 +77,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string consadd = "consadd";
         public const string consdel = "consdel";
         public const string locConstraint = "locConstraint";
+        public const string primary_role = "primary_role";
         //Globals - DataPusher
         public const string __eb_loop_through = "__eb_loop_through";
         //EbPhone/EbEmail ctrl

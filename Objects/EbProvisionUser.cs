@@ -237,6 +237,8 @@ this.Init = function(id)
 	this.Fields.$values.push(new EbObjects.UsrLocField('groups'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('preference'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('consadd'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('statusid'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('primary_role'));
 };";
         }
 
@@ -297,8 +299,8 @@ SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.
     STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups, 
     STRING_AGG(cons.id::TEXT, ',') AS consids, STRING_AGG(cons.c_value::TEXT, ',') AS consvals
 FROM eb_users u 
-LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id 
-LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
+LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id AND r2u.eb_del='F'
+LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid AND g2u.eb_del='F'
 LEFT JOIN 
 (   SELECT m.id, m.key_id, l.c_value
     FROM eb_constraints_master m, eb_constraints_line l
@@ -463,7 +465,11 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                     if (ebTyp.ApprovalRequired)
                         this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Unapproved).ToString());
                     else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                    {
+                        if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i))
+                            ebTyp.Roles.Add(priRole_i);
                         this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
+                    }
                 }
             }
         }
@@ -577,7 +583,8 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                         this.AddOrChange(_d, FormConstants.phprimary, _od[FormConstants.phprimary]);
                     this.AddOrChange(_d, FormConstants.usertype, _od[FormConstants.usertype]);
                     int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
-                    this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));
+                    if (!(_d.TryGetValue(FormConstants.statusid, out string newStatus_s) && int.TryParse(newStatus_s, out int newStatus_i) && newStatus_i != oldStatus))//if not status changed
+                        this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));
                     if (_od.ContainsKey(FormConstants.locConstraint))
                         this.AddOrChange(_d, FormConstants.locConstraint, _od[FormConstants.locConstraint]);
 
@@ -589,6 +596,8 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                             EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
                             if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
                             {
+                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i))
+                                    ebTyp.Roles.Add(priRole_i);
                                 this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Active).ToString());
                                 this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
                             }
@@ -598,7 +607,33 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                     foreach (KeyValuePair<string, string> item in _od)
                     {
                         if (!_d.ContainsKey(item.Key))
-                            _d.Add(item.Key, item.Value);
+                        {
+                            string val = item.Value;
+                            if (item.Key == FormConstants.roles)
+                            {
+                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i))
+                                {
+                                    List<string> st = string.IsNullOrWhiteSpace(item.Value) ? new List<string>() : item.Value.Split(",").ToList();
+                                    if (!st.Contains(priRole_s))
+                                    {
+                                        if (st.Count > 0)// remove old primary roles
+                                        {
+                                            string Qry = $"SELECT id FROM eb_roles WHERE is_primary='T' AND COALESCE(eb_del, 'F')='F' AND id IN(SELECT UNNEST(STRING_TO_ARRAY('{item.Value}', ',')::INTEGER[]));";
+                                            EbDataTable dt = args.DataDB.DoQuery(Qry);
+                                            foreach (EbDataRow dr in dt.Rows)
+                                            {
+                                                string old_rid = Convert.ToString(dr[0]);
+                                                if (st.Contains(old_rid))
+                                                    st.Remove(old_rid);
+                                            }
+                                        }
+                                        st.Add(priRole_s);// add new primary role
+                                        val = st.Join(",");
+                                    }
+                                }
+                            }
+                            _d.Add(item.Key, val);
+                        }
                     }
                 }
                 else
