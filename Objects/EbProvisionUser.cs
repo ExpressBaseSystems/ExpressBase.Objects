@@ -466,7 +466,7 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                         this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Unapproved).ToString());
                     else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
                     {
-                        if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i))
+                        if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i) && priRole_i > 100)
                             ebTyp.Roles.Add(priRole_i);
                         this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
                     }
@@ -596,7 +596,7 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                             EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
                             if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
                             {
-                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i))
+                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i) && priRole_i > 100)
                                     ebTyp.Roles.Add(priRole_i);
                                 this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Active).ToString());
                                 this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
@@ -611,7 +611,7 @@ WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP 
                             string val = item.Value;
                             if (item.Key == FormConstants.roles)
                             {
-                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i))
+                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && priRole_i > 100)
                                 {
                                     List<string> st = string.IsNullOrWhiteSpace(item.Value) ? new List<string>() : item.Value.Split(",").ToList();
                                     if (!st.Contains(priRole_s))
