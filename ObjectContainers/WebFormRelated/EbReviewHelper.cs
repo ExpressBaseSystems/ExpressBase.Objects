@@ -379,7 +379,8 @@ INSERT INTO eb_approval(
     eb_created_at, 
     eb_del,
     eb_lastmodified_by,
-    eb_lastmodified_at
+    eb_lastmodified_at,
+    eb_loc_id
 )
 VALUES(
     '{ReviewStatus.Completed}', 
@@ -391,7 +392,8 @@ VALUES(
     {this.DataDB.EB_CURRENT_TIMESTAMP}, 
     'F',
     @eb_createdby,
-    {this.DataDB.EB_CURRENT_TIMESTAMP}
+    {this.DataDB.EB_CURRENT_TIMESTAMP},
+    @eb_loc_id
 ); ";
 
             query += $@"
@@ -694,7 +696,8 @@ INSERT INTO eb_approval(
     eb_ver_id, 
     eb_created_by, 
     eb_created_at, 
-    eb_del)
+    eb_del,
+    eb_loc_id)
 VALUES(
     '{ReviewStatus.In_Process}', 
     {(int)ReviewStatusEnum.In_Process},
@@ -703,7 +706,8 @@ VALUES(
     @{this.webForm.TableName}_eb_ver_id, 
     @eb_createdby, 
     {this.DataDB.EB_CURRENT_TIMESTAMP}, 
-    'F'); ";
+    'F',
+    @eb_loc_id); ";
         }
 
         private string GetApprovalUpdateQry(string _reviewStatus, bool isdel, bool isReset)
