@@ -1796,7 +1796,7 @@ namespace ExpressBase.Objects
                 CloseDbConnection(this.DbConnection, this.DbTransaction, false);
                 Console.WriteLine("EbWebForm.SaveReview.DbTransaction Committed");
                 Console.WriteLine("EbWebForm.SaveReview.SendNotifications start");
-                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, EbConFactory, service);
                 Console.WriteLine("EbWebForm.SaveReview.SendMobileNotification start");
                 EbFnGateway.SendMobileNotification(this, EbConFactory);
                 Console.WriteLine("EbWebForm.SaveReview.resp = " + resp);
@@ -1942,7 +1942,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
                 resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
-                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, EbConFactory, service);
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
                 EbFnGateway.SendMobileNotification(this, EbConFactory);
                 Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
