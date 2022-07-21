@@ -448,6 +448,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     _this.Notifications.Add(new EbFnMobile()
                     {
+                        IsDirectNotification = true,
                         NotifyUserId = notification.UserId,
                         ProcessedMsgTitle = notification.Title ?? _this.DisplayName,
                         ProcessedMessage = notification.Message ?? string.Empty
