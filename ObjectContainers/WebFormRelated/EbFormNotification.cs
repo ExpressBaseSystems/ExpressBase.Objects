@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using ExpressBase.Common.NotificationHubs;
 using System.Threading.Tasks;
 using ExpressBase.Common.Constants;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects
 {
@@ -315,6 +316,16 @@ else if(this.NotifyBy === 3)
         [HideInPropertyGrid]
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
 
+        public string ProcessedMsgTitle { get; set; }
+        public string ProcessedMessage { get; set; }
+
+        #region NotificationFromApproval
+
+        public bool IsDirectNotification { get; set; }
+        public int NotifyUserId { get; set; }
+
+        #endregion NotificationFromApproval
+
         public override void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict)
         {
             this.BeforeSaveValidation4SysMobNotification(_dict, this.NotifyBy, this.Roles, this.UserGroup, this.Users, this.QryParams, "mobile");
@@ -325,55 +336,64 @@ else if(this.NotifyBy === 3)
             if (ConnFactory.MobileAppConnection == null)
                 return;
 
-            string Qry = null;
-            DbParameter[] _p = null;
-            if (this.NotifyBy == EbFnSys_NotifyBy.Roles)
-                Qry = $"SELECT user_id FROM eb_role2user WHERE role_id = ANY(STRING_TO_ARRAY('{this.Roles.Join(",")}'::TEXT, ',')::INT[]) AND COALESCE(eb_del, 'F') = 'F'; ";
-            else if (this.NotifyBy == EbFnSys_NotifyBy.UserGroup)
-                Qry = $"SELECT userid FROM eb_user2usergroup WHERE groupid = {this.UserGroup} AND COALESCE(eb_del, 'F') = 'F'; ";
-            else if (this.NotifyBy == EbFnSys_NotifyBy.Users)
+            List<int> uids = new List<int>();
+
+            if (this.IsDirectNotification)
             {
-                Qry = this.Users.Code;
-                _p = this.GetParameters(_this, ConnFactory.DataDB, this.QryParams);
+                uids.Add(this.NotifyUserId);
+            }
+            else
+            {
+                string Qry = null;
+                DbParameter[] _p = null;
+                if (this.NotifyBy == EbFnSys_NotifyBy.Roles)
+                    Qry = $"SELECT user_id FROM eb_role2user WHERE role_id = ANY(STRING_TO_ARRAY('{this.Roles.Join(",")}'::TEXT, ',')::INT[]) AND COALESCE(eb_del, 'F') = 'F'; ";
+                else if (this.NotifyBy == EbFnSys_NotifyBy.UserGroup)
+                    Qry = $"SELECT userid FROM eb_user2usergroup WHERE groupid = {this.UserGroup} AND COALESCE(eb_del, 'F') = 'F'; ";
+                else if (this.NotifyBy == EbFnSys_NotifyBy.Users)
+                {
+                    Qry = this.Users.Code;
+                    _p = this.GetParameters(_this, ConnFactory.DataDB, this.QryParams);
+                }
+
+                if (!string.IsNullOrWhiteSpace(Qry))
+                {
+                    EbDataTable dt;
+                    if (_p == null)
+                        dt = ConnFactory.DataDB.DoQuery(Qry);
+                    else
+                        dt = ConnFactory.DataDB.DoQuery(Qry, _p);
+                    foreach (EbDataRow dr in dt.Rows)
+                    {
+                        int.TryParse(dr[0].ToString(), out int temp);
+                        if (!uids.Contains(temp))
+                            uids.Add(temp);
+                    }
+                    if (uids.Count == 0)
+                        return;
+
+                    this.ProcessedMsgTitle = _this.DisplayName;
+                    if (!string.IsNullOrEmpty(this.MessageTitle?.Code))
+                    {
+                        object msg = _this.ExecuteCSharpScriptNew(this.MessageTitle.Code, globals);
+                        this.ProcessedMsgTitle = msg.ToString();
+                    }
+                    this.ProcessedMessage = string.Empty;
+                    if (!string.IsNullOrEmpty(this.Message?.Code))
+                    {
+                        object msg = _this.ExecuteCSharpScriptNew(this.Message.Code, globals);
+                        this.ProcessedMessage = msg.ToString();
+                    }
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(Qry))
+            if (uids.Count > 0)
             {
-                List<int> uids = new List<int>();
                 List<string> userAuthIds = new List<string>();
-                EbDataTable dt;
-                if (_p == null)
-                    dt = ConnFactory.DataDB.DoQuery(Qry);
-                else
-                    dt = ConnFactory.DataDB.DoQuery(Qry, _p);
-                foreach (EbDataRow dr in dt.Rows)
-                {
-                    int.TryParse(dr[0].ToString(), out int temp);
-                    if (!uids.Contains(temp))
-                        uids.Add(temp);
-                }
-                if (uids.Count > 0)
-                    resp++;
-                else
-                    return;
-
-                string title = _this.DisplayName;
-                if (!string.IsNullOrEmpty(this.MessageTitle?.Code))
-                {
-                    object msg = _this.ExecuteCSharpScriptNew(this.MessageTitle.Code, globals);
-                    title = msg.ToString();
-                }
-                string message = string.Empty;
-                if (!string.IsNullOrEmpty(this.Message?.Code))
-                {
-                    object msg = _this.ExecuteCSharpScriptNew(this.Message.Code, globals);
-                    message = msg.ToString();
-                }
-
                 EbNFData Data = new EbNFData()
                 {
-                    Title = title,
-                    Message = message
+                    Title = this.ProcessedMsgTitle,
+                    Message = this.ProcessedMessage
                 };
 
                 EbAzureNFClient client = EbAzureNFClient.Create(ConnFactory.MobileAppConnection);
@@ -495,6 +515,7 @@ else if(this.NotifyBy === 3)
 
     public static class EbFnGateway
     {
+        //Process => Notifications property + Notifications from nextStage script of review ctrl
         public static int SendNotifications(EbWebForm _this, EbConnectionFactory ConnFactory, Service service)
         {
             if (_this.Notifications?.Count == 0)
@@ -528,12 +549,13 @@ else if(this.NotifyBy === 3)
             return resp;
         }
 
-        public static async Task<EbNFResponse> SendMobileNotification(EbWebForm _this, EbConnectionFactory ConnFactory)
+        //Send my actions push notifications
+        public static async Task<EbNFResponse> SendMobileNotification(EbWebForm _this, EbConnectionFactory ConnFactory, Service service)
         {
             EbNFResponse resp = new EbNFResponse("0");
             try
             {
-                if (_this.MyActNotification != null)
+                if (_this.MyActNotification != null && ConnFactory.MobileAppConnection != null)
                 {
                     List<int> userIds = new List<int>();
                     if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Users)
@@ -578,16 +600,25 @@ else if(this.NotifyBy === 3)
 
                     EbAzureNFClient client = EbAzureNFClient.Create(ConnFactory.MobileAppConnection);
                     foreach (int uid in userIds)
-                        userAuthIds.Add(client.ConvertToAuthTag(_this.SolutionObj.SolutionID + CharConstants.COLON + uid + CharConstants.COLON + TokenConstants.MC));
-
-                    EbNFRequest req = new EbNFRequest()
                     {
-                        Platform = PNSPlatforms.GCM,
-                        Tags = userAuthIds
-                    };
-                    req.SetPayload(new EbNFDataTemplateAndroid() { Data = Data });
-
-                    resp = await client.Send(req);
+                        string authId = _this.SolutionObj.SolutionID + CharConstants.COLON + uid + CharConstants.COLON + TokenConstants.MC;
+                        User user = service.Redis.Get<User>(authId);
+                        if (user != null)
+                        {
+                            if (user.LocationIds.Contains(-1) || user.LocationIds.Contains(_this.LocationId))
+                                userAuthIds.Add(client.ConvertToAuthTag(authId));
+                        }
+                    }
+                    if (userAuthIds.Count > 0)
+                    {
+                        EbNFRequest req = new EbNFRequest()
+                        {
+                            Platform = PNSPlatforms.GCM,
+                            Tags = userAuthIds
+                        };
+                        req.SetPayload(new EbNFDataTemplateAndroid() { Data = Data });
+                        resp = await client.Send(req);
+                    }
                 }
             }
             catch (Exception ex)
@@ -597,6 +628,55 @@ else if(this.NotifyBy === 3)
             }
             Console.WriteLine("SendMobileNotification response: " + resp.Message);
             return resp;
+        }
+
+        public static void SendSystemNotifications(EbWebForm _this, FG_Root _globals, Service services)
+        {
+            List<Param> p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
+            string _params = JsonConvert.SerializeObject(p).ToBase64();
+            string link = $"/WebForm/Index?_r={_this.RefId}&_p={_params}&_m=1";
+
+            foreach (FG_Notification notification in _globals.system.Notifications)
+            {
+                try
+                {
+                    string title = notification.Title ?? _this.DisplayName + " notification";
+                    if (notification.NotifyBy == FG_NotifyBy.UserId)
+                    {
+                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserIDRequest. Tilte: {title}, UserId: {notification.UserId}");
+                        NotifyByUserIDResponse result = services.Gateway.Send<NotifyByUserIDResponse>(new NotifyByUserIDRequest
+                        {
+                            Link = link,
+                            Title = title,
+                            UsersID = notification.UserId
+                        });
+                    }
+                    else if (notification.NotifyBy == FG_NotifyBy.RoleIds)
+                    {
+                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserRoleRequest. Tilte: {title}, RoleIds: {notification.RoleIds}");
+                        NotifyByUserRoleResponse result = services.Gateway.Send<NotifyByUserRoleResponse>(new NotifyByUserRoleRequest
+                        {
+                            Link = link,
+                            Title = title,
+                            RoleID = notification.RoleIds
+                        });
+                    }
+                    else if (notification.NotifyBy == FG_NotifyBy.UserGroupIds)
+                    {
+                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserGroupRequest. Tilte: {title}, UserGroupId: {notification.UserGroupIds}");
+                        NotifyByUserGroupResponse result = services.Gateway.Send<NotifyByUserGroupResponse>(new NotifyByUserGroupRequest
+                        {
+                            Link = link,
+                            Title = title,
+                            GroupId = notification.UserGroupIds
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception in PostProcessGlobals: SystemNotification\nMessage: " + e.Message + "\nStackTrace: " + e.StackTrace);
+                }
+            }
         }
     }
 

@@ -1798,7 +1798,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.SaveReview.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, EbConFactory, service);
                 Console.WriteLine("EbWebForm.SaveReview.SendMobileNotification start");
-                EbFnGateway.SendMobileNotification(this, EbConFactory);
+                EbFnGateway.SendMobileNotification(this, EbConFactory, service);
                 Console.WriteLine("EbWebForm.SaveReview.resp = " + resp);
             }
             catch (FormException ex1)
@@ -1944,7 +1944,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, EbConFactory, service);
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
-                EbFnGateway.SendMobileNotification(this, EbConFactory);
+                EbFnGateway.SendMobileNotification(this, EbConFactory, service);
                 Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
                 if (IsMobInsert)
                     SearchHelper.InsertOrUpdateAsync(DataDB, this, service);

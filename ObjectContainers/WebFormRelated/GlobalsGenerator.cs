@@ -1,13 +1,10 @@
 ﻿using ExpressBase.Common;
-using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using ExpressBase.CoreBase.Globals;
 using ExpressBase.Objects.Objects;
-using ExpressBase.Objects.ServiceStack_Artifacts;
-using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -429,7 +426,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 return;
 
             if (_globals.system.Notifications.Count > 0)
-                SendSystemNotifications(_this, _globals, services);
+                EbFnGateway.SendSystemNotifications(_this, _globals, services);
 
             if (_globals.system.EmailNotifications.Count > 0)
             {
@@ -441,53 +438,20 @@ namespace ExpressBase.Objects.WebFormRelated
                     _this.Notifications.Add(new EbFnEmail() { RefId = notification.RefId });
                 }
             }
-        }
 
-        private static void SendSystemNotifications(EbWebForm _this, FG_Root _globals, Service services)
-        {
-            List<Param> p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
-            string _params = JsonConvert.SerializeObject(p).ToBase64();
-            string link = $"/WebForm/Index?_r={_this.RefId}&_p={_params}&_m=1";
-
-            foreach (FG_Notification notification in _globals.system.Notifications)
+            if (_globals.system.PushNotifications.Count > 0)
             {
-                try
+                if (_this.Notifications == null)
+                    _this.Notifications = new List<EbFormNotification>();
+
+                foreach (FG_Notification notification in _globals.system.PushNotifications)
                 {
-                    string title = notification.Title ?? _this.DisplayName + " notification";
-                    if (notification.NotifyBy == FG_NotifyBy.UserId)
+                    _this.Notifications.Add(new EbFnMobile()
                     {
-                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserIDRequest. Tilte: {title}, UserId: {notification.UserId}");
-                        NotifyByUserIDResponse result = services.Gateway.Send<NotifyByUserIDResponse>(new NotifyByUserIDRequest
-                        {
-                            Link = link,
-                            Title = title,
-                            UsersID = notification.UserId
-                        });
-                    }
-                    else if (notification.NotifyBy == FG_NotifyBy.RoleIds)
-                    {
-                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserRoleRequest. Tilte: {title}, RoleIds: {notification.RoleIds}");
-                        NotifyByUserRoleResponse result = services.Gateway.Send<NotifyByUserRoleResponse>(new NotifyByUserRoleRequest
-                        {
-                            Link = link,
-                            Title = title,
-                            RoleID = notification.RoleIds
-                        });
-                    }
-                    else if (notification.NotifyBy == FG_NotifyBy.UserGroupIds)
-                    {
-                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserGroupRequest. Tilte: {title}, UserGroupId: {notification.UserGroupIds}");
-                        NotifyByUserGroupResponse result = services.Gateway.Send<NotifyByUserGroupResponse>(new NotifyByUserGroupRequest
-                        {
-                            Link = link,
-                            Title = title,
-                            GroupId = notification.UserGroupIds
-                        });
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception in PostProcessGlobals: SystemNotification\nMessage: " + e.Message + "\nStackTrace: " + e.StackTrace);
+                        NotifyUserId = notification.UserId,
+                        ProcessedMsgTitle = notification.Title ?? _this.DisplayName,
+                        ProcessedMessage = notification.Message ?? string.Empty
+                    });
                 }
             }
         }
