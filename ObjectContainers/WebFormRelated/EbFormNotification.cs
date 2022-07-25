@@ -555,7 +555,7 @@ else if(this.NotifyBy === 3)
             EbNFResponse resp = new EbNFResponse("0");
             try
             {
-                if (_this.MyActNotification != null && ConnFactory.MobileAppConnection != null)
+                if (_this.MyActNotification?.SendPushNotification == true && ConnFactory.MobileAppConnection != null)
                 {
                     List<int> userIds = new List<int>();
                     if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Users)
@@ -686,6 +686,7 @@ else if(this.NotifyBy === 3)
         public int MyActionId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+        public bool SendPushNotification { get; set; }
 
         public ApproverEntityTypes ApproverEntity { get; set; }
         public List<int> UserIds { get; set; }

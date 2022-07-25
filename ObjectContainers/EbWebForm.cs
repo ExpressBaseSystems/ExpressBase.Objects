@@ -1922,6 +1922,8 @@ namespace ExpressBase.Objects
 
                 if (!IsMobInsert || IsMobSignUp)
                     this.RefreshFormData(DataDB, service, false, true);
+                else if (this.MyActNotification?.SendPushNotification == true)
+                    this.RefreshFormData(DataDB, service, false, false);
 
                 if (IsUpdate)
                 {

@@ -500,7 +500,11 @@ WHERE
         private string[] GetApproverEntityValues(ref int i, EbReviewStage nextStage, out bool hasPerm)
         {
             string _col = string.Empty, _val = string.Empty;
-            this.webForm.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
+            this.webForm.MyActNotification = new MyActionNotification()
+            {
+                ApproverEntity = nextStage.ApproverEntity,
+                SendPushNotification = !nextStage.HideNotification
+            };
             if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
             {
                 _col = "role_ids";
