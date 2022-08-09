@@ -120,6 +120,31 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         public EbScript HideRowExpr { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript HideColumnExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public string StageTitle { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public string StatusTitle { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public string ReviewedByTitle { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public string RemarksTitle { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public string ExecuteBtnText { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-stack-exchange'></i>"; } set { } }
@@ -203,12 +228,16 @@ namespace ExpressBase.Objects
                 <table class='table table-bordered fs-tblhead'>
                     <thead>
                         <tr>
-                        <th class='slno rc-slno' style='width:50px'><span class='grid-col-title'>#</span></th>
-                        <th class='grid-col-title rc-stage'><span class='grid-col-title'>Stage</span></th>
-                        <th class='grid-col-title rc-status'><span class='grid-col-title'>Status</span></th>
-                        <th class='grid-col-title rc-by'><span class='grid-col-title'>Reviewed by/At</span></th>
-                        <th class='grid-col-title rc-remarks'><span class='grid-col-title'>Remarks</span></th>
-                        ".Replace("@_height@", this.Height.ToString());
+                        <th class='slno rc-slno'><span class='grid-col-title'>#</span></th>
+                        <th class='grid-col-title rc-stage'><span class='grid-col-title'>@Stage@</span></th>
+                        <th class='grid-col-title rc-status'><span class='grid-col-title'>@Status@</span></th>
+                        <th class='grid-col-title rc-by'><span class='grid-col-title'>@Reviewed by/At@</span></th>
+                        <th class='grid-col-title rc-remarks'><span class='grid-col-title'>@Remarks@</span></th>"
+                        .Replace("@_height@", this.Height.ToString())
+                        .Replace("@Stage@", string.IsNullOrWhiteSpace(StageTitle) ? "Stage" : StageTitle)
+                        .Replace("@Status@", string.IsNullOrWhiteSpace(StatusTitle) ? "Status" : StatusTitle)
+                        .Replace("@Reviewed by/At@", string.IsNullOrWhiteSpace(ReviewedByTitle) ? "Reviewed by/At" : ReviewedByTitle)
+                        .Replace("@Remarks@", string.IsNullOrWhiteSpace(RemarksTitle) ? "Remarks" : RemarksTitle);
             html += @"
                         </tr>
                     </thead>
@@ -230,14 +259,14 @@ namespace ExpressBase.Objects
                 string _html = string.Concat(@"
                         <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' style ='@bg@'>",
                     "<td class='row-no-td rc-slno'>@slno@</td>",
-                    "<td class='row-no-td rc-stage' col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
+                    "<td class='row-no-td rc-stage' col='stage'><span class='fstd-div'>:", _FormStage.Name, ":</span></td>",
                     @"<td class='row-no-td rc-status' col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                                 <select class='selectpicker'>");
 
                 foreach (EbReviewAction stageAction in _FormStage_RS.StageActions)
                 {
                     string stageActionName = stageAction.Name;
-                    _html += ("<option value='" + stageAction.EbSid + "'>" + stageAction.Name + "</option>");
+                    _html += ("<option value='" + stageAction.EbSid + "'>:" + stageAction.Name + ":</option>");
                 }
                 _html += @"
                                 </select></div>
@@ -263,8 +292,8 @@ namespace ExpressBase.Objects
                     </tbody>
                 </table>
             </div>
-            <div class='fs-submit-cont'><div class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
-        </div>";
+            <div class='fs-submit-cont'><div class='btn btn-success fs-submit'>@Execute Review@ <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
+        </div>".Replace("@Execute Review@", string.IsNullOrWhiteSpace(ExecuteBtnText) ? "Execute Review" : ExecuteBtnText);
 
             return html;
         }
@@ -482,6 +511,10 @@ else{
         [PropertyEditor(PropertyEditorType.Collection)]
         [HelpText("List of validators will be executed before the submission of review control.")]
         public List<EbValidator> Validators { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript StageTextExpr { get; set; }
     }
 
     public abstract class ReviewActionAbstract { }
@@ -507,6 +540,14 @@ else{
         [PropertyGroup("Core")]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool CommentsRequired { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript ActionTextExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript HiddenExpr { get; set; }
     }
 
     public enum ApproverEntityTypes
