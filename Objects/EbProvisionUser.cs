@@ -117,6 +117,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public override EbScript HiddenExpr { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("150")]
+        [PropertyGroup("Appearance")]
+        public override int Height { get; set; }
+
 
         //--------Hide in property grid------------
 
