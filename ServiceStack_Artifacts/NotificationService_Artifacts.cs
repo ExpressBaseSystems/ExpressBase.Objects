@@ -144,6 +144,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<PendingActionAndMeetingInfo> MyMeetings { get; set; }
     }
 
+    public class GetAllActionsRequest : EbServiceStackAuthRequest, IReturn<GetAllActionsResponse>
+    {
+
+    }
+
+    public class GetAllActionsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<PendingActionAndMeetingInfo> PendingActions { get; set; }
+
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class GetAllNotificationsRequest : EbServiceStackAuthRequest, IReturn<GetAllNotificationsResponse>
+    {
+
+    }
+
+    public class GetAllNotificationsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<NotificationInfo> Notification { get; set; }
+
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class PendingActionAndMeetingInfo
     {
         public string Description { get; set; }
@@ -153,6 +179,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string DataId { get; set; }
 
         public string CreatedDate { get; set; }
+
+        public string CreatedBy { get; set; }
 
         public string DateInString { get; set; }
 
