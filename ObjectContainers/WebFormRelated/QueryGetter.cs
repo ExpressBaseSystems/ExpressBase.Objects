@@ -19,7 +19,7 @@ namespace ExpressBase.Objects.WebFormRelated
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             foreach (TableSchema _table in _this.FormSchema.Tables)
             {
-                if (_table.IsDynamic || _table.DoNotPersist)
+                if (_table.DoNotPersist)
                     continue;
                 string _cols = $"{ebs[SystemColumns.eb_loc_id]}, id";
                 string _id = "id";
@@ -120,42 +120,42 @@ namespace ExpressBase.Objects.WebFormRelated
             return query + extquery;
         }
 
-        public static string GetDynamicGridSelectQuery(EbWebForm _this, IDatabase DataDB, Service _service, string _prntTbl, string[] _targetTbls, out string _queryPs, out int _qryCount)
-        {
-            string query = string.Empty;
-            _queryPs = string.Empty;
-            _qryCount = 0;
-            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+        //public static string GetDynamicGridSelectQuery(EbWebForm _this, IDatabase DataDB, Service _service, string _prntTbl, string[] _targetTbls, out string _queryPs, out int _qryCount)
+        //{
+        //    string query = string.Empty;
+        //    _queryPs = string.Empty;
+        //    _qryCount = 0;
+        //    EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
 
-            for (int i = 0; i < _targetTbls.Length; i++)
-            {
-                TableSchema _table = _this.FormSchema.Tables.Find(e => e.TableName == _targetTbls[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
-                string _cols = string.Format("{0}, id, {1}",
-                    ebs[SystemColumns.eb_loc_id],
-                    ebs[SystemColumns.eb_row_num]);
+        //    for (int i = 0; i < _targetTbls.Length; i++)
+        //    {
+        //        TableSchema _table = _this.FormSchema.Tables.Find(e => e.TableName == _targetTbls[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+        //        string _cols = string.Format("{0}, id, {1}",
+        //            ebs[SystemColumns.eb_loc_id],
+        //            ebs[SystemColumns.eb_row_num]);
 
-                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
-                if (_columns.Count() > 0)
-                    _cols += ", " + string.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
+        //        IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
+        //        if (_columns.Count() > 0)
+        //            _cols += ", " + string.Join(", ", _columns.Select(x => { return x.Control.IsSysControl ? ebs[x.ColumnName] : x.ColumnName; }));
 
-                query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id AND {3}_id = @{3}_id AND COALESCE({4}, {6}) = {6} {5}; ",
-                    _cols,
-                    _table.TableName,
-                    _this.FormSchema.MasterTable,
-                    _prntTbl,
-                    ebs[SystemColumns.eb_del],
-                    "ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : string.Empty),
-                    ebs.GetBoolFalse(SystemColumns.eb_del));
+        //        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id AND {3}_id = @{3}_id AND COALESCE({4}, {6}) = {6} {5}; ",
+        //            _cols,
+        //            _table.TableName,
+        //            _this.FormSchema.MasterTable,
+        //            _prntTbl,
+        //            ebs[SystemColumns.eb_del],
+        //            "ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : string.Empty),
+        //            ebs.GetBoolFalse(SystemColumns.eb_del));
 
-                _qryCount++;
+        //        _qryCount++;
 
-                foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is EbDGPowerSelectColumn && !(e.Control as EbDGPowerSelectColumn).IsDataFromApi))
-                {
-                    _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery123(DataDB, _service, _table.TableName, Col.ColumnName, _prntTbl, _this.FormSchema.MasterTable);
-                }
-            }
-            return query;
-        }
+        //        foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is EbDGPowerSelectColumn && !(e.Control as EbDGPowerSelectColumn).IsDataFromApi))
+        //        {
+        //            _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery123(DataDB, _service, _table.TableName, Col.ColumnName, _prntTbl, _this.FormSchema.MasterTable);
+        //        }
+        //    }
+        //    return query;
+        //}
 
         public static string GetSelectQuery_Batch(EbWebForm _this, out int _qryCount)
         {

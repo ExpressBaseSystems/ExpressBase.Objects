@@ -433,16 +433,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             if (_cont is EbDataGrid _dg)
                 _dg.AdjustColumnWidth();
 
-            if (_cont is EbDataGrid && _cont.IsDynamicTabChild)
-            {
-                _cont.IsDynamicTabChild = false;
-                //(_cont as EbDataGrid).IsAddable = false;
-            }
             foreach (EbControl ctrl in _cont.Controls)
             {
-                ctrl.IsDynamicTabChild = _cont.IsDynamicTabChild;
-                if (ctrl.IsDynamicTabChild && !(ctrl is EbDataGrid))
-                    ctrl.DoNotPersist = true;
                 if (ctrl is EbTextBox)
                 {
                     if ((ctrl as EbTextBox).AutoSuggestion)
@@ -455,10 +447,6 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 }
                 else if (ctrl is EbControlContainer)
                 {
-                    if (ctrl is EbTabPane && (ctrl as EbTabPane).IsDynamic)
-                    {
-                        ctrl.IsDynamicTabChild = true;
-                    }
                     string t = _tbl;
                     if (ctrl is EbTableLayout || ctrl is EbTableTd || ctrl is EbTabControl || ctrl is EbTabPane)///////table name filling
                         (ctrl as EbControlContainer).TableName = _tbl;
@@ -797,13 +785,12 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         //get controls in webform as a single dimensional structure 
         public static void GetControlsAsDict(EbControlContainer _container, string _path, Dictionary<int, EbControlWrapper> _dict)
         {
-            int _counter = _dict.Count;
             IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
             foreach (EbControl control in FlatCtrls)
             {
                 string path = _path == string.Empty ? control.Name : _path + CharConstants.DOT + control.Name;
                 control.__path = path;
-                _dict.Add(_counter++, new EbControlWrapper
+                _dict.Add(_dict.Count, new EbControlWrapper
                 {
                     TableName = _container.TableName,
                     Path = path,
@@ -813,7 +800,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             }
             foreach (EbControl control in _container.Controls)
             {
-                if (control is EbControlContainer)
+                if (control is EbControlContainer ctrlCont)
                 {
                     //if (control is EbDataGrid)
                     //{
@@ -830,9 +817,23 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     //}
 
                     string path = _path;
-                    if (control is EbDataGrid)
-                        path = _path + CharConstants.DOT + (control as EbControlContainer).Name;
-                    GetControlsAsDict(control as EbControlContainer, path, _dict);
+                    if (ctrlCont is EbDataGrid DgCtrl)
+                    {
+                        path = _path + CharConstants.DOT + ctrlCont.Name;
+                        DgCtrl.__path = path;
+                    }
+                    else if (ctrlCont is EbTabPane TabPane)
+                    {
+                        TabPane.__path = _path + CharConstants.DOT + _container.Name + CharConstants.DOT + TabPane.Name;
+                        _dict.Add(_dict.Count, new EbControlWrapper
+                        {
+                            TableName = _container.TableName,
+                            Path = TabPane.__path,
+                            Control = control,
+                            Root = _path + CharConstants.DOT + _container.Name
+                        });
+                    }
+                    GetControlsAsDict(ctrlCont, path, _dict);
                 }
             }
         }

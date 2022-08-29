@@ -140,10 +140,11 @@ this.Init = function(id)
                     <div class='ebtab-close-btn eb-fb-icon' title='Remove'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
-            </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'" : string.Empty)
+            </li>".Replace("@style@", tab.Hidden && tab.IsRenderMode ? "style='display : none;'" : string.Empty)
+            .Replace("@active", tab.Hidden && tab.IsRenderMode ? string.Empty : "@active")
             .Replace("@title@", tab.Title)
             .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
-            .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
+            .Replace("@ebsid@", tab.EbSid);
 
             TabBtnHtml += @"
         </ul>
@@ -191,19 +192,49 @@ this.Init = function(id)
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        public bool IsDynamic { get; set; }
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public override EbScript HiddenExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public override bool Hidden { get; set; }
 
         public override string GetHtml()
         {
-            string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl ebcont-inner'>";
+            string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl ebcont-inner'>"
+                .Replace("@inactive", this.Hidden && this.IsRenderMode ? string.Empty : "@inactive");
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
             return (html + "</div>")
                 .Replace("@name@", this.Name)
-                .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : this.EbSid)
+                .Replace("@ebsid@", this.EbSid)
                 .Replace("@objtype@", this.ObjType);
+        }
+
+
+        [JsonIgnore]
+        public override string HideJSfn
+        {
+            get { return @"
+var liAndDiv = $('[ebsid=' + this.EbSid_CtxId+']'); 
+liAndDiv.hide();
+var visTabs = liAndDiv.filter('li').siblings(':visible');
+if (visTabs.length === 0)
+  liAndDiv.closest('[ctype=TabControl]').hide(300);
+else if (liAndDiv.filter('li.active').length > 0)
+  $(visTabs[0]).find('a').click();
+this.isInVisibleInUI = true;"; }
+        }
+
+        [JsonIgnore]
+        public override string ShowJSfn
+        {
+            get { return @"
+var liAndDiv = $('[ebsid=' + this.EbSid_CtxId+']'); 
+liAndDiv.show(300); 
+liAndDiv.closest('[ctype=TabControl]').show(300)
+this.isInVisibleInUI = false;"; }
         }
     }
 }

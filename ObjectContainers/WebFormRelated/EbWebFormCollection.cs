@@ -123,17 +123,17 @@ namespace ExpressBase.Objects
                                     }
                                 }
                             }
-                            else if (WebForm.DataPusherConfig == null && !_table.TableName.Equals(WebForm.TableName))
-                            {
-                                List<TableSchema> _tables = WebForm.FormSchema.Tables.FindAll(e => e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
-                                foreach (TableSchema _tbl in _tables)
-                                {
-                                    t += $@"UPDATE {_tbl.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
-                                        {_table.TableName}_id = @{_table.TableName}_id_{args.i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                                    param.Add(DataDB.GetNewParameter(_table.TableName + "_id_" + args.i, EbDbTypes.Int32, row.RowId));
-                                    args.i++;
-                                }
-                            }
+                            //else if (WebForm.DataPusherConfig == null && !_table.TableName.Equals(WebForm.TableName))
+                            //{
+                            //    List<TableSchema> _tables = WebForm.FormSchema.Tables.FindAll(e => e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+                            //    foreach (TableSchema _tbl in _tables)
+                            //    {
+                            //        t += $@"UPDATE {_tbl.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
+                            //            {_table.TableName}_id = @{_table.TableName}_id_{args.i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
+                            //        param.Add(DataDB.GetNewParameter(_table.TableName + "_id_" + args.i, EbDbTypes.Int32, row.RowId));
+                            //        args.i++;
+                            //    }
+                            //}
 
                             string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete);
                             fullqry += string.Format(_qry, args._colvals, row.RowId);

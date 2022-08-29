@@ -142,6 +142,7 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [OnChangeUIFunction("Common.CONTROL_ICON")]
+        [DefaultPropValue("true")]
         public bool HideInputIcon { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -195,7 +196,7 @@ else {
             <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block;' @required@ @tabIndex@ />
         </div>"
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
 .Replace("@value@", "")//"value='" + this.Value + "'")

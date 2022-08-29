@@ -30,7 +30,7 @@ namespace ExpressBase.Objects
 
         void InitFromDataBase_SS(JsonServiceClient ServiceClient);
         string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null);
-        string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl);
+        //string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl);
         string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms, List<DbParameter> param);
         void UpdateParamsMeta(Service Service, IRedisClient Redis);
         (string, EbDataReader) GetSqlAndDr(Service service);

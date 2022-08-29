@@ -349,7 +349,7 @@ else {
                                             "</th>")
                         .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                        .Replace("@ebsid@", col.IsRenderMode && col.IsDynamicTabChild ? "@" + col.EbSid_CtxId + "_ebsid@" : col.EbSid)
+                        .Replace("@ebsid@", col.EbSid)
                         .Replace("@name@", col.Name)
                         //.Replace("@Width@", lastCtrl == col ? $"calc({col.Width}% - 60px)" : $"{ col.Width}%")
                         .Replace("@Width@", $"{col.Width}%")
@@ -707,6 +707,7 @@ else {
         [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [OnChangeUIFunction("Common.CONTROL_ICON")]
+        [DefaultPropValue("true")]
         public bool HideInputIcon { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -1804,10 +1805,10 @@ pg.HideProperty('IsDynamic');
             return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, !StrictSelect);
         }
 
-        public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
-        {
-            return this.EbPowerSelect.GetSelectQuery123(DataDB, service, table, column, parentTbl, masterTbl);
-        }
+        //public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
+        //{
+        //    return this.EbPowerSelect.GetSelectQuery123(DataDB, service, table, column, parentTbl, masterTbl);
+        //}
 
         public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms, List<DbParameter> param)
         {

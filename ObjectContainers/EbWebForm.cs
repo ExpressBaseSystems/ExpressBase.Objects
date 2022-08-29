@@ -544,51 +544,51 @@ namespace ExpressBase.Objects
             }
         }
 
-        public WebformData GetDynamicGridData(IDatabase DataDB, Service Service, string SrcId, string[] Target)
-        {
-            int pid = Convert.ToInt32(SrcId.Substring(0, SrcId.IndexOf(CharConstants.UNDERSCORE)));
-            string ptbl = SrcId.Substring(SrcId.IndexOf(CharConstants.UNDERSCORE) + 1);
+        //public WebformData GetDynamicGridData(IDatabase DataDB, Service Service, string SrcId, string[] Target)
+        //{
+        //    int pid = Convert.ToInt32(SrcId.Substring(0, SrcId.IndexOf(CharConstants.UNDERSCORE)));
+        //    string ptbl = SrcId.Substring(SrcId.IndexOf(CharConstants.UNDERSCORE) + 1);
 
-            string query = QueryGetter.GetDynamicGridSelectQuery(this, DataDB, Service, ptbl, Target, out string psQry, out int qryCnt);
-            //psQry => /////// parameterization required to execute this
+        //    string query = QueryGetter.GetDynamicGridSelectQuery(this, DataDB, Service, ptbl, Target, out string psQry, out int qryCnt);
+        //    //psQry => /////// parameterization required to execute this
 
-            EbDataSet dataset = DataDB.DoQueries(query + psQry, new DbParameter[]
-            {
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(ptbl + FormConstants._id, EbDbTypes.Int32, pid)
-            });
+        //    EbDataSet dataset = DataDB.DoQueries(query + psQry, new DbParameter[]
+        //    {
+        //        DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
+        //        DataDB.GetNewParameter(ptbl + FormConstants._id, EbDbTypes.Int32, pid)
+        //    });
 
-            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+        //    this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
 
-            for (int i = 0; i < Target.Length; i++)
-            {
-                TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == Target[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+        //    for (int i = 0; i < Target.Length; i++)
+        //    {
+        //        TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == Target[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
 
-                SingleTable Table = new SingleTable();
-                EbDataTable dataTable = dataset.Tables[i];//
-                this.GetFormattedData(dataTable, Table, _table);
-                if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
-                    this.FormData.MultipleTables.Add(_table.TableName, Table);
-            }
+        //        SingleTable Table = new SingleTable();
+        //        EbDataTable dataTable = dataset.Tables[i];//
+        //        this.GetFormattedData(dataTable, Table, _table);
+        //        if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
+        //            this.FormData.MultipleTables.Add(_table.TableName, Table);
+        //    }
 
-            if (!psQry.IsNullOrEmpty())
-            {
-                for (int i = 0, j = Target.Length; i < Target.Length && j < dataset.Tables.Count; i++)
-                {
-                    TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == Target[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
-                    foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is EbDGPowerSelectColumn && !(e.Control as EbDGPowerSelectColumn).IsDataFromApi))
-                    {
-                        SingleTable Tbl = new SingleTable();
-                        this.GetFormattedData(dataset.Tables[j++], Tbl);
-                        if (!this.FormData.PsDm_Tables.ContainsKey(Col.Control.EbSid))
-                            this.FormData.PsDm_Tables.Add(Col.Control.EbSid, Tbl);
-                    }
-                }
-                this.PostFormatFormData(this.FormData);
-            }
+        //    if (!psQry.IsNullOrEmpty())
+        //    {
+        //        for (int i = 0, j = Target.Length; i < Target.Length && j < dataset.Tables.Count; i++)
+        //        {
+        //            TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == Target[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+        //            foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is EbDGPowerSelectColumn && !(e.Control as EbDGPowerSelectColumn).IsDataFromApi))
+        //            {
+        //                SingleTable Tbl = new SingleTable();
+        //                this.GetFormattedData(dataset.Tables[j++], Tbl);
+        //                if (!this.FormData.PsDm_Tables.ContainsKey(Col.Control.EbSid))
+        //                    this.FormData.PsDm_Tables.Add(Col.Control.EbSid, Tbl);
+        //            }
+        //        }
+        //        this.PostFormatFormData(this.FormData);
+        //    }
 
-            return this.FormData;
-        }
+        //    return this.FormData;
+        //}
 
         public string ExecuteSqlValueExpression(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int ExprType)
         {
@@ -647,8 +647,8 @@ namespace ExpressBase.Objects
 
             foreach (TableSchema _table in this.FormSchema.Tables)
             {
-                if (!_table.IsDynamic)
-                    continue;
+                //if (!_table.IsDynamic)
+                //    continue;
                 if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
                     continue;
                 foreach (SingleRow Row in this.FormData.MultipleTables[_table.TableName])
@@ -1339,7 +1339,7 @@ namespace ExpressBase.Objects
             foreach (TableSchema _table in _schema.Tables)
             {
                 SingleTable Table = new SingleTable();
-                if (!_table.IsDynamic && !_table.DoNotPersist)
+                if (!_table.DoNotPersist)
                 {
                     EbDataTable dataTable = dataset.Tables[count++];////                
                     this.GetFormattedData(dataTable, Table, _table);

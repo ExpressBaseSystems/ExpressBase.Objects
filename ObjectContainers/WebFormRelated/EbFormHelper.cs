@@ -156,7 +156,6 @@ namespace ExpressBase.Objects
                 {
                     EbControl c = _this.Controls[i];
                     c.IsRenderMode = _this.IsRenderMode;
-                    c.IsDynamicTabChild = _this.IsDynamicTabChild;
                     if (c is EbUserControl || c is EbDGUserControlColumn)
                     {
                         EbUserControl _temp = GetEbObject<EbUserControl>(c.RefId, client, Redis, service);
@@ -182,8 +181,6 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbControlContainer)
                     {
-                        if (c is EbTabPane && (c as EbTabPane).IsDynamic)
-                            c.IsDynamicTabChild = true;
                         AfterRedisGet(c as EbControlContainer, Redis, client, null);
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls

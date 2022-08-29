@@ -239,7 +239,7 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public override bool Index { get; set; }
-               
+
         private string TextTransformString
         {
             get { return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });".Replace("{0}", this.Name).Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty); }
@@ -309,7 +309,7 @@ else {
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
 @TabIndex@ @MaxLength@  style='width:100%; display:inline-block;'  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
- .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
+ .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
  .Replace("@name@", this.EbSid_CtxId)
  .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
  .Replace("@MaxLength@", (this.MaxLength > 0) ? "maxlength='" + this.MaxLength.ToString() + "'" : "")
@@ -362,7 +362,7 @@ else {
             <textarea id='@ebsid@' class='eb-textarea' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
                 @tabIndex@ @MaxLength@  style='width:100%;resize: none;' @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@MaxLength@", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@Required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@PlaceHolder@", "placeholder='" + this.PlaceHolder + "'")
