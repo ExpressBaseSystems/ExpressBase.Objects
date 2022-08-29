@@ -217,12 +217,12 @@ this.Init = function(id)
         public override string HideJSfn
         {
             get { return @"
-var liAndDiv = $('[ebsid=' + this.EbSid_CtxId+']'); 
-liAndDiv.hide();
-var visTabs = liAndDiv.filter('li').siblings(':visible');
+var li = $('li[ebsid=' + this.EbSid_CtxId+']'); 
+li.hide();
+var visTabs = li.siblings(':visible');
 if (visTabs.length === 0)
-  liAndDiv.closest('[ctype=TabControl]').hide(300);
-else if (liAndDiv.filter('li.active').length > 0)
+  li.closest('[ctype=TabControl]').hide();
+else if (li.hasClass('active'))
   $(visTabs[0]).find('a').click();
 this.isInVisibleInUI = true;"; }
         }
@@ -231,9 +231,13 @@ this.isInVisibleInUI = true;"; }
         public override string ShowJSfn
         {
             get { return @"
-var liAndDiv = $('[ebsid=' + this.EbSid_CtxId+']'); 
-liAndDiv.show(300); 
-liAndDiv.closest('[ctype=TabControl]').show(300)
+var li = $('li[ebsid=' + this.EbSid_CtxId+']'); 
+li.show(); 
+var visTabs = li.siblings(':visible');
+if (visTabs.length === 0) {
+  li.closest('[ctype=TabControl]').show();
+  li.find('a').click();
+}
 this.isInVisibleInUI = false;"; }
         }
     }
