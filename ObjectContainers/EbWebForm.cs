@@ -645,37 +645,37 @@ namespace ExpressBase.Objects
 
             MergeFormDataInner(this);
 
-            foreach (TableSchema _table in this.FormSchema.Tables)
-            {
-                //if (!_table.IsDynamic)
-                //    continue;
-                if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
-                    continue;
-                foreach (SingleRow Row in this.FormData.MultipleTables[_table.TableName])
-                {
-                    if (string.IsNullOrEmpty(Row.pId))
-                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+            //foreach (TableSchema _table in this.FormSchema.Tables)
+            //{
+            //    if (!_table.IsDynamic)
+            //        continue;
+            //    if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
+            //        continue;
+            //    foreach (SingleRow Row in this.FormData.MultipleTables[_table.TableName])
+            //    {
+            //        if (string.IsNullOrEmpty(Row.pId))
+            //            throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
 
-                    int id = Convert.ToInt32(Row.pId.Substring(0, Row.pId.IndexOf(CharConstants.UNDERSCORE)));
-                    string tbl = Row.pId.Substring(Row.pId.IndexOf(CharConstants.UNDERSCORE) + 1);
+            //        int id = Convert.ToInt32(Row.pId.Substring(0, Row.pId.IndexOf(CharConstants.UNDERSCORE)));
+            //        string tbl = Row.pId.Substring(Row.pId.IndexOf(CharConstants.UNDERSCORE) + 1);
 
-                    //if (tbl == this.FormSchema.MasterTable)
-                    //    throw new FormException("Invalid table. Master table is not allowed for dynamic entry.", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+            //        //if (tbl == this.FormSchema.MasterTable)
+            //        //    throw new FormException("Invalid table. Master table is not allowed for dynamic entry.", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
 
-                    SingleRow _row = this.FormData.MultipleTables[tbl].Find(e => e.RowId == id);
+            //        SingleRow _row = this.FormData.MultipleTables[tbl].Find(e => e.RowId == id);
 
-                    if (_row == null)
-                        throw new FormException("Invalid data found in dynamic entry", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
-                    if (_row.IsDelete)
-                        continue;
+            //        if (_row == null)
+            //            throw new FormException("Invalid data found in dynamic entry", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+            //        if (_row.IsDelete)
+            //            continue;
 
-                    if (_row.LinesTable.Key == null)
-                        _row.LinesTable = new KeyValuePair<string, SingleTable>(_table.TableName, new SingleTable());
+            //        if (_row.LinesTable.Key == null)
+            //            _row.LinesTable = new KeyValuePair<string, SingleTable>(_table.TableName, new SingleTable());
 
-                    _row.LinesTable.Value.Add(Row);
-                }
-                this.FormData.MultipleTables.Remove(_table.TableName);
-            }
+            //        _row.LinesTable.Value.Add(Row);
+            //    }
+            //    this.FormData.MultipleTables.Remove(_table.TableName);
+            //}
         }
 
         private void MergeFormDataInner(EbControlContainer _container)
