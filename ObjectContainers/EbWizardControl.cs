@@ -67,7 +67,7 @@ this.Init = function(id)
             foreach (EbWizardStep tab in Controls)
             {
                 TabBtnHtml += @"
-            <li li-of='@ebsid@' ebsid='@ebsid@'>
+            <li class='nav-item' li-of='@ebsid@' ebsid='@ebsid@'>
                 <a class='nav-link ppbtn-cont' href='#@ebsid@'  data-toggle='wizard'>
                     <span class='eb-label-editable'>@title@</span>
                     <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
