@@ -2649,7 +2649,8 @@ namespace ExpressBase.Objects
 
                         DbParameter[] param = new DbParameter[] {
                             DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                            DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                            DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
+                            DataDB.GetNewParameter(this.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
                         };
                         status = DataDB.DoNonQuery(this.DbConnection, query, param);
                         if (status > 0)

@@ -280,6 +280,22 @@ WHERE
                     FullQry = Qry + FullQry;
                 }
             }
+            EbReview ebReview = (EbReview)_this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
+            if (ebReview != null)
+            {
+                FullQry += $@"
+UPDATE 
+  eb_my_actions
+SET
+  hide='T'
+WHERE
+  COALESCE(is_completed, 'F') = 'F' AND 
+  COALESCE(eb_del, 'F') = 'F' AND 
+  COALESCE(hide, 'F') = 'F' AND
+  id=(SELECT eb_my_actions_id FROM eb_approval APP WHERE 
+    COALESCE(APP.eb_del, 'F') = 'F' AND status={(int)ReviewStatusEnum.In_Process} AND
+	eb_src_id=@{_this.TableName}_id AND eb_ver_id=@{_this.TableName}_eb_ver_id LIMIT 1);";
+            }
             return FullQry;
         }
 
