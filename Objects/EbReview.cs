@@ -261,7 +261,7 @@ namespace ExpressBase.Objects
                     "<td class='row-no-td rc-slno'>@slno@</td>",
                     "<td class='row-no-td rc-stage' col='stage'><span class='fstd-div'>:", _FormStage.Name, ":</span></td>",
                     @"<td class='row-no-td rc-status' col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
-                                <select class='selectpicker'>");
+                                <select class='selectpicker'><option value='' selected disabled> - select - </option>");
 
                 foreach (EbReviewAction stageAction in _FormStage_RS.StageActions)
                 {
@@ -292,7 +292,7 @@ namespace ExpressBase.Objects
                     </tbody>
                 </table>
             </div>
-            <div class='fs-submit-cont'><div class='btn btn-success fs-submit'>@Execute Review@ <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
+            <div class='fs-submit-cont' style='display: none;'><div class='btn btn-success fs-submit'>@Execute Review@ <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
         </div>".Replace("@Execute Review@", string.IsNullOrWhiteSpace(ExecuteBtnText) ? "Execute Review" : ExecuteBtnText);
 
             return html;
@@ -356,11 +356,11 @@ namespace ExpressBase.Objects
                 }
                 if (rows.Count == 1)//one new entry// need to write code for 'AfterSaveRoutines'
                 {
-                    foreach (TableSchema t in FormSchema.Tables)
-                    {
-                        if (t.TableName != this.TableName)
-                            FormData.MultipleTables.Remove(t.TableName);// approval execution, hence removing other data if present
-                    }
+                    //foreach (TableSchema t in FormSchema.Tables)
+                    //{
+                    //    if (t.TableName != this.TableName)
+                    //        FormData.MultipleTables.Remove(t.TableName);// approval execution, hence removing other data if present
+                    //}
                     string[] str_t = { FormConstants.stage_unique_id, FormConstants.action_unique_id, FormConstants.eb_my_actions_id, FormConstants.comments };
                     for (int i = 0; i < str_t.Length; i++)
                     {
@@ -515,6 +515,11 @@ else{
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         public EbScript StageTextExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("Associated controls")]
+        public List<ReviewAssociatedCtrl> AssocCtrls { get; set; }
     }
 
     public abstract class ReviewActionAbstract { }
@@ -548,6 +553,21 @@ else{
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         public EbScript HiddenExpr { get; set; }
+    }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("Associated control")]
+    public class ReviewAssociatedCtrl
+    {
+        public ReviewAssociatedCtrl() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string ControlName { get; set; }
     }
 
     public enum ApproverEntityTypes
