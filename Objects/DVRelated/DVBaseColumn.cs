@@ -573,10 +573,10 @@ else{
                 else
                     __value = _datarow[formulaPart.FieldName];
 
-                globals[formulaPart.TableName].Add(formulaPart.FieldName,new GNTV
+                globals[formulaPart.TableName].Add(formulaPart.FieldName, new GNTV
                 {
                     Name = formulaPart.FieldName,
-                    Type =(GlobalDbType) __partType,
+                    Type = (GlobalDbType)__partType,
                     Value = __value
                 });
             }
@@ -1154,6 +1154,10 @@ pg.ShowProperty('SubTypeFormat');
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> ResetterRoles { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyGroup(PGConstants.CORE)]
+        public bool DisableExecuteReview { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]
