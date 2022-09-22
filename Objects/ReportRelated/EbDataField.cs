@@ -176,13 +176,13 @@ namespace ExpressBase.Objects
             return anchor;
         }
 
-        public string FormatDecimals(string column_val, bool _inWords, int _decimalPlaces, NumberFormatInfo _numberFormat, bool formatUsingCulture)
+        public string FormatDecimals(string column_val, bool _inWords, int _decimalPlaces, NumberFormatInfo _numberFormat, bool formatUsingCulture, string decimalCurrency)
         {
             if (_inWords)
             {
                 //NumberToEnglishOld numToE = new NumberToEnglishOld();
                 //column_val = numToE.changeCurrencyToWords(column_val); 
-                column_val = NumberToWords.ConvertNumber(column_val);
+                column_val = NumberToWords.ConvertNumber(column_val, decimalCurrency);
             }
             else
             {
@@ -409,6 +409,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
+        public string DecimalCurrency { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
         public bool SuppressIfZero { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -449,7 +453,7 @@ namespace ExpressBase.Objects
                 column_val = String.Empty;
             else
             {
-                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture, DecimalCurrency);
                 if (Prefix != "" || Suffix != "")
                     column_val = Prefix + " " + column_val + " " + Suffix;
             }
@@ -597,7 +601,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
             ResetSummary();
-            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
+            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture, DecimalCurrency);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
                 Rep.SummaryValInRow[Title] = new GNTV { Name = Title.Replace(".", "_"), Type = GlobalDbType.Int32, Value = column_val };
@@ -1001,7 +1005,7 @@ namespace ExpressBase.Objects
             else
             {
                 if (dbtype == EbDbTypes.Decimal)
-                    column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
+                    column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture, string.Empty);
                 if (Prefix != "" || Suffix != "")
                 {
                     column_val = Prefix + " " + column_val + " " + Suffix;
@@ -1158,7 +1162,7 @@ namespace ExpressBase.Objects
             if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
                 column_val = string.Empty;
             else
-                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture);
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture, string.Empty);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
                 Rep.SummaryValInRow[Title] = new GNTV { Name = Title.Replace(".", "_"), Type = GlobalDbType.Int32, Value = column_val };

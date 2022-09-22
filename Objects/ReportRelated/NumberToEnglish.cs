@@ -427,7 +427,7 @@ namespace ExpressBase.Objects
             return word.Trim();
         }
 
-        private static String ConvertToWords(String numb)
+        private static String ConvertToWords(String numb, string decimalCurrency)
         {
             String val = "", wholeNo = numb, points = "", andStr = "", pointStr = "";
             String endStr = "";//"Only";
@@ -441,7 +441,7 @@ namespace ExpressBase.Objects
                     if (Convert.ToInt32(points) > 0)
                     {
                         andStr = "and";// just to separate whole numbers from points/cents    
-                        //endStr = "Fills " + endStr;//Cents    
+                        endStr = (string.IsNullOrWhiteSpace(decimalCurrency) ? string.Empty : (decimalCurrency + " ")) + endStr;//Cents    
                         pointStr = ConvertDecimals(points);
                     }
                 }
@@ -473,7 +473,7 @@ namespace ExpressBase.Objects
             return cd;
         }
 
-        public static string ConvertNumber(string number)
+        public static string ConvertNumber(string number, string decimalCurrency)
         {
             string isNegative = "";
             string word = "";
@@ -493,7 +493,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    word = isNegative + ConvertToWords(number);
+                    word = isNegative + ConvertToWords(number, decimalCurrency);
                 }
             }
             catch (Exception ex)
