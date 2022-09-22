@@ -372,6 +372,15 @@ namespace ExpressBase.Objects
             }
         }
 
+        public bool HasResetPermission(User _user)
+        {
+            bool flag = _user.RoleIds.Contains((int)SystemRoles.SolutionOwner) || _user.RoleIds.Contains((int)SystemRoles.SolutionAdmin);
+
+            if (!flag && this.ResetterRoles != null)
+                flag = _user.RoleIds.Select(x => x).Intersect(this.ResetterRoles).Any();
+
+            return flag;
+        }
     }
 
     public abstract class ReviewStageAbstract { }
