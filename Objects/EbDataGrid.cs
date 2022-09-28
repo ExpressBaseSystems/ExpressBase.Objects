@@ -2502,6 +2502,22 @@ pg.HideProperty('IsDynamic');
 
         [PropertyGroup(PGConstants.CORE)]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public string LinkVersionId
+        {
+            get { return this.EbLabel.LinkVersionId; }
+            set { this.EbLabel.LinkVersionId = value; }
+        }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public string LinkDataId
+        {
+            get { return this.EbLabel.LinkDataId; }
+            set { this.EbLabel.LinkDataId = value; }
+        }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public List<ObjectBasicInfo> LinkedObjects
