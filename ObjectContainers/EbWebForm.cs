@@ -396,10 +396,13 @@ namespace ExpressBase.Objects
             foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
             {
                 SingleRow Row = new SingleRow();
+
                 if (_dg.IsLoadDataSourceInEditMode && RowId > 0 && _row[FormConstants.id] != null)
                     Row.RowId = Convert.ToInt32(_row[FormConstants.id]);// assuming id is RowId /////
-                else
+
+                if (Row.RowId <= 0)
                     Row.RowId = rowCounter--;
+
                 foreach (ColumnSchema _column in _sc.Columns)
                 {
                     EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
@@ -2113,7 +2116,7 @@ namespace ExpressBase.Objects
                     }
                     else if (this.TableRowId > 0 && parentRow.RowId > 0 && _lineRow.RowId > 0)//EEE
                     {
-                        string _qry = QueryGetter.GetUpdateQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, _lineRow.IsDelete);
+                        string _qry = QueryGetter.GetUpdateQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, _lineRow.IsDelete, null);
                         _qry = string.Format(_qry, "{0}", $"{{1}} AND {pTable}_id = {parentRow.RowId} ");
                         fullqry += string.Format(_qry, inArgs._colvals, _lineRow.RowId);
                     }
@@ -2134,6 +2137,7 @@ namespace ExpressBase.Objects
                 this.PrepareWebFormData();
 
             this.FormCollection.ExecDGUniqueCheck();
+            this.ExecDGIntegrityColumnExpr();
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
@@ -2145,6 +2149,24 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
+        }
+
+        private void ExecDGIntegrityColumnExpr()
+        {
+            foreach (TableSchema _table in this.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Grid))
+            {
+                if (string.IsNullOrWhiteSpace(_table.IntegrityColumnExpr?.Code))
+                    continue;
+
+                if (!(this.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0 && Table.Exists(e => e.RowId > 0)))
+                    continue;
+
+                FG_Root _globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null, null, null, false);
+                object val = this.ExecuteCSharpScriptNew(_table.IntegrityColumnExpr.Code, _globals);
+
+                if (val is string && !string.IsNullOrWhiteSpace(Convert.ToString(val)))
+                    _table.IntegrityColumn = Convert.ToString(val);
+            }
         }
 
         private void ExecProvUserCreateOnlyIfScript()

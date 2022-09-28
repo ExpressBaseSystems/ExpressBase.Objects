@@ -553,7 +553,7 @@ VALUES (
             return _qry;
         }
 
-        public static string GetUpdateQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel)
+        public static string GetUpdateQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel, string foreignKey)
         {
             string _qry;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
@@ -573,7 +573,7 @@ VALUES (
                         "{0}",
                         "{1}");
                 else
-                    _qry = string.Format("UPDATE {0} SET {7} {1} = @eb_modified_by, {2} = {3} WHERE id = {8} AND {4}_id = @{4}_id AND COALESCE({5}, {6}) = {6}; ",
+                    _qry = string.Format("UPDATE {0} SET {8} {1} = @eb_modified_by, {2} = {3} WHERE id = {9} AND {7} = @{4}_id AND COALESCE({5}, {6}) = {6}; ",
                         tblName,//0
                         ebs[SystemColumns.eb_lastmodified_by],//1
                         ebs[SystemColumns.eb_lastmodified_at],//2
@@ -581,6 +581,7 @@ VALUES (
                         _this.TableName,//4
                         ebs[SystemColumns.eb_del],//5
                         ebs.GetBoolFalse(SystemColumns.eb_del),//6
+                        foreignKey ?? (_this.TableName + "_id"),//7
                         isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",
                         "{1}");
             }

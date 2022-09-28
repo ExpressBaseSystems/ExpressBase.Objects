@@ -155,6 +155,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         public EbScript PersistRowOnlyIf { get; set; }
 
+        [PropertyGroup("Data")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript IntegrityColumnExpr { get; set; }
+
         [JsonIgnore]
         public override string OnChangeBindJSFn
         {

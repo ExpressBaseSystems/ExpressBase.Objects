@@ -135,7 +135,7 @@ namespace ExpressBase.Objects
                             //    }
                             //}
 
-                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete);
+                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete, _table.IntegrityColumn);
                             fullqry += string.Format(_qry, args._colvals, row.RowId);
                             fullqry += t;
                         }

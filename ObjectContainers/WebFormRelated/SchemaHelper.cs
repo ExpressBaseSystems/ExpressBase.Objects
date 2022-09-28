@@ -34,7 +34,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     _schema.ExtendedControls.Add(_container);
                 }
                 else if (_container is EbDataGrid dg)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name, DescOdr = !dg.AscendingOrder, DoNotPersist = dg.DoNotPersist };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name, DescOdr = !dg.AscendingOrder, DoNotPersist = dg.DoNotPersist, IntegrityColumnExpr = dg.IntegrityColumnExpr };
                 else
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
                 _schema.Tables.Add(_table);
