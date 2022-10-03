@@ -181,7 +181,7 @@ namespace ExpressBase.Objects
                         if (c is EbDataGrid dg && !string.IsNullOrWhiteSpace(dg.CustomSelectDS))
                         {
                             EbDataReader _DR = GetEbObject<EbDataReader>(dg.CustomSelectDS, client, Redis, service);
-                            dg.CustomSelectDSQuery = _DR.Sql;
+                            dg.CustomSelectDSQuery = _DR.Sql.Replace(CharConstants.SEMI_COLON, CharConstants.SPACE) + CharConstants.SEMI_COLON;
                         }
                         AfterRedisGet(c as EbControlContainer, Redis, client, null);
                     }
