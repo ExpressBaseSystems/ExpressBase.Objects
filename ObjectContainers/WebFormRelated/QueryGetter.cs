@@ -6,6 +6,7 @@ using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects.WebFormRelated
 {
@@ -46,8 +47,32 @@ namespace ExpressBase.Objects.WebFormRelated
                 else
                     _id = _this.FormSchema.MasterTable + "_id";
 
+                string _pshId = _this.DataPusherConfig?.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
+
                 if (_table.TableType == WebFormTableTypes.Grid)
+                {
+                    if (!string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
+                    {
+                        string Id;
+                        if (_this.DataPusherConfig == null)
+                        {
+                            Id = $"@{_this.FormSchema.MasterTable}_id";
+                        }
+                        else
+                        {
+                            Id = string.Format("(SELECT id FROM {0} WHERE {1}_id = @{1}_id {2} AND COALESCE({3}, {4}) = {4} LIMIT 1)",
+                                _this.FormSchema.MasterTable,//0
+                                _this.DataPusherConfig.SourceTable,//1
+                                _pshId,//2
+                                ebs[SystemColumns.eb_del],//3
+                                ebs.GetBoolFalse(SystemColumns.eb_del));//4
+                        }
+                        query += Regex.Replace(_table.CustomSelectQuery, @":id|@id", Id);
+                        _qryCount++;
+                        continue;
+                    }
                     _cols = $"{ebs[SystemColumns.eb_loc_id]}, id, {ebs[SystemColumns.eb_row_num]}";
+                }
 
                 IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => !x.Control.DoNotPersist || x.Control.IsSysControl || _table.TableType == WebFormTableTypes.Review);
                 if (_columns.Count() > 0)
@@ -72,7 +97,6 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else
                 {
-                    string _pshId = _this.DataPusherConfig.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
 
                     if (_table.TableName == _this.FormSchema.MasterTable)
                         query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id {3} AND COALESCE({4}, {5}) = {5};",
@@ -195,36 +219,47 @@ SELECT
     {ebs[SystemColumns.eb_lastmodified_by]},
     {ebs[SystemColumns.eb_lastmodified_at]},
     id 
-    {_cols},
-    {conf.GridTableName}_id
+    {_cols}
 FROM
     {_table.TableName}
 WHERE
-    {conf.SourceTable}_id = {conf.SourceRecId} AND
+    {conf.GridTableName}_id={{0}} AND
     COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)} {_pshId}; ";
                 }
                 else
                 {
                     if (_table.TableType == WebFormTableTypes.Grid)
+                    {
+                        if (!string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
+                        {
+                            string Id = string.Format("(SELECT id FROM {0} WHERE {1}_id={5} AND COALESCE({2}, {3})={3} {4})",
+                                _this.FormSchema.MasterTable,//0
+                                conf.GridTableName,//1
+                                ebs[SystemColumns.eb_del],//2
+                                ebs.GetBoolFalse(SystemColumns.eb_del),//3
+                                _pshId,//4
+                                "{0}");//5
+
+                            query += Regex.Replace(_table.CustomSelectQuery, @":id|@id", Id);
+                            _qryCount++;
+                            continue;
+                        }
                         _cols = $"{ebs[SystemColumns.eb_loc_id]}, id, {ebs[SystemColumns.eb_row_num]}" + _cols;
+                    }
                     else
                         _cols = $"{ebs[SystemColumns.eb_loc_id]}, id" + _cols;
 
-                    query += $@"
-SELECT 
-    {_cols},
-    {_this.FormSchema.MasterTable}_id
-FROM 
-    {_table.TableName} 
-WHERE 
-    {_this.FormSchema.MasterTable}_id IN (
-        SELECT id FROM {_this.FormSchema.MasterTable} 
-        WHERE {conf.SourceTable}_id = {conf.SourceRecId} AND 
-            COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)}) AND 
-    COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)} {_pshId} 
-{(_table.TableType == WebFormTableTypes.Grid ? ("ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : "")) : "")}; ";
+                    query += string.Format("SELECT {0} FROM {2} WHERE {1}_id = (SELECT id FROM {1} WHERE {3}_id={8} AND COALESCE({4}, {5})={5}) AND COALESCE({4}, {5})={5} {6} {7};",
+                        _cols,//0
+                        _this.FormSchema.MasterTable,//1
+                        _table.TableName,//2
+                        conf.GridTableName,//3
+                        ebs[SystemColumns.eb_del],//4
+                        ebs.GetBoolFalse(SystemColumns.eb_del),//5
+                        _pshId,//6
+                        _table.TableType == WebFormTableTypes.Grid ? ("ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : "")) : "",//7
+                        "{0}");//8
                 }
-
                 _qryCount++;
             }
             return query;
@@ -240,44 +275,26 @@ WHERE
                 WebFormSchema _schema = ebWebForm.FormSchema;
                 foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
-                    string autoIdBckUp = string.Empty;
-                    //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName) // uncomment this and check the autoid reassignment
-                    //    autoIdBckUp = string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", ebWebForm.AutoId.Name);
-
-                    string Qry = string.Format("UPDATE {0} SET {1} = {6}, {2} = @eb_lastmodified_by, {3} = {4} {5} ",
-                        _table.TableName,
-                        ebs[SystemColumns.eb_del],
-                        ebs[SystemColumns.eb_lastmodified_by],
-                        ebs[SystemColumns.eb_lastmodified_at],
-                        DataDB.EB_CURRENT_TIMESTAMP,
-                        autoIdBckUp,
-                        ebs.GetBoolTrue(SystemColumns.eb_del));
-
-                    if (ebWebForm.DataPusherConfig == null)
-                        Qry += string.Format("WHERE {0} = @{1}_id AND COALESCE({2}, {3}) = {3};",
-                            _table.TableName == _schema.MasterTable ? "id" : (_schema.MasterTable + "_id"),
-                            _schema.MasterTable,
-                            ebs[SystemColumns.eb_del],
-                            ebs.GetBoolFalse(SystemColumns.eb_del));
-                    else
+                    if (ebWebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0)
                     {
-                        EbDataPusherConfig _conf = ebWebForm.DataPusherConfig;
-                        string _pshId = _conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_conf.MultiPushId}'";
-                        if (_table.TableName == _schema.MasterTable)
-                            Qry += string.Format("WHERE {0}_id = @{0}_id {1} AND COALESCE({2}, {3}) = {3};",
-                                _conf.SourceTable,
-                                _pshId,
-                                ebs[SystemColumns.eb_del],
-                                ebs.GetBoolFalse(SystemColumns.eb_del));
-                        else
-                            Qry += string.Format("WHERE {0}_id = (SELECT id FROM {0} WHERE {1}_id = @{1}_id {2} AND COALESCE({3}, {4}) = {4} LIMIT 1) AND COALESCE({3}, {4}) = {4};",
-                                _schema.MasterTable,
-                                _conf.SourceTable,
-                                _pshId,
-                                ebs[SystemColumns.eb_del],
-                                ebs.GetBoolFalse(SystemColumns.eb_del));
+                        string Ids = Table.Select(e => e.RowId).Join(",");
+                        string autoIdBckUp = string.Empty;
+                        //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName) // uncomment this and check the autoid reassignment
+                        //    autoIdBckUp = string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", ebWebForm.AutoId.Name);
+
+                        string Qry = string.Format("UPDATE {0} SET {1} = {7}, {2} = @eb_lastmodified_by, {3} = {4} {5} WHERE id IN ({6}) AND COALESCE({1}, {8}) = {8};",
+                            _table.TableName,//0
+                            ebs[SystemColumns.eb_del],//1
+                            ebs[SystemColumns.eb_lastmodified_by],//2
+                            ebs[SystemColumns.eb_lastmodified_at],//3
+                            DataDB.EB_CURRENT_TIMESTAMP,//4
+                            autoIdBckUp,//5
+                            Ids,//6
+                            ebs.GetBoolTrue(SystemColumns.eb_del),//7
+                            ebs.GetBoolFalse(SystemColumns.eb_del));//8
+
+                        FullQry = Qry + FullQry;//First Lines table data cancelled
                     }
-                    FullQry = Qry + FullQry;
                 }
             }
             EbReview ebReview = (EbReview)_this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
@@ -330,48 +347,28 @@ WHERE
                 WebFormSchema _schema = ebWebForm.FormSchema;
                 foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
-                    string Qry = string.Format("UPDATE {0} SET {1} = {5}, {2} = @eb_lastmodified_by, {3} = {4} ",
-                        _table.TableName,//0
-                        ebs[SystemColumns.eb_void],//1
-                        ebs[SystemColumns.eb_lastmodified_by],//2
-                        ebs[SystemColumns.eb_lastmodified_at],//3
-                        DataDB.EB_CURRENT_TIMESTAMP,//4
-                        Cancel ? ebs.GetBoolTrue(SystemColumns.eb_void) : ebs.GetBoolFalse(SystemColumns.eb_void));//5
+                    if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery) && !Cancel)
+                        continue;
 
-                    if (ebWebForm.DataPusherConfig == null)
-                        Qry += string.Format("WHERE {0} = @{1}_id AND COALESCE({2}, {4}) = {4} AND COALESCE({3}, {5}) = {6};",
-                            _table.TableName == _schema.MasterTable ? "id" : (_schema.MasterTable + "_id"),//0
-                            _schema.MasterTable,//1
-                            ebs[SystemColumns.eb_del],//2
-                            ebs[SystemColumns.eb_void],//3
-                            ebs.GetBoolFalse(SystemColumns.eb_del),//4
-                            ebs.GetBoolFalse(SystemColumns.eb_void),//5
-                            Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//6
-                    else
+                    if (ebWebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0)
                     {
-                        EbDataPusherConfig _conf = ebWebForm.DataPusherConfig;
-                        string _pshId = _conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_conf.MultiPushId}'";
-                        if (_table.TableName == _schema.MasterTable)
-                            Qry += string.Format("WHERE {0}_id = @{0}_id {1} AND COALESCE({2}, {4}) = {4} AND COALESCE({3}, {5}) = {6};",
-                                _conf.SourceTable,//0
-                                _pshId,//1
-                                ebs[SystemColumns.eb_del],//2
-                                ebs[SystemColumns.eb_void],//3
-                                ebs.GetBoolFalse(SystemColumns.eb_del),//4
-                                ebs.GetBoolFalse(SystemColumns.eb_void),//5
-                                Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//6
-                        else
-                            Qry += string.Format("WHERE {0}_id = (SELECT id FROM {0} WHERE {1}_id = @{1}_id {2} AND COALESCE({3}, {5}) = {5} AND COALESCE({4}, {6}) = {7} LIMIT 1) AND COALESCE({3}, {5}) = {5} AND COALESCE({4}, {6}) = {7};",
-                                _schema.MasterTable,//0
-                                _conf.SourceTable,//1
-                                 _pshId,//2
-                                ebs[SystemColumns.eb_del],//3
-                                ebs[SystemColumns.eb_void],//4
-                                ebs.GetBoolFalse(SystemColumns.eb_del),//5
-                                ebs.GetBoolFalse(SystemColumns.eb_void),//6
-                                Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//7
+                        string Ids = Table.Select(e => e.RowId).Join(",");
+
+                        string Qry = string.Format("UPDATE {0} SET {1} = {2}, {3} = @eb_lastmodified_by, {4} = {5} WHERE id IN ({6}) AND COALESCE({7}, {8}) = {8} AND COALESCE({1}, {9}) = {10};",
+                            _table.TableName,//0
+                            ebs[SystemColumns.eb_void],//1
+                            Cancel ? ebs.GetBoolTrue(SystemColumns.eb_void) : ebs.GetBoolFalse(SystemColumns.eb_void),//2
+                            ebs[SystemColumns.eb_lastmodified_by],//3
+                            ebs[SystemColumns.eb_lastmodified_at],//4
+                            DataDB.EB_CURRENT_TIMESTAMP,//5
+                            Ids,//6
+                            ebs[SystemColumns.eb_del],//7
+                            ebs.GetBoolFalse(SystemColumns.eb_del),//8
+                            ebs.GetBoolFalse(SystemColumns.eb_void),//9
+                            Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//10
+
+                        FullQry = Qry + FullQry;//First Lines table data cancelled
                     }
-                    FullQry = Qry + FullQry;
                 }
             }
             EbReview ebReview = (EbReview)_this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
@@ -494,7 +491,7 @@ WHERE
                         ebs.GetBoolTrue(SystemColumns.eb_lock),//14
                         ebs[SystemColumns.eb_src_ver_id],//15
                         ebs[SystemColumns.eb_ro],//16
-                        ebs.GetBoolTrue(SystemColumns.eb_ro),//17
+                        conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro),//17
                         currencyCols,//18
                         currencyVals,//19
                         ebs[SystemColumns.eb_void],//20
@@ -553,11 +550,14 @@ VALUES (
             return _qry;
         }
 
-        public static string GetUpdateQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel, string foreignKey)
+        public static string GetUpdateQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel, bool DGCustSelect)
         {
             string _qry;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             EbDataPusherConfig conf = _this.DataPusherConfig;
+
+            if (conf != null && DGCustSelect && !isDel)//don't edit datapusher line item with custom select query
+                return string.Empty;
 
             if (conf == null)
             {
@@ -573,15 +573,14 @@ VALUES (
                         "{0}",
                         "{1}");
                 else
-                    _qry = string.Format("UPDATE {0} SET {8} {1} = @eb_modified_by, {2} = {3} WHERE id = {9} AND {7} = @{4}_id AND COALESCE({5}, {6}) = {6}; ",
+                    _qry = string.Format("UPDATE {0} SET {7} {1} = @eb_modified_by, {2} = {3} WHERE id = {8} AND {4} AND COALESCE({5}, {6}) = {6}; ",
                         tblName,//0
                         ebs[SystemColumns.eb_lastmodified_by],//1
                         ebs[SystemColumns.eb_lastmodified_at],//2
                         DataDB.EB_CURRENT_TIMESTAMP,//3
-                        _this.TableName,//4
+                        DGCustSelect ? "true" : $"{_this.TableName}_id = @{_this.TableName}_id",//4
                         ebs[SystemColumns.eb_del],//5
                         ebs.GetBoolFalse(SystemColumns.eb_del),//6
-                        foreignKey ?? (_this.TableName + "_id"),//7
                         isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",
                         "{1}");
             }
@@ -597,17 +596,16 @@ VALUES (
                     parentTbl = conf.SourceTable;
                     pushIdChk = conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{conf.MultiPushId}'";
                 }
-                _qry = string.Format("UPDATE {0} SET {8} {1} = @eb_modified_by, {2} = {3} WHERE id = {10} AND {4}_id = @{4}_id{9} AND COALESCE({5}, {6}) = {6} {7}; ",
+                _qry = string.Format("UPDATE {0} SET {8} {1} = @eb_modified_by, {2} = {3} WHERE id = {9} AND {4} AND COALESCE({5}, {6}) = {6} {7}; ",
                     tblName,//0
                     ebs[SystemColumns.eb_lastmodified_by],//1
                     ebs[SystemColumns.eb_lastmodified_at],//2
                     DataDB.EB_CURRENT_TIMESTAMP,//3
-                    parentTbl,//4
+                    DGCustSelect ? "true" : $"{parentTbl}_id = @{parentTbl}_id{cxt}",//4
                     ebs[SystemColumns.eb_del],//5
                     ebs.GetBoolFalse(SystemColumns.eb_del),//6
                     pushIdChk,//7
                     isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",//8
-                    cxt,//9
                     "{1}");
             }
             return _qry;
@@ -674,20 +672,23 @@ VALUES
             return _qry;
         }
 
-        public static string GetUpdateQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel, int id)
+        public static string GetUpdateQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, bool isDel, int id, bool DGCustSelect)
         {
             string _qry, parentTblChk, pushIdChk;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             EbDataPusherConfig conf = _this.DataPusherConfig;
 
+            if (conf != null && DGCustSelect && !isDel)//don't edit datapusher line item with custom select query
+                return string.Empty;
+
             if (tblName.Equals(_this.TableName))
             {
-                parentTblChk = $"{conf.GridTableName}_id = {conf.GridDataId} AND {conf.SourceTable}_id = {conf.SourceRecId} AND id = {id} AND";
+                parentTblChk = $"{conf.GridTableName}_id = {conf.GridDataId} AND id = {id} AND";
                 pushIdChk = conf.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{conf.MultiPushId}'";
             }
             else
             {
-                parentTblChk = $"{_this.TableName}_id = {_this.TableRowId} AND id = {id} AND";
+                parentTblChk = (DGCustSelect ? string.Empty : $"{_this.TableName}_id = {_this.TableRowId} AND ") + $"id = {id} AND";
                 pushIdChk = string.Empty;
             }
 

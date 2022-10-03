@@ -40,19 +40,23 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             this.Service = service;
         }
 
-        public int UpdateAuditTrail(DataModificationAction action)
+        public int UpdateAuditTrail(DataModificationAction action, bool MasterFormOnly)
         {
-            //DataPusher not included
-            List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>()
+            List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>();
+
+            foreach (EbWebForm ebWebForm in this.WebForm.FormCollection)
             {
-                new AuditTrailInsertData
+                auditTrails.Add(new AuditTrailInsertData
                 {
                     Action = (int)action,
                     Fields = new List<AuditTrailEntry>(),
-                    RefId = this.WebForm.RefId,
-                    TableRowId = this.WebForm.TableRowId
-                }
-            };
+                    RefId = ebWebForm.RefId,
+                    TableRowId = ebWebForm.TableRowId
+                });
+
+                if (MasterFormOnly)
+                    break;
+            }
             return this.UpdateAuditTrail(auditTrails);
         }
 

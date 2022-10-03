@@ -3,9 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects.DVRelated;
-using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
 using System;
@@ -13,11 +11,9 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using ExpressBase.Security;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
-using System.Collections;
 using System.ComponentModel;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Constants;
@@ -156,9 +152,13 @@ namespace ExpressBase.Objects
         public EbScript PersistRowOnlyIf { get; set; }
 
         [PropertyGroup("Data")]
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        public EbScript IntegrityColumnExpr { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string CustomSelectDS { get; set; }
+
+        [JsonIgnore]
+        public string CustomSelectDSQuery { get; set; }
 
         [JsonIgnore]
         public override string OnChangeBindJSFn

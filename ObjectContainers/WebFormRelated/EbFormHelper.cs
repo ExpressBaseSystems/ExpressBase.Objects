@@ -9,7 +9,6 @@ using ExpressBase.Security;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.WebFormRelated;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -17,12 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Reflection;
-using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Net;
 using ExpressBase.Common.LocationNSolution;
-using ServiceStack.RabbitMq;
 
 namespace ExpressBase.Objects
 {
@@ -181,6 +178,11 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbControlContainer)
                     {
+                        if (c is EbDataGrid dg && !string.IsNullOrWhiteSpace(dg.CustomSelectDS))
+                        {
+                            EbDataReader _DR = GetEbObject<EbDataReader>(dg.CustomSelectDS, client, Redis, service);
+                            dg.CustomSelectDSQuery = _DR.Sql;
+                        }
                         AfterRedisGet(c as EbControlContainer, Redis, client, null);
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
@@ -297,7 +299,8 @@ namespace ExpressBase.Objects
                     _form.DataPusherConfig = new EbDataPusherConfig
                     {
                         SourceTable = _this.FormSchema.MasterTable,
-                        MultiPushId = _multipushId
+                        MultiPushId = _multipushId,
+                        DisableAutoReadOnly = pusher.DisableAutoReadOnly
                     };
                     _form.CrudContext = i++.ToString();
                     pusher.WebForm = _form;

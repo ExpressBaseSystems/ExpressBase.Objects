@@ -134,8 +134,9 @@ namespace ExpressBase.Objects
                             //        args.i++;
                             //    }
                             //}
+                            bool DGCustSelect = _table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery);
 
-                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete, _table.IntegrityColumn);
+                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete, DGCustSelect);
                             fullqry += string.Format(_qry, args._colvals, row.RowId);
                             fullqry += t;
                         }
@@ -176,19 +177,16 @@ namespace ExpressBase.Objects
                 args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
                 EbDataPusherConfig conf = WebForm.DataPusherConfig;
 
-                foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
-                    foreach (SingleRow row in entry.Value)
+                    if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
+                        continue;
+
+                    foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
                         args.ResetColVals();
                         if (row.RowId > 0)
                         {
-                            //SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId);
-                            //if (bkup_Row == null)
-                            //{
-                            //    Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {entry.Key}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
-                            //    continue;
-                            //}
                             string t = string.Empty;
                             if (!row.IsDelete)
                             {
@@ -207,8 +205,9 @@ namespace ExpressBase.Objects
                                     }
                                 }
                             }
+                            bool DGCustSelect = _table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery);
 
-                            string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, entry.Key, row.IsDelete, row.RowId);
+                            string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, _table.TableName, row.IsDelete, row.RowId, DGCustSelect);
                             fullqry += string.Format(_qry, args._colvals);
                             fullqry += t;
                         }
@@ -224,12 +223,13 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, entry.Key);
+                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName);
                             fullqry += string.Format(_qry, args._cols, args._vals);
                         }
-                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, args);
+                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }
                 }
+
                 if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
                 {
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));

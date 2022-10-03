@@ -30,13 +30,40 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 if (_container is EbReview)
                 {
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Review, Title = _container.Label, ContainerName = _container.Name };
+                    _table = new TableSchema
+                    {
+                        TableName = curTbl,
+                        ParentTable = _parentTable,
+                        TableType = WebFormTableTypes.Review,
+                        Title = _container.Label,
+                        ContainerName = _container.Name
+                    };
                     _schema.ExtendedControls.Add(_container);
                 }
                 else if (_container is EbDataGrid dg)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name, DescOdr = !dg.AscendingOrder, DoNotPersist = dg.DoNotPersist, IntegrityColumnExpr = dg.IntegrityColumnExpr };
+                {
+                    _table = new TableSchema
+                    {
+                        TableName = curTbl,
+                        ParentTable = _parentTable,
+                        TableType = WebFormTableTypes.Grid,
+                        Title = _container.Label,
+                        ContainerName = _container.Name,
+                        DescOdr = !dg.AscendingOrder,
+                        DoNotPersist = dg.DoNotPersist,
+                        CustomSelectQuery = dg.CustomSelectDSQuery
+                    };
+                }
                 else
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
+                {
+                    _table = new TableSchema
+                    {
+                        TableName = curTbl,
+                        ParentTable = _parentTable,
+                        TableType = WebFormTableTypes.Normal,
+                        ContainerName = _container.Name
+                    };
+                }
                 _schema.Tables.Add(_table);
             }
 
