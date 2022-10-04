@@ -139,7 +139,12 @@ namespace ExpressBase.Objects
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Form mode after new")]
         public WebFormAfterSaveModes FormModeAfterSave { get; set; }
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public WebFormAfterSaveModes FormModeAfterEdit { get; set; }
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
