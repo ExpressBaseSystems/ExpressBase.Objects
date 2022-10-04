@@ -647,7 +647,8 @@ VALUES
     @eb_signin_log_id,
     {ebs.GetBoolTrue(SystemColumns.eb_ro)},
     {conf.SourceRecId},
-    {conf.GridDataId});";
+    {conf.GridDataId});
+UPDATE {conf.GridTableName} SET {tblName}_id=(SELECT eb_currval('{tblName}_id_seq')) WHERE id={conf.GridDataId}; ";
             }
             else
             {
