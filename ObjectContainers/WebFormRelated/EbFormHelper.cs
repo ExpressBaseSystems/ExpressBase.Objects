@@ -300,7 +300,8 @@ namespace ExpressBase.Objects
                     {
                         SourceTable = _this.FormSchema.MasterTable,
                         MultiPushId = _multipushId,
-                        DisableAutoReadOnly = pusher.DisableAutoReadOnly
+                        DisableAutoReadOnly = pusher.DisableAutoReadOnly,
+                        DisableAutoLock = pusher.DisableAutoLock
                     };
                     _form.CrudContext = i++.ToString();
                     pusher.WebForm = _form;

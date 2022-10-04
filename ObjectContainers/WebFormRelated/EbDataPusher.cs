@@ -78,6 +78,10 @@ else if (this.MultiPushIdType === 2)
         [EnableInBuilder(BuilderType.WebForm)]
         public bool DisableAutoReadOnly { get; set; }
 
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool DisableAutoLock { get; set; }
+
         #region commented for backward compatibility
         //[PropertyEditor(PropertyEditorType.ObjectSelector)]
         //[EnableInBuilder(BuilderType.WebForm)]
@@ -126,6 +130,9 @@ else if (this.MultiPushIdType === 2)
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool DisableAutoReadOnly { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool DisableAutoLock { get; set; }
     }
 
     public class EbDataPusherConfig
@@ -141,6 +148,8 @@ else if (this.MultiPushIdType === 2)
         public int SourceRecId { get; set; }
 
         public bool DisableAutoReadOnly { get; set; }
+
+        public bool DisableAutoLock { get; set; }
 
         public bool IsBatch { get; set; }//Is batch datapusher
 
@@ -616,7 +625,8 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                     SourceTable = _this.TableName,
                     SourceRecId = _this.TableRowId,
                     AllowPush = true,
-                    DisableAutoReadOnly = batchDp.DisableAutoReadOnly
+                    DisableAutoReadOnly = batchDp.DisableAutoReadOnly,
+                    DisableAutoLock = batchDp.DisableAutoLock
                 };
             }
             if (!ChangeDetected)
@@ -685,7 +695,8 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                     SourceTable = _this.TableName,
                     SourceRecId = _this.TableRowId,
                     AllowPush = true,
-                    DisableAutoReadOnly = batchDp.DisableAutoReadOnly
+                    DisableAutoReadOnly = batchDp.DisableAutoReadOnly,
+                    DisableAutoLock = batchDp.DisableAutoLock
                 };
                 batchDp.WebForm = _form;
             }

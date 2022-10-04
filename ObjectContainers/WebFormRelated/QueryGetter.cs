@@ -488,7 +488,7 @@ WHERE
                         _this.TableName,//11
                         srcRef,//12
                         conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'",//13
-                        ebs.GetBoolTrue(SystemColumns.eb_lock),//14
+                        conf.DisableAutoLock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock),//14
                         ebs[SystemColumns.eb_src_ver_id],//15
                         ebs[SystemColumns.eb_ro],//16
                         conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro),//17
