@@ -638,6 +638,15 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             if (code != string.Empty)
             {
                 FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _FormData, null, DataDB, DbCon, true);
+                globals.DestinationForms = new List<FG_WebForm>();
+                for (int idx = 1; idx < _this.FormCollection.Count; idx++)
+                {
+                    EbWebForm __form = _this.FormCollection[idx];
+                    FG_WebForm fG_WebForm = new FG_WebForm(__form.TableName, __form.TableRowId, __form.LocationId, __form.RefId, __form.FormData.CreatedBy, __form.FormData.CreatedAt);
+                    GlobalsGenerator.GetCSharpFormGlobalsRec_NEW(fG_WebForm, __form, __form.FormData, null);
+                    globals.DestinationForms.Add(fG_WebForm);
+                }
+
                 object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
                 EbWebFormCollection FormCollection = ebDataPushHelper.CreateWebFormDataBatch(out_dict);//new + change identified formCollectios (Data in FormData)
                 EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon);//change identified + going to delete formCollectios backup (Data in FormDataBackup)
