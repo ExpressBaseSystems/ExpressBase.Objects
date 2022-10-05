@@ -1957,11 +1957,11 @@ namespace ExpressBase.Objects
 
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, in_data);
                 Console.WriteLine("EbWebForm.Save.ExecUniqueCheck start");
-                this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
                 this.DbTransaction.Commit();
                 CloseDbConnection(this.DbConnection, this.DbTransaction, false);
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");

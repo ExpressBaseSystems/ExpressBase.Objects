@@ -667,6 +667,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, _this.UserObj.SignInLogId));
 
                 int tem = DataDB.DoNonQuery(_this.DbConnection, fullqry, param.ToArray());
+                _this.RefreshFormData(DataDB, service, false, false);
                 return "rows affected " + tem;
             }
             return "Nothing to process";

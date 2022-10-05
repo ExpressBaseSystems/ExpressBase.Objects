@@ -100,23 +100,25 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     if (ParamsList.Exists(e => e.Name == psCtrl.Name))
                     {
-                        if (psqry.Contains(":" + psCtrl.Name))
-                            psqry = psqry.Replace(":" + psCtrl.Name, $"ANY(STRING_TO_ARRAY('{vms.Join(",")}', ',')::INT[])");
-                        if (psqry.Contains("@" + psCtrl.Name))
-                            psqry = psqry.Replace("@" + psCtrl.Name, $"ANY(STRING_TO_ARRAY('{vms.Join(",")}', ',')::INT[])");
+                        if (psqry.Contains(":" + psCtrl.Name) || psqry.Contains("@" + psCtrl.Name))//self parameter
+                        {
+                            string _str = GetPsDgParamAsQuery(psTable, psCtrl.Name);
+                            psqry = psqry.Replace(":" + psCtrl.Name, _str)
+                                .Replace("@" + psCtrl.Name, _str);
+                        }
                     }
                     _PsDmDict.TryAdd(DataDB, psCtrl);
+                    this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, psqry);
                     _PsDmDict.AppendQuery(DataDB, GetPsDmSelectQuery(psqry, ipsCtrl, vms));
                     row_ids[psCtrl.EbSid].Add(0);
-                    this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, null);
                 }
                 else if (psTable?.Count > 0)
                 {
                     _PsDmDict.TryAdd(DataDB, psCtrl);
+                    this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, psqry);
                     List<int> nums = Convert.ToString(psTable[0][psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
                     _PsDmDict.AppendQuery(DataDB, GetPsDmSelectQuery(psqry, ipsCtrl, nums));
                     row_ids[psCtrl.EbSid].Add(0);
-                    this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, null);
                 }
             }
         }
@@ -153,6 +155,12 @@ namespace ExpressBase.Objects.WebFormRelated
                             }
                             continue;
                         }
+                        else if (_p_column.Control is EbDGPowerSelectColumn || _p_column.Control is EbDGNumericColumn)
+                        {
+                            string _str = GetPsDgParamAsQuery(Table, _psParam.Name);
+                            qry = qry.Replace("@" + _psParam.Name, _str).Replace(":" + _psParam.Name, _str);
+                            continue;
+                        }
                     }
                     else
                     {
@@ -178,6 +186,29 @@ namespace ExpressBase.Objects.WebFormRelated
                 vms = $"ANY(STRING_TO_ARRAY('{vmArr.Join(",")}', ',')::INT[])";
 
             return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms};";
+        }
+
+        private string GetPsDgParamAsQuery(SingleTable Table, string pName)
+        {
+            string qryPart;
+            List<int> vms = new List<int>();
+            foreach (SingleRow Row in Table)
+            {
+                if (Row[pName] != null)
+                {
+                    List<int> nums = Convert.ToString(Row[pName]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
+                    vms.AddRange(nums);
+                }
+            }
+            vms = vms.Distinct().ToList();
+            if (vms.Count == 0)
+                qryPart = "0";
+            else if (vms.Count == 1)
+                qryPart = $"{vms[0]}";
+            else
+                qryPart = $"ANY(STRING_TO_ARRAY('{vms.Join(",")}', ',')::INT[])";
+
+            return qryPart;
         }
     }
 

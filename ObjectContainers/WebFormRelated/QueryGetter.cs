@@ -470,10 +470,14 @@ WHERE
                 }
                 else
                 {
+                    bool refCtrlExists = false;// source-primary-table_id is present as a control in destination form
+                    if (_table != null && _table.Columns.Exists(e => e.Control.Name == conf.SourceTable + "_id"))
+                        refCtrlExists = true;
+
                     string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
-                    _qry = string.Format(@"INSERT INTO {0} ({24} {1}, {2}, {3}, {4}, {9}_id, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}) 
-                                    VALUES ({25} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}); ",
+                    _qry = string.Format(@"INSERT INTO {0} ({26} {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}{24}) 
+                                    VALUES ({27} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -498,8 +502,10 @@ WHERE
                         ebs[SystemColumns.eb_del],//21
                         ebs.GetBoolFalse(SystemColumns.eb_void),//22
                         ebs.GetBoolFalse(SystemColumns.eb_del),//23
-                        "{0}",//24
-                        "{1}");//25
+                        refCtrlExists ? string.Empty : $", {conf.SourceTable}_id",//24
+                        refCtrlExists ? string.Empty : $", {srcRef}",//25
+                        "{0}",//26
+                        "{1}");//27
                 }
 
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
@@ -643,9 +649,9 @@ VALUES
     @{conf.SourceTable}_eb_ver_id,
     {conf.SourceRecId},
     {(conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'")},
-    {ebs.GetBoolTrue(SystemColumns.eb_lock)},
+    {(conf.DisableAutoLock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock))},
     @eb_signin_log_id,
-    {ebs.GetBoolTrue(SystemColumns.eb_ro)},
+    {(conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro))},
     {conf.SourceRecId},
     {conf.GridDataId});
 UPDATE {conf.GridTableName} SET {tblName}_id=(SELECT eb_currval('{tblName}_id_seq')) WHERE id={conf.GridDataId}; ";
