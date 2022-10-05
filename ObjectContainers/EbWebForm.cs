@@ -1655,6 +1655,8 @@ namespace ExpressBase.Objects
                 }
 
                 this.ExeDeleteCancelEditScript(DataDB, _FormData);
+
+                this.RunDgSqlValueExpr(DataDB, _FormData);
             }
 
             if (this.DataPusherConfig == null)//isMasterForm
@@ -1685,6 +1687,60 @@ namespace ExpressBase.Objects
 
                 this.PostFormatFormData(_FormData, true);
                 this.FormGlobals = null;// FormGlobals is a reusing Object, so clear when a data change happens
+            }
+        }
+
+        //for DoNotPersist ctrls only
+        private void RunDgSqlValueExpr(IDatabase DataDB, WebformData _FormData)
+        {
+            foreach (TableSchema _table in this.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Grid))
+            {
+                List<ColumnSchema> _columns = _table.Columns.FindAll(e => e.Control.DoNotPersist && e.Control.ValueExpr?.Lang == ScriptingLanguage.SQL && !string.IsNullOrWhiteSpace(e.Control.ValueExpr?.Code));
+
+                if (_columns.Count > 0 && _FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table))
+                {
+                    string FullQry = string.Empty;
+
+                    foreach (ColumnSchema _column in _columns)
+                    {
+                        foreach (SingleRow Row in Table)
+                        {
+                            string Qry = _column.Control.ValueExpr.Code;
+                            foreach (string paramPath in _column.Control.ValExpParams)
+                            {
+                                string pName = paramPath.Split(".")[2];
+                                SingleColumn PCol = Row.GetColumn(pName);
+                                string val = "'0'";
+                                if (PCol?.Value != null)
+                                {
+                                    val = Convert.ToString(PCol.Value);
+                                    if (PCol.Type != 7)
+                                        val = $"'{val}'";
+                                }
+                                Qry = Qry.Replace(":" + pName, "@" + pName).Replace("@" + pName, val);
+                            }
+                            Qry = Qry.Replace(";", "") + ";";
+                            FullQry += Qry;
+                        }
+                    }
+                    List<DbParameter> param = new List<DbParameter>();
+                    EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
+                    EbDataSet ds = DataDB.DoQueries(FullQry, param.ToArray());
+                    int idx = 0;
+
+                    foreach (ColumnSchema _column in _columns)
+                    {
+                        foreach (SingleRow Row in Table)
+                        {
+                            if (ds.Tables[idx].Rows?.Count > 0 && ds.Tables[idx].Columns?.Count > 0)
+                            {
+                                SingleColumn _col = _column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, ds.Tables[idx].Rows[0][0], false);
+                                Row.SetColumn(_column.ColumnName, _col);
+                            }
+                            idx++;
+                        }
+                    }
+                }
             }
         }
 
