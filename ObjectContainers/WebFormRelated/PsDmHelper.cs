@@ -108,14 +108,14 @@ namespace ExpressBase.Objects.WebFormRelated
                         }
                     }
                     _PsDmDict.TryAdd(DataDB, psCtrl);
-                    this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, psqry);
+                    psqry = this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, psqry);
                     _PsDmDict.AppendQuery(DataDB, GetPsDmSelectQuery(psqry, ipsCtrl, vms));
                     row_ids[psCtrl.EbSid].Add(0);
                 }
                 else if (psTable?.Count > 0)
                 {
                     _PsDmDict.TryAdd(DataDB, psCtrl);
-                    this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, psqry);
+                    psqry = this.AddPsParams(psCtrl, DataDB, _PsDmDict.GetPList(DataDB), null, ref p_i, psqry);
                     List<int> nums = Convert.ToString(psTable[0][psCtrl.Name]).Split(",").Select(e => { return int.TryParse(e, out int ie) ? ie : 0; }).ToList();
                     _PsDmDict.AppendQuery(DataDB, GetPsDmSelectQuery(psqry, ipsCtrl, nums));
                     row_ids[psCtrl.EbSid].Add(0);
