@@ -1725,7 +1725,11 @@ namespace ExpressBase.Objects
                     }
                     List<DbParameter> param = new List<DbParameter>();
                     EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
-                    EbDataSet ds = DataDB.DoQueries(FullQry, param.ToArray());
+                    EbDataSet ds;
+                    if (this.DbConnection == null)
+                        ds = DataDB.DoQueries(FullQry, param.ToArray());
+                    else
+                        ds = DataDB.DoQueries(this.DbConnection, FullQry, param.ToArray());
                     int idx = 0;
 
                     foreach (ColumnSchema _column in _columns)
