@@ -638,6 +638,8 @@ INSERT INTO {tblName}
     {ebs[SystemColumns.eb_lock]}, 
     {ebs[SystemColumns.eb_signin_log_id]},
     {ebs[SystemColumns.eb_ro]},
+    {ebs[SystemColumns.eb_void]},
+    {ebs[SystemColumns.eb_del]},
     {conf.SourceTable}_id,
     {conf.GridTableName}_id)
 VALUES
@@ -652,6 +654,8 @@ VALUES
     {(conf.DisableAutoLock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock))},
     @eb_signin_log_id,
     {(conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro))},
+    {ebs.GetBoolFalse(SystemColumns.eb_void)},
+    {ebs.GetBoolFalse(SystemColumns.eb_del)},
     {conf.SourceRecId},
     {conf.GridDataId});
 UPDATE {conf.GridTableName} SET {tblName}_id=(SELECT eb_currval('{tblName}_id_seq')) WHERE id={conf.GridDataId}; ";
@@ -666,14 +670,18 @@ INSERT INTO {tblName}
     {ebs[SystemColumns.eb_created_at]}, 
     {ebs[SystemColumns.eb_loc_id]}, 
     {_this.TableName}_id, 
-    {ebs[SystemColumns.eb_signin_log_id]}) 
+    {ebs[SystemColumns.eb_signin_log_id]},
+    {ebs[SystemColumns.eb_void]},
+    {ebs[SystemColumns.eb_del]}) 
 VALUES 
     ({{1}} 
     @eb_createdby, 
     {DataDB.EB_CURRENT_TIMESTAMP}, 
     @eb_loc_id , 
     {srcRef}, 
-    @eb_signin_log_id); ";
+    @eb_signin_log_id,
+    {ebs.GetBoolFalse(SystemColumns.eb_void)},
+    {ebs.GetBoolFalse(SystemColumns.eb_del)}); ";
             }
 
             return _qry;
