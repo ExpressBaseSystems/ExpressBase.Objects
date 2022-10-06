@@ -436,9 +436,25 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
             {
                 return @"
                     if(this.__isEditing)
-                        return this.curRowDataVals.Value
+                        return this.curRowDataVals.Value;
                     else
-                        return this.DataVals.Value";
+                        return this.DataVals.Value;";
+
+            }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetPreviousValueJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.__isEditing)
+                        return this.curRowDataVals.PrevValue;
+                    else
+                        return this.DataVals.PrevValue;";
 
             }
 
