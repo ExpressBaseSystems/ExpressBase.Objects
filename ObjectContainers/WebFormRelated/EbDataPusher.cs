@@ -649,7 +649,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
 
                 object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
                 EbWebFormCollection FormCollection = ebDataPushHelper.CreateWebFormDataBatch(out_dict);//new + change identified formCollectios (Data in FormData)
-                EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon);//change identified + going to delete formCollectios backup (Data in FormDataBackup)
+                EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon, _this.FormDataBackup == null);//change identified + going to delete formCollectios backup (Data in FormDataBackup)
                 MergeFormData(FormCollection, FormCollectionBkUp, pushers);
 
                 string fullqry = string.Empty;
@@ -710,7 +710,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 };
                 batchDp.WebForm = _form;
             }
-            Forms.AddRange(RefreshBatchFormData(pushers, DataDB, DbCon));
+            Forms.AddRange(RefreshBatchFormData(pushers, DataDB, DbCon, false));
 
             return Forms;
         }
@@ -803,41 +803,45 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             }
         }
 
-        private static EbWebFormCollection RefreshBatchFormData(List<EbBatchFormDataPusher> batchDataPushers, IDatabase DataDB, DbConnection DbCon)
+        private static EbWebFormCollection RefreshBatchFormData(List<EbBatchFormDataPusher> batchDataPushers, IDatabase DataDB, DbConnection DbCon, bool IsBkUpTblEmpty)
         {
-            string fullQuery = string.Empty;
-            List<int> QryCount = new List<int>();
-
-            foreach (EbBatchFormDataPusher batchDp in batchDataPushers)
-            {
-                string _qry = QueryGetter.GetSelectQuery_Batch(batchDp.WebForm, out int qCount);
-                EbDataPusherConfig _conf = batchDp.WebForm.DataPusherConfig;
-
-                foreach (SingleRow Row in _conf.GridSingleTable)
-                    fullQuery += string.Format(_qry, Row.RowId);
-
-                foreach (SingleRow Row in _conf.GridSingleTableDelete)
-                    fullQuery += string.Format(_qry, Row.RowId);
-
-                QryCount.Add(qCount);
-            }
-
-            EbDataSet dataset = DataDB.DoQueries(DbCon, fullQuery);
-
             List<EbWebForm> FormListBkUp = new List<EbWebForm>();
 
-            for (int i = 0; i < batchDataPushers.Count; i++)
+            if (!IsBkUpTblEmpty)
             {
-                EbWebForm _form = batchDataPushers[i].WebForm;
+                string fullQuery = string.Empty;
+                List<int> QryCount = new List<int>();
 
-                AddToFormList(FormListBkUp, dataset, DataDB, _form.DataPusherConfig.GridSingleTable, QryCount[i], _form, i * batchDataPushers.Count);
-                AddToFormList(FormListBkUp, dataset, DataDB, _form.DataPusherConfig.GridSingleTableDelete, QryCount[i], _form, i * batchDataPushers.Count);
+                foreach (EbBatchFormDataPusher batchDp in batchDataPushers)
+                {
+                    string _qry = QueryGetter.GetSelectQuery_Batch(batchDp.WebForm, out int qCount);
+                    EbDataPusherConfig _conf = batchDp.WebForm.DataPusherConfig;
+
+                    foreach (SingleRow Row in _conf.GridSingleTable)
+                        fullQuery += string.Format(_qry, Row.RowId);
+
+                    foreach (SingleRow Row in _conf.GridSingleTableDelete)
+                        fullQuery += string.Format(_qry, Row.RowId);
+
+                    QryCount.Add(qCount);
+                }
+
+                EbDataSet dataset = DataDB.DoQueries(DbCon, fullQuery);
+
+                int dtIdx = 0;
+
+                for (int i = 0; i < batchDataPushers.Count; i++)
+                {
+                    EbWebForm _form = batchDataPushers[i].WebForm;
+
+                    AddToFormList(FormListBkUp, dataset, DataDB, _form.DataPusherConfig.GridSingleTable, QryCount[i], _form, ref dtIdx);
+                    AddToFormList(FormListBkUp, dataset, DataDB, _form.DataPusherConfig.GridSingleTableDelete, QryCount[i], _form, ref dtIdx);
+                }
             }
-
             return new EbWebFormCollection(FormListBkUp);
         }
 
-        private static void AddToFormList(List<EbWebForm> FormListBkUp, EbDataSet dataset, IDatabase DataDB, SingleTable Table, int QueryCount, EbWebForm ebWebForm, int bchDpIdx)
+        private static void AddToFormList(List<EbWebForm> FormListBkUp, EbDataSet dataset, IDatabase DataDB, SingleTable Table, int QueryCount, EbWebForm ebWebForm, ref int dtIdx)
         {
             for (int j = 0; j < Table.Count; j++)
             {
@@ -848,10 +852,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 EbDataSet ds = new EbDataSet();
 
                 for (int k = 0; k < QueryCount; k++)
-                {
-                    int idx = bchDpIdx + (j * Table.Count) + k;
-                    ds.Tables.Add(dataset.Tables[idx]);
-                }
+                    ds.Tables.Add(dataset.Tables[dtIdx++]);
 
                 Form.RefreshFormDataInner(ds, DataDB, true, null);
                 FormListBkUp.Add(Form);
