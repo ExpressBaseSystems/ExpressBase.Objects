@@ -619,7 +619,16 @@ namespace ExpressBase.Objects
 
                     EbDataTable table = DataDB.DoQuery(ebScript.Code, parameters);
                     if (table.Rows.Count > 0)
-                        val = table.Rows[0][0];
+                    {
+                        if (table.Columns.Count == 1)
+                        {
+                            val = table.Rows[0][0];
+                        }
+                        else if (table.Columns.Count > 1)
+                        {
+                            val = table.Rows[0][TriggerCtrl.Name];
+                        }
+                    }
                     SingleColumn Column = TriggerCtrl.GetSingleColumn(this.UserObj, this.SolutionObj, val, false);
                     val = JsonConvert.SerializeObject(Column);
                 }
@@ -1699,30 +1708,27 @@ namespace ExpressBase.Objects
 
                 if (_columns.Count > 0 && _FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table))
                 {
-                    string FullQry = string.Empty;
+                    Dictionary<EbControl, List<EbControl>> ParamsCtrlDict = new Dictionary<EbControl, List<EbControl>>();
 
                     foreach (ColumnSchema _column in _columns)
                     {
-                        foreach (SingleRow Row in Table)
+                        ParamsCtrlDict.Add(_column.Control, new List<EbControl>());
+                        foreach (string paramPath in _column.Control.ValExpParams)
                         {
-                            string Qry = _column.Control.ValueExpr.Code;
-                            foreach (string paramPath in _column.Control.ValExpParams)
+                            string pName = paramPath.Split(".")[2];
+                            ColumnSchema _p_column = _table.Columns.Find(e => e.ColumnName == pName);
+                            if (_p_column != null)
+                                ParamsCtrlDict[_column.Control].Add(_p_column.Control);
+                            else
                             {
-                                string pName = paramPath.Split(".")[2];
-                                SingleColumn PCol = Row.GetColumn(pName);
-                                string val = "'0'";
-                                if (PCol?.Value != null)
-                                {
-                                    val = Convert.ToString(PCol.Value);
-                                    if (PCol.Type != 7)
-                                        val = $"'{val}'";
-                                }
-                                Qry = Qry.Replace(":" + pName, "@" + pName).Replace("@" + pName, val);
+                                _p_column = this.FormSchema.Tables[0].Columns.Find((e => e.ColumnName == pName));
+                                if (_p_column != null)
+                                    ParamsCtrlDict[_column.Control].Add(_p_column.Control);
                             }
-                            Qry = Qry.Replace(";", "") + ";";
-                            FullQry += Qry;
                         }
                     }
+
+                    string FullQry = this.RunDgSqlValueExpr_GetQuery(_columns, ParamsCtrlDict, Table);
                     List<DbParameter> param = new List<DbParameter>();
                     EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
                     EbDataSet ds;
@@ -1730,19 +1736,103 @@ namespace ExpressBase.Objects
                         ds = DataDB.DoQueries(FullQry, param.ToArray());
                     else
                         ds = DataDB.DoQueries(this.DbConnection, FullQry, param.ToArray());
-                    int idx = 0;
 
-                    foreach (ColumnSchema _column in _columns)
+                    this.RunDgSqlValueExpr_SetValue(_columns, ParamsCtrlDict, Table, ds);
+                }
+            }
+        }
+
+        private string RunDgSqlValueExpr_GetQuery(List<ColumnSchema> _columns, Dictionary<EbControl, List<EbControl>> ParamsCtrlDict, SingleTable Table)
+        {
+            string FullQry = string.Empty;
+            foreach (ColumnSchema _column in _columns)
+            {
+                bool CombineParams = !ParamsCtrlDict[_column.Control].Exists(e => e is EbDGColumn && (!(e is EbDGNumericColumn) && !(e is EbDGPowerSelectColumn)));
+                if (CombineParams)
+                {
+                    string Qry = _column.Control.ValueExpr.Code;
+                    foreach (EbControl p_control in ParamsCtrlDict[_column.Control])
+                    {
+                        if (p_control is EbDGColumn)
+                        {
+                            List<int> _pList = new List<int>();
+                            foreach (SingleRow Row in Table)
+                            {
+                                if (int.TryParse(Convert.ToString(Row[p_control.Name]), out int _val))
+                                {
+                                    if (!_pList.Contains(_val))
+                                        _pList.Add(_val);
+                                }
+                            }
+                            Qry = Qry.Replace(":" + p_control.Name, "@" + p_control.Name).Replace("@" + p_control.Name, $"'{_pList.Join(",")}'");
+                        }
+                        else
+                        {
+                            //primary table ctrl as parameter
+                        }
+                    }
+                    FullQry += Qry;
+                }
+                else
+                {
+                    foreach (SingleRow Row in Table)
+                    {
+                        string Qry = _column.Control.ValueExpr.Code;
+                        foreach (string paramPath in _column.Control.ValExpParams)
+                        {
+                            string pName = paramPath.Split(".")[2];
+                            SingleColumn PCol = Row.GetColumn(pName);
+                            string val = "'0'";
+                            if (PCol?.Value != null)
+                            {
+                                val = Convert.ToString(PCol.Value);
+                                if (PCol.Type != 7)
+                                    val = $"'{val}'";
+                            }
+                            Qry = Qry.Replace(":" + pName, "@" + pName).Replace("@" + pName, val);
+                        }
+                        Qry = Qry.Replace(";", "") + ";";
+                        FullQry += Qry;
+                    }
+                }
+            }
+            return FullQry;
+        }
+
+        private void RunDgSqlValueExpr_SetValue(List<ColumnSchema> _columns, Dictionary<EbControl, List<EbControl>> ParamsCtrlDict, SingleTable Table, EbDataSet ds)
+        {
+            int idx = 0;
+
+            foreach (ColumnSchema _column in _columns)
+            {
+                bool CombineParams = !ParamsCtrlDict[_column.Control].Exists(e => e is EbDGColumn && (!(e is EbDGNumericColumn) && !(e is EbDGPowerSelectColumn)));
+                if (CombineParams)
+                {
+                    if (ds.Tables[idx].Rows?.Count > 0 && ds.Tables[idx].Columns?.Count > 1)
                     {
                         foreach (SingleRow Row in Table)
                         {
-                            if (ds.Tables[idx].Rows?.Count > 0 && ds.Tables[idx].Columns?.Count > 0)
+                            string _val = Convert.ToString(Row[ParamsCtrlDict[_column.Control][0].Name]);
+                            EbDataRow dr = ds.Tables[idx].Rows.Find(e => Convert.ToString(e[ParamsCtrlDict[_column.Control][0].Name]) == _val);
+                            if (dr != null)
                             {
-                                SingleColumn _col = _column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, ds.Tables[idx].Rows[0][0], false);
+                                SingleColumn _col = _column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, dr[_column.ColumnName], false);
                                 Row.SetColumn(_column.ColumnName, _col);
                             }
-                            idx++;
                         }
+                    }
+                    idx++;
+                }
+                else
+                {
+                    foreach (SingleRow Row in Table)
+                    {
+                        if (ds.Tables[idx].Rows?.Count > 0 && ds.Tables[idx].Columns?.Count > 0)
+                        {
+                            SingleColumn _col = _column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, ds.Tables[idx].Rows[0][0], false);
+                            Row.SetColumn(_column.ColumnName, _col);
+                        }
+                        idx++;
                     }
                 }
             }
