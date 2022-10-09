@@ -2778,33 +2778,10 @@ namespace ExpressBase.Objects
             }
         }
 
-        //to check whether this form data entry can be delete by executing DisableDelete sql quries
-        private bool CanDelete(IDatabase DataDB)
-        {
-            if (this.DisableDelete != null && this.DisableDelete.Count > 0)
-            {
-                string q = string.Join(";", this.DisableDelete.Select(e => e.Script.Code));
-                DbParameter[] p = new DbParameter[] {
-                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
-                };
-                EbDataSet ds = DataDB.DoQueries(q, p);
-
-                for (int i = 0; i < ds.Tables.Count; i++)
-                {
-                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
-                    {
-                        if (!this.DisableDelete[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableDelete[i].IsWarningOnly)
-                            return false;
-                    }
-                }
-            }
-            return true;
-        }
-
         public int Delete(IDatabase DataDB, Service service)
         {
             int status = -1;
-            if (this.CanDelete(DataDB))
+            if (this.CanCancelOrDelete(DataDB, false))
             {
                 using (this.DbConnection = DataDB.GetNewConnection())
                 {
@@ -2855,45 +2832,31 @@ namespace ExpressBase.Objects
             return status;
         }
 
-        //to check whether this form data entry can be cancel by executing DisableCancel sql quries
-        private bool CanCancel(IDatabase DataDB)
+        //to check whether this form data entry can be cancel/delete by executing DisableCancel/DisableDelete sql quries
+        private bool CanCancelOrDelete(IDatabase DataDB, bool IsCancel)
         {
-            EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
-            string LockCheckQry = string.Empty;
-            //string LockCheckQry = string.Format("SELECT id FROM {0} WHERE id = @id AND COALESCE({1}, {2}) = {2} AND COALESCE({3}, {4}) = {4};",
-            //    this.TableName,
-            //    ebs[SystemColumns.eb_del],
-            //    ebs.GetBoolFalse(SystemColumns.eb_del),
-            //    ebs[SystemColumns.eb_lock],
-            //    ebs.GetBoolFalse(SystemColumns.eb_lock));
-
-            DbParameter[] p = new DbParameter[] {
+            List<EbSQLValidator> _DisableScript = IsCancel ? this.DisableCancel : this.DisableDelete;
+            DbParameter[] param = new DbParameter[] {
                 DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
             };
 
-            if (this.DisableCancel != null && this.DisableCancel.Count > 0)
+            if (_DisableScript != null && _DisableScript.Count > 0)
             {
-                string q = string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
+                List<EbSQLValidator> _validators = _DisableScript.FindAll(e => !e.IsDisabled && !e.IsWarningOnly && !string.IsNullOrWhiteSpace(e.Script.Code));
 
-                EbDataSet ds = DataDB.DoQueries(q + LockCheckQry, p);
-                int i = 0;
-                for (; i < this.DisableCancel.Count; i++)
+                string query = string.Join(";", _validators.Select(e => e.Script.Code));
+
+                EbDataSet ds = DataDB.DoQueries(query, param);
+
+                for (int i = 0; i < _validators.Count; i++)
                 {
                     if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
                     {
-                        if (!this.DisableCancel[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableCancel[i].IsWarningOnly)
+                        if (Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0)
                             return false;
                     }
                 }
-                if (ds.Tables[i].Rows.Count <= 0)
-                    return false;
             }
-            //else
-            //{
-            //    EbDataSet ds = DataDB.DoQueries(LockCheckQry, p);
-            //    if (ds.Tables[0].Rows.Count <= 0)
-            //        return false;
-            //}
             return true;
         }
 
@@ -2901,7 +2864,7 @@ namespace ExpressBase.Objects
         {
             int status = -1;
             string modifiedAt = null;
-            if (this.CanCancel(DataDB))
+            if (this.CanCancelOrDelete(DataDB, true))
             {
                 using (this.DbConnection = DataDB.GetNewConnection())
                 {

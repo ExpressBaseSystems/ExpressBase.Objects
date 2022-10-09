@@ -327,16 +327,16 @@ namespace ExpressBase.Objects
                     foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique))
                     {
                         List<string> Vals = new List<string>();
-                        foreach (SingleRow Row in Table)
-                            CheckDGUniqe(Row, _column, _table, Vals, WebForm);
+                        for (int i = 0; i < Table.Count; i++)
+                            CheckDGUniqe(Table[i], _column, _table, Vals, WebForm, i);
 
                         if (WebForm.FormDataBackup != null && WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
                         {
-                            foreach (SingleRow RowBkUp in TableBkUp)
+                            for (int i = 0; i < TableBkUp.Count; i++)
                             {
-                                SingleRow Row = Table.Find(e => e.RowId == RowBkUp.RowId);
+                                SingleRow Row = Table.Find(e => e.RowId == TableBkUp[i].RowId && !e.IsDelete);
                                 if (Row == null)
-                                    CheckDGUniqe(RowBkUp, _column, _table, Vals, WebForm);
+                                    CheckDGUniqe(TableBkUp[i], _column, _table, Vals, WebForm, i);
                             }
                         }
                     }
@@ -344,7 +344,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private void CheckDGUniqe(SingleRow Row, ColumnSchema _column, TableSchema _table, List<string> Vals, EbWebForm WebForm)
+        private void CheckDGUniqe(SingleRow Row, ColumnSchema _column, TableSchema _table, List<string> Vals, EbWebForm WebForm, int idx)
         {
             if (Row.IsDelete)
                 return;
@@ -353,10 +353,9 @@ namespace ExpressBase.Objects
                 return;
             if (Vals.Contains(Convert.ToString(cField.Value)))
             {
-                string msg2 = $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
-                string msg1 = $"Value in the '{(cField.Control as EbDGColumn).Title ?? cField.Control.Name}' column ({_table.Title ?? _table.ContainerName} Grid) must be unique" + msg2;
-                msg2 = $"DG column is not unique. Control name: {_table.ContainerName}.{cField.Control.Name}" + msg2;
-                throw new FormException(msg1, (int)HttpStatusCode.BadRequest, msg2, "EbWebFormCollection -> ExecUniqueCheck");
+                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{idx + 1}: Duplicate value in unique column '{(cField.Control as EbDGColumn).Title ?? cField.Control.Name}'";
+                msg += $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
+                throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebFormCollection -> ExecUniqueCheck");
             }
             Vals.Add(Convert.ToString(cField.Value));
         }
