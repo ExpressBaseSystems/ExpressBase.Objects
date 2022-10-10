@@ -353,8 +353,8 @@ namespace ExpressBase.Objects
                 return;
             if (Vals.Contains(Convert.ToString(cField.Value)))
             {
-                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{idx + 1}: Duplicate value in unique column '{(cField.Control as EbDGColumn).Title ?? cField.Control.Name}'";
-                msg += $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
+                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{idx + 1}: Duplicate value in unique column '{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}'";
+                msg += $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                 throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebFormCollection -> ExecUniqueCheck");
             }
             Vals.Add(Convert.ToString(cField.Value));
