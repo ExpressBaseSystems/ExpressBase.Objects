@@ -223,7 +223,7 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName);
+                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName, _table);
                             fullqry += string.Format(_qry, args._cols, args._vals);
                         }
                         fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);

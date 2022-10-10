@@ -617,7 +617,7 @@ VALUES (
             return _qry;
         }
 
-        public static string GetInsertQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName)
+        public static string GetInsertQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, TableSchema _table)
         {
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             EbDataPusherConfig conf = _this.DataPusherConfig;
@@ -625,6 +625,10 @@ VALUES (
 
             if (tblName.Equals(_this.TableName))
             {
+                bool refCtrlExists = false;// source-primary-table_id is present as a control in destination form
+                if (_table != null && _table.Columns.Exists(e => e.Control.Name == conf.SourceTable + "_id"))
+                    refCtrlExists = true;
+
                 _qry = $@"
 INSERT INTO {tblName} 
     ({{0}} 
@@ -640,7 +644,7 @@ INSERT INTO {tblName}
     {ebs[SystemColumns.eb_ro]},
     {ebs[SystemColumns.eb_void]},
     {ebs[SystemColumns.eb_del]},
-    {conf.SourceTable}_id,
+    {(refCtrlExists ? string.Empty : (conf.SourceTable + "_id,"))}
     {conf.GridTableName}_id)
 VALUES
     ({{1}}
@@ -656,7 +660,7 @@ VALUES
     {(conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro))},
     {ebs.GetBoolFalse(SystemColumns.eb_void)},
     {ebs.GetBoolFalse(SystemColumns.eb_del)},
-    {conf.SourceRecId},
+    {(refCtrlExists ? string.Empty : (conf.SourceRecId + ","))}
     {conf.GridDataId});
 UPDATE {conf.GridTableName} SET {tblName}_id=(SELECT eb_currval('{tblName}_id_seq')) WHERE id={conf.GridDataId}; ";
             }
