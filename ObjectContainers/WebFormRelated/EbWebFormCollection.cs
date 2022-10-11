@@ -106,7 +106,7 @@ namespace ExpressBase.Objects
                                 Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {_table.TableName}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
                                 continue;
                             }
-                            else if (_table.TableType == WebFormTableTypes.Grid)
+                            else if (_table.TableType == WebFormTableTypes.Grid && !row.IsDelete)
                             {
                                 bool ValChangeFound = false;
                                 foreach (SingleColumn Column in row.Columns)
