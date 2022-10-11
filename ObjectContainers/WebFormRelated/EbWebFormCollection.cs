@@ -84,6 +84,7 @@ namespace ExpressBase.Objects
         public void Update(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
         {
             ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
+            string eb_row_num = this[0].SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
             foreach (EbWebForm WebForm in this)
             {
                 args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
@@ -105,6 +106,24 @@ namespace ExpressBase.Objects
                                 Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {_table.TableName}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
                                 continue;
                             }
+                            else if (_table.TableType == WebFormTableTypes.Grid)
+                            {
+                                bool ValChangeFound = false;
+                                foreach (SingleColumn Column in row.Columns)
+                                {
+                                    if (Column.Control == null && Column.Name != eb_row_num)
+                                        continue;
+                                    SingleColumn ocF = bkup_Row.Columns.Find(e => e.Name.Equals(Column.Name));
+                                    if (ocF == null || Convert.ToString(ocF?.Value) != Convert.ToString(Column.Value))
+                                    {
+                                        ValChangeFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!ValChangeFound)
+                                    continue;
+                            }
+
                             string t = string.Empty;
                             if (!row.IsDelete)
                             {
