@@ -651,6 +651,8 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 EbWebFormCollection FormCollection = ebDataPushHelper.CreateWebFormDataBatch(out_dict);//new + change identified formCollectios (Data in FormData)
                 EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon, _this.FormDataBackup == null);//change identified + going to delete formCollectios backup (Data in FormDataBackup)
                 MergeFormData(FormCollection, FormCollectionBkUp, pushers);
+                if (FormCollection.Count == 0)
+                    return "Nothing to push";
 
                 string fullqry = string.Empty;
                 string _extqry = string.Empty;
@@ -760,10 +762,14 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 {
                     EbDataPusherConfig conf = Form.DataPusherConfig;
                     EbWebForm FormBkUp = FormCollectionBkUp.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
+                    
+                    bool FormBkUpDataFound = false;
+                    if (FormBkUp != null)
+                        FormBkUpDataFound = FormBkUp.FormDataBackup.MultipleTables[FormBkUp.FormSchema.MasterTable].Count > 0;
 
-                    if (!conf.AllowPush && FormBkUp == null)
+                    if (!conf.AllowPush && !FormBkUpDataFound)
                         RmForm.Add(Form);
-                    if (FormBkUp == null)//new
+                    if (!FormBkUpDataFound)//new
                         continue;
                     else
                     {
