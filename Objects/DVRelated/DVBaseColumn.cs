@@ -368,6 +368,10 @@ else{
         [PropertyGroup("LinkFromColumn")]
         public DVBaseColumn IdColumn { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyGroup("LinkFromColumn")]
+        public bool IsFormDraftMode { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("0")]
         [HideForUser]
