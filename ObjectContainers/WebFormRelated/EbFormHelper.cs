@@ -183,7 +183,7 @@ namespace ExpressBase.Objects
                             EbDataReader _DR = GetEbObject<EbDataReader>(dg.CustomSelectDS, client, Redis, service);
                             dg.CustomSelectDSQuery = _DR.Sql.Replace(CharConstants.SEMI_COLON, CharConstants.SPACE) + CharConstants.SEMI_COLON;
                         }
-                        AfterRedisGet(c as EbControlContainer, Redis, client, null);
+                        AfterRedisGet(c as EbControlContainer, Redis, client, service);
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
                     {
@@ -289,7 +289,10 @@ namespace ExpressBase.Objects
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
-                    _form.AfterRedisGet_All(Redis as RedisClient, client);
+                    if (service == null)
+                        _form.AfterRedisGet_All(Redis as RedisClient, client);
+                    else
+                        _form.AfterRedisGet_All(service);
                     string _multipushId = null;
                     if (pusher.MultiPushIdType == MultiPushIdTypes.Default)
                         _multipushId = _this.RefId + CharConstants.UNDERSCORE + pusher.Name;

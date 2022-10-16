@@ -731,6 +731,9 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 {
                     foreach (SingleColumn nColumn in nRow.Columns)
                     {
+                        //do not persist ctrls - NewTable will contains the value if the expr is sql val expr
+                        if (nColumn.Control?.DoNotPersist == true)
+                            continue;
                         if (Convert.ToString(oRow[nColumn.Name]) != Convert.ToString(nColumn.Value))
                         {
                             RowChanged = true;
@@ -762,7 +765,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 {
                     EbDataPusherConfig conf = Form.DataPusherConfig;
                     EbWebForm FormBkUp = FormCollectionBkUp.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
-                    
+
                     bool FormBkUpDataFound = false;
                     if (FormBkUp != null)
                         FormBkUpDataFound = FormBkUp.FormDataBackup.MultipleTables[FormBkUp.FormSchema.MasterTable].Count > 0;
