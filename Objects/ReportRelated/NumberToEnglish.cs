@@ -427,7 +427,7 @@ namespace ExpressBase.Objects
             return word.Trim();
         }
 
-        private static String ConvertToWords(String numb, string decimalCurrency)
+        private static String ConvertToWords(String numb, string decimalCurrency, int _decimalPlaces)
         {
             String val = "", wholeNo = numb, points = "", andStr = "", pointStr = "";
             String endStr = "";//"Only";
@@ -438,11 +438,12 @@ namespace ExpressBase.Objects
                 {
                     wholeNo = numb.Substring(0, decimalPlace);
                     points = numb.Substring(decimalPlace + 1);
-                    if (Convert.ToInt32(points) > 0)
+                    if (Convert.ToInt32(points) > 0 && _decimalPlaces > 0)
                     {
-                        andStr = "and";// just to separate whole numbers from points/cents    
-                        endStr = (string.IsNullOrWhiteSpace(decimalCurrency) ? string.Empty : (decimalCurrency + " ")) + endStr;//Cents    
-                        pointStr = ConvertDecimals(points);
+                        andStr = "and ";// just to separate whole numbers from points/cents    
+                        endStr = (string.IsNullOrWhiteSpace(decimalCurrency) ? string.Empty : (decimalCurrency + " ")) + endStr;//Cents
+                        points = points.PadRight(_decimalPlaces, '0');
+                        pointStr = ConvertWholeNumber(points);
                     }
                 }
                 val = String.Format("{0} {1}{2} {3}", ConvertWholeNumber(wholeNo).Trim(), (ConvertWholeNumber(wholeNo).Trim() == "") ? "" : andStr, pointStr, endStr);
@@ -454,26 +455,26 @@ namespace ExpressBase.Objects
             return val;
         }
 
-        private static String ConvertDecimals(String number)
-        {
-            String cd = "", digit = "", engOne = "";
-            for (int i = 0; i < number.Length; i++)
-            {
-                digit = number[i].ToString();
-                if (digit.Equals("0"))
-                {
-                    engOne = "Zero";
-                }
-                else
-                {
-                    engOne = ones(digit);
-                }
-                cd += " " + engOne;
-            }
-            return cd;
-        }
+        //private static String ConvertDecimals(String number)
+        //{
+        //    String cd = "", digit = "", engOne = "";
+        //    for (int i = 0; i < number.Length; i++)
+        //    {
+        //        digit = number[i].ToString();
+        //        if (digit.Equals("0"))
+        //        {
+        //            engOne = "Zero";
+        //        }
+        //        else
+        //        {
+        //            engOne = ones(digit);
+        //        }
+        //        cd += " " + engOne;
+        //    }
+        //    return cd;
+        //}
 
-        public static string ConvertNumber(string number, string decimalCurrency)
+        public static string ConvertNumber(string number, string decimalCurrency, int _decimalPlaces)
         {
             string isNegative = "";
             string word = "";
@@ -493,7 +494,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    word = isNegative + ConvertToWords(number, decimalCurrency);
+                    word = isNegative + ConvertToWords(number, decimalCurrency, _decimalPlaces);
                 }
             }
             catch (Exception ex)

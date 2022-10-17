@@ -182,7 +182,7 @@ namespace ExpressBase.Objects
             {
                 //NumberToEnglishOld numToE = new NumberToEnglishOld();
                 //column_val = numToE.changeCurrencyToWords(column_val); 
-                column_val = NumberToWords.ConvertNumber(column_val, decimalCurrency);
+                column_val = NumberToWords.ConvertNumber(column_val, decimalCurrency, _decimalPlaces);
             }
             else
             {
