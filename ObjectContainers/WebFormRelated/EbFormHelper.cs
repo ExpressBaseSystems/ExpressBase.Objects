@@ -461,24 +461,25 @@ namespace ExpressBase.Objects
                     {
                         if (Table.Count > 0)
                         {
-                            SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
-                            if (c != null) c.Value = null;
-                            foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true))
+                            SingleColumn c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
+                            if (c != null)
+                                c.Value = 0;
+                            Table[0].RowId = 0;
+                            foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true || e.Control?.DoNotImport == true))
                             {
                                 SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
-                                c_.Value = t.Value; c_.F = t.F;
+                                c_.Value = t.Value;
+                                c_.F = t.F;
                             }
                             if (Clone)
                             {
                                 foreach (SingleColumn c__ in Table[0].Columns.FindAll(e => e.Control is EbDate _Date && _Date.RestrictionRule != DateRestrictionRule.None))
                                 {
                                     SingleColumn t = c__.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
-                                    c__.Value = t.Value; c__.F = t.F;
+                                    c__.Value = t.Value;
+                                    c__.F = t.F;
                                 }
                             }
-                            c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
-                            if (c != null) c.Value = 0;
-                            Table[0].RowId = 0;
                         }
                     }
                     else
@@ -489,6 +490,13 @@ namespace ExpressBase.Objects
                             Row.RowId = id--;
                             SingleColumn c = Row.Columns.Find(e => e.Name == FormConstants.id);
                             if (c != null) c.Value = 0;
+
+                            foreach (SingleColumn c_ in Row.Columns.FindAll(e => e.Control?.IsSysControl == true || e.Control?.DoNotImport == true))
+                            {
+                                SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
+                                c_.Value = t.Value;
+                                c_.F = t.F;
+                            }
                         }
                     }
                 }
