@@ -1933,6 +1933,7 @@ namespace ExpressBase.Objects
         public string SaveReview(EbConnectionFactory EbConFactory, Service service, string wc)
         {
             IDatabase DataDB = EbConFactory.DataDB;
+            DateTime start = DateTime.UtcNow;
             string resp;
 
             try
@@ -1965,6 +1966,10 @@ namespace ExpressBase.Objects
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 Console.WriteLine("EbWebForm.SaveReview.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, true);
+
+                if (DateTime.UtcNow - start > new TimeSpan(0, 2, 30))
+                    throw new FormException("Request Timeout. Please try again.", (int)HttpStatusCode.RequestTimeout, $"Request timeout. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", "WebForm -> Save");
+
                 this.DbTransaction.Commit();
                 CloseDbConnection(this.DbConnection, this.DbTransaction, false);
                 Console.WriteLine("EbWebForm.SaveReview.DbTransaction Committed");
@@ -2056,6 +2061,7 @@ namespace ExpressBase.Objects
         public string Save(EbConnectionFactory EbConFactory, Service service, string wc, string MobilePageRefId)
         {
             IDatabase DataDB = EbConFactory.DataDB;
+            DateTime start = DateTime.UtcNow;
             string resp;
             try
             {
@@ -2112,6 +2118,10 @@ namespace ExpressBase.Objects
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, in_data);
                 Console.WriteLine("EbWebForm.Save.ExecUniqueCheck start");
+
+                if (DateTime.UtcNow - start > new TimeSpan(0, 2, 30))
+                    throw new FormException("Request Timeout. Please try again.", (int)HttpStatusCode.RequestTimeout, $"Request timeout. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", "WebForm -> Save");
+
                 this.DbTransaction.Commit();
                 CloseDbConnection(this.DbConnection, this.DbTransaction, false);
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
