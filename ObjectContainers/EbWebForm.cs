@@ -1715,7 +1715,8 @@ namespace ExpressBase.Objects
                         ParamsCtrlDict.Add(_column.Control, new List<EbControl>());
                         foreach (string paramPath in _column.Control.ValExpParams)
                         {
-                            string pName = paramPath.Split(".")[2];
+                            string[] strArr = paramPath.Split(".");
+                            string pName = strArr[strArr.Length - 1];
                             ColumnSchema _p_column = _table.Columns.Find(e => e.ColumnName == pName);
                             if (_p_column != null)
                                 ParamsCtrlDict[_column.Control].Add(_p_column.Control);
@@ -1771,6 +1772,7 @@ namespace ExpressBase.Objects
                             //primary table ctrl as parameter
                         }
                     }
+                    Qry = Qry.Replace(";", "") + ";";
                     FullQry += Qry;
                 }
                 else
