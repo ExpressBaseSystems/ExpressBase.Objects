@@ -173,6 +173,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> AfterBatchDataPusher { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutine_v2> AfterCancelRoutines { get; set; }
 
         [PropertyGroup("Events")]
@@ -2118,7 +2123,7 @@ namespace ExpressBase.Objects
                 this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
-                resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, in_data);
+                resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, IsUpdate);
                 Console.WriteLine("EbWebForm.Save.ExecUniqueCheck start");
 
                 if (DateTime.UtcNow - start > new TimeSpan(0, 2, 30))

@@ -590,7 +590,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
 
         #region _______________Batch_Data_Pusher_______________
 
-        public static string ProcessBatchFormDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, WebformData in_data)
+        public static string ProcessBatchFormDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, bool IsUpdate)
         {
             if (_this.DataPushers == null || !_this.DataPushers.Exists(e => e is EbBatchFormDataPusher))
                 return "No BatchFormDataPushers";
@@ -660,6 +660,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 int i = 0;
 
                 FormCollection.Update_Batch(DataDB, param, ref fullqry, ref _extqry, ref i);
+                fullqry += GetAfterBatchDpQueries(_this, IsUpdate);
 
                 param.Add(DataDB.GetNewParameter(_this.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, _this.RefId.Split(CharConstants.DASH)[4]));
                 param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, _this.UserObj.UserId));
@@ -673,6 +674,28 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 return "rows affected " + tem;
             }
             return "Nothing to process";
+        }
+
+        private static string GetAfterBatchDpQueries(EbWebForm _this, bool IsUpdate)
+        {
+            string Qry = string.Empty;
+
+            if (_this.AfterBatchDataPusher?.Count == 0)
+                return Qry;
+
+            foreach (EbRoutines routine in _this.AfterBatchDataPusher)
+            {
+                if (string.IsNullOrWhiteSpace(routine.Script.Code))
+                    continue;
+
+                if ((IsUpdate && !routine.IsDisabledOnEdit) || (!IsUpdate && !routine.IsDisabledOnNew))
+                {
+                    string str1 = _this.TableName + "_id";
+                    Qry += routine.Script.Code.Replace(":" + str1, "@" + str1).Replace("@" + str1, _this.TableRowId.ToString()) + ";";
+                }
+            }
+
+            return Qry;
         }
 
         //for batch data pusher cancel/delete
