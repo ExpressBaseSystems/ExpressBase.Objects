@@ -680,7 +680,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
         {
             string Qry = string.Empty;
 
-            if (_this.AfterBatchDataPusher?.Count == 0)
+            if (_this.AfterBatchDataPusher == null || _this.AfterBatchDataPusher.Count == 0)
                 return Qry;
 
             foreach (EbRoutines routine in _this.AfterBatchDataPusher)
