@@ -430,7 +430,7 @@ namespace ExpressBase.Objects
         private static String ConvertToWords(String numb, string decimalCurrency, int _decimalPlaces)
         {
             String val = "", wholeNo = numb, points = "", andStr = "", pointStr = "";
-            String endStr = "";//"Only";
+            String endStr = "Only.";
             try
             {
                 int decimalPlace = numb.IndexOf(".");
