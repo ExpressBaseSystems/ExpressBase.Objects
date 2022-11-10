@@ -480,7 +480,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         [JsonIgnore]
         //public override string EnableJSfn { get { return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
         public override string EnableJSfn { get { return @"
-    if(this.__IsDisable){
+    //if(this.__IsDisable){
         let td = document.getElementById('td_' + this.EbSid_CtxId);
         td.style.backgroundColor ='inherit';
         td.style.pointerEvents = 'inherit';
@@ -488,14 +488,14 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         td.querySelectorAll('input,select,button').disabled = false;
         td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',0));
         document.getElementById(this.EbSid_CtxId).disabled = false;
-    }
-    this.__IsDisable = false;
+    //}
+    //this.__IsDisable = false;
 "; } set { } }
 
         [JsonIgnore]
         //public override string DisableJSfn { get { return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
         public override string DisableJSfn { get { return @"
-    if(!this.__IsDisable){
+    //if(!this.__IsDisable){
         let td = document.getElementById('td_' + this.EbSid_CtxId);
         td.style.backgroundColor ='rgb(238, 238, 238, 0.6)';
         //td.style.pointerEvents = 'none';
@@ -503,8 +503,8 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         td.querySelectorAll('input,select,button').disabled = true;
         td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',-1));
         document.getElementById(this.EbSid_CtxId).disabled = true;
-    }
-    this.__IsDisable = true;
+    //}
+    //this.__IsDisable = true;
 "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
