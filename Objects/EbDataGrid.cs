@@ -132,6 +132,10 @@ namespace ExpressBase.Objects
         public string AddRowBtnTxt { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool DeferRender { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
         public bool AscendingOrder { get; set; }
 
