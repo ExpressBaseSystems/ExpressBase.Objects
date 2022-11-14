@@ -510,8 +510,20 @@ namespace ExpressBase.Objects
         }
 
         //Copy FormData in form SOURCE to DESTINATION (Different form)
-        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams, bool CopyAutoId)
+        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams, bool CopyAutoId, string srcCtrl)
         {
+            List<DataFlowMapAbstract> DataFlowMap = null;
+            if (!string.IsNullOrWhiteSpace(srcCtrl))
+            {
+                ColumnSchema _column = FormSrc.FormSchema.Tables[0].Columns.Find(e => e.Control is EbExportButton && e.Control.Name == srcCtrl);
+                if (_column != null && (_column.Control as EbExportButton).DataFlowMap?.Count > 0)
+                {
+                    DataFlowMap = (_column.Control as EbExportButton).DataFlowMap;
+                }
+            }
+            if (DataFlowMap == null)
+                DataFlowMap = new List<DataFlowMapAbstract>();
+
             foreach (TableSchema _tableDes in FormDes.FormSchema.Tables)
             {
                 if (_tableDes.TableType == WebFormTableTypes.Grid)
@@ -563,7 +575,12 @@ namespace ExpressBase.Objects
                         SingleColumn ColumnSrc;
                         foreach (ColumnSchema _columnDes in _tableDes.Columns)
                         {
-                            ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(_columnDes.ColumnName);
+                            string srcCtrlName = _columnDes.ColumnName;
+                            DataFlowMapAbstract DFM = DataFlowMap.Find(e => e is DataFlowForwardMap dffm && dffm.DestCtrlName == _columnDes.ColumnName);
+                            if (DFM != null && DFM is DataFlowForwardMap _dffm && !string.IsNullOrWhiteSpace(_dffm.SrcCtrlName))
+                                srcCtrlName = _dffm.SrcCtrlName;
+
+                            ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
                             if (ColumnSrc != null && (!(_columnDes.Control is EbAutoId) || CopyAutoId) && (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation))
                             {
                                 FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
