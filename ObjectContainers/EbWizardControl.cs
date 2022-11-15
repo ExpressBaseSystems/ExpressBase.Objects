@@ -114,6 +114,7 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeUIFunction("EbTabControl.label")]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [PropertyPriority(70)]
         public string Title { get; set; }
 

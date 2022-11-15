@@ -24,6 +24,8 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string eb_loc_id = "eb_loc_id";
         public const string eb_currentuser_id = "eb_currentuser_id";
         public const string eb_signin_log_id = "eb_signin_log_id";
+        public const string eb_current_language_id = "eb_current_language_id";
+        public const string eb_current_locale = "eb_current_locale";
         //_vals
         public const string _id = "_id";
         public const string _ebbkup = "_ebbkup";

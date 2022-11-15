@@ -514,6 +514,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         [UIproperty]
         [OnChangeUIFunction("EbDataGrid.title")]
         [PropertyGroup(PGConstants.CORE)]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         public string Title { get; set; }
 
         [HideInPropertyGrid]

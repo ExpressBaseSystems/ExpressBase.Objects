@@ -411,6 +411,8 @@ namespace ExpressBase.Objects
             {
                 { FormConstants.eb_loc_id},
                 { FormConstants.eb_currentuser_id},
+                { FormConstants.eb_current_language_id},
+                { FormConstants.eb_current_locale},
                 { tableName + FormConstants._id},
                 { FormConstants.id}
             };

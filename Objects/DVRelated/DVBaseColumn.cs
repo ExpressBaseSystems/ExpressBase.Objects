@@ -221,6 +221,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public string sType { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [Alias("Title")]
         public string sTitle { get; set; }
 
@@ -573,10 +574,10 @@ else{
                 else
                     __value = _datarow[formulaPart.FieldName];
 
-                globals[formulaPart.TableName].Add(formulaPart.FieldName,new GNTV
+                globals[formulaPart.TableName].Add(formulaPart.FieldName, new GNTV
                 {
                     Name = formulaPart.FieldName,
-                    Type =(GlobalDbType) __partType,
+                    Type = (GlobalDbType)__partType,
                     Value = __value
                 });
             }

@@ -221,6 +221,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool IsLocIndependent { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Is multilanguage enabled")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsLanguageEnabled { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -2014,7 +2019,7 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
             int _rowid, RetryCount = 0;
-        Retry:
+            Retry:
             try
             {
                 EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
@@ -3004,6 +3009,121 @@ namespace ExpressBase.Objects
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             EbFormHelper.ReplaceRefid(this, RefidMap);
+        }
+
+        public EbControlContainer Localize(Dictionary<string, string> Keys)
+        {
+            this.DisplayName = (Keys.ContainsKey(this.DisplayName)) ? Keys[this.DisplayName] : this.DisplayName;
+
+            EbControl[] controls = this.Controls.FlattenAllEbControls();
+
+            foreach (EbControl control in controls)
+            {
+                if (control.Label != null && Keys.ContainsKey(control.Label))
+                {
+                    control.Label = Keys[control.Label];
+                }
+                if (control is EbPowerSelect)
+                {
+                    foreach (DVBaseColumn c in (control as EbPowerSelect).Columns)
+                    {
+                        if (Keys.ContainsKey(c.sTitle))
+                        {
+                            c.sTitle = Keys[c.sTitle];
+                        }
+                    }
+                    foreach (DVBaseColumn c in (control as EbPowerSelect).DisplayMembers)
+                    {
+                        if (Keys.ContainsKey(c.sTitle))
+                        {
+                            c.sTitle = Keys[c.sTitle];
+                        }
+                    }
+                }
+                else if (control is EbDataGrid)
+                {
+                    foreach (EbControl c in (control as EbDataGrid).Controls)
+                    {
+                        EbDGColumn ct = c as EbDGColumn;
+                        if (ct.Title != null && Keys.ContainsKey(ct.Title))
+                        {
+                            ct.Title = Keys[ct.Title];
+                        }
+                    }
+                }
+                else if (control is EbWizardControl)
+                {
+                    foreach (EbControl c in (control as EbWizardControl).Controls)
+                    {
+                        EbWizardStep step = c as EbWizardStep;
+                        if (step.Title != null && Keys.ContainsKey(step.Title))
+                        {
+                            step.Title = Keys[step.Title];
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+        public static string[] GetKeys(object formObj)
+        {
+            EbControlContainer _formObj = formObj as EbControlContainer;
+            List<string> templist = new List<string>();
+            EbControl[] controls = _formObj.Controls.FlattenAllEbControls();// get all objects in the form
+
+            templist.Add(_formObj.DisplayName);
+
+            foreach (EbControl control in controls)
+            {
+                if (control.Label != null && !templist.Contains(control.Label))
+                {
+                    templist.Add(control.Label);
+                }
+
+                if (control is EbPowerSelect)
+                {
+                    foreach (DVBaseColumn c in (control as EbPowerSelect).Columns)
+                    {
+                        if (!templist.Contains(c.sTitle))
+                        {
+                            templist.Add(c.sTitle);
+                        }
+                    }
+                    foreach (DVBaseColumn c in (control as EbPowerSelect).DisplayMembers)
+                    {
+                        if (!templist.Contains(c.sTitle))
+                        {
+                            templist.Add(c.sTitle);
+                        }
+                    }
+                }
+
+                if (control is EbDataGrid)
+                {
+                    foreach (EbControl c in (control as EbDataGrid).Controls)
+                    {
+                        EbDGColumn ct = c as EbDGColumn;
+                        if (!templist.Contains(ct.Title))
+                        {
+                            templist.Add(ct.Title);
+                        }
+                    }
+                }
+
+                if (control is EbWizardControl)
+                {
+                    foreach (EbControl c in (control as EbWizardControl).Controls)
+                    {
+                        EbWizardStep step = c as EbWizardStep; if (!templist.Contains(step.Title))
+                        {
+                            templist.Add(step.Title);
+                        }
+                    }
+                }
+            }
+
+            return templist.ToArray();
         }
 
         //-------------Backup------------

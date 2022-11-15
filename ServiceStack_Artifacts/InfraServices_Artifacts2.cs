@@ -400,6 +400,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool Is2faEnabled { get; set; }
 
+        public bool IsMultiLanguageEnabled { get; set; }
+
         public string OtpDelivery2fa { get; set; }
 
         public bool IsOtpSigninEnabled { get; set; }
