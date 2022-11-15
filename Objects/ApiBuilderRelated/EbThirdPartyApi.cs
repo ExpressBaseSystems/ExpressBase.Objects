@@ -131,7 +131,7 @@ namespace ExpressBase.Objects
 
                 if (param.UseThisVal)
                 {
-                    p.Value = param.Value;
+                    p.Value = ReplacePlaceholders(param.Value, globalParams);  
                 }
                 else
                 {
@@ -146,13 +146,13 @@ namespace ExpressBase.Objects
 
         public object ExecuteThirdPartyApi(EbThirdPartyApi thirdPartyResource, EbApi Api)
         {
-            Uri uri = new Uri(ReplacePlaceholders(thirdPartyResource.Url, Api));
+            Uri uri = new Uri(ReplacePlaceholders(thirdPartyResource.Url, Api.GlobalParams));
 
             object result;
 
             try
-            { 
-                RestClient client = new RestClient(uri.GetLeftPart(UriPartial.Authority)); 
+            {
+                RestClient client = new RestClient(uri.GetLeftPart(UriPartial.Authority));
 
                 RestRequest request = thirdPartyResource.CreateRequest(uri.PathAndQuery, Api.GlobalParams);
 
@@ -205,7 +205,7 @@ namespace ExpressBase.Objects
             return result;
         }
 
-        public string ReplacePlaceholders(string text, EbApi Api)
+        public string ReplacePlaceholders(string text, Dictionary<string, object> globalParams)
         {
             if (!String.IsNullOrEmpty(text))
             {
@@ -216,9 +216,9 @@ namespace ExpressBase.Objects
                     try
                     {
                         string parameter_name = _col.Replace("{{", "").Replace("}}", "");
-                        if (Api.GlobalParams.ContainsKey(parameter_name))
+                        if (globalParams.ContainsKey(parameter_name))
                         {
-                            string value = Api.GlobalParams[parameter_name].ToString();
+                            string value = globalParams[parameter_name].ToString();
                             text = text.Replace(_col, value);
                         }
                     }
