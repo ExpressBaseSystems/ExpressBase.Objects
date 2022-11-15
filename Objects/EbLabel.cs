@@ -71,6 +71,15 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public List<ObjectBasicInfo> LinkedObjects { get; set; }
 
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HelpText("Control name that contains version id of the intented link object.")]
+        public string LinkVersionId { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HelpText("Control name that contains data id of the intented submission.")]
+        public string LinkDataId { get; set; }
 
         #region HideInPropertyGrid
 
@@ -175,6 +184,9 @@ namespace ExpressBase.Objects
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        [JsonIgnore]
+        public override string DisableJSfn { get { return string.Empty; } set { } }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {

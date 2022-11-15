@@ -67,14 +67,14 @@ this.Init = function(id)
             foreach (EbWizardStep tab in Controls)
             {
                 TabBtnHtml += @"
-            <li class='nav-item' li-of='@ebsid@' ebsid='@ebsid@'>
+            <li class='nav-item' li-of='@ebsid@' ebsid='@ebsid@' style='@display@'>
                 <a class='nav-link ppbtn-cont' href='#@ebsid@'  data-toggle='wizard'>
                     <span class='eb-label-editable'>@title@</span>
                     <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
                     <div class='ebtab-close-btn eb-fb-icon' title='Remove'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
-            </li>".Replace("@style@", string.Empty)
+            </li>".Replace("@display@", tab.Hidden && this.IsRenderMode ? "display: none;" : string.Empty)
             .Replace("@title@", tab.Title)
             .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
             .Replace("@ebsid@", tab.EbSid_CtxId);
@@ -121,6 +121,13 @@ this.Init = function(id)
         [JsonIgnore]
         public override string Label { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public override EbScript HiddenExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public override bool Hidden { get; set; }
+
         public override string GetHtml()
         {
             string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane ebcont-ctrl ebcont-inner'  role='tabpanel'>";
@@ -132,6 +139,40 @@ this.Init = function(id)
                 .Replace("@name@", this.Name)
                 .Replace("@ebsid@", this.EbSid)
                 .Replace("@objtype@", this.ObjType);
+        }
+
+        [JsonIgnore]
+        public override string HideJSfn
+        {
+            get { return @"
+debugger;
+var li = $('li[ebsid=' + this.EbSid_CtxId+']'); 
+li.hide();
+var wizDiv = li.closest('.RenderAsWizard');
+wizDiv.smartWizard('setState', [li.index()], 'disable');
+var visTabs = li.siblings(':visible');
+if (visTabs.length === 0)
+  li.closest('.RenderAsWizard').hide();
+else if (li.find('a').hasClass('active'))
+  $(visTabs[0]).find('a').click();
+this.isInVisibleInUI = true;"; }
+        }
+
+        [JsonIgnore]
+        public override string ShowJSfn
+        {
+            get { return @"
+debugger;
+var li = $('li[ebsid=' + this.EbSid_CtxId+']'); 
+li.show(); 
+var wizDiv = li.closest('.RenderAsWizard');
+wizDiv.smartWizard('unsetState', [li.index()], 'disable');
+var visTabs = li.siblings(':visible');
+if (visTabs.length === 0) {
+  li.closest('.RenderAsWizard').show();
+  li.find('a').click();
+}
+this.isInVisibleInUI = false;"; }
         }
     }
 }

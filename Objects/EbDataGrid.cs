@@ -3,9 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects.DVRelated;
-using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
 using System;
@@ -13,11 +11,9 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using ExpressBase.Security;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
-using System.Collections;
 using System.ComponentModel;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Constants;
@@ -136,6 +132,10 @@ namespace ExpressBase.Objects
         public string AddRowBtnTxt { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool DeferRender { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
         public bool AscendingOrder { get; set; }
 
@@ -154,6 +154,15 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         public EbScript PersistRowOnlyIf { get; set; }
+
+        [PropertyGroup("Data")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string CustomSelectDS { get; set; }
+
+        [JsonIgnore]
+        public string CustomSelectDSQuery { get; set; }
 
         [JsonIgnore]
         public override string OnChangeBindJSFn
@@ -431,9 +440,25 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
             {
                 return @"
                     if(this.__isEditing)
-                        return this.curRowDataVals.Value
+                        return this.curRowDataVals.Value;
                     else
-                        return this.DataVals.Value";
+                        return this.DataVals.Value;";
+
+            }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetPreviousValueJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.__isEditing)
+                        return this.curRowDataVals.PrevValue;
+                    else
+                        return this.DataVals.PrevValue;";
 
             }
 
@@ -459,7 +484,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         [JsonIgnore]
         //public override string EnableJSfn { get { return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
         public override string EnableJSfn { get { return @"
-    if(this.__IsDisable){
+    //if(this.__IsDisable){
         let td = document.getElementById('td_' + this.EbSid_CtxId);
         td.style.backgroundColor ='inherit';
         td.style.pointerEvents = 'inherit';
@@ -467,14 +492,14 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         td.querySelectorAll('input,select,button').disabled = false;
         td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',0));
         document.getElementById(this.EbSid_CtxId).disabled = false;
-    }
-    this.__IsDisable = false;
+    //}
+    //this.__IsDisable = false;
 "; } set { } }
 
         [JsonIgnore]
         //public override string DisableJSfn { get { return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
         public override string DisableJSfn { get { return @"
-    if(!this.__IsDisable){
+    //if(!this.__IsDisable){
         let td = document.getElementById('td_' + this.EbSid_CtxId);
         td.style.backgroundColor ='rgb(238, 238, 238, 0.6)';
         //td.style.pointerEvents = 'none';
@@ -482,8 +507,8 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
         td.querySelectorAll('input,select,button').disabled = true;
         td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',-1));
         document.getElementById(this.EbSid_CtxId).disabled = true;
-    }
-    this.__IsDisable = true;
+    //}
+    //this.__IsDisable = true;
 "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -2494,6 +2519,22 @@ pg.HideProperty('IsDynamic');
         {
             get { return this.EbLabel.RenderAs; }
             set { this.EbLabel.RenderAs = value; }
+        }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public string LinkVersionId
+        {
+            get { return this.EbLabel.LinkVersionId; }
+            set { this.EbLabel.LinkVersionId = value; }
+        }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public string LinkDataId
+        {
+            get { return this.EbLabel.LinkDataId; }
+            set { this.EbLabel.LinkDataId = value; }
         }
 
         [PropertyGroup(PGConstants.CORE)]

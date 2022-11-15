@@ -448,7 +448,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (ctrl is EbControlContainer)
                 {
                     string t = _tbl;
-                    if (ctrl is EbTableLayout || ctrl is EbTableTd || ctrl is EbTabControl || ctrl is EbTabPane)///////table name filling
+                    if (ctrl is EbTableLayout || ctrl is EbTableTd || ctrl is EbTabControl || ctrl is EbTabPane || ctrl is EbWizardControl || ctrl is EbWizardStep)///////table name filling
                         (ctrl as EbControlContainer).TableName = _tbl;
                     if (!string.IsNullOrEmpty((ctrl as EbControlContainer).TableName))
                         t = (ctrl as EbControlContainer).TableName;
@@ -829,6 +829,17 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         {
                             TableName = _container.TableName,
                             Path = TabPane.__path,
+                            Control = control,
+                            Root = _path + CharConstants.DOT + _container.Name
+                        });
+                    }
+                    else if (ctrlCont is EbWizardStep WizStep)
+                    {
+                        WizStep.__path = _path + CharConstants.DOT + _container.Name + CharConstants.DOT + WizStep.Name;
+                        _dict.Add(_dict.Count, new EbControlWrapper
+                        {
+                            TableName = _container.TableName,
+                            Path = WizStep.__path,
                             Control = control,
                             Root = _path + CharConstants.DOT + _container.Name
                         });

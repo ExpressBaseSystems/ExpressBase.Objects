@@ -84,6 +84,7 @@ namespace ExpressBase.Objects
         public void Update(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
         {
             ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
+            string eb_row_num = this[0].SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
             foreach (EbWebForm WebForm in this)
             {
                 args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
@@ -105,6 +106,24 @@ namespace ExpressBase.Objects
                                 Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {_table.TableName}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
                                 continue;
                             }
+                            else if (_table.TableType == WebFormTableTypes.Grid && !row.IsDelete)
+                            {
+                                bool ValChangeFound = false;
+                                foreach (SingleColumn Column in row.Columns)
+                                {
+                                    if (Column.Control == null && Column.Name != eb_row_num)
+                                        continue;
+                                    SingleColumn ocF = bkup_Row.Columns.Find(e => e.Name.Equals(Column.Name));
+                                    if (ocF == null || Convert.ToString(ocF?.Value) != Convert.ToString(Column.Value))
+                                    {
+                                        ValChangeFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!ValChangeFound)
+                                    continue;
+                            }
+
                             string t = string.Empty;
                             if (!row.IsDelete)
                             {
@@ -134,8 +153,9 @@ namespace ExpressBase.Objects
                             //        args.i++;
                             //    }
                             //}
+                            bool DGCustSelect = _table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery);
 
-                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete);
+                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete, DGCustSelect);
                             fullqry += string.Format(_qry, args._colvals, row.RowId);
                             fullqry += t;
                         }
@@ -176,19 +196,16 @@ namespace ExpressBase.Objects
                 args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
                 EbDataPusherConfig conf = WebForm.DataPusherConfig;
 
-                foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
-                    foreach (SingleRow row in entry.Value)
+                    if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
+                        continue;
+
+                    foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
                         args.ResetColVals();
                         if (row.RowId > 0)
                         {
-                            //SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId);
-                            //if (bkup_Row == null)
-                            //{
-                            //    Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {entry.Key}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
-                            //    continue;
-                            //}
                             string t = string.Empty;
                             if (!row.IsDelete)
                             {
@@ -207,8 +224,9 @@ namespace ExpressBase.Objects
                                     }
                                 }
                             }
+                            bool DGCustSelect = _table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery);
 
-                            string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, entry.Key, row.IsDelete, row.RowId);
+                            string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, _table.TableName, row.IsDelete, row.RowId, DGCustSelect);
                             fullqry += string.Format(_qry, args._colvals);
                             fullqry += t;
                         }
@@ -224,12 +242,13 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, entry.Key);
+                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName, _table);
                             fullqry += string.Format(_qry, args._cols, args._vals);
                         }
-                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, args);
+                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }
                 }
+
                 if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
                 {
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
@@ -327,16 +346,16 @@ namespace ExpressBase.Objects
                     foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique))
                     {
                         List<string> Vals = new List<string>();
-                        foreach (SingleRow Row in Table)
-                            CheckDGUniqe(Row, _column, _table, Vals, WebForm);
+                        for (int i = 0; i < Table.Count; i++)
+                            CheckDGUniqe(Table[i], _column, _table, Vals, WebForm, i);
 
                         if (WebForm.FormDataBackup != null && WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
                         {
-                            foreach (SingleRow RowBkUp in TableBkUp)
+                            for (int i = 0; i < TableBkUp.Count; i++)
                             {
-                                SingleRow Row = Table.Find(e => e.RowId == RowBkUp.RowId);
+                                SingleRow Row = Table.Find(e => e.RowId == TableBkUp[i].RowId && !e.IsDelete);
                                 if (Row == null)
-                                    CheckDGUniqe(RowBkUp, _column, _table, Vals, WebForm);
+                                    CheckDGUniqe(TableBkUp[i], _column, _table, Vals, WebForm, i);
                             }
                         }
                     }
@@ -344,7 +363,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private void CheckDGUniqe(SingleRow Row, ColumnSchema _column, TableSchema _table, List<string> Vals, EbWebForm WebForm)
+        private void CheckDGUniqe(SingleRow Row, ColumnSchema _column, TableSchema _table, List<string> Vals, EbWebForm WebForm, int idx)
         {
             if (Row.IsDelete)
                 return;
@@ -353,10 +372,9 @@ namespace ExpressBase.Objects
                 return;
             if (Vals.Contains(Convert.ToString(cField.Value)))
             {
-                string msg2 = $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(cField.Control.Hidden ? "[Hidden]" : "")}";
-                string msg1 = $"Value in the '{(cField.Control as EbDGColumn).Title ?? cField.Control.Name}' column ({_table.Title ?? _table.ContainerName} Grid) must be unique" + msg2;
-                msg2 = $"DG column is not unique. Control name: {_table.ContainerName}.{cField.Control.Name}" + msg2;
-                throw new FormException(msg1, (int)HttpStatusCode.BadRequest, msg2, "EbWebFormCollection -> ExecUniqueCheck");
+                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{idx + 1}: Duplicate value in unique column '{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}'";
+                msg += $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
+                throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebFormCollection -> ExecUniqueCheck");
             }
             Vals.Add(Convert.ToString(cField.Value));
         }

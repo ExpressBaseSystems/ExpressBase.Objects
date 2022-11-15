@@ -9,7 +9,6 @@ using ExpressBase.Security;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.WebFormRelated;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -17,12 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Reflection;
-using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Net;
 using ExpressBase.Common.LocationNSolution;
-using ServiceStack.RabbitMq;
 
 namespace ExpressBase.Objects
 {
@@ -181,7 +178,12 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbControlContainer)
                     {
-                        AfterRedisGet(c as EbControlContainer, Redis, client, null);
+                        if (c is EbDataGrid dg && !string.IsNullOrWhiteSpace(dg.CustomSelectDS))
+                        {
+                            EbDataReader _DR = GetEbObject<EbDataReader>(dg.CustomSelectDS, client, Redis, service);
+                            dg.CustomSelectDSQuery = _DR.Sql.Replace(CharConstants.SEMI_COLON, CharConstants.SPACE) + CharConstants.SEMI_COLON;
+                        }
+                        AfterRedisGet(c as EbControlContainer, Redis, client, service);
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
                     {
@@ -287,7 +289,10 @@ namespace ExpressBase.Objects
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
-                    _form.AfterRedisGet_All(Redis as RedisClient, client);
+                    if (service == null)
+                        _form.AfterRedisGet_All(Redis as RedisClient, client);
+                    else
+                        _form.AfterRedisGet_All(service);
                     string _multipushId = null;
                     if (pusher.MultiPushIdType == MultiPushIdTypes.Default)
                         _multipushId = _this.RefId + CharConstants.UNDERSCORE + pusher.Name;
@@ -297,7 +302,9 @@ namespace ExpressBase.Objects
                     _form.DataPusherConfig = new EbDataPusherConfig
                     {
                         SourceTable = _this.FormSchema.MasterTable,
-                        MultiPushId = _multipushId
+                        MultiPushId = _multipushId,
+                        DisableAutoReadOnly = pusher.DisableAutoReadOnly,
+                        DisableAutoLock = pusher.DisableAutoLock
                     };
                     _form.CrudContext = i++.ToString();
                     pusher.WebForm = _form;
@@ -456,24 +463,25 @@ namespace ExpressBase.Objects
                     {
                         if (Table.Count > 0)
                         {
-                            SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
-                            if (c != null) c.Value = null;
-                            foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true))
+                            SingleColumn c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
+                            if (c != null)
+                                c.Value = 0;
+                            Table[0].RowId = 0;
+                            foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true || e.Control?.DoNotImport == true))
                             {
                                 SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
-                                c_.Value = t.Value; c_.F = t.F;
+                                c_.Value = t.Value;
+                                c_.F = t.F;
                             }
                             if (Clone)
                             {
                                 foreach (SingleColumn c__ in Table[0].Columns.FindAll(e => e.Control is EbDate _Date && _Date.RestrictionRule != DateRestrictionRule.None))
                                 {
                                     SingleColumn t = c__.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
-                                    c__.Value = t.Value; c__.F = t.F;
+                                    c__.Value = t.Value;
+                                    c__.F = t.F;
                                 }
                             }
-                            c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
-                            if (c != null) c.Value = 0;
-                            Table[0].RowId = 0;
                         }
                     }
                     else
@@ -484,6 +492,13 @@ namespace ExpressBase.Objects
                             Row.RowId = id--;
                             SingleColumn c = Row.Columns.Find(e => e.Name == FormConstants.id);
                             if (c != null) c.Value = 0;
+
+                            foreach (SingleColumn c_ in Row.Columns.FindAll(e => e.Control?.IsSysControl == true || e.Control?.DoNotImport == true))
+                            {
+                                SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
+                                c_.Value = t.Value;
+                                c_.F = t.F;
+                            }
                         }
                     }
                 }
@@ -497,8 +512,20 @@ namespace ExpressBase.Objects
         }
 
         //Copy FormData in form SOURCE to DESTINATION (Different form)
-        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams, bool CopyAutoId)
+        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams, bool CopyAutoId, string srcCtrl)
         {
+            List<DataFlowMapAbstract> DataFlowMap = null;
+            if (!string.IsNullOrWhiteSpace(srcCtrl))
+            {
+                ColumnSchema _column = FormSrc.FormSchema.Tables[0].Columns.Find(e => e.Control is EbExportButton && e.Control.Name == srcCtrl);
+                if (_column != null && (_column.Control as EbExportButton).DataFlowMap?.Count > 0)
+                {
+                    DataFlowMap = (_column.Control as EbExportButton).DataFlowMap;
+                }
+            }
+            if (DataFlowMap == null)
+                DataFlowMap = new List<DataFlowMapAbstract>();
+
             foreach (TableSchema _tableDes in FormDes.FormSchema.Tables)
             {
                 if (_tableDes.TableType == WebFormTableTypes.Grid)
@@ -550,7 +577,12 @@ namespace ExpressBase.Objects
                         SingleColumn ColumnSrc;
                         foreach (ColumnSchema _columnDes in _tableDes.Columns)
                         {
-                            ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(_columnDes.ColumnName);
+                            string srcCtrlName = _columnDes.ColumnName;
+                            DataFlowMapAbstract DFM = DataFlowMap.Find(e => e is DataFlowForwardMap dffm && dffm.DestCtrlName == _columnDes.ColumnName);
+                            if (DFM != null && DFM is DataFlowForwardMap _dffm && !string.IsNullOrWhiteSpace(_dffm.SrcCtrlName))
+                                srcCtrlName = _dffm.SrcCtrlName;
+
+                            ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
                             if (ColumnSrc != null && (!(_columnDes.Control is EbAutoId) || CopyAutoId) && (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation))
                             {
                                 FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));

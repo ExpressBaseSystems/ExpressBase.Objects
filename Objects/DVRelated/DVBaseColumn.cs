@@ -369,6 +369,10 @@ else{
         [PropertyGroup("LinkFromColumn")]
         public DVBaseColumn IdColumn { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyGroup("LinkFromColumn")]
+        public bool IsFormDraftMode { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("0")]
         [HideForUser]
@@ -1155,6 +1159,10 @@ pg.ShowProperty('SubTypeFormat');
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> ResetterRoles { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyGroup(PGConstants.CORE)]
+        public bool DisableExecuteReview { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]

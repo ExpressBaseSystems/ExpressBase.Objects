@@ -118,12 +118,8 @@ namespace ExpressBase.Objects.WebFormRelated
                 Convert.ToString(this.Table[0][FormConstants.action_unique_id]) == FormConstants.__review_reset)
             {
                 insUpQ += this.GetApprovalLinesInsertQry(ref i);
-                bool hasRoleMatch = false;
-                if (this.ebReview.ResetterRoles != null)
-                    hasRoleMatch = this.webForm.UserObj.RoleIds.Select(x => x).Intersect(this.ebReview.ResetterRoles).Any() ||
-                        this.webForm.UserObj.RoleIds.Contains((int)SystemRoles.SolutionOwner) ||
-                        this.webForm.UserObj.RoleIds.Contains((int)SystemRoles.SolutionAdmin);
-                if (!hasRoleMatch)
+
+                if (!this.ebReview.HasResetPermission(this.webForm.UserObj))
                     throw new FormException("Access denied to reset review control", (int)HttpStatusCode.Unauthorized, $"User.RolesId does not contains any of permited roleIds[ResetterRoles]", "From GetMyActionInsertUpdateQuery");
 
                 SingleRow RowBkUp = this.TableBkUp.Find(e => e.RowId <= 0);

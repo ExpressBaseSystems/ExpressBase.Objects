@@ -131,6 +131,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public string DestRefId { get; set; }
+
+        [DataMember(Order = 6)]
+        public string SourceCtrl { get; set; }
     }
 
     [DataContract]

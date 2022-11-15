@@ -74,6 +74,14 @@ else if (this.MultiPushIdType === 2)
         [EnableInBuilder(BuilderType.WebForm)]
         public MultiPushIdTypes MultiPushIdType { get; set; }
 
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool DisableAutoReadOnly { get; set; }
+
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool DisableAutoLock { get; set; }
+
         #region commented for backward compatibility
         //[PropertyEditor(PropertyEditorType.ObjectSelector)]
         //[EnableInBuilder(BuilderType.WebForm)]
@@ -119,6 +127,12 @@ else if (this.MultiPushIdType === 2)
         [EnableInBuilder(BuilderType.WebForm)]
         [Alias("Source datagrid")]
         public string SourceDG { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool DisableAutoReadOnly { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool DisableAutoLock { get; set; }
     }
 
     public class EbDataPusherConfig
@@ -133,6 +147,10 @@ else if (this.MultiPushIdType === 2)
 
         public int SourceRecId { get; set; }
 
+        public bool DisableAutoReadOnly { get; set; }
+
+        public bool DisableAutoLock { get; set; }
+
         public bool IsBatch { get; set; }//Is batch datapusher
 
         public string GridTableName { get; set; }
@@ -141,7 +159,7 @@ else if (this.MultiPushIdType === 2)
 
         public SingleTable GridSingleTable { get; set; }
 
-        public SingleTable GridSingleTableBackUp { get; set; }
+        public SingleTable GridSingleTableDelete { get; set; }
 
         public int GridDataId { get; set; }
 
@@ -223,7 +241,7 @@ else if (this.MultiPushIdType === 2)
 
                 if (this.WebForm.TableRowId > 0)//if edit mode then fill or map the id by refering FormDataBackup
                 {
-                    pusher.WebForm.FormData = MergeFormDataWithBackUp(pusher.WebForm.FormData, pusher.WebForm.FormDataBackup, pusher.WebForm.DataPusherConfig.AllowPush);
+                    pusher.WebForm.FormData = MergeFormDataWithBackUp(pusher.WebForm.FormData, pusher.WebForm.FormDataBackup, pusher.WebForm.DataPusherConfig.AllowPush, pusher.WebForm.FormSchema);
                 }
             }
         }
@@ -298,10 +316,15 @@ else if (this.MultiPushIdType === 2)
                                 Value = val
                             });
                         }
-                        if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(SkipLineItemIf))
+                        if (_table.TableType == WebFormTableTypes.Grid)
                         {
-                            object status = this.GetValueFormOutDict(OutputDict, ref Index);
-                            if (Convert.ToBoolean(status))
+                            if (!string.IsNullOrWhiteSpace(SkipLineItemIf))
+                            {
+                                object status = this.GetValueFormOutDict(OutputDict, ref Index);
+                                if (Convert.ToBoolean(status))
+                                    continue;
+                            }
+                            if (!string.IsNullOrWhiteSpace(_table.CustomSelectQuery))//Data pushing to grid with CustomSelectQuery is blocked
                                 continue;
                         }
                         Table.Add(Row);
@@ -312,7 +335,7 @@ else if (this.MultiPushIdType === 2)
             return FormData;
         }
 
-        private static WebformData MergeFormDataWithBackUp(WebformData FormData, WebformData FormDataBackup, bool AllowPush)
+        private static WebformData MergeFormDataWithBackUp(WebformData FormData, WebformData FormDataBackup, bool AllowPush, WebFormSchema DestSchema)
         {
             if (FormDataBackup == null)
                 return FormData;
@@ -321,6 +344,10 @@ else if (this.MultiPushIdType === 2)
             {
                 foreach (KeyValuePair<string, SingleTable> entry in FormDataBackup.MultipleTables)
                 {
+                    TableSchema _table = DestSchema.Tables.Find(e => e.TableName == entry.Key);
+                    if (_table?.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
+                        continue;
+
                     if (FormData.MultipleTables.ContainsKey(entry.Key))
                     {
                         for (int i = 0; i < entry.Value.Count; i++)
@@ -563,13 +590,124 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
 
         #region _______________Batch_Data_Pusher_______________
 
-        public static string ProcessBatchFormDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, WebformData in_data)
+        public static string ProcessBatchFormDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, bool IsUpdate)
         {
             if (_this.DataPushers == null || !_this.DataPushers.Exists(e => e is EbBatchFormDataPusher))
                 return "No BatchFormDataPushers";
 
-            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon, true);
             List<EbBatchFormDataPusher> pushers = new List<EbBatchFormDataPusher>();
+            WebformData _FormData = JsonConvert.DeserializeObject<WebformData>(JsonConvert.SerializeObject(_this.FormData));
+            bool ChangeDetected = false;
+            foreach (EbBatchFormDataPusher batchDp in _this.DataPushers.FindAll(e => e is EbBatchFormDataPusher))
+            {
+                pushers.Add(batchDp);
+                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>(batchDp.FormRefId, null, service.Redis, service);
+                batchDp.WebForm = _form; _form.RefId = batchDp.FormRefId;
+                _form.UserObj = _this.UserObj;
+                _form.SolutionObj = _this.SolutionObj;
+                _form.LocationId = _this.LocationId;
+                _form.AfterRedisGet_All(service);
+                TableSchema _table = _this.FormSchema.Tables.Find(e => e.ContainerName == batchDp.SourceDG);
+                SingleTable Table = _this.FormData.MultipleTables[_table.TableName];
+                SingleTable TableBkUp = _this.FormDataBackup?.MultipleTables.ContainsKey(_table.TableName) == true ? _this.FormDataBackup.MultipleTables[_table.TableName] : null;
+                (SingleTable TableEdited, SingleTable TableDeleted) = MergeGridData(TableBkUp, Table);
+                _FormData.MultipleTables[_table.TableName] = TableEdited;//Grid aggregate in script may give wrong values because only edited rows are considered 
+                if (!ChangeDetected && (TableEdited.Count > 0 || TableDeleted.Count > 0))
+                    ChangeDetected = true;
+
+                _form.DataPusherConfig = new EbDataPusherConfig()
+                {
+                    IsBatch = true,
+                    GridTableName = _table.TableName,
+                    GridName = batchDp.SourceDG,
+                    GridSingleTable = TableEdited,
+                    GridSingleTableDelete = TableDeleted,
+                    SourceTable = _this.TableName,
+                    SourceRecId = _this.TableRowId,
+                    AllowPush = true,
+                    DisableAutoReadOnly = batchDp.DisableAutoReadOnly,
+                    DisableAutoLock = batchDp.DisableAutoLock
+                };
+            }
+            if (!ChangeDetected)
+                return "No Change found";
+
+            EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
+            string code = ebDataPushHelper.GetProcessedCodeForBatch();
+
+            if (code != string.Empty)
+            {
+                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _FormData, null, DataDB, DbCon, true);
+                globals.DestinationForms = new List<FG_WebForm>();
+                for (int idx = 1; idx < _this.FormCollection.Count; idx++)
+                {
+                    EbWebForm __form = _this.FormCollection[idx];
+                    FG_WebForm fG_WebForm = new FG_WebForm(__form.TableName, __form.TableRowId, __form.LocationId, __form.RefId, __form.FormData.CreatedBy, __form.FormData.CreatedAt);
+                    GlobalsGenerator.GetCSharpFormGlobalsRec_NEW(fG_WebForm, __form, __form.FormData, null);
+                    globals.DestinationForms.Add(fG_WebForm);
+                }
+
+                object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
+                EbWebFormCollection FormCollection = ebDataPushHelper.CreateWebFormDataBatch(out_dict);//new + change identified formCollectios (Data in FormData)
+                EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon, _this.FormDataBackup == null);//change identified + going to delete formCollectios backup (Data in FormDataBackup)
+                MergeFormData(FormCollection, FormCollectionBkUp, pushers);
+                if (FormCollection.Count == 0)
+                    return "Nothing to push";
+
+                string fullqry = string.Empty;
+                string _extqry = string.Empty;
+                List<DbParameter> param = new List<DbParameter>();
+                int i = 0;
+
+                FormCollection.Update_Batch(DataDB, param, ref fullqry, ref _extqry, ref i);
+                fullqry += GetAfterBatchDpQueries(_this, IsUpdate);
+
+                param.Add(DataDB.GetNewParameter(_this.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, _this.RefId.Split(CharConstants.DASH)[4]));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, _this.UserObj.UserId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, _this.UserObj.UserId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, _this.UserObj.UserId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, _this.LocationId));
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, _this.UserObj.SignInLogId));
+
+                int tem = DataDB.DoNonQuery(_this.DbConnection, fullqry, param.ToArray());
+                _this.RefreshFormData(DataDB, service, false, false);
+                return "rows affected " + tem;
+            }
+            return "Nothing to process";
+        }
+
+        private static string GetAfterBatchDpQueries(EbWebForm _this, bool IsUpdate)
+        {
+            string Qry = string.Empty;
+
+            if (_this.AfterBatchDataPusher == null || _this.AfterBatchDataPusher.Count == 0)
+                return Qry;
+
+            foreach (EbRoutines routine in _this.AfterBatchDataPusher)
+            {
+                if (string.IsNullOrWhiteSpace(routine.Script.Code))
+                    continue;
+
+                if ((IsUpdate && !routine.IsDisabledOnEdit) || (!IsUpdate && !routine.IsDisabledOnNew))
+                {
+                    string str1 = _this.TableName + "_id";
+                    Qry += routine.Script.Code.Replace(":" + str1, "@" + str1).Replace("@" + str1, _this.TableRowId.ToString()) + ";";
+                }
+            }
+
+            return Qry;
+        }
+
+        //for batch data pusher cancel/delete
+        public static List<EbWebForm> GetBatchPushedForms(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon)
+        {
+            List<EbWebForm> Forms = new List<EbWebForm>();
+
+            if (_this.DataPushers == null || !_this.DataPushers.Exists(e => e is EbBatchFormDataPusher))
+                return Forms;
+
+            List<EbBatchFormDataPusher> pushers = new List<EbBatchFormDataPusher>();
+
             foreach (EbBatchFormDataPusher batchDp in _this.DataPushers.FindAll(e => e is EbBatchFormDataPusher))
             {
                 pushers.Add(batchDp);
@@ -580,49 +718,65 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 _form.LocationId = _this.LocationId;
                 _form.AfterRedisGet_All(service);
                 TableSchema _table = _this.FormSchema.Tables.Find(e => e.ContainerName == batchDp.SourceDG);
-                SingleTable Table = _this.FormData.MultipleTables[_table.TableName];
-                SingleTable TableBkUp = in_data.MultipleTables.ContainsKey(_table.TableName) ? in_data.MultipleTables[_table.TableName] : null;
+                SingleTable Table = _this.FormDataBackup.MultipleTables[_table.TableName];
+
                 _form.DataPusherConfig = new EbDataPusherConfig()
                 {
                     IsBatch = true,
                     GridTableName = _table.TableName,
                     GridName = batchDp.SourceDG,
                     GridSingleTable = Table,
-                    GridSingleTableBackUp = TableBkUp,
+                    GridSingleTableDelete = new SingleTable(),
                     SourceTable = _this.TableName,
                     SourceRecId = _this.TableRowId,
-                    AllowPush = true
+                    AllowPush = true,
+                    DisableAutoReadOnly = batchDp.DisableAutoReadOnly,
+                    DisableAutoLock = batchDp.DisableAutoLock
                 };
                 batchDp.WebForm = _form;
             }
-            EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
-            string code = ebDataPushHelper.GetProcessedCodeForBatch();
+            Forms.AddRange(RefreshBatchFormData(pushers, DataDB, DbCon, false));
 
-            if (code != string.Empty)
+            return Forms;
+        }
+
+        private static (SingleTable, SingleTable) MergeGridData(SingleTable OldTable, SingleTable NewTable)
+        {
+            SingleTable TableEdited = new SingleTable();
+            SingleTable TableDeleted = new SingleTable();
+            if (OldTable == null)
+                return (NewTable, TableDeleted);
+            foreach (SingleRow nRow in NewTable)
             {
-                object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
-                EbWebFormCollection FormCollection = ebDataPushHelper.CreateWebFormDataBatch(out_dict);
-                EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon);
-                MergeFormData(FormCollection, FormCollectionBkUp, pushers);
+                bool RowChanged = false;
+                SingleRow oRow = OldTable.Find(e => e.RowId == nRow.RowId);
+                if (oRow != null)
+                {
+                    foreach (SingleColumn nColumn in nRow.Columns)
+                    {
+                        //do not persist ctrls - NewTable will contains the value if the expr is sql val expr
+                        if (nColumn.Control?.DoNotPersist == true)
+                            continue;
+                        if (Convert.ToString(oRow[nColumn.Name]) != Convert.ToString(nColumn.Value))
+                        {
+                            RowChanged = true;
+                            break;
+                        }
+                    }
+                    OldTable.Remove(oRow);
+                }
+                else
+                    RowChanged = true;
 
-                string fullqry = string.Empty;
-                string _extqry = string.Empty;
-                List<DbParameter> param = new List<DbParameter>();
-                int i = 0;
-
-                FormCollection.Update_Batch(DataDB, param, ref fullqry, ref _extqry, ref i);
-
-                param.Add(DataDB.GetNewParameter(_this.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, _this.RefId.Split(CharConstants.DASH)[4]));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, _this.UserObj.UserId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, _this.UserObj.UserId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Int32, _this.UserObj.UserId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, _this.LocationId));
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, _this.UserObj.SignInLogId));
-
-                int tem = DataDB.DoNonQuery(_this.DbConnection, fullqry, param.ToArray());
-                return "rows affected " + tem;
+                if (RowChanged)
+                    TableEdited.Add(nRow);
             }
-            return "Nothing to process";
+            foreach (SingleRow oRow in OldTable)
+            {
+                oRow.IsDelete = true;
+                TableDeleted.Add(oRow);
+            }
+            return (TableEdited, TableDeleted);
         }
 
         private static void MergeFormData(EbWebFormCollection FormCollection, EbWebFormCollection FormCollectionBkUp, List<EbBatchFormDataPusher> Pushers)
@@ -635,9 +789,13 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                     EbDataPusherConfig conf = Form.DataPusherConfig;
                     EbWebForm FormBkUp = FormCollectionBkUp.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
 
-                    if (!conf.AllowPush && FormBkUp == null)
+                    bool FormBkUpDataFound = false;
+                    if (FormBkUp != null)
+                        FormBkUpDataFound = FormBkUp.FormDataBackup.MultipleTables[FormBkUp.FormSchema.MasterTable].Count > 0;
+
+                    if (!conf.AllowPush && !FormBkUpDataFound)
                         RmForm.Add(Form);
-                    if (FormBkUp == null)//new
+                    if (!FormBkUpDataFound)//new
                         continue;
                     else
                     {
@@ -677,52 +835,60 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             }
         }
 
-        private static EbWebFormCollection RefreshBatchFormData(List<EbBatchFormDataPusher> batchDataPushers, IDatabase DataDB, DbConnection DbCon)
+        private static EbWebFormCollection RefreshBatchFormData(List<EbBatchFormDataPusher> batchDataPushers, IDatabase DataDB, DbConnection DbCon, bool IsBkUpTblEmpty)
         {
-            string fullQuery = string.Empty;
-            List<int> QryCount = new List<int>();
-
-            foreach (EbBatchFormDataPusher batchDp in batchDataPushers)
-            {
-                fullQuery += QueryGetter.GetSelectQuery_Batch(batchDp.WebForm, out int qCount);
-                QryCount.Add(qCount);
-            }
-
-            EbDataSet dataset = DataDB.DoQueries(DbCon, fullQuery);
-
             List<EbWebForm> FormListBkUp = new List<EbWebForm>();
 
-            for (int i = 0, start = 0; i < QryCount.Count; start += QryCount[i], i++)
+            if (!IsBkUpTblEmpty)
             {
-                WebFormSchema _schema = batchDataPushers[i].WebForm.FormSchema;
-                EbDataPusherConfig _conf = batchDataPushers[i].WebForm.DataPusherConfig;
+                string fullQuery = string.Empty;
+                List<int> QryCount = new List<int>();
 
-                for (int j = 0; j < dataset.Tables[start].Rows.Count; j++)
+                foreach (EbBatchFormDataPusher batchDp in batchDataPushers)
                 {
-                    EbDataSet ds = new EbDataSet();
-                    EbDataTable dt = new EbDataTable(_schema.MasterTable);
-                    dt.Columns = dataset.Tables[start].Columns;
-                    dt.Rows.Add(dataset.Tables[start].Rows[j]);
-                    ds.Tables.Add(dt);
+                    string _qry = QueryGetter.GetSelectQuery_Batch(batchDp.WebForm, out int qCount);
+                    EbDataPusherConfig _conf = batchDp.WebForm.DataPusherConfig;
 
-                    int src_lines_id = Convert.ToInt32(dt.Rows[0][_conf.GridTableName + "_id"]);
-                    int dest_master_id = Convert.ToInt32(dt.Rows[0]["id"]);
+                    foreach (SingleRow Row in _conf.GridSingleTable)
+                        fullQuery += string.Format(_qry, Row.RowId);
 
-                    for (int k = 1; k < QryCount[i]; k++)
-                    {
-                        EbDataTable dtLine = new EbDataTable(_schema.Tables[k].TableName);
-                        dtLine.Columns = dataset.Tables[start + k].Columns;
-                        dtLine.Rows.AddRange(dataset.Tables[start + k].Rows.FindAll(e => Convert.ToInt32(e[_schema.MasterTable + "_id"]) == dest_master_id));
-                        ds.Tables.Add(dtLine);
-                    }
-                    EbWebForm Form = GetShallowCopy(batchDataPushers[i].WebForm);
-                    Form.DataPusherConfig.GridDataId = src_lines_id;
-                    Form.CrudContext = j + "_";
-                    Form.RefreshFormDataInner(ds, DataDB, true, null);
-                    FormListBkUp.Add(Form);
+                    foreach (SingleRow Row in _conf.GridSingleTableDelete)
+                        fullQuery += string.Format(_qry, Row.RowId);
+
+                    QryCount.Add(qCount);
+                }
+
+                EbDataSet dataset = DataDB.DoQueries(DbCon, fullQuery);
+
+                int dtIdx = 0;
+
+                for (int i = 0; i < batchDataPushers.Count; i++)
+                {
+                    EbWebForm _form = batchDataPushers[i].WebForm;
+
+                    AddToFormList(FormListBkUp, dataset, DataDB, _form.DataPusherConfig.GridSingleTable, QryCount[i], _form, ref dtIdx);
+                    AddToFormList(FormListBkUp, dataset, DataDB, _form.DataPusherConfig.GridSingleTableDelete, QryCount[i], _form, ref dtIdx);
                 }
             }
             return new EbWebFormCollection(FormListBkUp);
+        }
+
+        private static void AddToFormList(List<EbWebForm> FormListBkUp, EbDataSet dataset, IDatabase DataDB, SingleTable Table, int QueryCount, EbWebForm ebWebForm, ref int dtIdx)
+        {
+            for (int j = 0; j < Table.Count; j++)
+            {
+                EbWebForm Form = GetShallowCopy(ebWebForm);
+                Form.DataPusherConfig.GridDataId = Table[j].RowId;
+                Form.CrudContext = j + "_";
+
+                EbDataSet ds = new EbDataSet();
+
+                for (int k = 0; k < QueryCount; k++)
+                    ds.Tables.Add(dataset.Tables[dtIdx++]);
+
+                Form.RefreshFormDataInner(ds, DataDB, true, null);
+                FormListBkUp.Add(Form);
+            }
         }
 
         private static EbWebForm GetShallowCopy(EbWebForm WebForm)

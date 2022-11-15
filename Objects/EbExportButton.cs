@@ -1,9 +1,11 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Security;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,10 @@ namespace ExpressBase.Objects.Objects
 
         public override string ToolHelpText { get { return "Export Button"; } set { } }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup(PGConstants.CORE)]
@@ -40,6 +46,23 @@ namespace ExpressBase.Objects.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         public bool OpenInNewTab { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup(PGConstants.DATA)]
+        public List<DataFlowMapAbstract> DataFlowMap { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorSQ)]
+        [Alias("Text Expression")]
+        [HelpText("Expression for button text.")]
+        public override EbScript ValueExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorSQ)]
+        [Alias("Default Text Expression")]
+        [HelpText("Default expression for button text.")]
+        public override EbScript DefaultValueExpression { get; set; }
 
         [JsonIgnore]
         public override string DisableJSfn
@@ -66,15 +89,12 @@ namespace ExpressBase.Objects.Objects
 
         public override string GetBareHtml()
         {
-
-
-            return @"<div id='@ebsid@' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'>@Label@ <i class='fa fa-external-link'></i></div>"
+            return @"<div id='@ebsid@' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'><span>@Label@ </span><i class='fa fa-external-link'></i></div>"
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@Label@", this.Label ?? "Export")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";");
-
         }
 
         public override string GetDesignHtml()
@@ -91,7 +111,21 @@ namespace ExpressBase.Objects.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
+        {
+            object _formattedData = Default ? this.Label : Value;
+            string _displayMember = Value == null ? string.Empty : Value.ToString();
 
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = _formattedData,
+                Control = this,
+                ObjType = this.ObjType,
+                F = _displayMember
+            };
+        }
 
         //--------Hide in property grid------------
 
@@ -102,22 +136,6 @@ namespace ExpressBase.Objects.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbScript DefaultValueExpression { get; set; }
-
-        //[EnableInBuilder(BuilderType.WebForm)]
-        //[HideInPropertyGrid]
-        //public override EbScript HiddenExpr { get; set; }
-
-        //[EnableInBuilder(BuilderType.WebForm)]
-        //[HideInPropertyGrid]
-        //public override EbScript DisableExpr { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbScript ValueExpr { get; set; }
 
         public override bool SelfTrigger { get; set; }
 

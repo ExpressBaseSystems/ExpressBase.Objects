@@ -31,6 +31,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override bool DoNotPersist { get; set; }
 
+        public override bool DoNotImport { get { return true; } }
+
         [HideInPropertyGrid]
         public override EbScript ValueExpr { get; set; }
 
