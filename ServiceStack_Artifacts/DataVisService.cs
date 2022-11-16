@@ -4,6 +4,7 @@ using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Data;
 using ExpressBase.Security;
+using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Text;
 using System;
@@ -101,8 +102,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-    [Route("/table")]
-    [Route("/table/data/{RefId}")]
+    //[Route("/table")]
+    //[Route("/table/data/{RefId}")]
     [DataContract]
     public class TableDataRequest : EbServiceStackAuthRequest, IReturn<DataSourceDataResponse>
     {
