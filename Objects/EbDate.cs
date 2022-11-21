@@ -314,6 +314,19 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
 
+        [JsonIgnore]
+        public override string IsRequiredOKJSfn
+        {
+            get
+            {
+                return @"
+                    if (this.IsNullable && $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked') && !this.getValue())
+                        return false;
+                    return true;";
+            }
+            set { }
+        }
+
         public bool ParameterizeControl(ParameterizeCtrl_Params args, bool randomize, string crudContext)
         {
             string paramName = randomize ? (args.cField.Name + "_" + args.i) : (args.cField.Name + crudContext);

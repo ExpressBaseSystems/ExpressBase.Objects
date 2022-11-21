@@ -2210,7 +2210,7 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
             int _rowid, RetryCount = 0;
-            Retry:
+        Retry:
             try
             {
                 EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
@@ -3133,6 +3133,9 @@ namespace ExpressBase.Objects
                         SingleColumn cField = Row.GetColumn(_column.ColumnName);
                         if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (cField.Type == (int)EbDbTypes.Decimal && Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                         {
+                            if (_column.Control is EbDate _date && _date.IsNullable)
+                                continue;
+
                             string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                             if (_table.TableType == WebFormTableTypes.Grid)
                                 msg = $"'{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}' in {_table.Title ?? _table.ContainerName} Grid {msg}";
