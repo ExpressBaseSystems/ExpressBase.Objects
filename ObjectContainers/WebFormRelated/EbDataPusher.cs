@@ -133,6 +133,9 @@ else if (this.MultiPushIdType === 2)
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool DisableAutoLock { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool DisableReverseLink { get; set; }
     }
 
     public class EbDataPusherConfig
@@ -150,6 +153,8 @@ else if (this.MultiPushIdType === 2)
         public bool DisableAutoReadOnly { get; set; }
 
         public bool DisableAutoLock { get; set; }
+
+        public bool DisableReverseLink { get; set; }
 
         public bool IsBatch { get; set; }//Is batch datapusher
 
@@ -626,7 +631,8 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                     SourceRecId = _this.TableRowId,
                     AllowPush = true,
                     DisableAutoReadOnly = batchDp.DisableAutoReadOnly,
-                    DisableAutoLock = batchDp.DisableAutoLock
+                    DisableAutoLock = batchDp.DisableAutoLock,
+                    DisableReverseLink = batchDp.DisableReverseLink
                 };
             }
             if (!ChangeDetected)
