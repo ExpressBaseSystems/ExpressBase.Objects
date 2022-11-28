@@ -345,17 +345,18 @@ namespace ExpressBase.Objects
 
                     foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique))
                     {
-                        List<string> Vals = new List<string>();
+                        int Pos = 0;
+                        Dictionary<string, int> Vals = new Dictionary<string, int>();//<Value, Position>
                         for (int i = 0; i < Table.Count; i++)
-                            CheckDGUniqe(Table[i], _column, _table, Vals, WebForm, i);
+                            CheckDGUniqe(Table[i], _column, _table, Vals, WebForm, ref Pos);
 
                         if (WebForm.FormDataBackup != null && WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
                         {
                             for (int i = 0; i < TableBkUp.Count; i++)
                             {
-                                SingleRow Row = Table.Find(e => e.RowId == TableBkUp[i].RowId && !e.IsDelete);
+                                SingleRow Row = Table.Find(e => e.RowId == TableBkUp[i].RowId);
                                 if (Row == null)
-                                    CheckDGUniqe(TableBkUp[i], _column, _table, Vals, WebForm, i);
+                                    CheckDGUniqe(TableBkUp[i], _column, _table, Vals, WebForm, ref Pos);
                             }
                         }
                     }
@@ -363,20 +364,22 @@ namespace ExpressBase.Objects
             }
         }
 
-        private void CheckDGUniqe(SingleRow Row, ColumnSchema _column, TableSchema _table, List<string> Vals, EbWebForm WebForm, int idx)
+        private void CheckDGUniqe(SingleRow Row, ColumnSchema _column, TableSchema _table, Dictionary<string, int> Vals, EbWebForm WebForm, ref int Pos)
         {
             if (Row.IsDelete)
                 return;
+            Pos++;
             SingleColumn cField = Row.GetColumn(_column.ColumnName);
             if (cField == null || cField.Value == null || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                 return;
-            if (Vals.Contains(Convert.ToString(cField.Value)))
+            string stVal = Convert.ToString(cField.Value);
+            if (Vals.ContainsKey(stVal))
             {
-                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{idx + 1}: Duplicate value in unique column '{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}'";
+                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{Vals[stVal]}, #{Pos}: Duplicate value in unique column '{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}'";
                 msg += $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                 throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebFormCollection -> ExecUniqueCheck");
             }
-            Vals.Add(Convert.ToString(cField.Value));
+            Vals.Add(stVal, Pos);
         }
 
     }
