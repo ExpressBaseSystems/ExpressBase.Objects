@@ -35,6 +35,12 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
         public override List<EbControl> Controls { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [DefaultPropValue("150")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [Alias("Minimum height")]
+        public int MinHeight { get; set; }
+
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
@@ -62,7 +68,8 @@ this.Init = function(id)
     <div class='RenderAsWizard'>
         <ul class='nav'>".Replace("@ebsid@", EbSid);
             string stepContentHtml = @"
-            <div class='tab-content'>";
+            <div class='tab-content' style='@height@'>"
+            .Replace("@height@", this.MinHeight > 0 ? $"height: {this.Height}px;" : "");
 
             foreach (EbWizardStep tab in Controls)
             {
