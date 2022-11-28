@@ -178,7 +178,9 @@ namespace ExpressBase.Objects
                     }
                 }
                 string IdParamName = WebForm.TableName + FormConstants._id + (WebForm.DataPusherConfig != null ? WebForm.CrudContext : string.Empty);
-                param.Add(DataDB.GetNewParameter(IdParamName, EbDbTypes.Int32, WebForm.TableRowId));
+                if (!param.Exists(e => e.ParameterName == IdParamName))
+                    param.Add(DataDB.GetNewParameter(IdParamName, EbDbTypes.Int32, WebForm.TableRowId));
+
                 if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
                 {
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));

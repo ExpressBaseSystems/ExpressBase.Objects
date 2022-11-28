@@ -18,6 +18,8 @@ namespace ExpressBase.Objects.WebFormRelated
             string extquery = string.Empty;
             _qryCount = 0;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+            string _pshId = _this.DataPusherConfig?.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
+
             foreach (TableSchema _table in _this.FormSchema.Tables)
             {
                 if (_table.DoNotPersist)
@@ -46,8 +48,6 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else
                     _id = _this.FormSchema.MasterTable + "_id";
-
-                string _pshId = _this.DataPusherConfig?.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
 
                 if (_table.TableType == WebFormTableTypes.Grid)
                 {
@@ -99,6 +99,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
 
                     if (_table.TableName == _this.FormSchema.MasterTable)
+                    {
                         query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id {3} AND COALESCE({4}, {5}) = {5};",
                             _cols,//0
                             _table.TableName,//1
@@ -106,8 +107,10 @@ namespace ExpressBase.Objects.WebFormRelated
                             _pshId,//3
                             ebs[SystemColumns.eb_del],//4
                             ebs.GetBoolFalse(SystemColumns.eb_del));//5
+                    }
                     else
-                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = (SELECT id FROM {2} WHERE {3}_id = @{3}_id {4} AND COALESCE({6}, {7}) = {7} LIMIT 1) AND COALESCE({8}, {9}) = {9} {5};",
+                    {
+                        query += string.Format("SELECT {0} FROM {1} WHERE {10} = (SELECT id FROM {2} WHERE {3}_id = @{3}_id {4} AND COALESCE({6}, {7}) = {7} LIMIT 1) AND COALESCE({8}, {9}) = {9} {5};",
                             _cols,//0
                             _table.TableName,//1
                             _this.FormSchema.MasterTable,//2
@@ -117,7 +120,9 @@ namespace ExpressBase.Objects.WebFormRelated
                             ebs[SystemColumns.eb_del],//6
                             ebs.GetBoolFalse(SystemColumns.eb_del),//7
                             _table.TableType == WebFormTableTypes.Review ? SystemColumns.eb_del : ebs[SystemColumns.eb_del],//8
-                            _table.TableType == WebFormTableTypes.Review ? "'F'" : ebs.GetBoolFalse(SystemColumns.eb_del));//9
+                            _table.TableType == WebFormTableTypes.Review ? "'F'" : ebs.GetBoolFalse(SystemColumns.eb_del),//9
+                            _id);//10
+                    }
                 }
                 _qryCount++;
             }
@@ -137,7 +142,10 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else if (Ctrl is IEbExtraQryCtrl)
                 {
-                    extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
+                    if (Ctrl is EbReview Rev && _this.DataPusherConfig != null)
+                        extquery += Rev.GetSelectQuery(_this, _pshId, ebs[SystemColumns.eb_del], ebs.GetBoolFalse(SystemColumns.eb_del));
+                    else
+                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
                     _qryCount++;
                 }
             }

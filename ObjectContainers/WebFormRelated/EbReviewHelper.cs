@@ -36,6 +36,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return inner.GetMyActionInsertUpdateQuery(ref i);
         }
 
+        //From SaveReview
         public static string GetMyActionInsertUpdateQueryxx(EbWebForm webForm, IDatabase DataDB, List<DbParameter> param, ref int i, Service service)
         {
             EbReviewHelper_inner inner = new EbReviewHelper_inner(webForm, DataDB, param, false, service);
@@ -83,17 +84,36 @@ namespace ExpressBase.Objects.WebFormRelated
 
         internal EbReviewHelper_inner(EbWebForm webForm, IDatabase DataDB, List<DbParameter> param, bool isInsert, Service service)
         {
-            this.ebReview = (EbReview)webForm.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
-            if (this.ebReview == null || this.ebReview.FormStages.Count == 0)
+            bool reviewFound = false;
+            int i;
+            for (i = 0; i < webForm.FormCollection.Count; i++)
+            {
+                this.ebReview = (EbReview)webForm.FormCollection[i].FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
+                if (this.ebReview != null && this.ebReview.FormStages.Count > 0)
+                {
+                    reviewFound = true;
+                    this.webForm = webForm.FormCollection[i];
+                    this.isInsert = this.webForm.TableRowId <= 0;
+                    break;
+                }
+            }
+
+            if (reviewFound)
+            {
+                for (i++; i < webForm.FormCollection.Count; i++)
+                {
+                    if (webForm.FormCollection[i].FormSchema.ExtendedControls.Exists(e => e is EbReview))
+                        throw new FormException("Unable to process more than one review controls. Please contact admin.", (int)HttpStatusCode.BadRequest, "Only one review control request is allowed. Please remove review control in source or destination form.", "From ReviewHelper");
+                }
+            }
+            else
             {
                 this.ReviewNotFound = true;
                 return;
             }
 
-            this.webForm = webForm;
             this.DataDB = DataDB;
             this.param = param;
-            this.isInsert = isInsert;
             this.service = service;
             this.globals = null;
 
@@ -176,7 +196,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
         public string GetMyActionInsertUpdateQuery(ref int i)
         {
-            string insUpQ = string.Empty, masterId = $"@{this.webForm.TableName}_id";
+            string insUpQ = string.Empty, masterId = $"@{this.webForm.TableName}_id" + (this.webForm.DataPusherConfig != null ? this.webForm.CrudContext : string.Empty);
             bool insMyActRequired = false, insInEdit = false, entryCriteriaRslt = true, entryCriteriaExecuted = false;
             EbReviewStage nextStage = null;
             if (!string.IsNullOrWhiteSpace(this.ebReview.EntryCriteria?.Code))
@@ -583,6 +603,8 @@ WHERE
 
         private string DeleteIfExists(ref int i)
         {
+            if (this.webForm.DataPusherConfig != null)//Reverting based on EntryCriteria is blocked for datapusher dest form
+                return string.Empty;
             string insUpQ = string.Empty;
             SingleRow RowBkUp = this.TableBkUp.Find(e => e.RowId <= 0);
             if (RowBkUp != null)
@@ -685,7 +707,7 @@ WHERE
             if (takeCurVal)
                 str = $"(SELECT eb_currval('{this.webForm.TableName}_id_seq'))";
             else
-                str = $"@{this.webForm.TableName}_id";
+                str = $"@{this.webForm.TableName}_id" + (this.webForm.DataPusherConfig != null ? this.webForm.CrudContext : string.Empty);
 
             return $@"
 INSERT INTO eb_approval(

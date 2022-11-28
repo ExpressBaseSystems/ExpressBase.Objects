@@ -350,7 +350,7 @@ else if (this.MultiPushIdType === 2)
                 foreach (KeyValuePair<string, SingleTable> entry in FormDataBackup.MultipleTables)
                 {
                     TableSchema _table = DestSchema.Tables.Find(e => e.TableName == entry.Key);
-                    if (_table?.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
+                    if ((_table?.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery)) || _table?.TableType == WebFormTableTypes.Review)
                         continue;
 
                     if (FormData.MultipleTables.ContainsKey(entry.Key))

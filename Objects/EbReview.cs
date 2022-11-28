@@ -344,6 +344,15 @@ namespace ExpressBase.Objects
                 COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
         }
 
+        public string GetSelectQuery(EbWebForm _Form, string _pshId, string del_col, string del_f_val)
+        {
+            return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id, A.description
+                FROM eb_my_actions A, eb_stages S
+                WHERE A.form_ref_id = '{_Form.RefId}' AND 
+                A.form_data_id = (SELECT id FROM {_Form.TableName} WHERE {_Form.DataPusherConfig.SourceTable}_id = @{_Form.DataPusherConfig.SourceTable}_id {_pshId} AND COALESCE({del_col}, {del_f_val}) = {del_f_val} LIMIT 1) AND 
+                COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
+        }
+
         public void MergeFormData(WebformData FormData, WebFormSchema FormSchema)
         {
             if (FormData.MultipleTables.ContainsKey(this.TableName) && FormData.MultipleTables[this.TableName].Count > 0)

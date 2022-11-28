@@ -1328,6 +1328,12 @@ namespace ExpressBase.Objects
             EbWebForm[] _FormCollection = new EbWebForm[formCount];
             string query = QueryGetter.GetSelectQuery(this, DataDB, service, out qrycount[0]);
             _FormCollection[0] = this;
+            List<DbParameter> param = new List<DbParameter>
+            {
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4]),
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._refid, EbDbTypes.String, this.RefId)
+            };
 
             if (this.FormDataPusherCount > 0 && includePushData)
             {
@@ -1335,24 +1341,22 @@ namespace ExpressBase.Objects
                 {
                     if (!(this.DataPushers[i] is EbFormDataPusher))
                         continue;
+                    EbWebForm _Form = this.DataPushers[i].WebForm;
                     query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out qrycount[j]);
-                    this.DataPushers[i].WebForm.UserObj = this.UserObj;
-                    this.DataPushers[i].WebForm.SolutionObj = this.SolutionObj;
-                    _FormCollection[j++] = this.DataPushers[i].WebForm;
+                    _Form.UserObj = this.UserObj;
+                    _Form.SolutionObj = this.SolutionObj;
+                    _FormCollection[j++] = _Form;
+                    string ebVerId = _Form.FormSchema.MasterTable + FormConstants._eb_ver_id;
+                    if (!param.Exists(e => e.ParameterName == ebVerId))
+                        param.Add(DataDB.GetNewParameter(ebVerId, EbDbTypes.Int32, _Form.RefId.Split(CharConstants.DASH)[4]));
                 }
             }
 
-            DbParameter[] param = new DbParameter[]
-            {
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4]),
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._refid, EbDbTypes.String, this.RefId)
-            };
             EbDataSet dataset;
             if (this.DbConnection == null)
-                dataset = DataDB.DoQueries(query, param);
+                dataset = DataDB.DoQueries(query, param.ToArray());
             else
-                dataset = DataDB.DoQueries(this.DbConnection, query, param);
+                dataset = DataDB.DoQueries(this.DbConnection, query, param.ToArray());
 
             Console.WriteLine("From RefreshFormData : Query count = " + qrycount.Join(",") + " DataTable count = " + dataset.Tables.Count);
 
