@@ -353,6 +353,11 @@ namespace ExpressBase.Objects
                 COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
         }
 
+        public static string GetPrimaryRoleNameQuery()
+        {
+            return ", (SELECT R.role_name FROM eb_roles R, eb_role2user R2U WHERE R2U.user_id=eb_created_by and R2U.role_id=R.id and R.is_primary='T' AND COALESCE(R2U.eb_del,'F')='F' AND COALESCE(R.eb_del,'F')='F' LIMIT 1) AS primary_role";
+        }
+
         public void MergeFormData(WebformData FormData, WebFormSchema FormSchema)
         {
             if (FormData.MultipleTables.ContainsKey(this.TableName) && FormData.MultipleTables[this.TableName].Count > 0)

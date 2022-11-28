@@ -1153,6 +1153,9 @@ namespace ExpressBase.Objects
                         val = null;
                     SingleColumn Col = _control.GetSingleColumn(this.UserObj, this.SolutionObj, val, false);
                     Col.Name = FormConstants.eb_created_by;
+                    string prim_role = Convert.ToString(dataRow["primary_role"]);
+                    if (!string.IsNullOrWhiteSpace(prim_role))
+                        Col.F += $" ({prim_role})";
                     Row.Columns.Add(Col);
                 }
                 else

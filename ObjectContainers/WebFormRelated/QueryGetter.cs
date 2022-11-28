@@ -86,14 +86,15 @@ namespace ExpressBase.Objects.WebFormRelated
 
                 if (_this.DataPusherConfig == null)// master form
                 {
-                    query += string.Format("SELECT {0} FROM {1} WHERE {2} = @{3}_id AND COALESCE({5}, {6}) = {6} {4};",
-                        _cols,
-                        _table.TableName,
-                        _id,
-                        _this.FormSchema.MasterTable,
-                        _table.TableType == WebFormTableTypes.Grid ? ("ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : string.Empty)) : "ORDER BY id",
-                        _table.TableType == WebFormTableTypes.Review ? SystemColumns.eb_del : ebs[SystemColumns.eb_del],
-                        _table.TableType == WebFormTableTypes.Review ? "'F'" : ebs.GetBoolFalse(SystemColumns.eb_del));
+                    query += string.Format("SELECT {0}{7} FROM {1} WHERE {2} = @{3}_id AND COALESCE({5}, {6}) = {6} {4};",
+                        _cols,//0
+                        _table.TableName,//1
+                        _id,//2
+                        _this.FormSchema.MasterTable,//3
+                        _table.TableType == WebFormTableTypes.Grid ? ("ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : string.Empty)) : "ORDER BY id",//4
+                        _table.TableType == WebFormTableTypes.Review ? SystemColumns.eb_del : ebs[SystemColumns.eb_del],//5
+                        _table.TableType == WebFormTableTypes.Review ? "'F'" : ebs.GetBoolFalse(SystemColumns.eb_del),//6
+                        _table.TableType == WebFormTableTypes.Review ? EbReview.GetPrimaryRoleNameQuery() : string.Empty);//7
                 }
                 else
                 {
