@@ -320,7 +320,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             get
             {
                 return @"
-                    if (this.IsNullable && $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked') && !this.getValue())
+                    if (!this.getValue())
                         return false;
                     return true;";
             }

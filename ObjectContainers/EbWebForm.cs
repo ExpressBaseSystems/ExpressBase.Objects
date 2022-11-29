@@ -3144,9 +3144,6 @@ namespace ExpressBase.Objects
                         SingleColumn cField = Row.GetColumn(_column.ColumnName);
                         if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (cField.Type == (int)EbDbTypes.Decimal && Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                         {
-                            if (_column.Control is EbDate _date && _date.IsNullable)
-                                continue;
-
                             string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                             if (_table.TableType == WebFormTableTypes.Grid)
                                 msg = $"'{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}' in {_table.Title ?? _table.ContainerName} Grid {msg}";
