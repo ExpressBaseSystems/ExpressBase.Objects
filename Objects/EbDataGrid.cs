@@ -116,6 +116,10 @@ namespace ExpressBase.Objects
         public bool IsLoadDataSourceAlways { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [Alias("Load ds new mode onload always")]
+        public bool IsLoadDsNewModeOnloadAlways { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [Alias("Merge imported data")]
         public bool MergeData { get; set; }
 
