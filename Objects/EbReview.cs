@@ -115,6 +115,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> ResetterRoles { get; set; }
 
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool EnablePullBack { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]

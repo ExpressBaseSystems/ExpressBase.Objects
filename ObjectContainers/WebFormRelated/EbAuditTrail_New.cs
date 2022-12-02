@@ -489,6 +489,11 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         unf_val = "Reset";
                         break;
                     }
+                    else if (val == FormConstants.__stage_pullback)
+                    {
+                        unf_val = "Pull Back";
+                        break;
+                    }
                 }
             }
             return unf_val;

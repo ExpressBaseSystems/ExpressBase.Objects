@@ -171,6 +171,29 @@ namespace ExpressBase.Objects.WebFormRelated
                     insUpQ += this.GetApprovalLinesDeleteQry();
                 }
             }
+            else if (Convert.ToString(this.Table[0][FormConstants.stage_unique_id]) == FormConstants.__system_stage &&
+                Convert.ToString(this.Table[0][FormConstants.action_unique_id]) == FormConstants.__stage_pullback)
+            {
+                insUpQ += this.GetApprovalLinesInsertQry(ref i);
+
+                bool permissionGranted = false;
+                if (this.TableBkUp.Count > 1)
+                {
+                    SingleRow RowBkUp = this.TableBkUp.Find(e => e.RowId <= 0);
+                    if (RowBkUp != null && Convert.ToString(RowBkUp[FormConstants.has_pullback_permission]) == "T")
+                    {
+                        permissionGranted = true;
+                        insUpQ += this.GetMyActionDeleteQry(ref i, Convert.ToInt32(RowBkUp[FormConstants.eb_my_actions_id]));
+
+                        string _stageId = Convert.ToString(this.TableBkUp[this.TableBkUp.Count - 2][FormConstants.stage_unique_id]);
+                        nextStage = this.ebReview.FormStages.Find(e => e.EbSid == _stageId);
+                        if (nextStage == null)
+                            throw new FormException("Bad request. Stage pull back failed.", (int)HttpStatusCode.BadRequest, "Pull back stage not found", "From GetMyActionInsertUpdateQueryxx");
+                    }
+                }
+                if (!permissionGranted)
+                    throw new FormException("Access denied to execute review", (int)HttpStatusCode.Unauthorized, "Stage pull back permission check failed", "From GetMyActionInsertUpdateQueryxx");
+            }
             else
             {
                 nextStage = this.ExecuteOneStage(ref insUpQ, ref i, ref insMyActRequired, true);

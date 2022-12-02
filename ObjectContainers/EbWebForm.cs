@@ -1559,6 +1559,19 @@ namespace ExpressBase.Objects
                                     DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                                     string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                     string f_dt = dt_con.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                                    bool hasPullBackPerm = false;
+                                    SingleTable Tbl = _FormData.MultipleTables["eb_approval_lines"];
+                                    if ((Ctrl as EbReview).EnablePullBack && Tbl.Count > 0)
+                                    {
+                                        object uid_s = Tbl[Tbl.Count - 1][FormConstants.eb_created_by];
+                                        string stage_id_s = Convert.ToString(Tbl[Tbl.Count - 1][FormConstants.stage_unique_id]);
+                                        if (stage_id_s != FormConstants.__system_stage && uid_s != null && int.TryParse(Convert.ToString(uid_s), out int uid_i))
+                                        {
+                                            if (uid_i == this.UserObj.UserId)
+                                                hasPullBackPerm = true;
+                                        }
+                                    }
+
                                     _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow()
                                     {
                                         RowId = 0,
@@ -1571,7 +1584,8 @@ namespace ExpressBase.Objects
                                             new SingleColumn{ Name = FormConstants.eb_created_at, Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null, F = hasPerm ? f_dt : null},
                                             new SingleColumn{ Name = FormConstants.eb_created_by, Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId : 0, F = hasPerm ? this.UserObj.FullName : string.Empty},
                                             new SingleColumn{ Name = FormConstants.is_form_data_editable, Type = (int)EbDbTypes.String, Value = hasPerm ? Convert.ToString(Table[0][FormConstants.is_form_data_editable]) : "F"},
-                                            new SingleColumn{ Name = FormConstants.has_permission, Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
+                                            new SingleColumn{ Name = FormConstants.has_permission, Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"},
+                                            new SingleColumn{ Name = FormConstants.has_pullback_permission, Type = (int)EbDbTypes.String, Value = hasPullBackPerm ? "T" : "F"}
                                         }
                                     });
                                     if (this.MyActNotification != null)
