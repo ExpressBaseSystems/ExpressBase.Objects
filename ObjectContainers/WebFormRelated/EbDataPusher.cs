@@ -568,13 +568,12 @@ catch (Exception e)
             string code = string.Format(@"
 try
 {{
-    var res{0} = fn_{0}();
-    destinationform.{1}.setValue(res{0});
-    out_dict.Add({0}, new object[]{{ 1, res{0}}});
+  var res{0} = fn_{0}();
+  AddToOutDict(out_dict, {0}, res{0}, destinationform.{1});
 }}
 catch (Exception e)
 {{
-    out_dict.Add({0}, new object[]{{ 2, e.Message}});
+  AddToOutDict(out_dict, {0}, e);
 }}
 ",
 Index,
