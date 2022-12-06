@@ -569,11 +569,11 @@ catch (Exception e)
 try
 {{
   var res{0} = fn_{0}();
-  AddToOutDict(out_dict, {0}, res{0}, destinationform.{1});
+  AddToOutDict({0}, res{0}, destinationform.{1});
 }}
 catch (Exception e)
 {{
-  AddToOutDict(out_dict, {0}, e);
+  AddToOutDict({0}, e);
 }}
 ",
 Index,
