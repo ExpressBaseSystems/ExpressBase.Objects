@@ -205,6 +205,10 @@ return val"; } set { } }
         [JsonIgnore]
         public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', p1 == this.Tv).trigger('change');"; } set { } }
 
+        //Testing required
+        //[JsonIgnore]
+        //public override string IsRequiredOKJSfn { get { return @"debugger; let $ctrl = $('#' + this.EbSid_CtxId); return $ctrl.prop('checked'); "; } set { } }
+
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             string paramName = args.cField.Name + crudContext;
@@ -218,7 +222,7 @@ return val"; } set { } }
             else
             {
                 if (this.ValueType == EbValueType.Boolean)
-                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.String, Convert.ToString(args.cField.Value) == "true" ? "T" : "F"));
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.String, Convert.ToString(args.cField.Value ?? string.Empty).ToLower() == "true" ? "T" : "F"));
                 else if (this.ValueType == EbValueType.Integer)
                     args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.Int32, Convert.ToInt32(args.cField.Value) == this.TrueValue_I ? this.TrueValue_I : this.FalseValue_I));
                 else
