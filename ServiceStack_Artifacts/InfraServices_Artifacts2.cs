@@ -79,7 +79,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UniqueRequest
     {
         [DataMember(Order = 1)]
-        public string email { get; set; }
+        public string Email { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsUser { get; set; }
+        
+        [DataMember(Order = 3)]
+        public string iSolutionId { get; set; }
 
     }
 
@@ -446,6 +452,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public string PagePath { get; set; }
+
+        [DataMember(Order = 6)]
+        public bool IsUser { get; set; }
+
+        [DataMember(Order = 7)]
+        public string iSolutionId { get; set; }
     }
 
     [DataContract]
@@ -467,6 +479,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string Password { get; set; }
+
+        [DataMember(Order = 4)]
+        public bool IsUser { get; set; }
+
+        [DataMember(Order = 5)]
+        public string iSolutionId { get; set; }
     }
 
     [DataContract]
