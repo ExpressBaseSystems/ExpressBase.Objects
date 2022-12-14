@@ -328,6 +328,9 @@ namespace ExpressBase.Objects
         //[JsonIgnore]
         //public ColumnColletion ColumnColletion { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        public bool IsLanguageEnabled { get; set; } = false;
+
         [JsonIgnore]
         public int DetailTableIndex { get; set; } = 0;
 
@@ -607,6 +610,12 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public Dictionary<string, GNTV> SummaryValInRow { get; set; } = new Dictionary<string, GNTV>();
+
+        [JsonIgnore]
+        public List<string> LabelsCollection { get; set; } = new List<string>();
+
+        [JsonIgnore]
+        public Dictionary<string, string> LabelKeyValues { get; set; } = new Dictionary<string, string>();
 
         [JsonIgnore]
         public IDatabase ObjectsDB { get; set; }
@@ -1442,8 +1451,15 @@ namespace ExpressBase.Objects
 
             this.InitializePdfObjects(Document, Ms1);
 
-            this.Doc.NewPage();
             this.GetData4Pdf(_params, EbConnectionFactory);
+
+            if (IsLanguageEnabled && Solution.IsMultiLanguageEnabled)
+            {
+                string _locale = "ml-IN";
+                string[] Keys = LabelsCollection.ToArray();
+                LabelKeyValues = EbObjectsHelper.GetKeyValues(new GetDictionaryValueRequest { Keys = Keys, Locale = _locale }, EbConnectionFactory.ObjectsDB);
+            }
+            this.Doc.NewPage();
 
             if (this.DataSet != null)
                 this.Draw();
@@ -1664,6 +1680,10 @@ namespace ExpressBase.Objects
                         Script appearscript = Report.CompileScriptV1(field_org.AppearExpression.Code);
                         Report.AppearanceScriptCollection.Add(field.Name, appearscript);
                     }
+                }
+                else if (field is EbText)
+                {
+                    LabelsCollection.Add(field.Title);
                 }
             }
         }

@@ -536,9 +536,10 @@ namespace ExpressBase.Objects
         {
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            string value = (Rep.IsLanguageEnabled && Rep.LabelKeyValues.ContainsKey(Title)) ? Rep.LabelKeyValues[Title] : Title;
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Title);
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, value);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
