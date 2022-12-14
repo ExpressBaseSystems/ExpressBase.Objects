@@ -79,6 +79,33 @@ namespace ExpressBase.Objects.Helpers
             return _tbl.Rows.Count > 0 ? Convert.ToString(_tbl.Rows[0][0]) : null;
         }
 
+        public static Dictionary<string, string> GetKeyValues(GetDictionaryValueRequest request, IDatabase db)
+        {
+            Dictionary<string, string> Dict = new Dictionary<string, string>();
+            string qry = @"SELECT k.key, v.value 
+                            FROM 
+	                            eb_keys k, eb_languages l, eb_keyvalue v
+                            WHERE
+	                            k.id = v.key_id AND
+	                            l.id = v.lang_id AND
+	                            k.key IN ({0})
+	                            AND l.language LIKE '%({1})';";
+
+            string temp = string.Empty;
+            foreach (string t in request.Keys)
+            {
+                temp += "'" + t + "',";
+            }
+            qry = string.Format(qry, temp.Substring(0, temp.Length - 1), request.Locale);
+            EbDataTable datatbl = db.DoQuery(qry, new DbParameter[] { });
+
+            foreach (EbDataRow dr in datatbl.Rows)
+            {
+                Dict.Add(dr["key"].ToString(), dr["value"].ToString());
+            }
+
+            return Dict;
+        }
         public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis)
         {
             DataSourceDataSetResponse resp = new DataSourceDataSetResponse();
@@ -103,7 +130,7 @@ namespace ExpressBase.Objects.Helpers
                     EbFilterDialog _dsf = Redis.Get<EbFilterDialog>(_ds.FilterDialogRefId);
                     if (_dsf == null)
                     {
-                        List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ebConnectionFactory.ObjectsDB, _ds.FilterDialogRefId); 
+                        List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ebConnectionFactory.ObjectsDB, _ds.FilterDialogRefId);
                         _dsf = EbSerializers.Json_Deserialize(result[0].Json);
                         Redis.Set<EbFilterDialog>(_ds.FilterDialogRefId, _dsf);
                     }
