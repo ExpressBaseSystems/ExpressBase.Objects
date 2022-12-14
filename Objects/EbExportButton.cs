@@ -64,13 +64,17 @@ namespace ExpressBase.Objects.Objects
         [HelpText("Default expression for button text.")]
         public override EbScript DefaultValueExpression { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool DisableInEditMode { get; set; }
+
         [JsonIgnore]
         public override string DisableJSfn
         {
             get
             {
-                return JSFnsConstants.Ctrl_DisableJSfn + @"
-     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('filter', 'contrast(0.6)');";
+                return @"this.__IsDisable = true;
+     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover div').attr('disabled', 'disabled');";
             }
             set { }
         }
@@ -80,8 +84,8 @@ namespace ExpressBase.Objects.Objects
         {
             get
             {
-                return JSFnsConstants.Ctrl_EnableJSfn + @"
-     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('filter', 'none');";
+                return @"this.__IsDisable = false;
+     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover div').removeAttr('disabled');";
             }
             set { }
         }
@@ -89,7 +93,7 @@ namespace ExpressBase.Objects.Objects
 
         public override string GetBareHtml()
         {
-            return @"<div id='@ebsid@' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'><span>@Label@ </span><i class='fa fa-external-link'></i></div>"
+            return @"<div id='@ebsid@' disabled='disabled' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor'><span>@Label@ </span><i class='fa fa-external-link'></i></div>"
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@Label@", this.Label ?? "Export")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
