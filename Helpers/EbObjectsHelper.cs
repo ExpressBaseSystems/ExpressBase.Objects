@@ -94,7 +94,10 @@ namespace ExpressBase.Objects.Helpers
             string temp = string.Empty;
             foreach (string t in request.Keys)
             {
-                temp += "'" + t + "',";
+                string _t = t;
+                if (_t.Contains("'"))
+                    _t = _t.Replace("'", "''");
+                temp += "'" + _t + "',";
             }
             qry = string.Format(qry, temp.Substring(0, temp.Length - 1), request.Locale);
             EbDataTable datatbl = db.DoQuery(qry, new DbParameter[] { });
