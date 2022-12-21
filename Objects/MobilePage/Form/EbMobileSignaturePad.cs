@@ -22,9 +22,6 @@ namespace ExpressBase.Objects
                                 <div class='dp-avatar'>
                                     <img src='/images/image.png'/>
                                 </div>
-                                <div class='dp-btn-container'>
-                                    <button class='eb_mob_fupbtn' style='width:100%'><i class='fa fa-pencil-square-o'></i></button>
-                                </div>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
