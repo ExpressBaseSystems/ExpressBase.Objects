@@ -15,7 +15,8 @@ namespace ExpressBase.Objects
     public enum EbLabelRenderType
     {
         Default = 0,
-        Link = 1
+        Link = 1,
+        Html = 2
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
