@@ -200,8 +200,19 @@ namespace ExpressBase.Objects
             Report.MultiRowTop = 0;
             DbType datatype = (DbType)DbType;
             int val_length = column_val.Length;
-            Phrase phrase = new Phrase(column_val, this.GetItextFont(this.Font, this.Font));
-            float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
+            Phrase phrase = new Phrase(column_val, this.GetItextFont(this.Font, Report.Font));
+            bool _isCaps = false;
+            if (this.Font != null)
+            {
+                if (this.Font.Caps == true)
+                    _isCaps = true;
+            }
+            else
+            {
+                if (Report.Font?.Caps == true)
+                    _isCaps = true;
+            }
+            float calculatedValueSize = (_isCaps) ? ((phrase.Font.CalculatedSize + 0.25f) * val_length) : phrase.Font.CalculatedSize * val_length;
             if (calculatedValueSize > this.WidthPt)
             {
                 int rowsneeded;
