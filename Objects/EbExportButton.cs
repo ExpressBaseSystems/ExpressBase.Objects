@@ -71,22 +71,14 @@ namespace ExpressBase.Objects.Objects
         [JsonIgnore]
         public override string DisableJSfn
         {
-            get
-            {
-                return @"this.__IsDisable = true;
-     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover div').attr('disabled', 'disabled');";
-            }
+            get { return string.Empty; }
             set { }
         }
 
         [JsonIgnore]
         public override string EnableJSfn
         {
-            get
-            {
-                return @"this.__IsDisable = false;
-     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover div').removeAttr('disabled');";
-            }
+            get { return string.Empty; }
             set { }
         }
 
