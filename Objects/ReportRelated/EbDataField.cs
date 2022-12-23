@@ -200,7 +200,18 @@ namespace ExpressBase.Objects
             Report.MultiRowTop = 0;
             DbType datatype = (DbType)DbType;
             int val_length = column_val.Length;
-            Phrase phrase = new Phrase(column_val, this.GetItextFont(this.Font, this.Font));
+            Phrase phrase = new Phrase(column_val, this.GetItextFont(this.Font, Report.Font));
+            bool _isCaps = false;
+            if (this.Font != null)
+            {
+                if (this.Font.Caps == true)
+                    _isCaps = true;
+            }
+            else
+            {
+                if (Report.Font?.Caps == true)
+                    _isCaps = true;
+            }
             float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
             if (calculatedValueSize > this.WidthPt)
             {
@@ -208,7 +219,7 @@ namespace ExpressBase.Objects
                 if (!_inwords && (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16 || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric))
                     rowsneeded = 1;
                 else
-                    rowsneeded = Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
+                    rowsneeded = (_isCaps) ? Convert.ToInt32(Math.Ceiling(calculatedValueSize / this.WidthPt)) : Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
                 if (rowsneeded > 1)
                 {
                     if (Report.MultiRowTop == 0)
