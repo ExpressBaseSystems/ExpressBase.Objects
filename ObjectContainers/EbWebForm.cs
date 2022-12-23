@@ -132,11 +132,6 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public virtual List<EbURL> InfoVideoURLs { get; set; }
 
-        [PropertyGroup("Events")]
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<EbSQLValidator> DisableDelete { get; set; }
-
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         [Alias("Form mode after new")]
@@ -149,6 +144,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         public PopupWebFormSize PopupFormSize { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbSQLValidator> DisableDelete { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -169,6 +169,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> AfterSaveRoutines { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public bool RefreshDataAfterSave { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -2149,7 +2154,10 @@ namespace ExpressBase.Objects
                 }
 
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
-                resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                int afterSaveStat = this.AfterSave(DataDB, IsUpdate);
+                resp += " - AfterSave: " + afterSaveStat;
+                if (this.RefreshDataAfterSave && afterSaveStat > 0)
+                    this.RefreshFormData(DataDB, service, false, true);
                 this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);

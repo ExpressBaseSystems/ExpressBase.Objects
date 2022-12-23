@@ -141,6 +141,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
+        [DefaultPropValue("true")]
         public bool AscendingOrder { get; set; }
 
         [HideInPropertyGrid]
