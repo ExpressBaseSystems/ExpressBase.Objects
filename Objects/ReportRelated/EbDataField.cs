@@ -212,14 +212,14 @@ namespace ExpressBase.Objects
                 if (Report.Font?.Caps == true)
                     _isCaps = true;
             }
-            float calculatedValueSize = (_isCaps) ? ((phrase.Font.CalculatedSize + 0.25f) * val_length) : phrase.Font.CalculatedSize * val_length;
+            float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
             if (calculatedValueSize > this.WidthPt)
             {
                 int rowsneeded;
                 if (!_inwords && (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16 || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric))
                     rowsneeded = 1;
                 else
-                    rowsneeded = Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
+                    rowsneeded = (_isCaps) ? Convert.ToInt32(Math.Ceiling(calculatedValueSize / this.WidthPt)) : Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
                 if (rowsneeded > 1)
                 {
                     if (Report.MultiRowTop == 0)
