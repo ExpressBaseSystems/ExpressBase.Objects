@@ -671,6 +671,10 @@ VALUES
     {ebs.GetBoolFalse(SystemColumns.eb_del)},
     {(refCtrlExists ? string.Empty : (conf.SourceRecId + ","))}
     {conf.GridDataId}); ";
+
+                if (_this.IsLocEditable)
+                    _qry = _qry.Replace("@eb_loc_id,", string.Empty).Replace($"{ebs[SystemColumns.eb_loc_id]},", string.Empty);
+
                 if (!conf.DisableReverseLink)
                     _qry += $"UPDATE {conf.GridTableName} SET {tblName}_id=(SELECT eb_currval('{tblName}_id_seq')) WHERE id={conf.GridDataId}; ";
             }
