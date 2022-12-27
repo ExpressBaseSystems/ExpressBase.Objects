@@ -455,7 +455,7 @@ WHERE
                     //if (_this.AutoId != null)
                     //    _qry = $"LOCK TABLE ONLY {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
 
-                    _qry += string.Format("INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({19} @eb_createdby, {6}, @{7}_eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
+                    _qry += string.Format("INSERT INTO {0} ({19} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({20} @eb_createdby, {6}, @{18}_eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -474,8 +474,9 @@ WHERE
                         ebs.GetBoolFalse(SystemColumns.eb_del),//15
                         _this.LockOnSave ? ebs.GetBoolTrue(SystemColumns.eb_lock) : ebs.GetBoolFalse(SystemColumns.eb_lock),//16
                         ebs.GetBoolFalse(SystemColumns.eb_ro),//17
-                        "{0}",//18
-                        "{1}");//19
+                        _this.CrudContext,//18
+                        "{0}",//19
+                        "{1}");//20
                 }
                 else
                 {
@@ -485,8 +486,8 @@ WHERE
 
                     string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
-                    _qry = string.Format(@"INSERT INTO {0} ({26} {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}{24}) 
-                                    VALUES ({27} @eb_createdby, {10}, @{11}_eb_loc_id, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
+                    _qry = string.Format(@"INSERT INTO {0} ({27} {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}{24}) 
+                                    VALUES ({28} @eb_createdby, {10}, @{26}_eb_loc_id, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -513,8 +514,9 @@ WHERE
                         ebs.GetBoolFalse(SystemColumns.eb_del),//23
                         refCtrlExists ? string.Empty : $", {conf.SourceTable}_id",//24
                         refCtrlExists ? string.Empty : $", {srcRef}",//25
-                        "{0}",//26
-                        "{1}");//27
+                        _this.CrudContext,//26
+                        "{0}",//27
+                        "{1}");//28
                 }
 
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
@@ -551,7 +553,7 @@ VALUES (
     {{1}} 
     @eb_createdby, 
     {DataDB.EB_CURRENT_TIMESTAMP},
-    @{_this.TableName}_eb_loc_id,
+    @{_this.CrudContext}_eb_loc_id,
     {srcRef},
     @eb_signin_log_id,
     {ebs.GetBoolFalse(SystemColumns.eb_void)},
