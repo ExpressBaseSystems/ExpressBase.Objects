@@ -31,6 +31,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string _ebbkup = "_ebbkup";
         public const string _eb_ver_id = "_eb_ver_id";
         public const string _refid = "_refid";
+        public const string _eb_loc_id = "_eb_loc_id";
 
         //Date
         public const string yyyy = "yyyy";

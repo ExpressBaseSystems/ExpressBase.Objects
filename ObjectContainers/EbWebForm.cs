@@ -994,15 +994,28 @@ namespace ExpressBase.Objects
                         Row.SetControl(c.Name, c);
                     }
                 }
-                else if ((!(c is EbFileUploader) && !c.DoNotPersist))
+                else if (!(c is EbFileUploader) && !c.DoNotPersist)
                 {
                     if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
                     {
-                        if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) != null)
+                        SingleColumn Col = FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name);
+                        if (Col != null)
                         {
-                            c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                            FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                            FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                            c.ValueFE = Col.Value;
+                            Col.Type = (int)c.EbDbType;
+                            Col.Control = c;
+                            if (this.IsLocEditable && c is EbSysLocation locCtrl)
+                            {
+                                if (int.TryParse(Convert.ToString(Col.Value), out int locId) && locId > 0)
+                                {
+                                    this.LocationId = locId;
+                                }
+                                else
+                                {
+                                    Col.Value = this.LocationId;
+                                    c.ValueFE = Col.Value;
+                                }
+                            }
                         }
                     }
                 }

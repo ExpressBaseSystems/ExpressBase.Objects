@@ -73,6 +73,10 @@ namespace ExpressBase.Objects
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
                 }
+                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_loc_id))
+                {
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_loc_id, EbDbTypes.Int32, WebForm.LocationId));
+                }
 
                 if (pushAuditTrail)
                     fullqry += EbAuditTrail.GetInsertModeQuery(DataDB, WebForm.RefId, WebForm.TableName);
@@ -185,6 +189,10 @@ namespace ExpressBase.Objects
                 {
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+                }
+                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_loc_id))
+                {
+                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_loc_id, EbDbTypes.Int32, WebForm.LocationId));
                 }
             }
             args.CopyBack(ref _extqry, ref i);

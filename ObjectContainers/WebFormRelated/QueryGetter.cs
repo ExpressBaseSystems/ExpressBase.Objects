@@ -455,7 +455,7 @@ WHERE
                     //if (_this.AutoId != null)
                     //    _qry = $"LOCK TABLE ONLY {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
 
-                    _qry += string.Format("INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({19} @eb_createdby, {6}, @eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
+                    _qry += string.Format("INSERT INTO {0} ({18} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({19} @eb_createdby, {6}, @{7}_eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -486,7 +486,7 @@ WHERE
                     string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
                     _qry = string.Format(@"INSERT INTO {0} ({26} {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}{24}) 
-                                    VALUES ({27} @eb_createdby, {10}, @eb_loc_id, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
+                                    VALUES ({27} @eb_createdby, {10}, @{11}_eb_loc_id, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -519,8 +519,8 @@ WHERE
 
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
-                if (_this.IsLocEditable)
-                    _qry = _qry.Replace($", {ebs[SystemColumns.eb_loc_id]}", string.Empty).Replace(", @eb_loc_id", string.Empty);
+                //if (_this.IsLocEditable)
+                //    _qry = _qry.Replace($", {ebs[SystemColumns.eb_loc_id]}", string.Empty).Replace(", @eb_loc_id", string.Empty);
             }
             //else if (tblName.Equals("eb_approval_lines"))
             //{
@@ -550,9 +550,9 @@ INSERT INTO {tblName} (
 VALUES (
     {{1}} 
     @eb_createdby, 
-    {DataDB.EB_CURRENT_TIMESTAMP}, 
-    @eb_loc_id , 
-    {srcRef}, 
+    {DataDB.EB_CURRENT_TIMESTAMP},
+    @{_this.TableName}_eb_loc_id,
+    {srcRef},
     @eb_signin_log_id,
     {ebs.GetBoolFalse(SystemColumns.eb_void)},
     {ebs.GetBoolFalse(SystemColumns.eb_del)}
