@@ -30,6 +30,7 @@ using System.Net;
 using System.Threading;
 using ExpressBase.Common.Security;
 using Npgsql;
+using ExpressBase.Objects.Helpers;
 
 namespace ExpressBase.Objects
 {
@@ -154,6 +155,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableCancel { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbSQLValidator> DisableNew { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -2131,7 +2137,7 @@ namespace ExpressBase.Objects
 
                     if (this.IsDisable)
                         throw new FormException("This form is READONLY!", (int)HttpStatusCode.Forbidden, $"ReadOnly form. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", "EbWebForm -> Save");
-
+                    this.ExecDisableNewScript(DataDB);
                     this.DbConnection = DataDB.GetNewConnection();
                     this.DbConnection.Open();
                     this.DbTransaction = this.DbConnection.BeginTransaction();
@@ -3027,6 +3033,50 @@ namespace ExpressBase.Objects
                 ts = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
             }
             return ts;
+        }
+
+        private void ExecDisableNewScript(IDatabase DataDB)
+        {
+            List<EbSQLValidator> _DisableScript = this.DisableNew;
+            List<DbParameter> dbParams = new List<DbParameter>();
+
+            if (_DisableScript != null && _DisableScript.Count > 0)
+            {
+                List<EbSQLValidator> _validators = _DisableScript.FindAll(e => !e.IsDisabled && !e.IsWarningOnly && !string.IsNullOrWhiteSpace(e.Script.Code));
+
+                string query = string.Join(";", _validators.Select(e => e.Script.Code));
+
+                List<Param> _params = SqlHelper.GetSqlParams(query);
+                SingleRow MRow = this.FormData.MultipleTables[this.FormSchema.MasterTable][0];
+
+                foreach (Param _p in _params)
+                {
+                    SingleColumn Column = MRow.GetColumn(_p.Name);
+                    if (Column != null)
+                        dbParams.Add(DataDB.GetNewParameter(Column.Name, (EbDbTypes)Column.Type, Column.Value));
+                    else if (!EbFormHelper.IsExtraSqlParam(_p.Name, this.FormSchema.MasterTable))
+                        throw new FormException($"Parameter {_p.Name} not found.", (int)HttpStatusCode.InternalServerError, "Parameter not found for DisableNew script", "EbWebForm -> ExecDisableNewScript");
+                }
+                EbFormHelper.AddExtraSqlParams(dbParams, DataDB, this.FormSchema.MasterTable, this.TableRowId, this.LocationId, this.UserObj.UserId);
+                EbDataSet ds;
+                try
+                {
+                    ds = DataDB.DoQueries(query, dbParams.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    throw new FormException(ex.Message, (int)HttpStatusCode.InternalServerError, "Exception in DisableNew script execution.", ex.StackTrace);
+                }
+                for (int i = 0; i < _validators.Count; i++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
+                    {
+                        string st = Convert.ToString(ds.Tables[0].Rows[0][0])?.ToLower();
+                        if ((int.TryParse(st, out int x) && x > 0) || bool.TryParse(st, out bool xb) && xb || st == "t")
+                            throw new FormException(_validators[i].FailureMSG, (int)HttpStatusCode.Forbidden, "Save operation blocked by DisableNew script", "EbWebForm -> ExecDisableNewScript");
+                    }
+                }
+            }
         }
 
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)
