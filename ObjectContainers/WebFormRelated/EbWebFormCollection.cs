@@ -73,9 +73,9 @@ namespace ExpressBase.Objects
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
                 }
-                if (!param.Exists(e => e.ParameterName == WebForm.CrudContext + FormConstants._eb_loc_id))
+                if (!param.Exists(e => e.ParameterName == FormConstants.eb_loc_id_ + WebForm.CrudContext))
                 {
-                    param.Add(DataDB.GetNewParameter(WebForm.CrudContext + FormConstants._eb_loc_id, EbDbTypes.Int32, WebForm.LocationId));
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId));
                 }
 
                 if (pushAuditTrail)
@@ -124,6 +124,8 @@ namespace ExpressBase.Objects
                                         break;
                                     }
                                 }
+                                if (!ValChangeFound && bkup_Row.LocId != WebForm.LocationId)
+                                    ValChangeFound = true;
                                 if (!ValChangeFound)
                                     continue;
                             }
@@ -190,9 +192,9 @@ namespace ExpressBase.Objects
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
                 }
-                if (!param.Exists(e => e.ParameterName == WebForm.CrudContext + FormConstants._eb_loc_id))
+                if (!param.Exists(e => e.ParameterName == FormConstants.eb_loc_id_ + WebForm.CrudContext))
                 {
-                    param.Add(DataDB.GetNewParameter(WebForm.CrudContext + FormConstants._eb_loc_id, EbDbTypes.Int32, WebForm.LocationId));
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId));
                 }
             }
             args.CopyBack(ref _extqry, ref i);
@@ -263,6 +265,10 @@ namespace ExpressBase.Objects
                 {
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                     param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
+                }
+                if (!param.Exists(e => e.ParameterName == FormConstants.eb_loc_id_ + WebForm.CrudContext))
+                {
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId));
                 }
             }
             args.CopyBack(ref _extqry, ref i);
