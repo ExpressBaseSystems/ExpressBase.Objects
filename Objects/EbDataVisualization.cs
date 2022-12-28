@@ -1085,7 +1085,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.Calendar)]
     public class ObjectBasicForm : ObjectBasicInfo
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if(this.FormMode === 1){

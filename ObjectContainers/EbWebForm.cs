@@ -493,7 +493,8 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void FormatImportData(IDatabase DataDB, Service Service, EbWebForm FormDes, Dictionary<string, SingleTable> _PsApiTables = null, bool copyAutoId = false, string srcCtrl = null)//COPY this TO FormDes(Destination)
+        //COPY this TO FormDes(Destination)
+        public void FormatImportData(IDatabase DataDB, Service Service, EbWebForm FormDes, Dictionary<string, SingleTable> _PsApiTables = null, bool copyAutoId = false, string srcCtrl = null)
         {
             //mapping is based on ctrl name //different form
             //normal table columns are copying to master entry for easy search(not for Api import)
