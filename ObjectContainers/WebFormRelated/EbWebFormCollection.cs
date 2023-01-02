@@ -68,15 +68,9 @@ namespace ExpressBase.Objects
                         fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }
                 }
-                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
-                {
-                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
-                }
-                if (!param.Exists(e => e.ParameterName == FormConstants.eb_loc_id_ + WebForm.CrudContext))
-                {
-                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId));
-                }
+                AddSysParam(DataDB, param, WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]);
+                AddSysParam(DataDB, param, WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId);
+                AddSysParam(DataDB, param, FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId);
 
                 if (pushAuditTrail)
                     fullqry += EbAuditTrail.GetInsertModeQuery(DataDB, WebForm.RefId, WebForm.TableName);
@@ -184,20 +178,19 @@ namespace ExpressBase.Objects
                     }
                 }
                 string IdParamName = WebForm.TableName + FormConstants._id + (WebForm.DataPusherConfig != null ? WebForm.CrudContext : string.Empty);
-                if (!param.Exists(e => e.ParameterName == IdParamName))
-                    param.Add(DataDB.GetNewParameter(IdParamName, EbDbTypes.Int32, WebForm.TableRowId));
-
-                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
-                {
-                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
-                }
-                if (!param.Exists(e => e.ParameterName == FormConstants.eb_loc_id_ + WebForm.CrudContext))
-                {
-                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId));
-                }
+                AddSysParam(DataDB, param, IdParamName, EbDbTypes.Int32, WebForm.TableRowId);
+                AddSysParam(DataDB, param, WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]);
+                AddSysParam(DataDB, param, WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId);
+                AddSysParam(DataDB, param, FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId);
             }
             args.CopyBack(ref _extqry, ref i);
+        }
+
+        private void AddSysParam(IDatabase DataDB, List<DbParameter> pList, string pName, EbDbTypes dbType, object value)
+        {
+            if (pList.Exists(e => e.ParameterName == pName))
+                pList.RemoveAll(e => e.ParameterName == pName);
+            pList.Add(DataDB.GetNewParameter(pName, dbType, value));
         }
 
         public void Update_Batch(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
@@ -261,15 +254,9 @@ namespace ExpressBase.Objects
                     }
                 }
 
-                if (!param.Exists(e => e.ParameterName == WebForm.TableName + FormConstants._eb_ver_id))
-                {
-                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-                    param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
-                }
-                if (!param.Exists(e => e.ParameterName == FormConstants.eb_loc_id_ + WebForm.CrudContext))
-                {
-                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId));
-                }
+                AddSysParam(DataDB, param, WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]);
+                AddSysParam(DataDB, param, WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId);
+                AddSysParam(DataDB, param, FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId);
             }
             args.CopyBack(ref _extqry, ref i);
         }

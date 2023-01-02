@@ -250,6 +250,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyPriority(98)]
+        public bool EnableExcelUpload { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [OnChangeExec(@"
 if (this.IsDisable){
     pg.HideProperty('DisableRowEdit');
@@ -343,13 +348,15 @@ else {
 
             string html = @"
 <div class='grid-cont'>
+    @exceluploadbtn@
     @addrowbtn@
 <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>  
                 <th class='slno' style='width:30px'><span class='grid-col-title'>#</span></th>"
-.Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0' title='Add Row (Alt+R)'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty); ;
+.Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0' title='Add Row (Alt+R)'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty)
+.Replace("@exceluploadbtn@", this.EnableExcelUpload ? "<div id='@ebsid@excelupload' class='excelupload-btn' tabindex='0'>Upload Excel</div>" : string.Empty);
             EbDGColumn lastCtrl = (EbDGColumn)Controls.FindLast(e => !e.Hidden);
             this.AdjustColumnWidth();
             foreach (EbDGColumn col in Controls)
