@@ -586,11 +586,14 @@ namespace ExpressBase.Objects
                             ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
                             if (ColumnSrc != null &&
                                 (!(_columnDes.Control is EbAutoId) || CopyAutoId) &&
-                                (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation) &&
-                                !_columnDes.Control.DoNotImport)
+                                (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation || !_columnDes.Control.DoNotImport))
                             {
                                 TableDes[0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                                 _formattedData = Convert.ToString(ColumnSrc.Value);
+                                if (ColumnSrc.Control is EbSimpleFileUploader && _columnDes.Control is EbSimpleFileUploader)
+                                {
+                                    TableDes[0].GetColumn(_columnDes.ColumnName).F = ColumnSrc.F;
+                                }
                             }
                             else
                                 _formattedData = Convert.ToString(TableDes[0][_columnDes.ColumnName]);
