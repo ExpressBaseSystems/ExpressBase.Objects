@@ -210,6 +210,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class GetDgDataFromExcelRequest : EbServiceStackAuthRequest, IReturn<GetDgDataFromExcelResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string DgName { get; set; }
+
+        [DataMember(Order = 3)]
+        public byte[] FileBytea { get; set; }
+    }
+
+    [DataContract]
+    public class GetDgDataFromExcelResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string FormDataWrap { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     //[DataContract]
     //public class GetDynamicGridDataRequest : EbServiceStackAuthRequest, IReturn<GetDynamicGridDataResponse>
     //{
