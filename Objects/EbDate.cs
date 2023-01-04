@@ -437,7 +437,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
 
             if (_this is EbDate || _this is EbDGDateColumn)
             {
-                if (Value == null && _this.IsNullable)
+                if (string.IsNullOrWhiteSpace(Convert.ToString(Value)) && _this.IsNullable)
                     skip = true;
             }
 
