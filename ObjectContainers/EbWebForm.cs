@@ -1438,7 +1438,20 @@ namespace ExpressBase.Objects
             if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable) || _FormData.MultipleTables[_FormData.MasterTable].Count == 0)
             {
                 if (this.DataPusherConfig != null)
+                {
+                    if (!backup)
+                    {
+                        //for data pusher
+                        WebformData tempWFD = this.GetEmptyModel();
+                        _FormData.DGsRowDataModel = tempWFD.DGsRowDataModel;
+                        foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Normal))
+                        {
+                            if (_FormData.MultipleTables[_table.TableName].Count == 0)
+                                _FormData.MultipleTables[_table.TableName] = tempWFD.MultipleTables[_table.TableName];
+                        }
+                    }
                     return;
+                }
                 string t = "From RefreshFormData - TABLE : " + _FormData.MasterTable + "   ID : " + this.TableRowId + "\nData Not Found";
                 Console.WriteLine(t);
                 throw new FormException("Error in loading data", (int)HttpStatusCode.NotFound, t, string.Empty);
