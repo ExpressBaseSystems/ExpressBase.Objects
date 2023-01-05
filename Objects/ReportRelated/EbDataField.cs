@@ -131,7 +131,7 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetFormattedPhrase(this.Font, _reportFont, column_val);
 
-            if (column_val != string.Empty)
+            if (!string.IsNullOrEmpty(column_val))
             {
                 try
                 {
@@ -194,13 +194,8 @@ namespace ExpressBase.Objects
             return column_val;
         }
 
-        public void DoRenderInMultiLine(string column_val, EbReport Report, bool _inwords)
+        public bool IsCaps(EbFont font)
         {
-            //Report.RowHeight = 0;
-            Report.MultiRowTop = 0;
-            DbType datatype = (DbType)DbType;
-            int val_length = column_val.Length;
-            Phrase phrase = new Phrase(column_val, this.GetItextFont(this.Font, Report.Font));
             bool _isCaps = false;
             if (this.Font != null)
             {
@@ -209,17 +204,33 @@ namespace ExpressBase.Objects
             }
             else
             {
-                if (Report.Font?.Caps == true)
+                if (font?.Caps == true)
                     _isCaps = true;
             }
-            float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
-            if (calculatedValueSize > this.WidthPt)
+            return _isCaps;
+        }
+
+        public void DoRenderInMultiLine(string column_val, EbReport Report, bool _inwords)
+        {
+            Report.MultiRowTop = 0;
+            DbType datatype = (DbType)DbType;
+
+            Font _font = this.GetItextFont(this.Font, Report.Font);
+            if (IsCaps(Report.Font))
+                column_val = column_val.ToUpper();
+
+            Phrase phrase = new Phrase(column_val, _font);
+            double calculatedWidth = GetCalculatedWidth(column_val, Report);
+
+            if (calculatedWidth > this.WidthPt)
             {
                 int rowsneeded;
-                if (!_inwords && (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16 || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric))
+                if (!_inwords && (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16
+                                                || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric))
                     rowsneeded = 1;
                 else
-                    rowsneeded = (_isCaps) ? Convert.ToInt32(Math.Ceiling(calculatedValueSize / this.WidthPt)) : Convert.ToInt32(Math.Floor(calculatedValueSize / this.WidthPt));
+                    rowsneeded = Convert.ToInt32(Math.Ceiling(calculatedWidth / this.WidthPt));
+
                 if (rowsneeded > 1)
                 {
                     if (Report.MultiRowTop == 0)
@@ -233,6 +244,14 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+        }
+
+        public double GetCalculatedWidth(string column_val, EbReport Report)
+        {
+            Font currentITFont = this.GetItextFont(this.Font, Report.Font);
+
+            float returnvalue7 = currentITFont.GetCalculatedBaseFont(true).GetWidthPoint(column_val, currentITFont.Size);
+            return Math.Ceiling(returnvalue7);
         }
     }
 

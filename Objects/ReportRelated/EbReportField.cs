@@ -1000,7 +1000,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
 
-            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, (Rep.iDetailRowPos + 1).ToString());
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, (Rep.iDetailRowPos + 1).ToString()+". ");
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
