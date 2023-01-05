@@ -1469,7 +1469,8 @@ namespace ExpressBase.Objects
                     }
                 }
                 this.TableRowId = _FormData.MultipleTables[_FormData.MasterTable][0].RowId;
-                this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
+                if (!(this.IsLocEditable && this.LocationId > 0))
+                    this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
             }
 
             if (dataset.Tables.Count > _schema.Tables.Count)
@@ -1753,7 +1754,7 @@ namespace ExpressBase.Objects
 
                 if (drPsList.Count > 0)
                 {
-                    this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
+                    //this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
                     PsDmHelper dmHelper = new PsDmHelper(this, drPsList, _FormData, service);
                     dmHelper.UpdatePsDm_Tables();
                 }
