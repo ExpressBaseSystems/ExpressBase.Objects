@@ -544,8 +544,9 @@ namespace ExpressBase.Objects
                                 SingleColumn ColumnSrc = RowSrc.GetColumn(_columnDes.ColumnName);
                                 if (ColumnSrc != null)
                                 {
-                                    RowDes.SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
-                                    string _formattedData = Convert.ToString(ColumnSrc.Value);
+                                    if (!_columnDes.Control.DoNotImport)
+                                        RowDes.SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
+                                    string _formattedData = Convert.ToString(RowDes[_columnDes.ColumnName]);
                                     if (_columnDes.Control is EbDGPowerSelectColumn && !string.IsNullOrEmpty(_formattedData))
                                     {
                                         if (psDict.ContainsKey(_columnDes.Control))
@@ -583,13 +584,19 @@ namespace ExpressBase.Objects
                                 srcCtrlName = _dffm.SrcCtrlName;
 
                             ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
-                            if (ColumnSrc != null && (!(_columnDes.Control is EbAutoId) || CopyAutoId) && (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation))
+                            if (ColumnSrc != null &&
+                                (!(_columnDes.Control is EbAutoId) || CopyAutoId) &&
+                                (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation || !_columnDes.Control.DoNotImport))
                             {
-                                FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
+                                TableDes[0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                                 _formattedData = Convert.ToString(ColumnSrc.Value);
+                                if (ColumnSrc.Control is EbSimpleFileUploader && _columnDes.Control is EbSimpleFileUploader)
+                                {
+                                    TableDes[0].GetColumn(_columnDes.ColumnName).F = ColumnSrc.F;
+                                }
                             }
                             else
-                                _formattedData = Convert.ToString(FormDes.FormData.MultipleTables[_tableDes.TableName][0][_columnDes.ColumnName]);
+                                _formattedData = Convert.ToString(TableDes[0][_columnDes.ColumnName]);
                             if (_columnDes.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
                             {
                                 if (psDict.ContainsKey(_columnDes.Control))

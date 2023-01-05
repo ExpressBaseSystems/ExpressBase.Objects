@@ -208,17 +208,6 @@ namespace ExpressBase.Objects
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
-            if (!args.ins && args.webForm is EbWebForm WebForm && WebForm.IsLocEditable)
-            {
-                string paramName = args.cField.Name + crudContext;
-                double val = 0;
-                if (double.TryParse(Convert.ToString(args.cField.Value), out double temp))
-                    val = temp;
-                args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, val));
-                EbSystemColumns ebs = WebForm.SolutionObj.SolutionSettings.SystemColumns;
-                args._colvals += ebs[args.cField.Name] + CharConstants.EQUALS + CharConstants.AT + paramName + CharConstants.COMMA + CharConstants.SPACE;
-                args.i++;
-            }
             return true;
         }
 

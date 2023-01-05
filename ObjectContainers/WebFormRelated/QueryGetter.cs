@@ -455,7 +455,7 @@ WHERE
                     //if (_this.AutoId != null)
                     //    _qry = $"LOCK TABLE ONLY {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
 
-                    _qry += string.Format("INSERT INTO {0} ({19} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({20} @eb_createdby, {6}, @{18}_eb_loc_id, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
+                    _qry += string.Format("INSERT INTO {0} ({19} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({20} @eb_createdby, {6}, @{18}, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -474,7 +474,7 @@ WHERE
                         ebs.GetBoolFalse(SystemColumns.eb_del),//15
                         _this.LockOnSave ? ebs.GetBoolTrue(SystemColumns.eb_lock) : ebs.GetBoolFalse(SystemColumns.eb_lock),//16
                         ebs.GetBoolFalse(SystemColumns.eb_ro),//17
-                        _this.CrudContext,//18
+                        FormConstants.eb_loc_id_ + _this.CrudContext,//18
                         "{0}",//19
                         "{1}");//20
                 }
@@ -487,7 +487,7 @@ WHERE
                     string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
                     _qry = string.Format(@"INSERT INTO {0} ({27} {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}{24}) 
-                                    VALUES ({28} @eb_createdby, {10}, @{26}_eb_loc_id, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
+                                    VALUES ({28} @eb_createdby, {10}, @{26}, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -514,7 +514,7 @@ WHERE
                         ebs.GetBoolFalse(SystemColumns.eb_del),//23
                         refCtrlExists ? string.Empty : $", {conf.SourceTable}_id",//24
                         refCtrlExists ? string.Empty : $", {srcRef}",//25
-                        _this.CrudContext,//26
+                        FormConstants.eb_loc_id_ + _this.CrudContext,//26
                         "{0}",//27
                         "{1}");//28
                 }
@@ -553,7 +553,7 @@ VALUES (
     {{1}} 
     @eb_createdby, 
     {DataDB.EB_CURRENT_TIMESTAMP},
-    @{_this.CrudContext}_eb_loc_id,
+    @{FormConstants.eb_loc_id_ + _this.CrudContext},
     {srcRef},
     @eb_signin_log_id,
     {ebs.GetBoolFalse(SystemColumns.eb_void)},
@@ -575,18 +575,22 @@ VALUES (
 
             if (conf != null && DGCustSelect && !isDel)//don't edit datapusher line item with custom select query
                 return string.Empty;
+            string LocUpdateQry = string.Empty;
+            if (_this.IsLocEditable)
+                LocUpdateQry = $"{ebs[SystemColumns.eb_loc_id]}=@{FormConstants.eb_loc_id_ + _this.CrudContext}, ";
 
             if (conf == null)
             {
                 if (tblName.Equals(_this.TableName))
-                    _qry = string.Format("UPDATE {0} SET {7} {6}{1} = @eb_modified_by, {2} = {3} WHERE id = {8} AND COALESCE({4}, {5}) = {5}; ",
+                    _qry = string.Format("UPDATE {0} SET {8} {6}{7}{1} = @eb_modified_by, {2} = {3} WHERE id = {9} AND COALESCE({4}, {5}) = {5}; ",
                         tblName,//0
                         ebs[SystemColumns.eb_lastmodified_by],//1
                         ebs[SystemColumns.eb_lastmodified_at],//2
                         DataDB.EB_CURRENT_TIMESTAMP,//3
                         ebs[SystemColumns.eb_del],//4
                         ebs.GetBoolFalse(SystemColumns.eb_del),//5
-                        _this.LockOnSave ? $"{ebs[SystemColumns.eb_lock]} = {ebs.GetBoolTrue(SystemColumns.eb_lock)}, " : string.Empty,
+                        _this.LockOnSave ? $"{ebs[SystemColumns.eb_lock]} = {ebs.GetBoolTrue(SystemColumns.eb_lock)}, " : string.Empty,//6
+                        LocUpdateQry,//7
                         "{0}",
                         "{1}");
                 else
@@ -598,7 +602,7 @@ VALUES (
                         DGCustSelect ? "true" : $"{_this.TableName}_id = @{_this.TableName}_id",//4
                         ebs[SystemColumns.eb_del],//5
                         ebs.GetBoolFalse(SystemColumns.eb_del),//6
-                        isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",
+                        isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : ("{0}" + LocUpdateQry),//7
                         "{1}");
             }
             else
@@ -622,7 +626,7 @@ VALUES (
                     ebs[SystemColumns.eb_del],//5
                     ebs.GetBoolFalse(SystemColumns.eb_del),//6
                     pushIdChk,//7
-                    isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}",//8
+                    isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : ("{0}" + LocUpdateQry),//8
                     "{1}");
             }
             return _qry;
@@ -661,7 +665,7 @@ VALUES
     ({{1}}
     @eb_createdby,
     {DataDB.EB_CURRENT_TIMESTAMP},
-    @eb_loc_id,
+    @{FormConstants.eb_loc_id_ + _this.CrudContext},
     @{_this.TableName}_eb_ver_id,
     @{conf.SourceTable}_eb_ver_id,
     {conf.SourceRecId},
@@ -697,7 +701,7 @@ VALUES
     ({{1}} 
     @eb_createdby, 
     {DataDB.EB_CURRENT_TIMESTAMP}, 
-    @eb_loc_id , 
+    @{FormConstants.eb_loc_id_ + _this.CrudContext}, 
     {srcRef}, 
     @eb_signin_log_id,
     {ebs.GetBoolFalse(SystemColumns.eb_void)},
@@ -715,6 +719,9 @@ VALUES
 
             if (conf != null && DGCustSelect && !isDel)//don't edit datapusher line item with custom select query
                 return string.Empty;
+            string LocUpdateQry = string.Empty;
+            if (_this.IsLocEditable)
+                LocUpdateQry = $"{ebs[SystemColumns.eb_loc_id]}=@{FormConstants.eb_loc_id_ + _this.CrudContext}, ";
 
             if (tblName.Equals(_this.TableName))
             {
@@ -731,7 +738,7 @@ VALUES
 UPDATE 
     {tblName} 
 SET 
-    {(isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : "{0}")} 
+    {(isDel ? $"{ebs[SystemColumns.eb_del]} = {ebs.GetBoolTrue(SystemColumns.eb_del)}, " : ("{0}" + LocUpdateQry))} 
     {ebs[SystemColumns.eb_lastmodified_by]} = @eb_modified_by, 
     {ebs[SystemColumns.eb_lastmodified_at]} = {DataDB.EB_CURRENT_TIMESTAMP} 
 WHERE 

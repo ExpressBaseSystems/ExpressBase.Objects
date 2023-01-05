@@ -493,7 +493,8 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void FormatImportData(IDatabase DataDB, Service Service, EbWebForm FormDes, Dictionary<string, SingleTable> _PsApiTables = null, bool copyAutoId = false, string srcCtrl = null)//COPY this TO FormDes(Destination)
+        //COPY this TO FormDes(Destination)
+        public void FormatImportData(IDatabase DataDB, Service Service, EbWebForm FormDes, Dictionary<string, SingleTable> _PsApiTables = null, bool copyAutoId = false, string srcCtrl = null)
         {
             //mapping is based on ctrl name //different form
             //normal table columns are copying to master entry for easy search(not for Api import)
@@ -1437,7 +1438,20 @@ namespace ExpressBase.Objects
             if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable) || _FormData.MultipleTables[_FormData.MasterTable].Count == 0)
             {
                 if (this.DataPusherConfig != null)
+                {
+                    if (!backup)
+                    {
+                        //for data pusher
+                        WebformData tempWFD = this.GetEmptyModel();
+                        _FormData.DGsRowDataModel = tempWFD.DGsRowDataModel;
+                        foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Normal))
+                        {
+                            if (_FormData.MultipleTables[_table.TableName].Count == 0)
+                                _FormData.MultipleTables[_table.TableName] = tempWFD.MultipleTables[_table.TableName];
+                        }
+                    }
                     return;
+                }
                 string t = "From RefreshFormData - TABLE : " + _FormData.MasterTable + "   ID : " + this.TableRowId + "\nData Not Found";
                 Console.WriteLine(t);
                 throw new FormException("Error in loading data", (int)HttpStatusCode.NotFound, t, string.Empty);
@@ -1455,7 +1469,8 @@ namespace ExpressBase.Objects
                     }
                 }
                 this.TableRowId = _FormData.MultipleTables[_FormData.MasterTable][0].RowId;
-                this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
+                if (!(this.IsLocEditable && this.LocationId > 0))
+                    this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
             }
 
             if (dataset.Tables.Count > _schema.Tables.Count)
@@ -1739,7 +1754,7 @@ namespace ExpressBase.Objects
 
                 if (drPsList.Count > 0)
                 {
-                    this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
+                    //this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
                     PsDmHelper dmHelper = new PsDmHelper(this, drPsList, _FormData, service);
                     dmHelper.UpdatePsDm_Tables();
                 }
