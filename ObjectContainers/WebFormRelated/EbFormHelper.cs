@@ -576,6 +576,7 @@ namespace ExpressBase.Objects
                     {
                         string _formattedData;
                         SingleColumn ColumnSrc;
+                        bool mustCopy;
                         foreach (ColumnSchema _columnDes in _tableDes.Columns)
                         {
                             string srcCtrlName = _columnDes.ColumnName;
@@ -583,10 +584,20 @@ namespace ExpressBase.Objects
                             if (DFM != null && DFM is DataFlowForwardMap _dffm && !string.IsNullOrWhiteSpace(_dffm.SrcCtrlName))
                                 srcCtrlName = _dffm.SrcCtrlName;
 
+                            mustCopy = false;
                             ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
-                            if (ColumnSrc != null &&
-                                (!(_columnDes.Control is EbAutoId) || CopyAutoId) &&
-                                (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation || !_columnDes.Control.DoNotImport))
+                            if (ColumnSrc != null)//source ctrl not found
+                            {
+                                mustCopy = _columnDes.Control is EbAutoId && CopyAutoId;//import auto id
+                                if (!mustCopy)
+                                {
+                                    mustCopy = _columnDes.Control.IsSysControl && _columnDes.Control is EbSysLocation && !_columnDes.Control.DoNotImport;//sys location must be imported
+                                    if (!mustCopy)
+                                        mustCopy = !_columnDes.Control.DoNotImport;
+                                }
+                            }
+
+                            if (mustCopy)
                             {
                                 TableDes[0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
                                 _formattedData = Convert.ToString(ColumnSrc.Value);
