@@ -114,6 +114,9 @@ namespace ExpressBase.Objects
         [Alias("Import Form")]
         public string DataImportId { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Data import")]
+        public bool ImportInEditMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.CORE)]
