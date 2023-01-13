@@ -212,6 +212,10 @@ namespace ExpressBase.Objects
         public void DoRenderInMultiLine2(string column_val, EbReport Report, bool _inwords, float lly, float ury)
         {
             Report.MultiRowTop = 0;
+            DbType datatype = (DbType)DbType;
+            if (!_inwords && (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16
+                 || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric))
+                return;
             ColumnText ct_simulator = new ColumnText(Report.Canvas);
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Report.Font);
             ct_simulator.AddText(phrase);
@@ -510,7 +514,7 @@ namespace ExpressBase.Objects
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
             if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
-            column_val = String.Empty;
+                column_val = String.Empty;
             else
             {
                 column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture, DecimalCurrency);
@@ -519,7 +523,7 @@ namespace ExpressBase.Objects
             }
 
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop/* + Rep.RowHeight*/);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (RenderInMultiLine && AmountInWords)
