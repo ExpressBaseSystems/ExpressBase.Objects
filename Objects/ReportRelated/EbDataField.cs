@@ -539,7 +539,7 @@ namespace ExpressBase.Objects
             else
                 ct.AddText(phrase);
             ct.Canvas.SetColorFill(GetColor(ForeColor));
-            lly += Rep.RowHeight;
+            lly -= Rep.RowHeight;
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
