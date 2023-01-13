@@ -421,7 +421,7 @@ namespace ExpressBase.Objects
         public virtual List<EbURL> InfoVideoURLs { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultPropValue("100")]
+        [DefaultPropValue("500")]
         [PropertyGroup("Paging")]
         public int PageLength { get; set; }
 
@@ -465,7 +465,7 @@ namespace ExpressBase.Objects
         public List<FormLink> FormLinks { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
-        [DefaultPropValue("15")]
+        [DefaultPropValue("25")]
         [HideForUser]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public int RowHeight { get; set; }
@@ -1190,6 +1190,9 @@ else {
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage, BuilderType.DVBuilder)]
         public string Title { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool UseParams { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]

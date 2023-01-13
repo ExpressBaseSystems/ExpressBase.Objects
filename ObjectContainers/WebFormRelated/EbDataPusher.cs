@@ -355,14 +355,42 @@ else if (this.MultiPushIdType === 2)
 
                     if (FormData.MultipleTables.ContainsKey(entry.Key))
                     {
-                        for (int i = 0; i < entry.Value.Count; i++)
+                        if (_table?.TableType == WebFormTableTypes.Grid)
                         {
-                            if (i < FormData.MultipleTables[entry.Key].Count)
-                                FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
-                            else
+                            string keyColumn = _table.Columns[0].ColumnName;
+                            List<int> rowIds = new List<int>();
+                            for (int i = 0; i < FormData.MultipleTables[entry.Key].Count; i++)
                             {
-                                FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
-                                FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                                string keyValue = Convert.ToString(FormData.MultipleTables[entry.Key][i][keyColumn]);
+                                SingleRow _or = entry.Value.Find(e => Convert.ToString(e[keyColumn]) == keyValue);
+                                if (_or != null && !rowIds.Contains(_or.RowId))
+                                {
+                                    rowIds.Add(_or.RowId);
+                                    FormData.MultipleTables[entry.Key][i].RowId = _or.RowId;
+                                }
+                            }
+                            for (int i = 0; i < entry.Value.Count; i++)
+                            {
+                                if (!rowIds.Contains(entry.Value[i].RowId))
+                                {
+                                    FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
+                                    FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < entry.Value.Count; i++)
+                            {
+                                if (i < FormData.MultipleTables[entry.Key].Count)
+                                {
+                                    FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
+                                }
+                                else
+                                {
+                                    FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
+                                    FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                                }
                             }
                         }
                     }
