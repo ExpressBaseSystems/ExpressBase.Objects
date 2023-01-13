@@ -1190,6 +1190,9 @@ else {
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage, BuilderType.DVBuilder)]
         public string Title { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool UseParams { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]
