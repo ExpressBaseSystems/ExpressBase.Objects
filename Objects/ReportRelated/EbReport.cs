@@ -871,7 +871,11 @@ namespace ExpressBase.Objects
                     }
 
                     if (field.RenderInMultiLine)
-                        field.DoRenderInMultiLine(column_val, this, false);
+                    { 
+                        float ury = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop);
+                        float lly = HeightPt - (dt_Yposition + field.TopPt +  detailprintingtop + field.HeightPt);
+                        field.DoRenderInMultiLine2(column_val, this, false, lly, ury);
+                    }
                 }
                 EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
                 if (SortedReportFields.Length > 0)
@@ -879,8 +883,8 @@ namespace ExpressBase.Objects
                     for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
                         EbReportField field = SortedReportFields[iSortPos];
-                        if (field is EbDataField)
-                            field.HeightPt += RowHeight;
+                        //if (field is EbDataField)
+                        //    field.HeightPt += RowHeight;
                         DrawFields(field, dt_Yposition, serialnumber);
                     }
                     detailprintingtop += detail.HeightPt + RowHeight;
