@@ -515,12 +515,14 @@ namespace ExpressBase.Objects
         public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams, bool CopyAutoId, string srcCtrl)
         {
             List<DataFlowMapAbstract> DataFlowMap = null;
+            bool ExportMapedDataOnly = false;
             if (!string.IsNullOrWhiteSpace(srcCtrl))
             {
                 ColumnSchema _column = FormSrc.FormSchema.Tables[0].Columns.Find(e => e.Control is EbExportButton && e.Control.Name == srcCtrl);
-                if (_column != null && (_column.Control as EbExportButton).DataFlowMap?.Count > 0)
+                if (_column != null && _column.Control is EbExportButton ExprtCtrl && ExprtCtrl.DataFlowMap?.Count > 0)
                 {
-                    DataFlowMap = (_column.Control as EbExportButton).DataFlowMap;
+                    DataFlowMap = ExprtCtrl.DataFlowMap;
+                    ExportMapedDataOnly = ExprtCtrl.ExportMapedDataOnly;
                 }
             }
             if (DataFlowMap == null)
@@ -530,6 +532,9 @@ namespace ExpressBase.Objects
             {
                 if (_tableDes.TableType == WebFormTableTypes.Grid)
                 {
+                    if (ExportMapedDataOnly)//Grid is not considered when ExportMapedDataOnly property is set
+                        continue;
+
                     TableSchema _tableSrc = FormSrc.FormSchema.Tables.Find(e => e.ContainerName == _tableDes.ContainerName);
                     if (_tableSrc != null)
                     {
@@ -579,13 +584,17 @@ namespace ExpressBase.Objects
                         bool mustCopy;
                         foreach (ColumnSchema _columnDes in _tableDes.Columns)
                         {
-                            string srcCtrlName = _columnDes.ColumnName;
+                            string srcCtrlName = null;
                             DataFlowMapAbstract DFM = DataFlowMap.Find(e => e is DataFlowForwardMap dffm && dffm.DestCtrlName == _columnDes.ColumnName);
+
                             if (DFM != null && DFM is DataFlowForwardMap _dffm && !string.IsNullOrWhiteSpace(_dffm.SrcCtrlName))
                                 srcCtrlName = _dffm.SrcCtrlName;
 
+                            if (srcCtrlName == null && !ExportMapedDataOnly)
+                                srcCtrlName = _columnDes.ColumnName;
+
                             mustCopy = false;
-                            ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
+                            ColumnSrc = srcCtrlName == null ? null : FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
                             if (ColumnSrc != null)//source ctrl not found
                             {
                                 mustCopy = _columnDes.Control is EbAutoId && CopyAutoId;//import auto id

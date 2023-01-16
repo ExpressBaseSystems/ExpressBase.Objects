@@ -53,6 +53,10 @@ namespace ExpressBase.Objects.Objects
         public List<DataFlowMapAbstract> DataFlowMap { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.DATA)]
+        public bool ExportMapedDataOnly { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorSQ)]
         [Alias("Text Expression")]
         [HelpText("Expression for button text.")]
