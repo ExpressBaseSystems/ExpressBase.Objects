@@ -347,58 +347,61 @@ else if (this.MultiPushIdType === 2)
 
             if (AllowPush)
             {
-                foreach (KeyValuePair<string, SingleTable> entry in FormDataBackup.MultipleTables)
+                foreach (KeyValuePair<string, SingleTable> TableBkupEntry in FormDataBackup.MultipleTables)
                 {
-                    TableSchema _table = DestSchema.Tables.Find(e => e.TableName == entry.Key);
+                    SingleTable TableBkup = TableBkupEntry.Value;
+                    TableSchema _table = DestSchema.Tables.Find(e => e.TableName == TableBkupEntry.Key);
                     if ((_table?.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery)) || _table?.TableType == WebFormTableTypes.Review)
                         continue;
 
-                    if (FormData.MultipleTables.ContainsKey(entry.Key))
+                    if (FormData.MultipleTables.ContainsKey(TableBkupEntry.Key))
                     {
+                        SingleTable Table = FormData.MultipleTables[TableBkupEntry.Key];
                         if (_table?.TableType == WebFormTableTypes.Grid)
                         {
                             string keyColumn = _table.Columns[0].ColumnName;
                             List<int> rowIds = new List<int>();
-                            for (int i = 0; i < FormData.MultipleTables[entry.Key].Count; i++)
+                            for (int i = 0; i < Table.Count; i++)
                             {
-                                string keyValue = Convert.ToString(FormData.MultipleTables[entry.Key][i][keyColumn]);
-                                SingleRow _or = entry.Value.Find(e => Convert.ToString(e[keyColumn]) == keyValue);
+                                string keyValue = Convert.ToString(Table[i][keyColumn]);
+                                SingleRow _or = TableBkup.Find(e => Convert.ToString(e[keyColumn]) == keyValue);
                                 if (_or != null && !rowIds.Contains(_or.RowId))
                                 {
                                     rowIds.Add(_or.RowId);
-                                    FormData.MultipleTables[entry.Key][i].RowId = _or.RowId;
+                                    Table[i].RowId = _or.RowId;
                                 }
                             }
-                            for (int i = 0; i < entry.Value.Count; i++)
+                            for (int i = 0; i < TableBkup.Count; i++)
                             {
-                                if (!rowIds.Contains(entry.Value[i].RowId))
+                                if (!rowIds.Contains(TableBkup[i].RowId))
                                 {
-                                    FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
-                                    FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                                    TableBkup[i].IsDelete = true;
+                                    Table.Add(TableBkup[i]);
                                 }
                             }
                         }
                         else
                         {
-                            for (int i = 0; i < entry.Value.Count; i++)
+                            for (int i = 0; i < TableBkup.Count; i++)
                             {
-                                if (i < FormData.MultipleTables[entry.Key].Count)
+                                if (i < Table.Count)
                                 {
-                                    FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
+                                    Table[i].RowId = TableBkup[i].RowId;
                                 }
                                 else
                                 {
-                                    FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
-                                    FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                                    TableBkup[i].IsDelete = true;
+                                    Table.Add(TableBkup[i]);
                                 }
                             }
                         }
                     }
                     else
                     {
-                        FormData.MultipleTables.Add(entry.Key, entry.Value);
-                        foreach (SingleRow Row in FormData.MultipleTables[entry.Key])
+                        foreach (SingleRow Row in TableBkup)
                             Row.IsDelete = true;
+
+                        FormData.MultipleTables.Add(TableBkupEntry.Key, TableBkup);
                     }
                 }
             }
