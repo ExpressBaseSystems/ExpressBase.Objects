@@ -446,6 +446,24 @@ namespace ExpressBase.Objects
             }
         }
 
+        private float _rhHeightAsPh = 0;
+
+        [JsonIgnore]
+        public float ReportHeaderHeightRepeatAsPH
+        {
+            get
+            {
+                if (_rhHeightAsPh == 0)
+                {
+                    foreach (EbReportHeader r_header in ReportHeaders)
+                        if (r_header.RepeatOnAllPages)
+                            _rhHeightAsPh += r_header.HeightPt;
+                }
+
+                return _rhHeightAsPh;
+            }
+        }
+
         private float _phHeight = 0;
         [JsonIgnore]
         public float PageHeaderHeight
@@ -491,6 +509,23 @@ namespace ExpressBase.Objects
                 return _rfHeight;
             }
         }
+
+        private float _rfHeightAsPf = 0;
+        [JsonIgnore]
+        public float ReportFooterHeightRepeatAsPf
+        {
+            get
+            {
+                if (_rfHeightAsPf == 0)
+                {
+                    foreach (EbReportFooter r_footer in ReportFooters)
+                        if (r_footer.RepeatOnAllPages)
+                            _rfHeightAsPf += r_footer.HeightPt;
+                }
+                return _rfHeightAsPf;
+            }
+        }
+
 
         private float _dtHeight = 0;
         [JsonIgnore]
@@ -558,13 +593,13 @@ namespace ExpressBase.Objects
                 //}
 
                 if (PageNumber == 1 && IsLastpage)
-                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight + Margin.Top + Margin.Bottom);
+                    dt_fillheight = HeightPt - (ReportHeaderHeight + ReportFooterHeight + PageHeaderHeight + PageFooterHeight + Margin.Top + Margin.Bottom);
                 else if (PageNumber == 1)
-                    dt_fillheight = HeightPt - (ReportHeaderHeight + Margin.Top + PageHeaderHeight + PageFooterHeight + Margin.Bottom);
+                    dt_fillheight = HeightPt - (ReportHeaderHeight + Margin.Top + PageHeaderHeight + PageFooterHeight + Margin.Bottom + ReportFooterHeightRepeatAsPf);
                 else if (IsLastpage == true)
-                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top + ReportFooterHeight);
+                    dt_fillheight = HeightPt - (ReportHeaderHeightRepeatAsPH + PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top + ReportFooterHeight);
                 else
-                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top);
+                    dt_fillheight = HeightPt - (ReportHeaderHeightRepeatAsPH + PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top + ReportFooterHeightRepeatAsPf);
                 return dt_fillheight;
             }
         }
@@ -688,7 +723,7 @@ namespace ExpressBase.Objects
 
         }
 
-        public void DrawReportHeader()
+        public void DrawReportHeader(bool IsCallFromNewPageEvent = false)
         {
             RowHeight = 0;
             MultiRowTop = 0;
@@ -696,11 +731,14 @@ namespace ExpressBase.Objects
             detailprintingtop = 0;
             foreach (EbReportHeader r_header in ReportHeaders)
             {
-                foreach (EbReportField field in r_header.GetFields())
+                if (!IsCallFromNewPageEvent || (IsCallFromNewPageEvent && r_header.RepeatOnAllPages))
                 {
-                    DrawFields(field, rh_Yposition, 0);
+                    foreach (EbReportField field in r_header.GetFields())
+                    {
+                        DrawFields(field, rh_Yposition, 0);
+                    }
+                    rh_Yposition += r_header.HeightPt;
                 }
-                rh_Yposition += r_header.HeightPt;
             }
         }
 
@@ -709,7 +747,13 @@ namespace ExpressBase.Objects
             RowHeight = 0;
             MultiRowTop = 0;
             detailprintingtop = 0;
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
+            if (PageNumber == 1)
+                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
+            else if (ReportHeaderHeightRepeatAsPH > 0)
+                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
+            else
+                ph_Yposition = this.Margin.Top;
+
             foreach (EbPageHeader p_header in PageHeaders)
             {
                 foreach (EbReportField field in p_header.GetFields())
@@ -724,7 +768,13 @@ namespace ExpressBase.Objects
         {
             RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[DetailTableIndex].Rows : null;
 
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
+            if (PageNumber == 1)
+                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
+            else if (ReportHeaderHeightRepeatAsPH > 0)
+                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
+            else
+                ph_Yposition = this.Margin.Top;
+
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             if (rows != null && HasRows == true)
             {
@@ -842,7 +892,12 @@ namespace ExpressBase.Objects
 
         public void DoLoopInDetail(int serialnumber)
         {
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
+            if (PageNumber == 1)
+                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
+            else if (ReportHeaderHeightRepeatAsPH > 0)
+                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
+            else
+                ph_Yposition = this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             foreach (EbReportDetail detail in Detail)
             {
@@ -871,9 +926,9 @@ namespace ExpressBase.Objects
                     }
 
                     if (field.RenderInMultiLine)
-                    { 
+                    {
                         float ury = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop);
-                        float lly = HeightPt - (dt_Yposition + field.TopPt +  detailprintingtop + field.HeightPt);
+                        float lly = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop + field.HeightPt);
                         field.DoRenderInMultiLine2(column_val, this, false, lly, ury);
                     }
                 }
@@ -930,7 +985,12 @@ namespace ExpressBase.Objects
             RowHeight = 0;
             MultiRowTop = 0;
             detailprintingtop = 0;
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
+            if (PageNumber == 1)
+                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
+            else if (ReportHeaderHeightRepeatAsPH > 0)
+                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
+            else
+                ph_Yposition = this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //  pf_Yposition = dt_Yposition + DT_FillHeight;
             pf_Yposition = (float)detailEnd + /*DetailHeight +*/ dt_Yposition;
@@ -944,7 +1004,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void DrawReportFooter()
+        public void DrawReportFooter(bool IsCallFromNewPageEvent = false)
         {
             RowHeight = 0;
             MultiRowTop = 0;
@@ -952,7 +1012,7 @@ namespace ExpressBase.Objects
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //pf_Yposition = dt_Yposition + DT_FillHeight;
             pf_Yposition = (float)detailEnd /*+ DetailHeight*/ + dt_Yposition;
-            if (RenderReportFooterInBottom)
+            if (RenderReportFooterInBottom && !IsCallFromNewPageEvent)
             {
                 rf_Yposition = HeightPt - ReportFooterHeight;
             }
@@ -960,29 +1020,33 @@ namespace ExpressBase.Objects
             {
                 rf_Yposition = pf_Yposition + PageFooterHeight;
             }
+
             foreach (EbReportFooter r_footer in ReportFooters)
             {
-                float footer_diffrence = 0;
-                EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
-                if (SortedReportFields.Length > 0)
+                if (!IsCallFromNewPageEvent || (IsCallFromNewPageEvent && r_footer.RepeatOnAllPages))
                 {
-                    for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                    float footer_diffrence = 0;
+                    EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
+                    if (SortedReportFields.Length > 0)
                     {
-                        EbReportField field = SortedReportFields[iSortPos];
-                        // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
-                        if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
+                        for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                         {
-                            AddNewPage();
-                            //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
-                            footer_diffrence = field.TopPt;
-                            FooterDrawn = true;
-                            rf_Yposition = Margin.Top;
+                            EbReportField field = SortedReportFields[iSortPos];
+                            // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
+                            if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
+                            {
+                                AddNewPage();
+                                //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
+                                footer_diffrence = field.TopPt;
+                                FooterDrawn = true;
+                                rf_Yposition = Margin.Top;
+                            }
+                            field.TopPt -= footer_diffrence;
+                            DrawFields(field, rf_Yposition, 0);
                         }
-                        field.TopPt -= footer_diffrence;
-                        DrawFields(field, rf_Yposition, 0);
                     }
+                    rf_Yposition += r_footer.HeightPt;
                 }
-                rf_Yposition += r_footer.HeightPt;
             }
         }
 
@@ -1861,10 +1925,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbReportHeader : EbReportSection
     {
+        [EnableInBuilder(BuilderType.Report)]
+        public bool RepeatOnAllPages { get; set; }
 
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportHeader' tabindex='1' id='@id' data_val='0' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportHeader' tabindex='1' id='@id' data_val='0' style='width :100%;height: @SectionHeight ;position: relative'> </div>".RemoveCR().DoubleQuoted();  // background-color:@BackColor ;
         }
 
         public override string GetJsInitFunc()
@@ -1882,7 +1948,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageHeader' tabindex='1' id='@id' data_val='1' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageHeader' tabindex='1' id='@id' data_val='1' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted(); //background-color:@BackColor ;
         }
 
         public override string GetJsInitFunc()
@@ -1900,7 +1966,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportDetail' tabindex='1' id='@id' data_val='2' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportDetail' tabindex='1' id='@id' data_val='2' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted(); //background-color:@BackColor ;
         }
 
         public override string GetJsInitFunc()
@@ -1919,7 +1985,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageFooter' tabindex='1' id='@id' data_val='3' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageFooter' tabindex='1' id='@id' data_val='3' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted(); //background-color:@BackColor ;
         }
 
         public override string GetJsInitFunc()
@@ -1935,9 +2001,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbReportFooter : EbReportSection
     {
+        [EnableInBuilder(BuilderType.Report)]
+        public bool RepeatOnAllPages { get; set; }
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportFooter' tabindex='1' id='@id' data_val='4' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportFooter' tabindex='1' id='@id' data_val='4' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted(); //background-color:@BackColor ;
         }
 
         public override string GetJsInitFunc()
