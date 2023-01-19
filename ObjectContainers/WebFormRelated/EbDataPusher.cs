@@ -203,7 +203,7 @@ else if (this.MultiPushIdType === 2)
                     EbWebForm Form = pusher.WebForm.ShallowCopy();
                     Form.DataPusherConfig = pusher.WebForm.DataPusherConfig.ShallowCopy();
 
-                    Form.FormData = CreateWebFormData_inner(OutputDict, ref Index, JObj, pusher.WebForm.FormSchema, this.WebForm, pusher.SkipLineItemIf, pusher.WebForm.DataPusherConfig.ScriptCount);
+                    Form.FormData = CreateWebFormData_inner(OutputDict, ref Index, JObj, pusher.WebForm, this.WebForm, pusher.SkipLineItemIf, pusher.WebForm.DataPusherConfig.ScriptCount);
                     Form.DataPusherConfig.GridDataId = Row.RowId;
                     Form.MergeFormData();
                     Form.CrudContext = CrudContext++.ToString();
@@ -234,7 +234,7 @@ else if (this.MultiPushIdType === 2)
                 pusher.WebForm.LocationId = this.WebForm.LocationId;
                 pusher.WebForm.SolutionObj = this.WebForm.SolutionObj;
                 pusher.WebForm.DataPusherConfig.AllowPush = true;
-                pusher.WebForm.FormData = CreateWebFormData_inner(OutputDict, ref Index, JObj, pusher.WebForm.FormSchema, this.WebForm, pusher.SkipLineItemIf);
+                pusher.WebForm.FormData = CreateWebFormData_inner(OutputDict, ref Index, JObj, pusher.WebForm, this.WebForm, pusher.SkipLineItemIf);
 
                 if (!string.IsNullOrWhiteSpace(pusher.PushOnlyIf))
                 {
@@ -251,11 +251,11 @@ else if (this.MultiPushIdType === 2)
             }
         }
 
-        private WebformData CreateWebFormData_inner(Dictionary<int, object[]> OutputDict, ref int Index, JObject JObj, WebFormSchema DestSchema, EbWebForm SrcWebForm, string SkipLineItemIf, int CodeIdx = 1000)
+        private WebformData CreateWebFormData_inner(Dictionary<int, object[]> OutputDict, ref int Index, JObject JObj, EbWebForm DestWebForm, EbWebForm SrcWebForm, string SkipLineItemIf, int CodeIdx = 1000)
         {
-            WebformData FormData = new WebformData() { MasterTable = DestSchema.MasterTable };
+            WebformData FormData = new WebformData() { MasterTable = DestWebForm.FormSchema.MasterTable };
 
-            foreach (TableSchema _table in DestSchema.Tables)
+            foreach (TableSchema _table in DestWebForm.FormSchema.Tables)
             {
                 if (JObj[_table.TableName] != null)
                 {
@@ -308,6 +308,11 @@ else if (this.MultiPushIdType === 2)
                             {
                                 val = Convert.ToString(val).Replace(FG_Constants.DataId_PlaceHolder, string.Empty);
                                 _column.Control.BypassParameterization = true;
+                            }
+                            else if (_column.Control is EbSysLocation && DestWebForm.IsLocEditable && int.TryParse(Convert.ToString(val), out int locId))
+                            {
+                                if (DestWebForm.SolutionObj.Locations.ContainsKey(locId))
+                                    DestWebForm.LocationId = locId;
                             }
 
                             Row.Columns.Add(new SingleColumn
