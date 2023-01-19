@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
@@ -287,8 +288,17 @@ namespace ExpressBase.Objects.WebFormRelated
                     {
                         object data = null;
                         Dictionary<string, object> Metas = new Dictionary<string, object>();
-                        if (_control is EbAutoId && fG_WebForm.__mode == "new")// && fG_WebForm.id == 0
-                            data = FG_Constants.AutoId_PlaceHolder;
+                        if (_control is EbAutoId ebAI && fG_WebForm.__mode == "new")// && fG_WebForm.id == 0
+                        {
+                            data = string.Format("{4}(SELECT {5}{0}{6} FROM {1} WHERE {2}id = (SELECT(eb_currval('{3}_id_seq')))){4}",
+                                ebAI.Name,//0
+                                ebAI.TableName,//1
+                                ebAI.TableName == fG_WebForm.MasterTable ? string.Empty : (fG_WebForm.MasterTable + CharConstants.UNDERSCORE),//2
+                                fG_WebForm.MasterTable,//3
+                                FG_Constants.AutoId_PlaceHolder,//4
+                                "{0}",
+                                "{1}");
+                        }
                         else
                         {
                             SingleColumn psSC = null;
@@ -310,8 +320,10 @@ namespace ExpressBase.Objects.WebFormRelated
                             if (psSC != null && _control is IEbPowerSelect)
                                 Metas.Add(FG_Constants.Columns, psSC.R);
                         }
-                        if (_control is EbAutoId ebAI)
-                            Metas.Add(FG_Constants.SerialLength, ebAI.Pattern?.SerialLength ?? 0);
+                        if (_control is EbAutoId ebAI2)
+                        {
+                            Metas.Add(FG_Constants.SerialLength, ebAI2.Pattern?.SerialLength ?? 0);
+                        }
 
                         fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control.Name, _control.ObjType, data, Metas));
                     }

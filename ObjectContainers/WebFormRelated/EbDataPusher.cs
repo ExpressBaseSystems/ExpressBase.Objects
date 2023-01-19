@@ -276,13 +276,9 @@ else if (this.MultiPushIdType === 2)
                                     _column.Control.BypassParameterization = true;
                                     string[] val_s = Convert.ToString(val).Split(FG_Constants.AutoId_PlaceHolder);
 
-                                    val = string.Format("(SELECT {4}{0}{5} FROM {1} WHERE {2}id = (SELECT(eb_currval('{3}_id_seq'))))",
-                                        SrcWebForm.AutoId.Name,
-                                        SrcWebForm.AutoId.TableName,
-                                        SrcWebForm.AutoId.TableName == SrcWebForm.TableName ? string.Empty : (SrcWebForm.TableName + CharConstants.UNDERSCORE),
-                                        SrcWebForm.TableName,
+                                    val = string.Format(val_s[1],
                                         string.IsNullOrWhiteSpace(val_s[0]) ? string.Empty : $"'{val_s[0]}' || ",
-                                        string.IsNullOrWhiteSpace(val_s[1]) ? string.Empty : $" || '{val_s[1]}'");
+                                        string.IsNullOrWhiteSpace(val_s[2]) ? string.Empty : $" || '{val_s[2]}'");
                                 }
                                 else
                                     val = string.Empty;

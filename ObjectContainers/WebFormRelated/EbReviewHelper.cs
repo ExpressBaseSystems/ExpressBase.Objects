@@ -514,11 +514,14 @@ WHERE
                 if (!string.IsNullOrEmpty(description))
                 {
                     if (this.webForm.AutoId != null && this.isInsert && description.Contains(FG_Constants.AutoId_PlaceHolder))
-                        description = description.Replace(FG_Constants.AutoId_PlaceHolder, autoId);
+                    {
+                        string[] val_s = description.Split(FG_Constants.AutoId_PlaceHolder);
+                        description = val_s[0] + autoId + val_s[2];
+                    }
                 }
             }
             if (string.IsNullOrEmpty(description))
-                description = $"{this.webForm.DisplayName} {(autoId.IsEmpty() ? string.Empty : (CharConstants.SPACE + autoId))}in {nextStage.Name}";
+                description = $"{this.webForm.DisplayName} {(autoId.IsEmpty() ? string.Empty : (autoId + CharConstants.SPACE))}in {nextStage.Name}";
             return description;
         }
 
@@ -529,7 +532,7 @@ WHERE
             if (this.webForm.AutoId != null)
             {
                 if (this.isInsert)
-                    autoId = $" ' || (SELECT {this.webForm.AutoId.Name} FROM {this.webForm.AutoId.TableName} WHERE {(this.webForm.AutoId.TableName == this.webForm.TableName ? string.Empty : (this.webForm.TableName + CharConstants.UNDERSCORE))}id = {masterId}) || ' ";
+                    autoId = $"' || (SELECT {this.webForm.AutoId.Name} FROM {this.webForm.AutoId.TableName} WHERE {(this.webForm.AutoId.TableName == this.webForm.TableName ? string.Empty : (this.webForm.TableName + CharConstants.UNDERSCORE))}id = {masterId}) || '";
                 else if (this.webForm.FormDataBackup.MultipleTables.TryGetValue(this.webForm.AutoId.TableName, out SingleTable _Table) && _Table.Count > 0)
                     autoId = CharConstants.SPACE + Convert.ToString(_Table[0][this.webForm.AutoId.Name]) + CharConstants.SPACE;
             }
