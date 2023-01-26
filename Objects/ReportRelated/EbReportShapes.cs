@@ -410,4 +410,28 @@ namespace ExpressBase.Objects
                     };";
         }
     }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbReportDataTable : EbReportField
+    {
+        public override string GetDesignHtml()
+        {
+            return @"
+                    <div class='eb_report_datatable_container dropped' id='@id' eb-type='ReportDataTable'
+                         style='top: @Top px;left: @Left px;height: @Height px;width: @Width px; border: @Border px solid ; border-color: @BorderColor ;'>
+                        <span class='name'> @Title </span>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+                this.Init = function(id)
+                    {
+                        this.Width= 300;
+                        this.Border = 1;
+                        this.BorderColor = '#eeeeee';
+                    };";
+        }
+    }
 }
