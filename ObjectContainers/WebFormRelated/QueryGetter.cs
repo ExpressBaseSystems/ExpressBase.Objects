@@ -144,10 +144,15 @@ namespace ExpressBase.Objects.WebFormRelated
                 else if (Ctrl is IEbExtraQryCtrl)
                 {
                     if (Ctrl is EbReview Rev && _this.DataPusherConfig != null)
+                    {
                         extquery += Rev.GetSelectQuery(_this, _pshId, ebs[SystemColumns.eb_del], ebs.GetBoolFalse(SystemColumns.eb_del));
-                    else
+                        _qryCount++;
+                    }
+                    else if (_this.DataPusherConfig == null)
+                    {
                         extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
-                    _qryCount++;
+                        _qryCount++;
+                    }
                 }
             }
             return query + extquery;

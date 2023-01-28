@@ -1479,7 +1479,7 @@ namespace ExpressBase.Objects
                 SingleTable UserTable = null;
                 foreach (EbControl Ctrl in _schema.ExtendedControls)
                 {
-                    if (Ctrl is IEbExtraQryCtrl)
+                    if (Ctrl is EbProvisionUser || (Ctrl is IEbExtraQryCtrl && ((Ctrl is EbReview Rev && this.DataPusherConfig != null) || this.DataPusherConfig == null)))
                     {
                         SingleTable Table = new SingleTable();
                         if (!(UserTable != null && Ctrl is EbProvisionUser))
