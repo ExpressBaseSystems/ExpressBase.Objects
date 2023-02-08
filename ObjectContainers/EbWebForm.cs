@@ -801,7 +801,14 @@ namespace ExpressBase.Objects
                     EbAutoId ctrl = c as EbAutoId;
                     SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
                     if (ctrl.BypassParameterization)
+                    {
                         patternVal = Convert.ToString(Row[ctrl.Name]);
+                    }
+                    else if (this.DataPusherConfig != null && Convert.ToString(Row[ctrl.Name]).Contains(FG_Constants.AutoId_Prefix_PlaceHolder))
+                    {
+                        patternVal = Convert.ToString(Row[ctrl.Name]);
+                        ctrl.DpAutoIdPrefix = true;
+                    }
                     else if (this.TableRowId == 0 && (isMobOfflineData || isDraftSave) && !string.IsNullOrWhiteSpace(Row[ctrl.Name]?.ToString()))
                     {
                         patternVal = $"'{Convert.ToString(Row[ctrl.Name])}'";

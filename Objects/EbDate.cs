@@ -366,7 +366,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                                     if (finStartEnd == null && !fy.Locked)
                                         finStartEnd = GetFyDate(this.RestrictionRule, fy, true).ToString(shtDtPtn, CultureInfo.InvariantCulture) + " and " + GetFyDate(this.RestrictionRule, fy, false).ToString(shtDtPtn, CultureInfo.InvariantCulture);
 
-                                    if ((!fy.Locked || IsSysUser) && GetFyDate(this.RestrictionRule, fy, true) <= Date && GetFyDate(this.RestrictionRule, fy, false) >= Date)
+                                    if ((!fy.Locked || IsSysUser) && GetFyDate(this.RestrictionRule, fy, true).Date <= Date.Date && GetFyDate(this.RestrictionRule, fy, false).Date >= Date.Date)
                                     {
                                         DateIsOk = true;
                                         break;

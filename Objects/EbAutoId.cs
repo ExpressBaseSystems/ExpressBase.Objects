@@ -17,6 +17,7 @@ using System.Net;
 using ExpressBase.Objects.WebFormRelated;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.LocationNSolution;
+using ExpressBase.CoreBase.Globals;
 
 namespace ExpressBase.Objects
 {
@@ -86,6 +87,8 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         public string TableName { get; set; }
+
+        public bool DpAutoIdPrefix { get; set; }
 
         private bool IsSqlExpr { get; set; }
 
@@ -185,13 +188,18 @@ namespace ExpressBase.Objects
                 if (this.BypassParameterization)
                 {
                     args._vals += Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
+                    this.IsSqlExpr = true;
                 }
                 else
                 {
                     this.IsSqlExpr = false;
                     string SqlCode = null;
 
-                    if (!string.IsNullOrWhiteSpace(this.Script?.Code))
+                    if (Convert.ToString(args.cField.Value).Contains(FG_Constants.AutoId_Prefix_PlaceHolder) && this.DpAutoIdPrefix)
+                    {
+                        args.cField.Value = Convert.ToString(args.cField.Value).Replace(FG_Constants.AutoId_Prefix_PlaceHolder, string.Empty);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(this.Script?.Code))
                     {
                         EbWebForm WebForm = args.webForm as EbWebForm;
                         if (this.Script.Lang == ScriptingLanguage.CSharp)
@@ -228,7 +236,7 @@ namespace ExpressBase.Objects
                             this.IsSqlExpr ? SqlCode : $"@{args.cField.Name}_{args.i}",
                             this.Pattern.SerialLength,
                             args.tbl,
-                            this.IsSqlExpr ? $"({SqlCode}) || '%'" : $"'args.cField.Value%'");
+                            this.IsSqlExpr ? $"({SqlCode}) || '%'" : $"'{args.cField.Value}%'");
                     else
                         args._vals += string.Format(@"
 (({1}) || 

@@ -299,6 +299,11 @@ else if (this.MultiPushIdType === 2)
                                 else
                                     val = string.Empty;
                             }
+                            else if (Convert.ToString(val).Contains(FG_Constants.AutoId_Prefix_PlaceHolder))
+                            {
+                                if (!(_column.Control is EbAutoId))
+                                    throw new FormException($"Invalid Datapusher config for column {_column.ColumnName};", (int)HttpStatusCode.BadRequest, "getNewAutoIdUsingPrefix fn allowed only for AutoId controls; ", "DataPusher=>CreateWebFormData");
+                            }
                             else if (SrcWebForm.AutoId != null && _column.Control is EbAutoId && SrcWebForm.TableRowId > 0 && !string.IsNullOrWhiteSpace(Convert.ToString(val)))
                             {
                                 _column.Control.BypassParameterization = true;
