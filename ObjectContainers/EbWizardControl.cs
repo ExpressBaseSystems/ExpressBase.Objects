@@ -41,6 +41,10 @@ namespace ExpressBase.Objects
         [Alias("Minimum height")]
         public int MinHeight { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public string SubmitButtonText { get; set; }
+
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
