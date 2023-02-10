@@ -651,7 +651,8 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 TableSchema _table = _this.FormSchema.Tables.Find(e => e.ContainerName == batchDp.SourceDG);
                 SingleTable Table = _this.FormData.MultipleTables[_table.TableName];
                 SingleTable TableBkUp = _this.FormDataBackup?.MultipleTables.ContainsKey(_table.TableName) == true ? _this.FormDataBackup.MultipleTables[_table.TableName] : null;
-                (SingleTable TableEdited, SingleTable TableDeleted) = MergeGridData(TableBkUp, Table);
+                bool NormalCtrlValChanged = IsNormalCtrlValueChanged(batchDp, _this);
+                (SingleTable TableEdited, SingleTable TableDeleted) = MergeGridData(TableBkUp, Table, NormalCtrlValChanged);
                 _FormData.MultipleTables[_table.TableName] = TableEdited;//Grid aggregate in script may give wrong values because only edited rows are considered 
                 if (!ChangeDetected && (TableEdited.Count > 0 || TableDeleted.Count > 0))
                     ChangeDetected = true;
@@ -782,27 +783,58 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
             return Forms;
         }
 
-        private static (SingleTable, SingleTable) MergeGridData(SingleTable OldTable, SingleTable NewTable)
+        private static bool IsNormalCtrlValueChanged(EbBatchFormDataPusher batchDp, EbWebForm _this)
+        {
+            if (_this.FormDataBackup == null)
+                return false;
+            string json = batchDp.Json;
+            foreach (TableSchema _table in _this.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Normal))
+            {
+                if (_this.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0 &&
+                    _this.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
+                {
+                    foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control?.DoNotPersist == false))
+                    {
+                        if (Convert.ToString(Table[0][_column.ColumnName]) != Convert.ToString(TableBkUp[0][_column.ColumnName]))
+                        {
+                            if (json.Contains($"sourceform.{_column.ColumnName}.getValue()"))
+                            {
+                                //change detected
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static (SingleTable, SingleTable) MergeGridData(SingleTable OldTable, SingleTable NewTable, bool ForceUpdate)
         {
             SingleTable TableEdited = new SingleTable();
             SingleTable TableDeleted = new SingleTable();
             if (OldTable == null)
                 return (NewTable, TableDeleted);
+
             foreach (SingleRow nRow in NewTable)
             {
                 bool RowChanged = false;
                 SingleRow oRow = OldTable.Find(e => e.RowId == nRow.RowId);
                 if (oRow != null)
                 {
-                    foreach (SingleColumn nColumn in nRow.Columns)
+                    if (!ForceUpdate)
                     {
-                        //do not persist ctrls - NewTable will contains the value if the expr is sql val expr
-                        if (nColumn.Control?.DoNotPersist == true)
-                            continue;
-                        if (Convert.ToString(oRow[nColumn.Name]) != Convert.ToString(nColumn.Value))
+                        foreach (SingleColumn nColumn in nRow.Columns)
                         {
-                            RowChanged = true;
-                            break;
+                            //do not persist ctrls - NewTable will contains the value if the expr is sql val expr
+                            if (nColumn.Control?.DoNotPersist == true)
+                                continue;
+                            if (Convert.ToString(oRow[nColumn.Name]) != Convert.ToString(nColumn.Value))
+                            {
+                                RowChanged = true;
+                                break;
+                            }
                         }
                     }
                     OldTable.Remove(oRow);
@@ -810,7 +842,7 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                 else
                     RowChanged = true;
 
-                if (RowChanged)
+                if (RowChanged || ForceUpdate)
                     TableEdited.Add(nRow);
             }
             foreach (SingleRow oRow in OldTable)
