@@ -255,6 +255,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyPriority(98)]
+        [Alias("Show Refresh Button")]
+        public bool ShowRefreshBtn { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [OnChangeExec(@"
 if (this.IsDisable){
     pg.HideProperty('DisableRowEdit');
@@ -345,9 +351,14 @@ else {
         public override string GetBareHtml()
         {
             //SetCols();
+            int btnright = 0;
+            if (this.EnableExcelUpload) btnright += 100;
+            if (this.ShowRefreshBtn) btnright += 76;
+            if (btnright == 0) btnright = 8;
 
             string html = @"
 <div class='grid-cont'>
+    @refreshdgdrbtn@
     @exceluploadbtn@
     @addrowbtn@
 <div class='Dg_head'>
@@ -356,8 +367,10 @@ else {
               <tr>  
                 <th class='slno' style='width:30px'><span class='grid-col-title'>#</span></th>"
 .Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0' title='Add Row (Alt+R)' style='right: @addbtnrightstyle@px;'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty)
-.Replace("@exceluploadbtn@", this.EnableExcelUpload ? "<div id='@ebsid@excelupload' class='excelupload-btn' tabindex='0'>Upload Excel</div>" : string.Empty)
-.Replace("@addbtnrightstyle@", this.IsAddable && this.EnableExcelUpload ? "102" : "8");
+.Replace("@exceluploadbtn@", this.EnableExcelUpload ? "<div id='@ebsid@excelupload' class='excelupload-btn' tabindex='0' style='right: @exelbtnrightstyle@px;'>Upload Excel</div>" : string.Empty)
+.Replace("@refreshdgdrbtn@", this.ShowRefreshBtn ? "<div id='@ebsid@refreshdgdr' class='refreshdgdr-btn' tabindex='0'>Refresh</div>" : string.Empty)
+.Replace("@addbtnrightstyle@", btnright.ToString())
+.Replace("@exelbtnrightstyle@", this.ShowRefreshBtn ? "76" : "8");
             EbDGColumn lastCtrl = (EbDGColumn)Controls.FindLast(e => !e.Hidden);
             this.AdjustColumnWidth();
             foreach (EbDGColumn col in Controls)
