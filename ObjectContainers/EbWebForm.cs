@@ -1401,7 +1401,7 @@ namespace ExpressBase.Objects
 
                 if (this.FormDataPusherCount > 0 && includePushData)
                 {
-                    for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
+                    for (int i = 0, j = 1; i < this.DataPushers.Count; i++, j++)
                     {
                         if (!(this.DataPushers[i] is EbFormDataPusher))
                             continue;
@@ -1409,7 +1409,7 @@ namespace ExpressBase.Objects
                         qrycount[j] = QueryGetter.GetSelectQueryCount(_Form);
                         _Form.UserObj = this.UserObj;
                         _Form.SolutionObj = this.SolutionObj;
-                        _FormCollection[j++] = _Form;
+                        _FormCollection[j] = _Form;
                         for (int k = 0; k < qrycount[j]; k++)
                             query += $"FETCH ALL FROM ref{refCounter++};";
                     }
