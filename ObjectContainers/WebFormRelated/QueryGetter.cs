@@ -44,7 +44,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_lastmodified_at]);//11
                 else if (_table.TableType == WebFormTableTypes.Review)
                 {
-                    _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
+                    _id = $"eb_ver_id = {form_ver_id} AND eb_src_id";
                     _cols = "eb_loc_id, id";
                 }
                 else

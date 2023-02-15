@@ -1372,6 +1372,8 @@ namespace ExpressBase.Objects
                 {
                     if (!(this.DataPushers[i] is EbFormDataPusher))
                         continue;
+                    this.DataPushers[i].WebForm.UserObj = this.UserObj;
+                    this.DataPushers[i].WebForm.SolutionObj = this.SolutionObj;
                     destTableQuery += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out qrycount[j]);
                 }
             }
