@@ -245,9 +245,9 @@ this.Init = function(id)
 
         public bool IsLocationCreated { get; set; }
 
-        public string GetSelectQuery(IDatabase DataDB, string masterTbl)
+        public string GetSelectQuery(IDatabase DataDB, string masterTbl, string form_ver_id, string form_ref_id)
         {
-            return string.Format("SELECT id, longname, shortname, image, meta_json, is_group, parent_id, eb_location_types_id FROM eb_locations WHERE eb_ver_id = :{0}_eb_ver_id AND eb_data_id = :{0}_id AND COALESCE(eb_del, 'F') = 'F';", masterTbl);
+            return $"SELECT id, longname, shortname, image, meta_json, is_group, parent_id, eb_location_types_id FROM eb_locations WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id AND COALESCE(eb_del, 'F') = 'F';";
         }
 
         private string GetSaveQuery(bool ins, string param, string mtbl)

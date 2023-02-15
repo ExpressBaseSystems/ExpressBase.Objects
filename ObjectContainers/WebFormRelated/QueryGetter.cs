@@ -19,6 +19,7 @@ namespace ExpressBase.Objects.WebFormRelated
             _qryCount = 0;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             string _pshId = _this.DataPusherConfig?.MultiPushId == null ? string.Empty : $"AND {ebs[SystemColumns.eb_push_id]} = '{_this.DataPusherConfig.MultiPushId}'";
+            string form_ver_id = _this.RefId.Split(CharConstants.DASH)[4];
 
             foreach (TableSchema _table in _this.FormSchema.Tables)
             {
@@ -134,7 +135,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     if (!MuCtrlFound)
                     {
-                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
+                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable, form_ver_id, _this.RefId);
                         MuCtrlFound = true;
                         _qryCount++;
                     }
@@ -150,12 +151,58 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     else if (_this.DataPusherConfig == null)
                     {
-                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
+                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable, form_ver_id, _this.RefId);
                         _qryCount++;
                     }
                 }
             }
             return query + extquery;
+        }
+
+        public static int GetSelectQueryCount(EbWebForm _this)
+        {
+            int _qryCount = 0;
+            foreach (TableSchema _table in _this.FormSchema.Tables)
+            {
+                if (_table.DoNotPersist)
+                    continue;
+
+                if (_table.TableType == WebFormTableTypes.Grid)
+                {
+                    if (!string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
+                    {
+
+                        _qryCount++;
+                        continue;
+                    }
+                }
+                _qryCount++;
+            }
+            bool MuCtrlFound = false;//multiple ctrl found
+            foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)
+            {
+                if (Ctrl is EbProvisionUser)
+                {
+                    if (!MuCtrlFound)
+                    {
+                        MuCtrlFound = true;
+                        _qryCount++;
+                    }
+                    _qryCount++;
+                }
+                else if (Ctrl is IEbExtraQryCtrl)
+                {
+                    if (Ctrl is EbReview Rev && _this.DataPusherConfig != null)
+                    {
+                        _qryCount++;
+                    }
+                    else if (_this.DataPusherConfig == null)
+                    {
+                        _qryCount++;
+                    }
+                }
+            }
+            return _qryCount;
         }
 
         //public static string GetDynamicGridSelectQuery(EbWebForm _this, IDatabase DataDB, Service _service, string _prntTbl, string[] _targetTbls, out string _queryPs, out int _qryCount)
@@ -368,6 +415,7 @@ WHERE
                     {
                         string Ids = Table.Select(e => e.RowId).Join(",");
 
+                        //USE ANY
                         string Qry = string.Format("UPDATE {0} SET {1} = {2}, {3} = @eb_lastmodified_by, {4} = {5} WHERE id IN ({6}) AND COALESCE({7}, {8}) = {8} AND COALESCE({1}, {9}) = {10};",
                             _table.TableName,//0
                             ebs[SystemColumns.eb_void],//1

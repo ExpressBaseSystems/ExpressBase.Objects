@@ -173,9 +173,9 @@ this.Init = function(id)
 
         public string TableName { get; set; }
 
-        public string GetSelectQuery(IDatabase DataDB, string masterTbl)
+        public string GetSelectQuery(IDatabase DataDB, string masterTbl, string form_ver_id, string form_ref_id)
         {
-            return string.Format("SELECT id, role_name, applicationid, description, is_primary FROM eb_roles WHERE eb_ver_id = :{0}_eb_ver_id AND eb_data_id = :{0}_id AND COALESCE(eb_del, 'F') = 'F';", masterTbl);
+            return $"SELECT id, role_name, applicationid, description, is_primary FROM eb_roles WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id AND COALESCE(eb_del, 'F') = 'F';";
         }
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)

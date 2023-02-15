@@ -151,7 +151,7 @@ namespace ExpressBase.Objects
 
         //--------Hide in property grid------------end
 
-        public string GetSelectQuery(IDatabase DataDB, string MasterTable)
+        public string GetSelectQuery(IDatabase DataDB, string MasterTable, string form_ver_id, string form_ref_id)
         {
             string idCol = this.TableName == MasterTable ? "id" : MasterTable + "_id";
             if (DataDB.Vendor == DatabaseVendors.MYSQL)

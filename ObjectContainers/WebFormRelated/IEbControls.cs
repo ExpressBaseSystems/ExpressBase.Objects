@@ -46,6 +46,6 @@ namespace ExpressBase.Objects
     public interface IEbExtraQryCtrl
     {
         string TableName { get; set; }
-        string GetSelectQuery(IDatabase DataDB, string MasterTbl);
+        string GetSelectQuery(IDatabase DataDB, string MasterTbl, string form_ver_id, string form_ref_id);
     }
 }

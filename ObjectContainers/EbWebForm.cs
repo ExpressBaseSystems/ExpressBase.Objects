@@ -276,6 +276,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public override bool IsDisable { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool EnableSqlRetriver { get; set; }
+
         public EbWebForm ShallowCopy()
         {
             return (EbWebForm)this.MemberwiseClone();
@@ -1355,47 +1359,97 @@ namespace ExpressBase.Objects
             }
         }
 
+        public (string, string) GetFormDataQuries(IDatabase DataDB, Service service)
+        {
+            int formCount = (this.FormDataPusherCount > 0) ? this.FormDataPusherCount + 1 : 1;
+            int[] qrycount = new int[formCount];
+            string srcTableQuery = QueryGetter.GetSelectQuery(this, DataDB, service, out qrycount[0]);
+
+            string destTableQuery = string.Empty;
+            if (this.FormDataPusherCount > 0)
+            {
+                for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
+                {
+                    if (!(this.DataPushers[i] is EbFormDataPusher))
+                        continue;
+                    destTableQuery += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out qrycount[j]);
+                }
+            }
+            return (srcTableQuery, destTableQuery);
+        }
+
         //For Normal Mode
         public void RefreshFormData(IDatabase DataDB, Service service, bool backup = false, bool includePushData = false)
         {
             int formCount = (this.FormDataPusherCount > 0 && includePushData) ? this.FormDataPusherCount + 1 : 1;
             int[] qrycount = new int[formCount];
             EbWebForm[] _FormCollection = new EbWebForm[formCount];
-            string query = QueryGetter.GetSelectQuery(this, DataDB, service, out qrycount[0]);
             _FormCollection[0] = this;
-            List<DbParameter> param = new List<DbParameter>
-            {
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4]),
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._refid, EbDbTypes.String, this.RefId)
-            };
+            EbDataSet dataset;
 
-            if (this.FormDataPusherCount > 0 && includePushData)
+            if (this.EnableSqlRetriver && this.DbConnection == null)
             {
-                for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
+                string[] refid_parts = this.RefId.Split("-");
+                string query = $"SELECT eb_udf_{this.DisplayName.ToLower().Replace(" ", "_")}_{refid_parts[3]}_{refid_parts[4]}_get_form_data({this.TableRowId}, {includePushData});";
+                qrycount[0] = QueryGetter.GetSelectQueryCount(this);
+                int refCounter = 0;
+                for (int i = 0; i < qrycount[0]; i++)
+                    query += $"FETCH ALL FROM ref{refCounter++};";
+
+
+                if (this.FormDataPusherCount > 0 && includePushData)
                 {
-                    if (!(this.DataPushers[i] is EbFormDataPusher))
-                        continue;
-                    EbWebForm _Form = this.DataPushers[i].WebForm;
-                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out qrycount[j]);
-                    _Form.UserObj = this.UserObj;
-                    _Form.SolutionObj = this.SolutionObj;
-                    _FormCollection[j++] = _Form;
-                    string ebVerId = _Form.FormSchema.MasterTable + FormConstants._eb_ver_id;
-                    if (!param.Exists(e => e.ParameterName == ebVerId))
-                        param.Add(DataDB.GetNewParameter(ebVerId, EbDbTypes.Int32, _Form.RefId.Split(CharConstants.DASH)[4]));
+                    for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
+                    {
+                        if (!(this.DataPushers[i] is EbFormDataPusher))
+                            continue;
+                        EbWebForm _Form = this.DataPushers[i].WebForm;
+                        qrycount[j] = QueryGetter.GetSelectQueryCount(_Form);
+                        _Form.UserObj = this.UserObj;
+                        _Form.SolutionObj = this.SolutionObj;
+                        _FormCollection[j++] = _Form;
+                        for (int k = 0; k < qrycount[j]; k++)
+                            query += $"FETCH ALL FROM ref{refCounter++};";
+                    }
                 }
+
+                if (this.DbConnection == null)
+                    dataset = (DataDB as PGSQLDatabase).CursorDoQueries(query);
+                else
+                    dataset = (DataDB as PGSQLDatabase).CursorDoQueries(this.DbConnection, query);
+            }
+            else
+            {
+                string query = QueryGetter.GetSelectQuery(this, DataDB, service, out qrycount[0]);
+                DbParameter[] param = new DbParameter[]
+                {
+                    DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                };
+
+                if (this.FormDataPusherCount > 0 && includePushData)
+                {
+                    for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
+                    {
+                        if (!(this.DataPushers[i] is EbFormDataPusher))
+                            continue;
+                        EbWebForm _Form = this.DataPushers[i].WebForm;
+                        query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out qrycount[j]);
+                        _Form.UserObj = this.UserObj;
+                        _Form.SolutionObj = this.SolutionObj;
+                        _FormCollection[j++] = _Form;
+                    }
+                }
+
+                if (this.DbConnection == null)
+                    dataset = DataDB.DoQueries(query, param);
+                else
+                    dataset = DataDB.DoQueries(this.DbConnection, query, param);
             }
 
-            EbDataSet dataset;
-            if (this.DbConnection == null)
-                dataset = DataDB.DoQueries(query, param.ToArray());
-            else
-                dataset = DataDB.DoQueries(this.DbConnection, query, param.ToArray());
 
             Console.WriteLine("From RefreshFormData : Query count = " + qrycount.Join(",") + " DataTable count = " + dataset.Tables.Count);
 
-            for (int i = 0, start = 0; i < formCount; start += qrycount[i], i++)
+            for (int i = 0, start = this.EnableSqlRetriver && this.DbConnection == null ? 1 : 0; i < formCount; start += qrycount[i], i++)
             {
                 EbDataSet ds = new EbDataSet();
                 ds.Tables.AddRange(dataset.Tables.GetRange(start, qrycount[i]));

@@ -296,7 +296,7 @@ this.Init = function(id)
             }
         }
 
-        public string GetSelectQuery(IDatabase DataDB, string masterTbl)
+        public string GetSelectQuery(IDatabase DataDB, string masterTbl, string form_ver_id, string form_ref_id)
         {
             //if multiple user ctrl placed in form then one select query is enough // imp
             return $@"
@@ -312,7 +312,7 @@ LEFT JOIN
     WHERE m.id = l.master_id AND m.key_type = {(int)EbConstraintKeyTypes.User} AND 
     l.c_type = {(int)EbConstraintTypes.User_Location} AND eb_del = 'F' ORDER BY m.id
 ) cons ON u.id = cons.key_id 
-WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
+WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
         }//EbConstraintKeyTypes.User, EbConstraintTypes.User_Location    
 
         public string GetMappedUserQuery(string MasterTable, string eb_del, string false_val)

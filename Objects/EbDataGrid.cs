@@ -351,10 +351,9 @@ else {
         public override string GetBareHtml()
         {
             //SetCols();
-            int btnright = 0;
+            int btnright = 8;
             if (this.EnableExcelUpload) btnright += 100;
-            if (this.ShowRefreshBtn) btnright += 76;
-            if (btnright == 0) btnright = 8;
+            if (this.ShowRefreshBtn) btnright += 68;
 
             string html = @"
 <div class='grid-cont'>

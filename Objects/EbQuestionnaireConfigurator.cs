@@ -162,10 +162,10 @@ namespace ExpressBase.Objects
 
 		public string TableName { get; set; }
 
-		public string GetSelectQuery(IDatabase DataDB, string mTbl)
+		public string GetSelectQuery(IDatabase DataDB, string mTbl, string form_ver_id, string form_ref_id)
 		{
-			string Qry = string.Format("SELECT id, ques_id, ext_props FROM eb_ques_config " +
-				"WHERE form_refid = @{0}_refid AND form_data_id = @{0}_id AND COALESCE(eb_del, 'F') = 'F';", mTbl);
+			string Qry = $@"SELECT id, ques_id, ext_props FROM eb_ques_config
+                WHERE form_refid = '{form_ref_id}' AND form_data_id = @{mTbl}_id AND COALESCE(eb_del, 'F') = 'F';";
 
 			return Qry;
 		}

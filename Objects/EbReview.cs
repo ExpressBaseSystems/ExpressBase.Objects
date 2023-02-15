@@ -341,11 +341,11 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        public string GetSelectQuery(IDatabase DataDB, string MasterTable)
+        public string GetSelectQuery(IDatabase DataDB, string MasterTable, string form_ver_id, string form_ref_id)
         {
             return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id, A.description
                 FROM eb_my_actions A, eb_stages S
-                WHERE A.form_ref_id = @{MasterTable}_refid AND A.form_data_id = @{MasterTable}_id AND 
+                WHERE A.form_ref_id = '{form_ref_id}' AND A.form_data_id = @{MasterTable}_id AND 
                 COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
         }
 
