@@ -1359,7 +1359,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public (string, string) GetFormDataQuries(IDatabase DataDB, Service service)
+        public (string, string) GetFormDataQueries(IDatabase DataDB, Service service)
         {
             int formCount = (this.FormDataPusherCount > 0) ? this.FormDataPusherCount + 1 : 1;
             int[] qrycount = new int[formCount];
@@ -1380,6 +1380,22 @@ namespace ExpressBase.Objects
             return (srcTableQuery, destTableQuery);
         }
 
+        public string[] GetFormDataPsSelectQueries(Service service)
+        {
+            List<EbControl> drPsList = new List<EbControl>();
+            string[] QueryArray = new string[0];
+            foreach (TableSchema Tbl in this.FormSchema.Tables)
+            {
+                drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+            }
+            if (drPsList.Count > 0)
+            {
+                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, service);
+                QueryArray = dmHelper.GetPsDmSelectQuery().ToArray();
+            }
+            return QueryArray;
+        }
+
         //For Normal Mode
         public void RefreshFormData(IDatabase DataDB, Service service, bool backup = false, bool includePushData = false)
         {
@@ -1393,11 +1409,10 @@ namespace ExpressBase.Objects
             {
                 string[] refid_parts = this.RefId.Split("-");
                 string query = $"SELECT eb_udf_{this.DisplayName.ToLower().Replace(" ", "_")}_{refid_parts[3]}_{refid_parts[4]}_get_form_data({this.TableRowId}, {includePushData});";
-                qrycount[0] = QueryGetter.GetSelectQueryCount(this);
+                qrycount[0] = QueryGetter.GetSelectQueryCount(this, true);
                 int refCounter = 0;
                 for (int i = 0; i < qrycount[0]; i++)
                     query += $"FETCH ALL FROM ref{refCounter++};";
-
 
                 if (this.FormDataPusherCount > 0 && includePushData)
                 {
@@ -1406,7 +1421,7 @@ namespace ExpressBase.Objects
                         if (!(this.DataPushers[i] is EbFormDataPusher))
                             continue;
                         EbWebForm _Form = this.DataPushers[i].WebForm;
-                        qrycount[j] = QueryGetter.GetSelectQueryCount(_Form);
+                        qrycount[j] = QueryGetter.GetSelectQueryCount(_Form, false);
                         _Form.UserObj = this.UserObj;
                         _Form.SolutionObj = this.SolutionObj;
                         _FormCollection[j] = _Form;
@@ -1536,9 +1551,10 @@ namespace ExpressBase.Objects
                     this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
             }
 
+            int tableIndex = _schema.Tables.Count;
+
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
-                int tableIndex = _schema.Tables.Count;
                 SingleTable UserTable = null;
                 foreach (EbControl Ctrl in _schema.ExtendedControls)
                 {
@@ -1815,11 +1831,23 @@ namespace ExpressBase.Objects
                     apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
                 }
 
-                if (drPsList.Count > 0)
+                if (this.EnableSqlRetriver)
                 {
-                    //this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
-                    PsDmHelper dmHelper = new PsDmHelper(this, drPsList, _FormData, service);
-                    dmHelper.UpdatePsDm_Tables();
+                    foreach (EbControl psCtrl in drPsList)
+                    {
+                        SingleTable Table = new SingleTable();
+                        this.GetFormattedData(dataset.Tables[tableIndex++], Table);
+                        _FormData.PsDm_Tables.Add(psCtrl.EbSid, Table);
+                    }
+                }
+                else
+                {
+                    if (drPsList.Count > 0)
+                    {
+                        //this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
+                        PsDmHelper dmHelper = new PsDmHelper(this, drPsList, _FormData, service);
+                        dmHelper.UpdatePsDm_Tables();
+                    }
                 }
 
                 foreach (EbControl Ctrl in apiPsList)
@@ -3170,6 +3198,7 @@ namespace ExpressBase.Objects
             }
         }
 
+        //Change required: execute when side window clicked
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)
         {
             string q = string.Empty;

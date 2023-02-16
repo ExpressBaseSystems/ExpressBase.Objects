@@ -949,10 +949,7 @@ else// PS
         public (string, EbDataReader) GetSqlAndDr(Service service)
         {
             EbDataReader dr = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, null, service.Redis, service);
-            string Sql = dr.Sql.Trim();
-            if (Sql.LastIndexOf(";") == Sql.Length - 1)
-                Sql = Sql.Substring(0, Sql.Length - 1);
-
+            string Sql = dr.Sql.Trim().TrimEnd(';');
             return (Sql, dr);
         }
 

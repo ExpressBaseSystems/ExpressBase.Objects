@@ -1,14 +1,18 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects.WebFormRelated
 {
@@ -38,6 +42,115 @@ namespace ExpressBase.Objects.WebFormRelated
             _PsDmDict.ExecuteQuery(this.ebForm);
             _PsDmDict.AttachPsDmTable(this.ebForm, this._FormData, this.drPsList, row_ids);
         }
+
+        #region SqlRetrival //for dev side
+
+        public PsDmHelper(EbWebForm ebForm, List<EbControl> drPsList, Service service)
+        {
+            this.ebForm = ebForm;
+            this.drPsList = drPsList;
+            this.service = service;
+        }
+
+        public List<string> GetPsDmSelectQuery()
+        {
+            string psqry;
+            List<string> QueryList = new List<string>();
+            EbDataReader dataReader;
+
+            foreach (EbControl psCtrl in this.drPsList)
+            {
+                List<Param> ParamsList = (psCtrl as IEbDataReaderControl).ParamsList;
+                IEbPowerSelect ipsCtrl = psCtrl as IEbPowerSelect;
+                if (ParamsList == null)
+                {
+                    throw new FormException($"Invalid ParamsList in '{psCtrl.Label ?? psCtrl.Name}'. Contact Admin.", (int)HttpStatusCode.InternalServerError, "Please file a bug", "EbWebForm");
+                }
+                TableSchema _pstableSchema = this.ebForm.FormSchema.Tables.Find(e => e.TableName == ipsCtrl.TableName);
+
+                if (_pstableSchema == null)
+                    throw new FormException("InternalServerError: _pstable is null", (int)HttpStatusCode.InternalServerError, "_pstableSchema is null", "PsDmHelper");
+                if (_pstableSchema.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_pstableSchema.CustomSelectQuery))
+                    throw new FormException("EnableSqlRetriver not supported for CustomSelectQuery DG PS", (int)HttpStatusCode.InternalServerError, "--", "PsDmHelper");
+
+                (psqry, dataReader) = ipsCtrl.GetSqlAndDr(this.service);
+
+                if (psCtrl is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect)
+                    throw new FormException("EnableSqlRetriver not supported for StrictSelect PS", (int)HttpStatusCode.InternalServerError, "__", "PsDmHelper");
+
+
+                psqry = ReplaceParamsInQuery(psCtrl, psqry);
+                psqry = WrapPsQuery(psqry, psCtrl, _pstableSchema);
+                QueryList.Add(psqry);
+            }
+            return QueryList;
+        }
+
+        private string ReplaceParamsInQuery(EbControl psCtrl, string qry)
+        {
+            EbSystemColumns ebs = this.ebForm.SolutionObj.SolutionSettings.SystemColumns;
+
+            foreach (Param _psParam in (psCtrl as IEbDataReaderControl).ParamsList)
+            {
+                TableSchema _p_table = null;
+                ColumnSchema _p_column = null;
+                foreach (TableSchema __table in this.ebForm.FormSchema.Tables)
+                {
+                    _p_column = __table.Columns.Find(e => e.Control.Name == _psParam.Name);
+                    if (_p_column != null)
+                    {
+                        _p_table = __table;
+                        break;
+                    }
+                }
+                if (_p_table != null && _p_column != null)
+                {
+                    string _str;
+                    if (_p_table.TableType == WebFormTableTypes.Grid)
+                    {
+                        _str = $"ANY(SELECT {_p_column.ColumnName} FROM {_p_table.TableName} WHERE {this.ebForm.FormSchema.MasterTable}_id=id__in AND COALESCE({ebs[SystemColumns.eb_del]},{ebs.GetBoolFalse(SystemColumns.eb_del)})={ebs.GetBoolFalse(SystemColumns.eb_del)})";
+                    }
+                    else
+                    {
+                        string idCol = this.ebForm.FormSchema.MasterTable == _p_table.TableName ? "id" : $"{this.ebForm.FormSchema.MasterTable}_id";
+                        _str = $"(SELECT {_p_column.ColumnName} FROM {_p_table.TableName} WHERE {idCol}=id__in AND COALESCE({ebs[SystemColumns.eb_del]},{ebs.GetBoolFalse(SystemColumns.eb_del)})={ebs.GetBoolFalse(SystemColumns.eb_del)})";
+                    }
+                    qry = ReplaceQueryParam(qry, _p_column.ColumnName, _str);
+                }
+                else
+                {
+                    //if (EbFormHelper.IsExtraSqlParam(_psParam.Name, this.ebForm.TableName))
+                    qry = ReplaceQueryParam(qry, _psParam.Name, $"'{_psParam.ValueTo}'");
+                }
+            }
+            return qry;
+        }
+
+        private string WrapPsQuery(string psqry, EbControl psCtrl, TableSchema _pstableSchema)
+        {
+            string vms;
+            EbSystemColumns ebs = this.ebForm.SolutionObj.SolutionSettings.SystemColumns;
+            IEbPowerSelect ipsCtrl = psCtrl as IEbPowerSelect;
+            if (_pstableSchema.TableType == WebFormTableTypes.Grid)
+            {
+                vms = $"ANY(SELECT {psCtrl.Name} FROM {_pstableSchema.TableName} WHERE {this.ebForm.FormSchema.MasterTable}_id=id__in AND COALESCE({ebs[SystemColumns.eb_del]},{ebs.GetBoolFalse(SystemColumns.eb_del)})={ebs.GetBoolFalse(SystemColumns.eb_del)})";
+            }
+            else
+            {
+                string idCol = this.ebForm.FormSchema.MasterTable == _pstableSchema.TableName ? "id" : $"{this.ebForm.FormSchema.MasterTable}_id";
+                vms = $"(SELECT {psCtrl.Name} FROM {_pstableSchema.TableName} WHERE {idCol}=id__in AND COALESCE({ebs[SystemColumns.eb_del]},{ebs.GetBoolFalse(SystemColumns.eb_del)})={ebs.GetBoolFalse(SystemColumns.eb_del)})";
+            }
+
+            return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms}";
+        }
+
+        private string ReplaceQueryParam(string query, string paramName, string sqlParam)
+        {
+            Regex r = new Regex(@"(@|:)" + paramName + @"\b");
+            return r.Replace(query, sqlParam);
+        }
+
+        #endregion SqlRetrival
 
         private void GetPsQueryAndParams(PsDmDict _PsDmDict, Dictionary<string, List<int>> row_ids)
         {

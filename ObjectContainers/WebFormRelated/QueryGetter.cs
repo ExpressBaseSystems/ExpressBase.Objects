@@ -159,7 +159,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return query + extquery;
         }
 
-        public static int GetSelectQueryCount(EbWebForm _this)
+        public static int GetSelectQueryCount(EbWebForm _this, bool includePsQryCount)
         {
             int _qryCount = 0;
             foreach (TableSchema _table in _this.FormSchema.Tables)
@@ -200,6 +200,20 @@ namespace ExpressBase.Objects.WebFormRelated
                     {
                         _qryCount++;
                     }
+                }
+            }
+
+            if (includePsQryCount)
+            {
+                List<EbControl> drPsList = new List<EbControl>();
+
+                foreach (TableSchema Tbl in _this.FormSchema.Tables)
+                {
+                    drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+                }
+                if (drPsList.Count > 0)
+                {
+                    _qryCount += drPsList.Count;
                 }
             }
             return _qryCount;
