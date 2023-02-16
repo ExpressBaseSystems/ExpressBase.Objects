@@ -1389,7 +1389,7 @@ namespace ExpressBase.Objects
             _FormCollection[0] = this;
             EbDataSet dataset;
 
-            if (this.EnableSqlRetriver && this.DbConnection == null)
+            if (this.EnableSqlRetriver)
             {
                 string[] refid_parts = this.RefId.Split("-");
                 string query = $"SELECT eb_udf_{this.DisplayName.ToLower().Replace(" ", "_")}_{refid_parts[3]}_{refid_parts[4]}_get_form_data({this.TableRowId}, {includePushData});";
@@ -1451,7 +1451,7 @@ namespace ExpressBase.Objects
 
             Console.WriteLine("From RefreshFormData : Query count = " + qrycount.Join(",") + " DataTable count = " + dataset.Tables.Count);
 
-            for (int i = 0, start = this.EnableSqlRetriver && this.DbConnection == null ? 1 : 0; i < formCount; start += qrycount[i], i++)
+            for (int i = 0, start = this.EnableSqlRetriver ? 1 : 0; i < formCount; start += qrycount[i], i++)
             {
                 EbDataSet ds = new EbDataSet();
                 ds.Tables.AddRange(dataset.Tables.GetRange(start, qrycount[i]));
