@@ -119,8 +119,16 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else
                 {
-                    //if (EbFormHelper.IsExtraSqlParam(_psParam.Name, this.ebForm.TableName))
-                    qry = ReplaceQueryParam(qry, _psParam.Name, $"'{_psParam.ValueTo}'");
+                    string _val;
+
+                    if (_psParam.Name == FormConstants.id || _psParam.Name == this.ebForm.TableName + FormConstants._id)
+                        _val = "id__in";
+                    else if (_psParam.Name == FormConstants.eb_loc_id)
+                        _val = $"(SELECT {ebs[SystemColumns.eb_loc_id]} FROM {this.ebForm.TableName} WHERE id=id__in)";
+                    else
+                        _val = $"'{_psParam.ValueTo}'";
+
+                    qry = ReplaceQueryParam(qry, _psParam.Name, _val);
                 }
             }
             return qry;
@@ -139,6 +147,8 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 string idCol = this.ebForm.FormSchema.MasterTable == _pstableSchema.TableName ? "id" : $"{this.ebForm.FormSchema.MasterTable}_id";
                 vms = $"(SELECT {psCtrl.Name} FROM {_pstableSchema.TableName} WHERE {idCol}=id__in AND COALESCE({ebs[SystemColumns.eb_del]},{ebs.GetBoolFalse(SystemColumns.eb_del)})={ebs.GetBoolFalse(SystemColumns.eb_del)})";
+                if (ipsCtrl.MultiSelect)
+                    vms = $"ANY(STRING_TO_ARRAY(({vms}), ',')::INT[])";
             }
 
             return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms}";
