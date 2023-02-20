@@ -3,6 +3,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);;";
+                return @"$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);";
             }
             set { }
         }
@@ -32,11 +33,11 @@ namespace ExpressBase.Objects
             get
             {
                 return @"	
-							var cval=[];
-						$('[name=' + this.EbSid_CtxId + ']:checked').each(function(){
-							cval.push($(this).val());
-						});
-					return cval.join();
+var cval=[];
+  $('[name=' + this.EbSid_CtxId + ']:checked').each(function(){
+    cval.push($(this).val());
+  });
+return cval.join(',');
                 ";
             }
             set { }
@@ -52,6 +53,32 @@ namespace ExpressBase.Objects
 						});
 					return ctxt.join('<br />');
                 ";
+            }
+            set { }
+        }
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+var $cbgrp = $('[name=' + this.EbSid_CtxId + ']');
+if (p1) {
+  var vals= p1.split(',');
+  $cbgrp.each(function() {
+    var $this = $(this);
+	if (vals.includes($this.val()))
+      $this.prop('checked', true);
+    else
+      $this.prop('checked', false);
+  });
+}
+else {
+  $cbgrp.each(function() {
+    $(this).prop('checked', false);
+  });
+}
+if ($cbgrp.length > 0)
+  $($cbgrp[0]).trigger('change');";
             }
             set { }
         }
@@ -87,6 +114,10 @@ namespace ExpressBase.Objects
         {
             return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]

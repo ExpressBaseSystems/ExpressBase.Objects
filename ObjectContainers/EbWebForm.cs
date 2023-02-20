@@ -1408,7 +1408,7 @@ namespace ExpressBase.Objects
             if (this.EnableSqlRetriver)
             {
                 string[] refid_parts = this.RefId.Split("-");
-                string query = $"SELECT eb_udf_{this.DisplayName.ToLower().Replace(" ", "_")}_{refid_parts[3]}_{refid_parts[4]}_get_form_data({this.TableRowId}, {includePushData});";
+                string query = $"SELECT eb_udf_{this.DisplayName.ToLower().Replace(" ", "_").Replace("-", "_").Replace("&", "_")}_{refid_parts[3]}_{refid_parts[4]}_get_form_data({this.TableRowId}, {includePushData});";
                 qrycount[0] = QueryGetter.GetSelectQueryCount(this, true);
                 int refCounter = 0;
                 for (int i = 0; i < qrycount[0]; i++)
