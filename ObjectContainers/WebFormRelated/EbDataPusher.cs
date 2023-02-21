@@ -15,6 +15,7 @@ using ServiceStack;
 using ExpressBase.CoreBase.Globals;
 using System.Data.Common;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace ExpressBase.Objects
 {
@@ -119,10 +120,6 @@ else if (this.MultiPushIdType === 2)
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Name { get; set; }
-
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.WebForm)]
-        public override string SkipLineItemIf { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Alias("Source datagrid")]
@@ -447,11 +444,13 @@ else if (this.MultiPushIdType === 2)
             this.CodeDict = new Dictionary<int, string>();
             string FnDef = string.Empty, FnCall = string.Empty;
             int Index = 1; //Code index
+            int DpCounter = 0;
 
             foreach (EbDataPusher pusher in this.WebForm.DataPushers.FindAll(e => e is EbBatchFormDataPusher))
             {
                 EbDataPusherConfig conf = pusher.WebForm.DataPusherConfig;
                 int startIndex = Index;
+                FnCall += $"\ndestinationform = BatchDestinationForms[{DpCounter++}];";
                 FnCall += $"\nfor (int i = 0; i < {conf.GridSingleTable.Count}; i++) \n{{";
                 FnCall += $"\nsourceform.{conf.GridName}.GetEnumerator();";
                 JObject JObj = JObject.Parse(pusher.Json);
@@ -462,13 +461,19 @@ else if (this.MultiPushIdType === 2)
                     {
                         foreach (JToken jRow in JObj[_table.TableName])
                         {
+                            string DgName = null;
+                            if (_table.TableType == WebFormTableTypes.Grid)
+                            {
+                                FnCall += $"\ndestinationform.UpdateCurrentRowOfDG(\"{_table.ContainerName}\");";
+                                DgName = _table.ContainerName;
+                            }
                             foreach (ColumnSchema _column in _table.Columns)
                             {
                                 if (jRow[_column.ColumnName] != null)
                                 {
                                     this.CodeDict.Add(Index, jRow[_column.ColumnName].ToString());
                                     FnDef += GetFunctionDefinition(jRow[_column.ColumnName].ToString(), Index);
-                                    FnCall += GetFunctionCall(Index, true);
+                                    FnCall += GetFunctionCall_NEW(Index, _column.ColumnName, DgName, true);
                                     Index++;
                                 }
                             }
@@ -600,13 +605,12 @@ catch (Exception e)
             return s;
         }
 
-        private string GetFunctionCall_NEW(int Index, string CtrlName, string DgName)
+        private string GetFunctionCall_NEW(int Index, string CtrlName, string DgName, bool MultiplierPlaceHolder = false)
         {
             string code = string.Format(@"
 try
 {{
-  var res{0} = fn_{0}();
-  AddToOutDict({0}, res{0}, destinationform.{1});
+  AddToOutDict({2}{0}, fn_{0}(), destinationform.{1});
 }}
 catch (Exception e)
 {{
@@ -614,7 +618,8 @@ catch (Exception e)
 }}
 ",
 Index,
-DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
+DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]",
+MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
 
             return code;
         }
@@ -690,13 +695,14 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                     globals.DestinationForms.Add(fG_WebForm);
                 }
 
+                globals.BatchDestinationForms = GlobalsGenerator.GetEmptyDestinationModelGlobals(_this.DataPushers.FindAll(e => e is EbBatchFormDataPusher).Select(e => e.WebForm).ToList());
+
                 object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
                 EbWebFormCollection FormCollection = ebDataPushHelper.CreateWebFormDataBatch(out_dict);//new + change identified formCollectios (Data in FormData)
                 EbWebFormCollection FormCollectionBkUp = RefreshBatchFormData(pushers, DataDB, DbCon, _this.FormDataBackup == null);//change identified + going to delete formCollectios backup (Data in FormDataBackup)
                 MergeFormData(FormCollection, FormCollectionBkUp, pushers);
                 if (FormCollection.Count == 0)
                     return "Nothing to push";
-
                 string fullqry = string.Empty;
                 string _extqry = string.Empty;
                 List<DbParameter> param = new List<DbParameter>();
@@ -875,25 +881,27 @@ DgName == null ? CtrlName : $"{DgName}.currentRow[\"{CtrlName}\"]");
                     {
                         Form.FormDataBackup = FormBkUp.FormDataBackup;
                         Form.TableRowId = FormBkUp.TableRowId;
-                        foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
-                        {
-                            for (int i = 0; i < entry.Value.Count; i++)
-                            {
-                                if (Form.FormDataBackup.MultipleTables[entry.Key].Count > i)
-                                    entry.Value[i].RowId = Form.FormDataBackup.MultipleTables[entry.Key][i].RowId;
-                            }
-                        }
-                        if (!conf.AllowPush)
-                        {
-                            foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
-                                entry.Value.ForEach(e => e.IsDelete = true);
-                        }
+                        Form.FormData = MergeFormDataWithBackUp(Form.FormData, Form.FormDataBackup, conf.AllowPush, Form.FormSchema);
+
+                        //foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
+                        //{
+                        //    for (int i = 0; i < entry.Value.Count; i++)
+                        //    {
+                        //        if (Form.FormDataBackup.MultipleTables[entry.Key].Count > i)
+                        //            entry.Value[i].RowId = Form.FormDataBackup.MultipleTables[entry.Key][i].RowId;
+                        //    }
+                        //}
+                        //if (!conf.AllowPush)
+                        //{
+                        //    foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
+                        //        entry.Value.ForEach(e => e.IsDelete = true);
+                        //}
                     }
                 }
 
                 RmForm.ForEach(e => FormCollection.Remove(e));
 
-                foreach (EbWebForm FormBkUp in FormCollectionBkUp)
+                foreach (EbWebForm FormBkUp in FormCollectionBkUp)//set IsDelete flag if Bakup form not in FormData
                 {
                     EbDataPusherConfig conf = FormBkUp.DataPusherConfig;
                     EbWebForm Form = FormCollection.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
