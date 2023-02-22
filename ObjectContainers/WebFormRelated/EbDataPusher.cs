@@ -614,7 +614,7 @@ try
 }}
 catch (Exception e)
 {{
-  AddToOutDict({0}, e);
+  AddToOutDict({2}{0}, e);
 }}
 ",
 Index,
