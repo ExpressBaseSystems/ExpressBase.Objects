@@ -115,6 +115,9 @@ namespace ExpressBase.Objects
         public bool SendVerificationMsg { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        public bool SendWelcomeMsg { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         public override EbScript HiddenExpr { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -763,9 +766,50 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             set { }
         }
 
+        private string MailHtml2
+        {
+            get
+            {
+                return @"
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div style='border: 1px solid #508bf9;padding:20px 40px 20px 40px; '>
+            <div style='text-align: center;'>
+                <img src='https://myaccount.expressbase.com/images/logo/ebdboihyfxflxe20220224111752.png' style='max-height: 100px; max-width: 300px; ' />
+            </div>
+            <br />
+            <div style='line-height: 1.4;'>
+                Dear {UserName},<br />
+                <br />
+                You have been added as a user into Sakshyam Portal. Please find below credentials to log in.
+                <br />
+                <br />
+                Solution URL - https://sakshyam.expressbase.com/Ext/UsrSignIn?Page=False <br />
+                User name - {Email} <br />
+                Password - {Password} <br />
+                <br />
+                Please make sure you change the password after logging in (in the <b>My Profile</b> page).
+            </div>
+            <br />
+            <br />
+            Thanks,<br />
+            Sakshyam Portal Team<br />
+        </div>
+    </body>
+</html>";
+            }
+            set { }
+        }
+
         public void SendWelcomeMail(RabbitMqProducer MessageProducer3, User user, Eb_Solution solution)
         {
-            string Html = this.MailHtml
+            string __html = this.MailHtml;
+            if (solution.SolutionID == "ebdboihyfxflxe20220224111752")
+                __html = this.MailHtml2;
+            __html = __html
                 .Replace("{SolutionName}", solution.SolutionName)
                 .Replace("{eSolutionId}", solution.ExtSolutionID)
                 .Replace("{iSolutionId}", solution.SolutionID)
@@ -779,8 +823,8 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             MessageProducer3.Publish(new EmailServicesRequest()
             {
                 To = this.UserCredentials.Email,
-                Message = Html,
-                Subject = $"Welcome to {solution.SolutionName} Solution",
+                Message = __html,
+                Subject = (solution.SolutionID == "ebdboihyfxflxe20220224111752" ? "Welcome to Sakshyam Portal" : $"Welcome to {solution.SolutionName} Solution"),
                 UserId = user.UserId,
                 UserAuthId = user.AuthId,
                 SolnId = solution.SolutionID

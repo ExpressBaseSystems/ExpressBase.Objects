@@ -144,6 +144,12 @@ namespace ExpressBase.Objects
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iHtmlPage)]
+        public string AfterSavePage { get; set; }
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm)]
         public PopupWebFormSize PopupFormSize { get; set; }
 
         [PropertyGroup("Events")]
@@ -2883,11 +2889,9 @@ namespace ExpressBase.Objects
             bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
             {
-                if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
+                if (c is EbProvisionUser pc && pc.IsUserCreated())
                 {
                     UpdateSoluObj = true;
-
-                    EbProvisionUser pc = c as EbProvisionUser;
 
                     if (this.FormData?.MultipleTables.ContainsKey(pc.TableName) == true && this.FormData?.MultipleTables[pc.TableName].Count > 0)
                     {
@@ -2941,12 +2945,12 @@ namespace ExpressBase.Objects
                         }
                     }
 
-                    //Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
-                    //if (EmailCon?.Primary != null)
-                    //{
-                    //    Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
-                    //    (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
-                    //}
+                    Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
+                    if (pc.SendWelcomeMsg && EmailCon?.Primary != null)
+                    {
+                        Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
+                        pc.SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
+                    }
                 }
                 else if (c is EbProvisionLocation && (c as EbProvisionLocation).IsLocationCreated)
                     UpdateSoluObj = true;
