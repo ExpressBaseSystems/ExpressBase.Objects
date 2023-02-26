@@ -94,6 +94,10 @@ namespace ExpressBase.Objects
         public bool ResizeViewPort { set; get; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        public ViewerPosition ViewerPosition { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript ContextGetExpr { set; get; }
 
