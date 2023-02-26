@@ -924,6 +924,10 @@ else if(this.RenderAs === 5){
         [PropertyGroup(PGConstants.EXTENDED)]
         public bool SuppresIfZero { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public bool DoNotFormat { get; set; }
+
         public DVNumericColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
