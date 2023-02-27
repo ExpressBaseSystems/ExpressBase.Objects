@@ -211,6 +211,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("General")]
         public FileClass FileType { set; get; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        public ViewerPosition ViewerPosition { set; get; }
+
         public string GetSelectQuery(IDatabase DataDB, string MasterTable, string form_ver_id, string form_ref_id)
         {
             string idCol = this.TableName == MasterTable ? "id" : MasterTable + "_id";
