@@ -231,6 +231,11 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript DraftTitleExpression { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
         [DefaultPropValue("true")]
         public bool MakeEbSidUnique { get; set; }
 

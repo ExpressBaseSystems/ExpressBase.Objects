@@ -87,7 +87,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
+        [Alias("Max file size in MB")]
         public int MaxFileSize { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        [Alias("Max file size in KB")]
+        public int MaxSizeInKB { set; get; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Crop Properties")]
