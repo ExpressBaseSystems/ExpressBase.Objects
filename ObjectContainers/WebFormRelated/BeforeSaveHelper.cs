@@ -657,7 +657,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         }
 
         //Populate Property DefaultValsExecOrder
-        private static void SetDefaultValueExprExecOrder(EbWebForm _this, Dictionary<int, EbControlWrapper> _dict)
+        private static void SetDefaultValueExprExecOrder(EbForm _this, Dictionary<int, EbControlWrapper> _dict)
         {
             _this.DefaultValsExecOrder = new List<string>();//cleared the old values
             List<int> CalcFlds = new List<int>();
@@ -866,6 +866,24 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             CalcValueExprDependency(_this, _dict);
             CalcDataReaderDependency(_this, _dict, Allctrls);
             ValidateNotificationProp(_this.Notifications, _dict);
+        }
+
+        public static void BeforeSave_FilterDialog(EbFilterDialog _this, IServiceClient serviceClient, IRedisClient redis)
+        {
+            Dictionary<string, string> tbls = new Dictionary<string, string>();
+
+            EbControl[] Allctrls = _this.Controls.FlattenAllEbControls();
+            Dictionary<Type, bool> OneCtrls = new Dictionary<Type, bool>() // Limit more than one ctrl
+            {
+                { typeof(EbUserLocation), false }
+            };
+            PerformRequirdCheck(_this, Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, null);
+            Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
+            GetControlsAsDict(_this, "form", _dict);
+            CalcValueExprDependency(_this, _dict);
+            CalcDataReaderDependency(_this, _dict, Allctrls);
+            SetDefaultValueExprExecOrder(_this, _dict);
+            CalcHideAndDisableExprDependency(_dict);
         }
     }
 }

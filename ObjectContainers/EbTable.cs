@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
         Bottom = 2
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class EbTableLayout : EbControlContainer
     {
 
@@ -47,7 +47,7 @@ namespace ExpressBase.Objects
         [ListType(typeof(EbTableTd))]
         public override List<EbControl> Controls { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override string TableName { get; set; }
 
@@ -75,7 +75,7 @@ namespace ExpressBase.Objects
         [DefaultPropValue(0, 0, 0, 0)]
         public override UISides Padding { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]

@@ -6,6 +6,7 @@ using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Objects.WebFormRelated;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
@@ -25,7 +26,7 @@ namespace ExpressBase.Objects
         public EbFilterDialog() { }
 
         private List<Param> _paramlist = new List<Param>();
-        
+
         public List<Param> GetDefaultParams()
         {
             foreach (EbControl c in this.Controls)
@@ -41,7 +42,7 @@ namespace ExpressBase.Objects
                     val = "01/2018";
                 else if (c is EbDate && (c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month_Date)
                     val = "01-01-2018";
-                else if(c is EbCalendarControl)
+                else if (c is EbCalendarControl)
                     val = "01-01-2018";
                 Param _p = new Param { Name = c.Name, Type = Convert.ToInt32(c.EbDbType).ToString(), Value = val };
                 if (c is EbPowerSelect)
@@ -121,6 +122,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.FilterDialog)]
         public bool AutoRun { get; set; }
 
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public override string TableName { get; set; }
+
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             EbFormHelper.ReplaceRefid(this, RefidMap);
@@ -142,6 +147,11 @@ namespace ExpressBase.Objects
         //    Console.WriteLine(this.RefId + "-->" + refids);
         //    return refids;
         //}
+
+        public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
+        {
+            BeforeSaveHelper.BeforeSave_FilterDialog(this, serviceClient, redis);
+        }
 
         public void AfterRedisGet(Service service)
         {
