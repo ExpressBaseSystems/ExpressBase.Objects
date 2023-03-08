@@ -336,7 +336,7 @@ else
         {
             get
             {
-                return (this.MultiSelect) ? EbDbTypes.String : EbDbTypes.Decimal;
+                return (this.MultiSelect) ? EbDbTypes.String : EbDbTypes.Int32;
             }
             set { }
         }
