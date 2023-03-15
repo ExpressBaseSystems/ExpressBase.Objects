@@ -621,6 +621,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [JsonIgnore]
         public CultureInfo CultureDetails { get; set; }
 
+        [JsonIgnore]
+        public List<DVBaseColumn> RowGroupingColumns
+        {
+            get;
+            set;
+        }
+
         public void SetRowIndex(int index)
         {
             this.RowIndex = index;
@@ -671,10 +678,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 if(ShowCheckbox)
                     _tempFooterPadding += "<td>&nbsp;</td>";
                 string _tempFooterText = string.Empty;
+                
                 foreach (DVBaseColumn Column in TableColumns)
                 {
                     var ColumnCulture = Column.GetColumnCultureInfo(CultureDetails);
-                    if (Column.bVisible)
+                    if (Column.bVisible && (RowGroupingColumns == null || !RowGroupingColumns.Exists(e => e.Name == Column.Name)))
                     {
                         if ((Column is DVNumericColumn) && (Column as DVNumericColumn).Aggregate)
                         {
