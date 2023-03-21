@@ -416,7 +416,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [JsonIgnore]
         public bool ShowCheckbox { get; set; }
-        
+
         [JsonIgnore]
         public string TableId { get; set; }
 
@@ -675,10 +675,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 if (IsMultiLevel)
                     _tempFooterPadding += "<td>&nbsp;</td>";
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
-                if(ShowCheckbox)
+                if (ShowCheckbox)
                     _tempFooterPadding += "<td>&nbsp;</td>";
                 string _tempFooterText = string.Empty;
-                
+
                 foreach (DVBaseColumn Column in TableColumns)
                 {
                     var ColumnCulture = Column.GetColumnCultureInfo(CultureDetails);
@@ -691,9 +691,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                                 _style = "text-align:left;";
                             else if ((Column as DVNumericColumn).Align == Align.Right || (Column as DVNumericColumn).Align == Align.Auto)
                                 _style = "text-align:right;";
-                            else 
+                            else
                                 _style = "text-align:center;";
-                            _tempFooterText += "<td style="+ _style + "><b>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat)
+                            _tempFooterText += "<td style=" + _style + "><b>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat)
                                 + "</b></td>";
                         }
                         else
@@ -856,7 +856,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Param> ParamsList { get; set; }
     }
 
-    
+
     [DataContract]
     public class DataSourceDataSetDataRequest : IReturn<DataSourceDataSetDataResponse>, IEbSSRequest
     {

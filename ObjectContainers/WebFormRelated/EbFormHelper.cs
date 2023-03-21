@@ -998,6 +998,100 @@ namespace ExpressBase.Objects
                 };
             }
         }
+
+        # region Form Submission Job ID
+
+        public static void SetFsWebReceivedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        {
+            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+                return;
+
+            string ObjVerId = RefId.Split("-")[4];
+            string RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionJobId, SolnId, ObjVerId, UserId, fsCxtId);
+            FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
+            if (status == FormSubmissionJobStatus.Default)
+            {
+                Redis.Set(RedisKey, FormSubmissionJobStatus.WebReceived, new TimeSpan(0, 1, 0));
+            }
+            else if (status == FormSubmissionJobStatus.WebReceived || status == FormSubmissionJobStatus.SsReceived)
+            {
+                throw new FormException("This form submission is already in progress. Please check after sometime.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
+            }
+            else if (status == FormSubmissionJobStatus.SsProcessed || status == FormSubmissionJobStatus.WebProcessed)
+            {
+                throw new FormException("This form submission is already saved.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
+            }
+        }
+
+        public static void SetFsWebProcessedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        {
+            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+                return;
+
+            string ObjVerId = RefId.Split("-")[4];
+            string RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionJobId, SolnId, ObjVerId, UserId, fsCxtId);
+            FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
+            if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.SsProcessed)
+            {
+                Redis.Set(RedisKey, FormSubmissionJobStatus.WebProcessed, new TimeSpan(0, 15, 0));
+            }
+            else
+            {
+                throw new FormException("Invalid status of form submission job. Please refresh and try again.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
+            }
+        }
+
+        public static void SetFsSsReceivedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        {
+            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+                return;
+
+            string ObjVerId = RefId.Split("-")[4];
+            string RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionJobId, SolnId, ObjVerId, UserId, fsCxtId);
+            FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
+            if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.WebReceived)
+            {
+                Redis.Set(RedisKey, FormSubmissionJobStatus.SsReceived, new TimeSpan(0, 5, 0));
+            }
+            else if (status == FormSubmissionJobStatus.SsReceived)
+            {
+                throw new FormException("This form submission is already in progress. Please check after sometime.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "SsCheck");
+            }
+            else if (status == FormSubmissionJobStatus.SsProcessed || status == FormSubmissionJobStatus.WebProcessed)
+            {
+                throw new FormException("This form submission is already saved.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "SsCheck");
+            }
+        }
+
+        public static void SetFsSsProcessedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        {
+            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+                return;
+
+            string ObjVerId = RefId.Split("-")[4];
+            string RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionJobId, SolnId, ObjVerId, UserId, fsCxtId);
+            FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
+            if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.SsReceived)
+            {
+                Redis.Set(RedisKey, FormSubmissionJobStatus.SsProcessed, new TimeSpan(0, 15, 0));
+            }
+            //else
+            //{
+            //    throw new FormException("Invalid status of form submission job. Please refresh and try again.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "SsCheck");
+            //}
+        }
+
+        public static void ReSetFormSubmissionCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        {
+            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+                return;
+
+            string ObjVerId = RefId.Split("-")[4];
+            string RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionJobId, SolnId, ObjVerId, UserId, fsCxtId);
+            Redis.Set(RedisKey, FormSubmissionJobStatus.Default, new TimeSpan(0, 0, 30));
+        }
+
+        #endregion
     }
 
     public class EbColumnExtra

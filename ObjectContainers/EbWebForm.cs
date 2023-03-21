@@ -2300,7 +2300,7 @@ namespace ExpressBase.Objects
                 resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, IsUpdate);
                 Console.WriteLine("EbWebForm.Save.ExecUniqueCheck start");
 
-                if (DateTime.UtcNow - start > new TimeSpan(0, 2, 30))
+                if (DateTime.UtcNow - start > new TimeSpan(0, 2, 0))
                     throw new FormException("Request Timeout. Please try again.", (int)HttpStatusCode.RequestTimeout, $"Request timeout. Info: [{this.RefId}, {this.TableRowId}, {this.UserObj.UserId}]", "WebForm -> Save");
 
                 this.DbTransaction.Commit();

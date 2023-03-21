@@ -380,6 +380,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public string MobilePageRefId { get; set; }
+
+        [DataMember(Order = 7)]
+        public string FsCxtId { get; set; }
     }
 
     [DataContract]
