@@ -881,6 +881,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class LogEbErrorRequest : EbServiceStackAuthRequest, IReturn<LogEbErrorResponse>
+    {
+        [DataMember(Order = 1)]
+        public int Code { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Title { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 4)]
+        public int SourceId { get; set; }
+
+        [DataMember(Order = 5)]
+        public string SourceVerId { get; set; }
+    }
+
+    [DataContract]
+    public class LogEbErrorResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
 
     //=============================================== AUDIT TRAIL ====================================================

@@ -20,6 +20,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Net;
 using ExpressBase.Common.LocationNSolution;
+using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
@@ -1001,11 +1002,12 @@ namespace ExpressBase.Objects
 
         # region Form Submission Job ID
 
-        public static void SetFsWebReceivedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        public static int SetFsWebReceivedCxtId(IServiceClient ServiceClient, IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
             if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
-                return;
+                return 0;
 
+            int DataId = 0;
             string ObjVerId = RefId.Split("-")[4];
             string RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionJobId, SolnId, ObjVerId, UserId, fsCxtId);
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
@@ -1015,15 +1017,47 @@ namespace ExpressBase.Objects
             }
             else if (status == FormSubmissionJobStatus.WebReceived || status == FormSubmissionJobStatus.SsReceived)
             {
+                try
+                {
+                    LogEbErrorResponse Resp = ServiceClient.Post<LogEbErrorResponse>(new LogEbErrorRequest
+                    {
+                        Code = (int)EbErrorCode.DuplicateFormSubmission,
+                        Title = "Duplicate Form Submission is in progress",
+                        Message = $"Form Submission Context: {fsCxtId}, Status: {status}",
+                        SourceId = 0,
+                        SourceVerId = ObjVerId
+                    });
+                }
+                catch (Exception ex)
+                {
+
+                }
                 throw new FormException("This form submission is already in progress. Please check after sometime.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
             }
             else if (status == FormSubmissionJobStatus.SsProcessed || status == FormSubmissionJobStatus.WebProcessed)
             {
-                throw new FormException("This form submission is already saved.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
+                RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionDataId, SolnId, ObjVerId, UserId, fsCxtId);
+                DataId = Redis.Get<int>(RedisKey);
+                try
+                {
+                    LogEbErrorResponse Resp = ServiceClient.Post<LogEbErrorResponse>(new LogEbErrorRequest
+                    {
+                        Code = (int)EbErrorCode.DuplicateFormSubmission,
+                        Title = "Duplicate Form Submission is completed",
+                        Message = $"Form Submission Context: {fsCxtId}, Status: {status}",
+                        SourceId = DataId,
+                        SourceVerId = ObjVerId
+                    });
+                }
+                catch (Exception ex)
+                {
+                    throw new FormException("This form submission is already saved.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
+                }
             }
+            return DataId;
         }
 
-        public static void SetFsWebProcessedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        public static void SetFsWebProcessedCxtId(IServiceClient ServiceClient, IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
             if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
                 return;
@@ -1037,6 +1071,21 @@ namespace ExpressBase.Objects
             }
             else
             {
+                try
+                {
+                    LogEbErrorResponse Resp = ServiceClient.Post<LogEbErrorResponse>(new LogEbErrorRequest
+                    {
+                        Code = (int)EbErrorCode.DuplicateFormSubmission,
+                        Title = "Duplicate Form Submission is in invalid state",
+                        Message = $"Form Submission Context: {fsCxtId}, Status: {status}",
+                        SourceId = 0,
+                        SourceVerId = ObjVerId
+                    });
+                }
+                catch (Exception ex)
+                {
+
+                }
                 throw new FormException("Invalid status of form submission job. Please refresh and try again.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
             }
         }
@@ -1063,7 +1112,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public static void SetFsSsProcessedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
+        public static void SetFsSsProcessedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId, int NewRowId)
         {
             if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
                 return;
@@ -1074,6 +1123,8 @@ namespace ExpressBase.Objects
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.SsReceived)
             {
                 Redis.Set(RedisKey, FormSubmissionJobStatus.SsProcessed, new TimeSpan(0, 15, 0));
+                RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionDataId, SolnId, ObjVerId, UserId, fsCxtId);
+                Redis.Set(RedisKey, NewRowId, new TimeSpan(0, 15, 0));
             }
             //else
             //{
@@ -1089,6 +1140,29 @@ namespace ExpressBase.Objects
             string ObjVerId = RefId.Split("-")[4];
             string RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionJobId, SolnId, ObjVerId, UserId, fsCxtId);
             Redis.Set(RedisKey, FormSubmissionJobStatus.Default, new TimeSpan(0, 0, 30));
+        }
+
+        public static void LogEbError(IDatabase DataDB, int Code, string Title, string Message, int SourceId, string SourceVerId, int UserId)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    Console.WriteLine("LogEbError Async start");
+
+                    string Qry = $@"
+INSERT INTO eb_errors (code, title, message, eb_src_id, eb_src_ver_id, eb_created_by, eb_created_at,eb_del)
+VALUES({Code}, '{Title}', '{Message}', {SourceId}, {SourceVerId}, {UserId}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F');";
+
+                    int temp = DataDB.DoNonQuery(Qry);
+
+                    Console.WriteLine("LogEbError Async end: " + temp);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception in LogEbError. Message: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                }
+            });
         }
 
         #endregion
