@@ -22,6 +22,7 @@ using ExpressBase.Common.Data;
 using System.Text.RegularExpressions;
 using ExpressBase.Objects.WebFormRelated;
 using System.Net;
+using ExpressBase.Objects.Helpers;
 
 namespace ExpressBase.Objects
 {
@@ -999,12 +1000,7 @@ else// PS
                         throw new FormException($"Invalid ParamsList in '{_this.Label ?? _this.Name}'. Contact Admin", (int)HttpStatusCode.InternalServerError, "Save object in dev side", "EbPowerSelect -> GetSelectQuery");
 
                     if (IsDgPs && _this.ParamsList.Exists(e => e.Name == _this.Name))
-                    {
-                        if (Sql.Contains(":" + _this.Name))
-                            Sql = Sql.Replace(":" + _this.Name, $"ANY(STRING_TO_ARRAY(:{_this.Name}{FormConstants.__ebedt}, ',')::INT[])");
-                        if (Sql.Contains("@" + _this.Name))
-                            Sql = Sql.Replace("@" + _this.Name, $"ANY(STRING_TO_ARRAY(@{_this.Name}{FormConstants.__ebedt}, ',')::INT[])");
-                    }
+                        Sql = SqlHelper.ReplaceParamByValue(Sql, _this.Name, $"ANY(STRING_TO_ARRAY(:{_this.Name}{FormConstants.__ebedt}, ',')::INT[])");
 
                     s = string.Format(@"SELECT DISTINCT __A.* FROM ({0}) __A, {1} __B
                                     WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :{5}_id;",
@@ -1044,12 +1040,7 @@ else// PS
                 if (!param.Exists(e => e.ParameterName == _P.Name))
                 {
                     if (_P.Name == this.Name)
-                    {
-                        if (Sql.Contains(":" + this.Name))
-                            Sql = Sql.Replace(":" + this.Name, $"ANY(STRING_TO_ARRAY('{vms}'::TEXT, ',')::INT[])");
-                        if (Sql.Contains("@" + this.Name))
-                            Sql = Sql.Replace("@" + this.Name, $"ANY(STRING_TO_ARRAY('{vms}'::TEXT, ',')::INT[])");
-                    }
+                        Sql = SqlHelper.ReplaceParamByValue(Sql, this.Name, $"ANY(STRING_TO_ARRAY('{vms}'::TEXT, ',')::INT[])");
                     else
                         param.Add(DataDB.GetNewParameter(_P.Name, (EbDbTypes)Convert.ToInt32(_P.Type), _P.ValueTo));
                 }

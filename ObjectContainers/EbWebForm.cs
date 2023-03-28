@@ -1941,7 +1941,7 @@ namespace ExpressBase.Objects
                                         _pList.Add(_val);
                                 }
                             }
-                            Qry = Qry.Replace(":" + p_control.Name, "@" + p_control.Name).Replace("@" + p_control.Name, $"'{_pList.Join(",")}'");
+                            Qry = SqlHelper.ReplaceParamByValue(Qry, p_control.Name, $"'{_pList.Join(",")}'");
                         }
                         else
                         {
@@ -1967,7 +1967,7 @@ namespace ExpressBase.Objects
                                 if (PCol.Type != 7)
                                     val = $"'{val}'";
                             }
-                            Qry = Qry.Replace(":" + pName, "@" + pName).Replace("@" + pName, val);
+                            Qry = SqlHelper.ReplaceParamByValue(Qry, pName, val);
                         }
                         Qry = Qry.Replace(";", "") + ";";
                         FullQry += Qry;

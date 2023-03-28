@@ -829,14 +829,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string RefId { get; set; }
 
-        [DataMember(Order = 7)]
+        [DataMember(Order = 2)]
         public string SolnId { get; set; }
 
-        [DataMember(Order = 8)]
+        [DataMember(Order = 3)]
         public int UserId { get; set; }
 
-        [DataMember(Order = 9)]
+        [DataMember(Order = 4)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order = 5)]
+        public bool UpdateSqlFn { get; set; }
     }
 
     [DataContract]
