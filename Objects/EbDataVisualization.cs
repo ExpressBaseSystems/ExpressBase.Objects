@@ -151,6 +151,7 @@ namespace ExpressBase.Objects
         public bool IsDataFromApi { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("1")]
         [PropertyGroup("Core")]
         public EvaluatorVersion EvaluatorVersion { get; set; }
 

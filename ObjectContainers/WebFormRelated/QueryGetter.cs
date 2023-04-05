@@ -29,7 +29,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string _id = "id";
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
-                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, id",
+                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}id",
                         ebs[SystemColumns.eb_loc_id],//0
                         ebs[SystemColumns.eb_ver_id],//1
                         ebs[SystemColumns.eb_lock],//2
@@ -41,7 +41,8 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_src_ver_id],//8
                         ebs[SystemColumns.eb_ro],//9
                         ebs[SystemColumns.eb_lastmodified_by],//10
-                        ebs[SystemColumns.eb_lastmodified_at]);//11
+                        ebs[SystemColumns.eb_lastmodified_at],//11
+                        _this.CancelReason ? ebs[SystemColumns.eb_void_reason] + ", " : string.Empty);//12
                 else if (_table.TableType == WebFormTableTypes.Review)
                 {
                     _id = $"eb_ver_id = {form_ver_id} AND eb_src_id";
@@ -355,7 +356,7 @@ WHERE
                         string Ids = Table.Select(e => e.RowId).Join(",");
                         string autoIdBckUp = string.Empty;
                         //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName) // uncomment this and check the autoid reassignment
-                        //    autoIdBckUp = string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", ebWebForm.AutoId.Name);
+                        //    autoIdBckUp = string.Format(", {0}_ebbkup = {0}, {0} = CONCAT('DEL_', {0}, '_ebbkup')", ebWebForm.AutoId.Name);
 
                         string Qry = string.Format("UPDATE {0} SET {1} = {7}, {2} = @eb_lastmodified_by, {3} = {4} {5} WHERE id IN ({6}) AND COALESCE({1}, {8}) = {8};",
                             _table.TableName,//0
@@ -425,12 +426,14 @@ WHERE
                     if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery) && !Cancel)
                         continue;
 
+                    bool _cnlRsn = ebWebForm.CancelReason && _schema.MasterTable == _table.TableName;
+
                     if (ebWebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0)
                     {
                         string Ids = Table.Select(e => e.RowId).Join(",");
 
                         //USE ANY
-                        string Qry = string.Format("UPDATE {0} SET {1} = {2}, {3} = @eb_lastmodified_by, {4} = {5} WHERE id IN ({6}) AND COALESCE({7}, {8}) = {8} AND COALESCE({1}, {9}) = {10};",
+                        string Qry = string.Format("UPDATE {0} SET {1} = {2}, {3} = @eb_lastmodified_by, {4} = {5} {11} WHERE id IN ({6}) AND COALESCE({7}, {8}) = {8} AND COALESCE({1}, {9}) = {10};",
                             _table.TableName,//0
                             ebs[SystemColumns.eb_void],//1
                             Cancel ? ebs.GetBoolTrue(SystemColumns.eb_void) : ebs.GetBoolFalse(SystemColumns.eb_void),//2
@@ -441,7 +444,8 @@ WHERE
                             ebs[SystemColumns.eb_del],//7
                             ebs.GetBoolFalse(SystemColumns.eb_del),//8
                             ebs.GetBoolFalse(SystemColumns.eb_void),//9
-                            Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void));//10
+                            Cancel ? ebs.GetBoolFalse(SystemColumns.eb_void) : ebs.GetBoolTrue(SystemColumns.eb_void),//10
+                            _cnlRsn ? $", {ebs[SystemColumns.eb_void_reason]} = @{FormConstants.eb_void_reason}" : string.Empty);//11
 
                         FullQry = Qry + FullQry;//First Lines table data cancelled
                     }

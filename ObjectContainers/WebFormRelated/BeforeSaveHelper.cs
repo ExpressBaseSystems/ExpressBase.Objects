@@ -37,6 +37,15 @@ namespace ExpressBase.Objects.WebFormRelated
             };
             if (_this.MakeEbSidUnique)
                 UpdateEbSid(_this, Allctrls, false);
+            if (!string.IsNullOrWhiteSpace(_this.EditReasonCtrl))
+            {
+                EbControl ERctrl = Allctrls.FirstOrDefault(e => e.Name == _this.EditReasonCtrl);
+                if (ERctrl == null)
+                    throw new FormException($"Edit reason control not found");
+                if (!(ERctrl is EbTextBox))
+                    throw new FormException($"Edit reason control must be a TextBox");
+            }
+
             PerformRequirdCheck(_this, Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl, service);
             PerformRequirdUpdate(_this, _this.TableName);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();

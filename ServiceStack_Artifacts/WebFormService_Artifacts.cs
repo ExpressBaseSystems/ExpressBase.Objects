@@ -820,6 +820,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public bool Cancel { get; set; }
+
+        [DataMember(Order = 4)]
+        public string Reason { get; set; }
     }
 
     [DataContract]
