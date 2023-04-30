@@ -992,6 +992,14 @@ return '✖';
             set { this.EbDate.RestrictionRule = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public TimeShowFormat ShowTimeAs
+        {
+            get { return this.EbDate.ShowTimeAs; }
+            set { this.EbDate.ShowTimeAs = value; }
+        }
+
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {

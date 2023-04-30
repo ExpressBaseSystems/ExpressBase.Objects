@@ -37,6 +37,7 @@ namespace ExpressBase.Objects
 
     public enum TimeShowFormat
     {
+        Default = 0,
         Hour_Minute_Second_12hrs,
         Hour_Minute_Second_24hrs,
         Hour_Minute_12hrs,
@@ -184,7 +185,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
-        public TimeShowFormat ShowTimeAs_ { get; set; }
+        public TimeShowFormat ShowTimeAs { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -265,8 +266,10 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern).format('YYYY-MM-DD');
                     else if(this.EbDateType === 6) //DateTime
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');
-                    else if(this.EbDateType === 17) //Time
-                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('HH:mm:ss');";
+                    else if(this.EbDateType === 17) { //Time
+                        let _ptn = this.ShowTimeAs === 4 ? 'HH:mm' : ebcontext.user.Preference.ShortTimePattern;
+                        return moment($('#' + this.EbSid_CtxId).val(), _ptn).format('HH:mm:ss');
+                    }";
             }
             set { }
         }
@@ -496,7 +499,8 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                     else// EbDateType.Time 
                     {
                         _formattedData = dt.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                        _displayMember = dt.ToString(UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                        string _ptn = _this.ShowTimeAs == TimeShowFormat.Hour_Minute_24hrs ? "HH:mm" : UserObj.Preference.GetShortTimePattern();
+                        _displayMember = dt.ToString(_ptn, CultureInfo.InvariantCulture);
                     }
                 }
                 catch (Exception e)
