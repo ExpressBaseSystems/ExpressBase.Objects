@@ -1,9 +1,11 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Security;
 using Newtonsoft.Json;
 using ServiceStack;
 using System;
@@ -15,7 +17,7 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbInputGeoLocation : EbControlUI
-	{
+    {
 
         [HideInPropertyGrid]
         public override bool Unique { get; set; }
@@ -42,7 +44,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override EbScript HiddenExpr { get; set; }
-        
+
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }
 
@@ -55,19 +57,19 @@ namespace ExpressBase.Objects
             this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
-		public override string GetHtml4Bot()
-		{
-			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
-		}
+        public override string GetHtml4Bot()
+        {
+            return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+        }
 
-		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		//[PropertyEditor(PropertyEditorType.Expandable)]
-		//public LatLng Position { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyEditor(PropertyEditorType.Expandable)]
+        //public LatLng Position { get; set; }
 
-		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		//public string ContentHTML { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        //public string ContentHTML { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("400")]
         public override int Height { get; set; }
 
@@ -75,11 +77,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
-		//[HideInPropertyGrid]
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//public override bool IsReadOnly { get => this.IsDisable; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
-		public override string GetDesignHtml()
+        public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
         }
@@ -141,17 +143,17 @@ namespace ExpressBase.Objects
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB;
             return ReplacePropsInHTML(EbCtrlHTML);
 
-//            return @"
-//            <div id='cont_@EbSid@' Ctype='InputGeoLocation' ebsid='@EbSid@' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
-//                <span class='eb-ctrl-label' ui-label='' id='@EbSidLbl' style=' @BackColor@ @ForeColor@ '>@Label@</span>
-//                    @GetBareHtml@
-//            </div>"
-//.Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
-//.Replace("@Label@", this.Label)
-//.Replace("@LabelBackColor@", this.LabelBackColor)
-//.Replace("@LabelForeColor@", this.LabelForeColor)
-//.Replace("@isHidden@", this.Hidden.ToString())
-//.Replace("@GetBareHtml@", this.GetBareHtml());
+            //            return @"
+            //            <div id='cont_@EbSid@' Ctype='InputGeoLocation' ebsid='@EbSid@' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
+            //                <span class='eb-ctrl-label' ui-label='' id='@EbSidLbl' style=' @BackColor@ @ForeColor@ '>@Label@</span>
+            //                    @GetBareHtml@
+            //            </div>"
+            //.Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
+            //.Replace("@Label@", this.Label)
+            //.Replace("@LabelBackColor@", this.LabelBackColor)
+            //.Replace("@LabelForeColor@", this.LabelForeColor)
+            //.Replace("@isHidden@", this.Hidden.ToString())
+            //.Replace("@GetBareHtml@", this.GetBareHtml());
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -181,7 +183,7 @@ namespace ExpressBase.Objects
             {
                 return @"if (p1){
                             let tmp = p1.includes(',') ? p1.split(',') : p1.split('/');
-                            if (tmp.length === 2 && parseFloat(tmp[0]) && parseFloat(tmp[1])){
+                            if (tmp.length === 2 && !isNaN(parseFloat(tmp[0])) && !isNaN(parseFloat(tmp[1]))){
                                 if (this.__mapVendor === 'osm'){
                                     this.__mapMarker.setLatLng([parseFloat(tmp[0]), parseFloat(tmp[1])]);
                                     this.__map.setView(this.__mapMarker.getLatLng());
@@ -233,6 +235,23 @@ if(!this.__ebonchangeFns)
     this.__ebonchangeFns = [];
 this.__ebonchangeFns.push(p1);
 "; } set { } }
+
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
+        {
+            object _formattedData = Value == null || Value.ToString().Trim().Length < 3 ? "0,0" : Value;
+            string _displayMember = Value == null ? string.Empty : Value.ToString();
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = _formattedData,
+                Control = this,
+                ObjType = this.ObjType,
+                F = _displayMember
+            };
+        }
 
     }
 }
