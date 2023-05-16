@@ -778,6 +778,7 @@ if(this.RenderAs === 9){
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [DefaultPropValue("4")]
         [PropertyGroup("Search")]
         public StringOperators DefaultOperator { get; set; }
 

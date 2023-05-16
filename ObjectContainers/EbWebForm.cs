@@ -291,6 +291,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableSqlRetriver { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool CancelReason { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string EditReasonCtrl { get; set; }
+
         public EbWebForm ShallowCopy()
         {
             return (EbWebForm)this.MemberwiseClone();
@@ -1115,6 +1123,7 @@ namespace ExpressBase.Objects
                             this.FormData.ModifiedBy = Convert.ToInt32(dataRow[i++]);
                             DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                            this.FormData.CancelReason = this.CancelReason ? Convert.ToString(dataRow[i++]) : string.Empty;
 
                             string p = this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetLongTimePattern();
                             this.FormData.Info = new WebformDataInfo()
@@ -1127,7 +1136,11 @@ namespace ExpressBase.Objects
                             };
                         }
                         else
-                            i += 11;// 9 => Count of above properties
+                        {
+                            i += 11;// 11 => Count of above properties
+                            if (this.CancelReason)
+                                i++;
+                        }
                     }
 
                     if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
@@ -1941,7 +1954,7 @@ namespace ExpressBase.Objects
                                         _pList.Add(_val);
                                 }
                             }
-                            Qry = Qry.Replace(":" + p_control.Name, "@" + p_control.Name).Replace("@" + p_control.Name, $"'{_pList.Join(",")}'");
+                            Qry = SqlHelper.ReplaceParamByValue(Qry, p_control.Name, $"'{_pList.Join(",")}'");
                         }
                         else
                         {
@@ -1967,7 +1980,7 @@ namespace ExpressBase.Objects
                                 if (PCol.Type != 7)
                                     val = $"'{val}'";
                             }
-                            Qry = Qry.Replace(":" + pName, "@" + pName).Replace("@" + pName, val);
+                            Qry = SqlHelper.ReplaceParamByValue(Qry, pName, val);
                         }
                         Qry = Qry.Replace(";", "") + ";";
                         FullQry += Qry;
@@ -3049,7 +3062,7 @@ namespace ExpressBase.Objects
             return true;
         }
 
-        public (int, string) Cancel(IDatabase DataDB, bool Cancel, Service service)
+        public (int, string) Cancel(IDatabase DataDB, bool Cancel, Service service, string Reason)
         {
             int status = -1;
             string modifiedAt = null;
@@ -3077,7 +3090,8 @@ namespace ExpressBase.Objects
                         {
                             DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                             DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
-                            DataDB.GetNewParameter(this.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
+                            DataDB.GetNewParameter(this.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4]),
+                            DataDB.GetNewParameter(FormConstants.eb_void_reason, EbDbTypes.String, Reason ?? string.Empty)
                         };
                         status = DataDB.DoNonQuery(this.DbConnection, query, param);
                         if (status > 0)

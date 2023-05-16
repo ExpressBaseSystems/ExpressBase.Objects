@@ -261,6 +261,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyPriority(98)]
+        [Alias("Show Copy Button")]
+        public bool ShowCopyBtn { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [OnChangeExec(@"
 if (this.IsDisable){
     pg.HideProperty('DisableRowEdit');
@@ -351,15 +357,18 @@ else {
         public override string GetBareHtml()
         {
             //SetCols();
-            int btnright = 8;
-            if (this.EnableExcelUpload) btnright += 100;
-            if (this.ShowRefreshBtn) btnright += 68;
+            int copyBtnW = 0, refreshBtnW = 0, excelBtnW = 0;
+
+            if (this.ShowCopyBtn) copyBtnW = 50;
+            if (this.ShowRefreshBtn) refreshBtnW = 64;
+            if (this.EnableExcelUpload) excelBtnW = 90;
 
             string html = @"
 <div class='grid-cont'>
     @refreshdgdrbtn@
     @exceluploadbtn@
     @addrowbtn@
+    @copydgbtn@
 <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
@@ -367,9 +376,11 @@ else {
                 <th class='slno' style='width:30px'><span class='grid-col-title'>#</span></th>"
 .Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0' title='Add Row (Alt+R)' style='right: @addbtnrightstyle@px;'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty)
 .Replace("@exceluploadbtn@", this.EnableExcelUpload ? "<div id='@ebsid@excelupload' class='excelupload-btn' tabindex='0' style='right: @exelbtnrightstyle@px;'>Upload Excel</div>" : string.Empty)
-.Replace("@refreshdgdrbtn@", this.ShowRefreshBtn ? "<div id='@ebsid@refreshdgdr' class='refreshdgdr-btn' tabindex='0'>Refresh</div>" : string.Empty)
-.Replace("@addbtnrightstyle@", btnright.ToString())
-.Replace("@exelbtnrightstyle@", this.ShowRefreshBtn ? "76" : "8");
+.Replace("@refreshdgdrbtn@", this.ShowRefreshBtn ? "<div id='@ebsid@refreshdgdr' class='refreshdgdr-btn' tabindex='0' style='right: @refreshbtnrightstyle@px;'>Refresh</div>" : string.Empty)
+.Replace("@copydgbtn@", this.ShowCopyBtn ? "<div id='@ebsid@copydg' class='copydg-btn' tabindex='0'>Copy</div>" : string.Empty)
+.Replace("@addbtnrightstyle@", (copyBtnW + refreshBtnW + excelBtnW + 8).ToString())
+.Replace("@exelbtnrightstyle@", (copyBtnW + refreshBtnW + 8).ToString())
+.Replace("@refreshbtnrightstyle@", (copyBtnW + 8).ToString());
             EbDGColumn lastCtrl = (EbDGColumn)Controls.FindLast(e => !e.Hidden);
             this.AdjustColumnWidth();
             foreach (EbDGColumn col in Controls)
@@ -979,6 +990,14 @@ return '✖';
         {
             get { return this.EbDate.RestrictionRule; }
             set { this.EbDate.RestrictionRule = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public TimeShowFormat ShowTimeAs
+        {
+            get { return this.EbDate.ShowTimeAs; }
+            set { this.EbDate.ShowTimeAs = value; }
         }
 
         [JsonIgnore]

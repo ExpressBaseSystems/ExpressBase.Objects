@@ -283,7 +283,7 @@ namespace ExpressBase.Objects
                     {
                         SingleColumn cField = Table[0].GetColumn(_column.ColumnName);
 
-                        if (cField == null || cField.Value == null || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+                        if (cField == null || string.IsNullOrWhiteSpace(Convert.ToString(cField.Value)) || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                             continue;
 
                         if (WebForm.FormDataBackup != null)
@@ -373,7 +373,7 @@ namespace ExpressBase.Objects
                 return;
             Pos++;
             SingleColumn cField = Row.GetColumn(_column.ColumnName);
-            if (cField == null || cField.Value == null || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+            if (cField == null || string.IsNullOrWhiteSpace(Convert.ToString(cField.Value)) || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                 return;
             string stVal = Convert.ToString(cField.Value);
             if (Vals.ContainsKey(stVal))

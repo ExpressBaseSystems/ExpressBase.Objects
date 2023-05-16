@@ -14,7 +14,7 @@ namespace ExpressBase.Objects.Helpers
         {
             //sql = Base64Decode(sql);
             if (obj_type == EbObjectTypes.DataWriter || obj_type == EbObjectTypes.DataReader)
-            {                
+            {
                 return GetSqlParams(sql);
             }
             else if (!string.IsNullOrEmpty(sql) && obj_type == EbObjectTypes.SqlFunction)
@@ -55,6 +55,25 @@ namespace ExpressBase.Objects.Helpers
                     param.Add(new Param { Name = match.Value });
             }
             return param;
+        }
+
+        public static bool ContainsParameter(string Query, string Parameter)
+        {
+            Regex r = new Regex(@"((?<=:(?<!::))|(?<=@(?<!::)))" + Parameter + @"\b");
+            return r.IsMatch(Query);
+        }
+
+        public static string RenameParameter(string Query, string Parameter, string NewParameter)
+        {
+            Regex r = new Regex(@"((?<=:(?<!::))|(?<=@(?<!::)))" + Parameter + @"\b");
+            return r.Replace(Query, NewParameter);
+        }
+
+        //replace @ : also
+        public static string ReplaceParamByValue(string Query, string ParamName, string Value)
+        {
+            Regex r = new Regex(@"((:(?<!::))|(@(?<!::)))" + ParamName + @"\b");
+            return r.Replace(Query, Value);
         }
 
         private string Base64Decode(string base64EncodedData)

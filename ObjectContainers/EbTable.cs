@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Constants;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -42,7 +43,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Core")]
         [PropertyPriority(70)]
         [ListType(typeof(EbTableTd))]
         public override List<EbControl> Controls { get; set; }
@@ -68,6 +69,42 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override EbScript OnChangeFn { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DependedValExp { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DrDependents { get; set; }
+
+        [JsonIgnore]
+        public override List<string> HiddenExpDependants { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DisableExpDependants { get; set; }
+
+        [JsonIgnore]
+        public override List<string> ValExpParams { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DependedDG { get; set; }
+
+        [JsonIgnore]
+        public override string DBareHtml { get; set; }
+
+        [JsonIgnore]
+        public override string Info { get; set; }
+
+        [JsonIgnore]
+        public override string InfoIcon { get; set; }
+
+        [JsonIgnore]
+        public override EbScript _OnChange { get; set; }
+
+        [JsonIgnore]
+        public override EbFont LabelFontStyle { get; set; }
+
+        [JsonIgnore]
+        public override float FontSize { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
@@ -151,10 +188,7 @@ this.Init = function(id){
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [HideInPropertyGrid]
-        public override string Name { get; set; }
-
-        [HideInPropertyGrid]
+        [JsonIgnore]
         public override string Label { get; set; }
 
         [JsonIgnore]
@@ -165,6 +199,46 @@ this.Init = function(id){
 
         [JsonIgnore]
         public override EbScript OnChangeFn { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DependedValExp { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DrDependents { get; set; }
+
+        [JsonIgnore]
+        public override List<string> HiddenExpDependants { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DisableExpDependants { get; set; }
+
+        [JsonIgnore]
+        public override List<string> ValExpParams { get; set; }
+
+        [JsonIgnore]
+        public override List<string> DependedDG { get; set; }
+
+        [JsonIgnore]
+        public override string DBareHtml { get; set; }
+
+        [JsonIgnore]
+        public override string Info { get; set; }
+
+        [JsonIgnore]
+        public override string InfoIcon { get; set; }
+
+        [JsonIgnore]
+        public override EbScript _OnChange { get; set; }
+
+        [JsonIgnore]
+        public override EbFont LabelFontStyle { get; set; }
+
+        [JsonIgnore]
+        public override float FontSize { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string TableName { get; set; }
 
         [PropertyGroup(PGConstants.APPEARANCE)]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]

@@ -16,6 +16,7 @@ using ExpressBase.CoreBase.Globals;
 using System.Data.Common;
 using Newtonsoft.Json;
 using System.Linq;
+using ExpressBase.Objects.Helpers;
 
 namespace ExpressBase.Objects
 {
@@ -740,7 +741,7 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                 if ((IsUpdate && !routine.IsDisabledOnEdit) || (!IsUpdate && !routine.IsDisabledOnNew))
                 {
                     string str1 = _this.TableName + "_id";
-                    Qry += routine.Script.Code.Replace(":" + str1, "@" + str1).Replace("@" + str1, _this.TableRowId.ToString()) + ";";
+                    Qry += SqlHelper.ReplaceParamByValue(routine.Script.Code, str1, _this.TableRowId.ToString()) + ";";
                 }
             }
 

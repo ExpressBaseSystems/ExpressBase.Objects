@@ -87,6 +87,9 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
         public string FilterDialogRefId { get; set; }
 
+        [EnableInBuilder(BuilderType.DataReader)]
+        public bool EnableSqlFunction { get; set; }
+
         //public string VersionNumber { get; set; }
 
         //public string Status { get; set; }

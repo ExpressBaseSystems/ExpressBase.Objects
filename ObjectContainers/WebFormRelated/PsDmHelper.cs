@@ -4,6 +4,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using System;
@@ -115,7 +116,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         string idCol = this.ebForm.FormSchema.MasterTable == _p_table.TableName ? "id" : $"{this.ebForm.FormSchema.MasterTable}_id";
                         _str = $"(SELECT {_p_column.ColumnName} FROM {_p_table.TableName} WHERE {idCol}=id__in AND COALESCE({ebs[SystemColumns.eb_del]},{ebs.GetBoolFalse(SystemColumns.eb_del)})={ebs.GetBoolFalse(SystemColumns.eb_del)})";
                     }
-                    qry = ReplaceQueryParam(qry, _p_column.ColumnName, _str);
+                    qry = SqlHelper.ReplaceParamByValue(qry, _p_column.ColumnName, _str);
                 }
                 else
                 {
@@ -128,7 +129,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     else
                         _val = $"'{_psParam.ValueTo}'";
 
-                    qry = ReplaceQueryParam(qry, _psParam.Name, _val);
+                    qry = SqlHelper.ReplaceParamByValue(qry, _psParam.Name, _val);
                 }
             }
             return qry;
@@ -152,12 +153,6 @@ namespace ExpressBase.Objects.WebFormRelated
             }
 
             return $"SELECT __A.* FROM ({psqry}) __A WHERE __A.{ipsCtrl.ValueMember.Name} = {vms}";
-        }
-
-        private string ReplaceQueryParam(string query, string paramName, string sqlParam)
-        {
-            Regex r = new Regex(@"(@|:)" + paramName + @"\b");
-            return r.Replace(query, sqlParam);
         }
 
         #endregion SqlRetrival
@@ -223,11 +218,10 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     if (ParamsList.Exists(e => e.Name == psCtrl.Name))
                     {
-                        if (psqry.Contains(":" + psCtrl.Name) || psqry.Contains("@" + psCtrl.Name))//self parameter
+                        if (SqlHelper.ContainsParameter(psqry, psCtrl.Name))//self parameter
                         {
                             string _str = GetPsDgParamAsQuery(psTable, psCtrl.Name);
-                            psqry = psqry.Replace(":" + psCtrl.Name, _str)
-                                .Replace("@" + psCtrl.Name, _str);
+                            psqry = SqlHelper.ReplaceParamByValue(psqry, psCtrl.Name, _str);
                         }
                     }
                     _PsDmDict.TryAdd(DataDB, psCtrl);
@@ -274,14 +268,14 @@ namespace ExpressBase.Objects.WebFormRelated
                             if (!(_psParam.Name == psCtrl.Name && qry == null))
                             {
                                 param.Add(DataDB.GetNewParameter(_psParam.Name + i, (EbDbTypes)Convert.ToInt32(_psParam.Type), curRow[_psParam.Name]));
-                                qry = qry.Replace("@" + _psParam.Name, "@" + _psParam.Name + i).Replace(":" + _psParam.Name, ":" + _psParam.Name + i);
+                                qry = SqlHelper.RenameParameter(qry, _psParam.Name, _psParam.Name + i);
                             }
                             continue;
                         }
                         else if (_p_column.Control is EbDGPowerSelectColumn || _p_column.Control is EbDGNumericColumn)
                         {
                             string _str = GetPsDgParamAsQuery(Table, _psParam.Name);
-                            qry = qry.Replace("@" + _psParam.Name, _str).Replace(":" + _psParam.Name, _str);
+                            qry = SqlHelper.ReplaceParamByValue(qry, _psParam.Name, _str);
                             continue;
                         }
                     }
