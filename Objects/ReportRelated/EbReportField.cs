@@ -107,7 +107,7 @@ namespace ExpressBase.Objects
                 else
                     Font = (new EbFont { color = "#000000", FontName = "Roboto", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
             }
-            iTextFont = FontFactory.GetFont(Font.FontName, Font.Size, (int)Font.Style);
+            iTextFont = FontFactory.GetFont(Font.FontName, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, Font.Size, (int)Font.Style);
             iTextFont.Color = GetColor(Font.color);
             if (Font.Caps)
                 text = text.ToUpper();
