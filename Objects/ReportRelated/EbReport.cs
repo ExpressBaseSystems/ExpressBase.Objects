@@ -281,6 +281,10 @@ namespace ExpressBase.Objects
         public string BackgroundImage { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool IsLongDetailSection { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public List<EbReportField> ReportObjects { get; set; }
 
@@ -857,9 +861,11 @@ namespace ExpressBase.Objects
                 {
                     __reportFieldsSortedPerDetail = new Dictionary<EbReportDetail, EbReportField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __reportFieldsSortedPerDetail[detail] = detail.GetFields().OrderBy(o => o.Left).ToArray();
+                        if (this.IsLongDetailSection)
+                            __reportFieldsSortedPerDetail[detail] = detail.GetFields().OrderBy(o => o.TopPt).ToArray();
+                        else
+                            __reportFieldsSortedPerDetail[detail] = detail.GetFields().OrderBy(o => o.Left).ToArray();
                 }
-
                 return __reportFieldsSortedPerDetail;
             }
         }
@@ -899,58 +905,119 @@ namespace ExpressBase.Objects
             else
                 ph_Yposition = this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
+            string column_val = string.Empty;
+
             foreach (EbReportDetail detail in Detail)
             {
-                string column_val;
+                float nextpage_quotient = 0;
                 RowHeight = 0;
                 MultiRowTop = 0;
                 EbDataField[] SortedList = FieldsNotSummaryPerDetail[detail];
                 EbPdfGlobals globals = new EbPdfGlobals();
-                for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
+                if (!IsLongDetailSection)
                 {
-                    EbDataField field = SortedList[iSortPos];
-                    if (field is EbCalcField)
+                    for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                     {
-                        globals.CurrentField = field;
-                        column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
-                        EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
+                        EbDataField field = SortedList[iSortPos];
+                        if (field is EbCalcField)
+                        {
+                            globals.CurrentField = field;
+                            column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
+                            EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
 
-                        if (CalcValInRow.ContainsKey(field.Title))
-                            CalcValInRow[field.Title] = new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val };
+                            if (CalcValInRow.ContainsKey(field.Title))
+                                CalcValInRow[field.Title] = new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val };
+                            else
+                                CalcValInRow.Add(field.Title, new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val });
+                        }
                         else
-                            CalcValInRow.Add(field.Title, new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val });
+                        {
+                            column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
+                        }
+
+                        if (field.RenderInMultiLine)
+                        {
+                            float ury = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop);
+                            float lly = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop + field.HeightPt);
+                            field.DoRenderInMultiLine2(column_val, this, false, lly, ury);
+                        }
+                    }
+                    EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
+                    if (SortedReportFields.Length > 0)
+                    {
+                        for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                        {
+                            EbReportField field = SortedReportFields[iSortPos];
+                            //if (field is EbDataField)
+                            //    field.HeightPt += RowHeight;
+                            DrawFields(field, dt_Yposition, serialnumber);
+                        }
+                        detailprintingtop += detail.HeightPt + RowHeight;
+                        detailEnd = detailprintingtop;
                     }
                     else
                     {
-                        column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
+                        detailEnd = detailprintingtop;
+                        IsLastpage = true;
+                        Writer.PageEvent.OnEndPage(Writer, Doc);
+                        return;
                     }
-
-                    if (field.RenderInMultiLine)
-                    {
-                        float ury = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop);
-                        float lly = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop + field.HeightPt);
-                        field.DoRenderInMultiLine2(column_val, this, false, lly, ury);
-                    }
-                }
-                EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
-                if (SortedReportFields.Length > 0)
-                {
-                    for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
-                    {
-                        EbReportField field = SortedReportFields[iSortPos];
-                        //if (field is EbDataField)
-                        //    field.HeightPt += RowHeight;
-                        DrawFields(field, dt_Yposition, serialnumber);
-                    }
-                    detailprintingtop += detail.HeightPt + RowHeight;
-                    detailEnd = detailprintingtop;
                 }
                 else
                 {
-                    detailEnd = detailprintingtop;
-                    IsLastpage = true;
-                    Writer.PageEvent.OnEndPage(Writer, Doc);
-                    return;
+                    EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
+                    if (SortedReportFields.Length > 0)
+                    {
+                        for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                        {
+                            EbReportField field = SortedReportFields[iSortPos];
+                            if (field is EbCalcField)
+                            {
+                                globals.CurrentField = field;
+                                column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
+                                EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
+
+                                if (CalcValInRow.ContainsKey(field.Title))
+                                    CalcValInRow[field.Title] = new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val };
+                                else
+                                    CalcValInRow.Add(field.Title, new GNTV { Name = field.Title, Type = (GlobalDbType)(int)dbtype, Value = column_val });
+                            }
+                            else
+                            {
+                                if (field is EbDataField)
+                                    column_val = GetDataFieldValue((field as EbDataField).ColumnName, serialnumber, (field as EbDataField).TableIndex);
+                            }
+
+                            if (field is EbDataField && (field as EbDataField).RenderInMultiLine)
+                            {
+                                float ury = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop);
+                                float lly = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop + field.HeightPt);
+                                (field as EbDataField).DoRenderInMultiLine2(column_val, this, false, lly, ury);
+                            }
+                            //if (DT_FillHeight < field.TopPt - nextpage_quotient + field.HeightPt + RowHeight)
+                            if (this.DT_FillHeight < detailprintingtop + Margin.Bottom)
+                            {
+                                AddNewPage();
+                                detailprintingtop = 0;
+                                nextpage_quotient = field.TopPt;
+                            }
+                            field.TopPt -= nextpage_quotient;
+                            DrawFields(field, dt_Yposition, serialnumber);
+                            if (RowHeight > 0)
+                                detailprintingtop += RowHeight;
+                            // detailprintingtop += field.HeightPt;
+                            detailEnd = detailprintingtop;
+                            RowHeight = 0;
+                        }
+                        detailprintingtop += detail.HeightPt;
+                    }
+                    else
+                    {
+                        detailEnd = detailprintingtop;
+                        IsLastpage = true;
+                        Writer.PageEvent.OnEndPage(Writer, Doc);
+                        return;
+                    }
                 }
             }
         }
