@@ -335,6 +335,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         public bool IsLanguageEnabled { get; set; } = false;
 
+        [EnableInBuilder(BuilderType.Report)]
+        public bool RestartSerialNumberOnGroup { set; get; }
+
         [JsonIgnore]
         public int DetailTableIndex { get; set; } = 0;
 
@@ -388,6 +391,9 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public int PageNumber { get; set; }
+
+        [JsonIgnore]
+        public int SerialNumber = 0;
 
         private DateTime _currentTimeStamp = DateTime.MinValue;
         [JsonIgnore]
@@ -639,7 +645,7 @@ namespace ExpressBase.Objects
         public bool FooterDrawn = false;
 
         [JsonIgnore]
-        private int PreviousGheadersSlNo { get; set; }
+        private int PreviousGheadersIterator { get; set; }
 
         [JsonIgnore]
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; } = new Dictionary<string, List<Common.Objects.EbControl>>();
@@ -662,13 +668,13 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public IRedisClient Redis { get; set; }
 
-        public dynamic GetDataFieldValue(string column_name, int i, int tableIndex)
+        public dynamic GetDataFieldValue(string column_name, int iterator, int tableIndex)
         {
             dynamic value = null;
             int index;
             if (DataSet != null && DataSet.Tables.Count > 0 && DataSet.Tables[tableIndex].Rows != null)
             {
-                index = (DataSet.Tables[tableIndex].Rows.Count > 1) ? i : 0;
+                index = (DataSet.Tables[tableIndex].Rows.Count > 1) ? iterator : 0;
                 EbDbTypes type = (DataSet.Tables[tableIndex].Columns[column_name].Type);
                 value = (type == EbDbTypes.Bytea) ? DataSet.Tables[tableIndex].Rows[index][column_name] : DataSet.Tables[tableIndex].Rows[index][column_name].ToString();
             }
@@ -686,18 +692,18 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void CallSummerize(EbDataField field, int serialnumber)
+        public void CallSummerize(EbDataField field, int iterator)
         {
             string column_val;
             EbPdfGlobals globals = new EbPdfGlobals();
 
             if (field is EbCalcField)
             {
-                column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
+                column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, iterator, this);
             }
             else
             {
-                column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
+                column_val = GetDataFieldValue(field.ColumnName, iterator, field.TableIndex);
             }
             List<EbDataField> SummaryList;
             if (GroupSummaryFields.ContainsKey(field.Name))
@@ -784,6 +790,7 @@ namespace ExpressBase.Objects
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
+                    SerialNumber++;
                     if (Groupheaders?.Count > 0)
                         DrawGroup();
                     if (detailprintingtop < DT_FillHeight && DT_FillHeight - detailprintingtop >= DetailHeight)
@@ -896,7 +903,7 @@ namespace ExpressBase.Objects
             PageNumber = Writer.PageNumber;
         }
 
-        public void DoLoopInDetail(int serialnumber)
+        public void DoLoopInDetail(int iterator)
         {
             if (PageNumber == 1)
                 ph_Yposition = ReportHeaderHeight + this.Margin.Top;
@@ -922,7 +929,7 @@ namespace ExpressBase.Objects
                         if (field is EbCalcField)
                         {
                             globals.CurrentField = field;
-                            column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
+                            column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, iterator, this);
                             EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
 
                             if (CalcValInRow.ContainsKey(field.Title))
@@ -932,7 +939,7 @@ namespace ExpressBase.Objects
                         }
                         else
                         {
-                            column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
+                            column_val = GetDataFieldValue(field.ColumnName, iterator, field.TableIndex);
                         }
 
                         if (field.RenderInMultiLine)
@@ -950,7 +957,7 @@ namespace ExpressBase.Objects
                             EbReportField field = SortedReportFields[iSortPos];
                             //if (field is EbDataField)
                             //    field.HeightPt += RowHeight;
-                            DrawFields(field, dt_Yposition, serialnumber);
+                            DrawFields(field, dt_Yposition, iterator);
                         }
                         detailprintingtop += detail.HeightPt + RowHeight;
                         detailEnd = detailprintingtop;
@@ -974,7 +981,7 @@ namespace ExpressBase.Objects
                             if (field is EbCalcField)
                             {
                                 globals.CurrentField = field;
-                                column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
+                                column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, iterator, this);
                                 EbDbTypes dbtype = (EbDbTypes)((field as EbCalcField).CalcFieldIntType);
 
                                 if (CalcValInRow.ContainsKey(field.Title))
@@ -985,7 +992,7 @@ namespace ExpressBase.Objects
                             else
                             {
                                 if (field is EbDataField)
-                                    column_val = GetDataFieldValue((field as EbDataField).ColumnName, serialnumber, (field as EbDataField).TableIndex);
+                                    column_val = GetDataFieldValue((field as EbDataField).ColumnName, iterator, (field as EbDataField).TableIndex);
                             }
 
                             if (field is EbDataField && (field as EbDataField).RenderInMultiLine)
@@ -1002,7 +1009,7 @@ namespace ExpressBase.Objects
                                 nextpage_quotient = field.TopPt;
                             }
                             field.TopPt -= nextpage_quotient;
-                            DrawFields(field, dt_Yposition, serialnumber);
+                            DrawFields(field, dt_Yposition, iterator);
                             if (RowHeight > 0)
                                 detailprintingtop += RowHeight;
                             // detailprintingtop += field.HeightPt;
@@ -1022,9 +1029,9 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void DrawGroupHeader(int order, int serialnumber)
+        public void DrawGroupHeader(int order, int iterator)
         {
-            if ((PreviousGheadersSlNo != serialnumber && GroupHeaderHeight + DetailHeight > DT_FillHeight - detailprintingtop) || (ReportGroups[order].GroupHeader.GroupInNewPage && serialnumber > 0))
+            if ((PreviousGheadersIterator != iterator && GroupHeaderHeight + DetailHeight > DT_FillHeight - detailprintingtop) || (ReportGroups[order].GroupHeader.GroupInNewPage && iterator > 0))
             {
                 AddNewPage();
                 dt_Yposition = PageHeaderHeight + this.Margin.Top;
@@ -1032,19 +1039,21 @@ namespace ExpressBase.Objects
 
             foreach (EbReportField field in ReportGroups[order].GroupHeader.GetFields())
             {
-                DrawFields(field, dt_Yposition, serialnumber);
+                DrawFields(field, dt_Yposition, iterator);
             }
             detailprintingtop += ReportGroups[order].GroupHeader.HeightPt;
-            PreviousGheadersSlNo = serialnumber;
+            PreviousGheadersIterator = iterator;
         }
 
-        public void DrawGroupFooter(int order, int serialnumber)
+        public void DrawGroupFooter(int order, int iterator)
         {
             foreach (EbReportField field in ReportGroups[order].GroupFooter.GetFields())
             {
-                DrawFields(field, dt_Yposition, serialnumber);
+                DrawFields(field, dt_Yposition, iterator);
             }
             detailprintingtop += ReportGroups[order].GroupFooter.HeightPt;
+            if (RestartSerialNumberOnGroup)
+                SerialNumber = 1;
         }
 
         public void DrawPageFooter()
@@ -1117,7 +1126,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
+        public void DrawFields(EbReportField field, float section_Yposition, int iterator)
         {
             if (!field.IsHidden)
             {
@@ -1126,17 +1135,17 @@ namespace ExpressBase.Objects
                 {
                     EbDataField field_org = field as EbDataField;
                     if (GroupSummaryFields.ContainsKey(field.Name) || PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.Name))
-                        CallSummerize(field_org, serialnumber);
+                        CallSummerize(field_org, iterator);
                     if (AppearanceScriptCollection.ContainsKey(field.Name))
-                        RunAppearanceExpression(field_org, serialnumber);
+                        RunAppearanceExpression(field_org, iterator);
                     if (!string.IsNullOrEmpty(field_org.LinkRefId))
-                        RowParams = CreateRowParamForLink(field_org, serialnumber);
+                        RowParams = CreateRowParamForLink(field_org, iterator);
                 }
-                field.DrawMe(section_Yposition, this, RowParams, serialnumber);
+                field.DrawMe(section_Yposition, this, RowParams, iterator);
             }
         }
 
-        public void RunAppearanceExpression(EbDataField field, int slno)
+        public void RunAppearanceExpression(EbDataField field, int iterator)
         {
             if (field.Font is null || field.Font.Size == 0)
                 field.Font = new EbFont { color = "#000000", FontName = "Roboto", Caps = false, Size = 10, Strikethrough = false, Style = FontStyle.NORMAL, Underline = false };
@@ -1156,19 +1165,19 @@ namespace ExpressBase.Objects
             };
 
             if (this.EvaluatorVersion == EvaluatorVersion.Version_1)
-                ExecuteExpressionV1((Script)AppearanceScriptCollection[field.Name], slno, globals, field.DataFieldsUsedAppearance);
+                ExecuteExpressionV1((Script)AppearanceScriptCollection[field.Name], iterator, globals, field.DataFieldsUsedAppearance);
             else
-                ExecuteExpressionV2(AppearanceScriptCollection[field.Name].ToString(), slno, globals, field.DataFieldsUsedAppearance, true);
+                ExecuteExpressionV2(AppearanceScriptCollection[field.Name].ToString(), iterator, globals, field.DataFieldsUsedAppearance, true);
 
             field.SetValuesFromGlobals(globals.CurrentField);
         }
 
-        public List<Param> CreateRowParamForLink(EbDataField field, int slno)
+        public List<Param> CreateRowParamForLink(EbDataField field, int iterator)
         {
             List<Param> RowParams = new List<Param>();
             foreach (EbControl control in LinkCollection[field.LinkRefId])
             {
-                Param x = DataSet.Tables[field.TableIndex].Rows[slno].GetCellParam(control.Name);
+                Param x = DataSet.Tables[field.TableIndex].Rows[iterator].GetCellParam(control.Name);
                 ArrayList IndexToRemove = new ArrayList();
                 for (int i = 0; i < RowParams.Count; i++)
                 {

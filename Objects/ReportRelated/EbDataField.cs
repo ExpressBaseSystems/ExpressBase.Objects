@@ -101,10 +101,10 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, iterator, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
 
@@ -319,10 +319,10 @@ namespace ExpressBase.Objects
                     };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, iterator, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
@@ -384,10 +384,10 @@ namespace ExpressBase.Objects
         }
 
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, iterator, TableIndex);
             column_val = FormatDate(column_val, Format, Rep);
             if (column_val != string.Empty)
             {
@@ -440,11 +440,11 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, iterator, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
@@ -509,10 +509,10 @@ namespace ExpressBase.Objects
                     };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, iterator, TableIndex);
             if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
                 column_val = String.Empty;
             else
@@ -659,7 +659,7 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
@@ -762,7 +762,7 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
@@ -857,7 +857,7 @@ namespace ExpressBase.Objects
         };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = FormatDate(SummarizedValue.ToString(), Format, Rep);
@@ -931,7 +931,7 @@ namespace ExpressBase.Objects
         };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
 
             ColumnText ct = new ColumnText(Rep.Canvas);
@@ -1035,7 +1035,7 @@ namespace ExpressBase.Objects
         };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = string.Empty;
@@ -1045,11 +1045,11 @@ namespace ExpressBase.Objects
             {
                 if (Rep.EvaluatorVersion == EvaluatorVersion.Version_1)
                 {
-                    column_val = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[Name], slno, globals, DataFieldsUsedInCalc).ToString();
+                    column_val = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[Name], iterator, globals, DataFieldsUsedInCalc).ToString();
                 }
                 else
                 {
-                    column_val = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), slno, globals, DataFieldsUsedInCalc, true).ToString();
+                    column_val = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), iterator, globals, DataFieldsUsedInCalc, true).ToString();
                 }
 
                 dbtype = (EbDbTypes)CalcFieldIntType;
@@ -1095,16 +1095,16 @@ namespace ExpressBase.Objects
             ct.Go();
         }
 
-        public string GetCalcFieldValue(EbPdfGlobals globals, EbDataSet DataSet, int serialnumber, EbReport Rep)
+        public string GetCalcFieldValue(EbPdfGlobals globals, EbDataSet DataSet, int iterator, EbReport Rep)
         {
             string value;
             if (Rep.EvaluatorVersion == EvaluatorVersion.Version_1)
             {
-                value = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[this.Name], serialnumber, globals, DataFieldsUsedInCalc)?.ToString();
+                value = Rep.ExecuteExpressionV1((Script)Rep.ValueScriptCollection[this.Name], iterator, globals, DataFieldsUsedInCalc)?.ToString();
             }
             else
             {
-                value = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), serialnumber, globals, DataFieldsUsedInCalc, true)?.ToString();
+                value = Rep.ExecuteExpressionV2(Rep.ValueScriptCollection[Name].ToString(), iterator, globals, DataFieldsUsedInCalc, true)?.ToString();
             }
             return value;
         }
@@ -1216,7 +1216,7 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
@@ -1330,7 +1330,7 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
@@ -1434,7 +1434,7 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
@@ -1511,7 +1511,7 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
