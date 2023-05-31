@@ -421,4 +421,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string AutoIdData { set; get; }
     }
+
+    public class GetAttendanceDeviceListRequest : EbServiceStackAuthRequest, IReturn<GetAttendanceDeviceListResponse>
+    {
+        public int Device { set; get; }
+    }
+
+    [DataContract]
+    public class GetAttendanceDeviceListResponse
+    {
+        [DataMember(Order = 1)]
+        public List<AttendanceDevice> DeviceList { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Message { set; get; }
+
+        public GetAttendanceDeviceListResponse()
+        {
+            DeviceList = new List<AttendanceDevice>();
+        }
+    }
+
+    public class AttendanceDevice
+    {
+        public int Id { set; get; }
+        public string DeviceName { set; get; }
+        public string Ip { set; get; }
+        public int Port { set; get; }
+        public string CommKey { set; get; }
+        public int LocationId { set; get; }
+        public string LocationShortName { set; get; }
+        public string LastSyncTs { set; get; }
+    }
 }
