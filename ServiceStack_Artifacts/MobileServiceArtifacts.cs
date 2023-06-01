@@ -453,4 +453,37 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string LocationShortName { set; get; }
         public string LastSyncTs { set; get; }
     }
+
+    public class GetEmployeesListRequest : EbServiceStackAuthRequest, IReturn<GetEmployeesListResponse>
+    {
+        public int LocationId { get; set; }
+    }
+
+    [DataContract]
+    public class GetEmployeesListResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EmployeesDetails> Employees { set; get; }
+
+        [DataMember(Order = 2)]
+        public string ErrorMessage { set; get; }
+
+        public GetEmployeesListResponse()
+        {
+            Employees = new List<EmployeesDetails>();
+        }
+    }
+
+    public class EmployeesDetails
+    {
+        public int Id { set; get; }
+        public string Xid { set; get; }
+        public string Name { set; get; }
+        public string Designation { set; get; }
+        public string Department { set; get; }
+        public string PunchId1 { set; get; }
+        public string PunchId2 { set; get; }
+        public string ShiftStart { set; get; }
+        public string ShiftEnd { set; get; }
+    }
 }
