@@ -131,6 +131,10 @@ namespace ExpressBase.Objects.WebFormRelated
                 else if (control is IEbPowerSelect iPs)
                 {
                     iPs.TableName = curTbl;
+                    if (iPs is EbDGPowerSelectColumn dgPs && dgPs.StrictSelect && _this.EnableSqlRetriver && dgPs.IsCostCentrePs())
+                    {
+                        dgPs.OverrideStrictSelect = true;
+                    }
                 }
             }
 

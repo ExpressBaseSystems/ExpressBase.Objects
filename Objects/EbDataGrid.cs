@@ -1838,6 +1838,8 @@ pg.HideProperty('IsDynamic');
         [EnableInBuilder(BuilderType.WebForm)]
         public bool StrictSelect { get; set; }
 
+        public bool OverrideStrictSelect { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public override bool Index { get; set; }
 
@@ -1872,7 +1874,7 @@ pg.HideProperty('IsDynamic');
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
-            return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, !StrictSelect);
+            return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, !(StrictSelect && !OverrideStrictSelect));
         }
 
         //public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
@@ -1899,6 +1901,11 @@ pg.HideProperty('IsDynamic');
         public override DVBaseColumn GetDVBaseColumn(int index)
         {
             return new DVStringColumn { Data = index, Name = this.Name, sTitle = this.Title, Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px", Align = Align.Left };
+        }
+
+        public bool IsCostCentrePs()
+        {
+            return this.Name == "sys_cc_id" || this.Name == "cost_centres_id";
         }
     }
 

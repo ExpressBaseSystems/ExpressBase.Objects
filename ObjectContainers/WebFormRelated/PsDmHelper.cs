@@ -77,14 +77,38 @@ namespace ExpressBase.Objects.WebFormRelated
                 (psqry, dataReader) = ipsCtrl.GetSqlAndDr(this.service);
 
                 if (psCtrl is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect)
-                    throw new FormException("EnableSqlRetriver not supported for StrictSelect PS", (int)HttpStatusCode.InternalServerError, "__", "PsDmHelper");
-
-
-                psqry = ReplaceParamsInQuery(psCtrl, psqry);
-                psqry = WrapPsQuery(psqry, psCtrl, _pstableSchema);
+                {
+                    if (dgpsCtrl.OverrideStrictSelect)
+                        psqry = ReplaceParamsAndWrapDgPsQuery(dgpsCtrl, psqry);
+                    else
+                        throw new FormException("EnableSqlRetriver not supported for StrictSelect PS", (int)HttpStatusCode.InternalServerError, "__", "PsDmHelper");
+                }
+                else
+                {
+                    psqry = ReplaceParamsInQuery(psCtrl, psqry);
+                    psqry = WrapPsQuery(psqry, psCtrl, _pstableSchema);
+                }
                 QueryList.Add(psqry);
             }
             return QueryList;
+        }
+
+        private string ReplaceParamsAndWrapDgPsQuery(EbDGPowerSelectColumn dgpsCtrl, string qry)
+        {
+            if (dgpsCtrl.DisplayMembers.Count > 1)
+                throw new FormException("EnableSqlRetriver not supported for StrictSelect PS with more than one DM", (int)HttpStatusCode.InternalServerError, "_-", "PsDmHelper");
+            if (dgpsCtrl.Columns.Count > 2)
+                throw new FormException("EnableSqlRetriver not supported for StrictSelect PS with more than 2 columns", (int)HttpStatusCode.InternalServerError, "__--", "PsDmHelper");
+
+            string vm = dgpsCtrl.ValueMember.Name;
+            string dm1 = dgpsCtrl.DisplayMembers[0].Name;
+            EbSystemColumns ebs = this.ebForm.SolutionObj.SolutionSettings.SystemColumns;
+            qry = SqlHelper.RenameParameter(qry, SystemColumns.eb_loc_id, ebs[SystemColumns.eb_loc_id]);
+            qry = qry.Replace("*", dm1).Replace("@", "").Replace(";", "");
+
+            string Qry = $@"SELECT {dgpsCtrl.Name} AS {vm}, ({qry} WHERE {vm}={dgpsCtrl.Name}) AS {dm1} FROM {dgpsCtrl.TableName} WHERE {this.ebForm.FormSchema.MasterTable}_id=id__in";
+
+            return Qry;
         }
 
         private string ReplaceParamsInQuery(EbControl psCtrl, string qry)
@@ -190,7 +214,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 (psqry, dataReader) = ipsCtrl.GetSqlAndDr(this.service);
                 IDatabase DataDB = dataReader.GetDatastore(this.ebForm.EbConnectionFactory);
 
-                if (psCtrl is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect && psTable?.Count > 0)// separate query
+                if (psCtrl is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect && !dgpsCtrl.OverrideStrictSelect && psTable?.Count > 0)// separate query
                 {
                     _PsDmDict.TryAdd(DataDB, psCtrl);
                     foreach (SingleRow Row in psTable)
@@ -380,7 +404,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         SingleTable Table = new SingleTable();
                         ebForm.GetFormattedData(item.Value.ds.Tables[item.Value.dsIndex], Table);
                         string key = drPsList[x].EbSid;
-                        if (drPsList[x] is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect)
+                        if (drPsList[x] is EbDGPowerSelectColumn dgpsCtrl && dgpsCtrl.StrictSelect && !dgpsCtrl.OverrideStrictSelect)
                             key = drPsList[x].EbSid + row_ids[drPsList[x].EbSid][y];
                         _FormData.PsDm_Tables.Add(key, Table);
                         item.Value.dsIndex++;
