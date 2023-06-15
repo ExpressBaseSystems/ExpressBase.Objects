@@ -95,6 +95,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 23)]
         public string PrpImgInfo { get; set; }
+
+        [DataMember(Order = 24)]
+        public List<GfcPrpEntry> GfcPrpList { get; set; }
     }
 
     [DataContract]
@@ -273,6 +276,38 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     public class SaveSurgeryDetailsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+    }
+
+    [DataContract]
+    public class SaveGfcPrpDetailsRequest : IReturn<SaveGfcPrpDetailsResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RequestMode { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string UserName { get; set; }
+
+        [DataMember(Order = 5)]
+        public bool Permission { get; set; }
+    }
+
+    [DataContract]
+    public class SaveGfcPrpDetailsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int Status { get; set; }
@@ -505,6 +540,42 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Method { get; set; }
 
         [DataMember(Order = 15)]
+        public string Comment { get; set; }
+    }
+
+    public class GfcPrpEntry
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Date { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Branch { get; set; }
+
+        [DataMember(Order = 4)]
+        public int Account_Code { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Created_By { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Created_Date { get; set; }
+
+        [DataMember(Order = 7)]
+        public string Complimentary { get; set; }
+
+        [DataMember(Order = 8)]
+        public string GfcOrPrp { get; set; }
+
+        [DataMember(Order = 9)]
+        public int GfcPrpSession { get; set; }
+
+        [DataMember(Order = 10)]
+        public int Done_By { get; set; }
+
+        [DataMember(Order = 11)]
         public string Comment { get; set; }
     }
 }
