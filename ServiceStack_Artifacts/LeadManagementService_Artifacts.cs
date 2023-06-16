@@ -564,7 +564,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Created_Date { get; set; }
 
         [DataMember(Order = 7)]
-        public string Complimentary { get; set; }
+        public string Service_Type { get; set; }
 
         [DataMember(Order = 8)]
         public string GfcOrPrp { get; set; }
