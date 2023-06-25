@@ -38,6 +38,13 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("Common.LABEL")]
         public override string Label { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public override EbScript HiddenExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public override bool Hidden { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [OnChangeUIFunction("EbGroupBox.backColor")]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -73,7 +80,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string html = @"
-            <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer ebcont-ctrl' ctype='@objtype@'>
+            <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer ebcont-ctrl' ctype='@objtype@' @display@>
                 <div class='gb-wraper'>
                     <span class='gb-label eb-label-editable' ui-label>@glabel@</span>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
@@ -87,7 +94,8 @@ namespace ExpressBase.Objects
                 .Replace("@name@", this.Name)
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@glabel@", this.Label)
-                .Replace("@objtype@", this.ObjType);
+                .Replace("@objtype@", this.ObjType)
+                .Replace("@display@", this.Hidden && this.IsRenderMode ? "style='display : none;'" : string.Empty);
         }
 
     }

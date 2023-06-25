@@ -853,6 +853,17 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             Root = _path + CharConstants.DOT + _container.Name
                         });
                     }
+                    else if (ctrlCont is EbGroupBox GrpBox)
+                    {
+                        GrpBox.__path = _path + CharConstants.DOT + GrpBox.Name;
+                        _dict.Add(_dict.Count, new EbControlWrapper
+                        {
+                            TableName = _container.TableName,
+                            Path = GrpBox.__path,
+                            Control = control,
+                            Root = _path
+                        });
+                    }
                     GetControlsAsDict(ctrlCont, path, _dict);
                 }
             }
