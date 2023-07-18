@@ -306,22 +306,30 @@ else {
 
         public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis, EbControl[] Allctrls, Service service)
         {
-            List<string> _params = new List<string>();
-            EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, service);
-            this.ParamsList = DataReader.GetParams(redis as RedisClient);
-            foreach (Param p in this.ParamsList)
+            if (string.IsNullOrEmpty(this.DataSourceId))
             {
-                _params.Add(p.Name);
-                for (int i = 0; i < Allctrls.Length; i++)
+                this.ParamsList = new List<Param>();
+                this.Eb__paramControls = new List<string>();
+            }
+            else
+            {
+                List<string> _params = new List<string>();
+                EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, service);
+                this.ParamsList = DataReader.GetParams(redis as RedisClient);
+                foreach (Param p in this.ParamsList)
                 {
-                    if (p.Name == Allctrls[i].Name && !Allctrls[i].DependedDG.Contains(this.Name))
+                    _params.Add(p.Name);
+                    for (int i = 0; i < Allctrls.Length; i++)
                     {
-                        Allctrls[i].DependedDG.Add(this.Name);
+                        if (p.Name == Allctrls[i].Name && !Allctrls[i].DependedDG.Contains(this.Name))
+                        {
+                            Allctrls[i].DependedDG.Add(this.Name);
+                        }
                     }
                 }
-            }
 
-            this.Eb__paramControls = _params;
+                this.Eb__paramControls = _params;
+            }
         }
 
         public void AdjustColumnWidth()
