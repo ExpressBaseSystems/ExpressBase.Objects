@@ -846,6 +846,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowValue { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool DisableZoom { get; set; }
+
         //[EnableInBuilder(BuilderType.DVBuilder)]
         //public Position LegendPosition { get; set; }
 
