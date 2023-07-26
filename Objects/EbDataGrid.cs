@@ -306,22 +306,30 @@ else {
 
         public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis, EbControl[] Allctrls, Service service)
         {
-            List<string> _params = new List<string>();
-            EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, service);
-            this.ParamsList = DataReader.GetParams(redis as RedisClient);
-            foreach (Param p in this.ParamsList)
+            if (string.IsNullOrEmpty(this.DataSourceId))
             {
-                _params.Add(p.Name);
-                for (int i = 0; i < Allctrls.Length; i++)
+                this.ParamsList = new List<Param>();
+                this.Eb__paramControls = new List<string>();
+            }
+            else
+            {
+                List<string> _params = new List<string>();
+                EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, service);
+                this.ParamsList = DataReader.GetParams(redis as RedisClient);
+                foreach (Param p in this.ParamsList)
                 {
-                    if (p.Name == Allctrls[i].Name && !Allctrls[i].DependedDG.Contains(this.Name))
+                    _params.Add(p.Name);
+                    for (int i = 0; i < Allctrls.Length; i++)
                     {
-                        Allctrls[i].DependedDG.Add(this.Name);
+                        if (p.Name == Allctrls[i].Name && !Allctrls[i].DependedDG.Contains(this.Name))
+                        {
+                            Allctrls[i].DependedDG.Add(this.Name);
+                        }
                     }
                 }
-            }
 
-            this.Eb__paramControls = _params;
+                this.Eb__paramControls = _params;
+            }
         }
 
         public void AdjustColumnWidth()
@@ -1838,6 +1846,8 @@ pg.HideProperty('IsDynamic');
         [EnableInBuilder(BuilderType.WebForm)]
         public bool StrictSelect { get; set; }
 
+        public bool OverrideStrictSelect { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public override bool Index { get; set; }
 
@@ -1872,7 +1882,7 @@ pg.HideProperty('IsDynamic');
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
-            return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, !StrictSelect);
+            return EbPowerSelect.GetSelectQuery(this.EbPowerSelect, DataDB, service, Col, Tbl, _id, masterTbl, !(StrictSelect && !OverrideStrictSelect));
         }
 
         //public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
@@ -1899,6 +1909,11 @@ pg.HideProperty('IsDynamic');
         public override DVBaseColumn GetDVBaseColumn(int index)
         {
             return new DVStringColumn { Data = index, Name = this.Name, sTitle = this.Title, Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px", Align = Align.Left };
+        }
+
+        public bool IsCostCentrePs()
+        {
+            return this.Name == "sys_cc_id" || this.Name == "cost_centres_id";
         }
     }
 

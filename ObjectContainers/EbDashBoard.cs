@@ -61,7 +61,7 @@ namespace ExpressBase.Objects
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string DisplayName { get; set; }
-        
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Description { get; set; }
@@ -266,7 +266,7 @@ namespace ExpressBase.Objects
                                 _refids.Add(component.DataSource);
                         }
                     }
-                    if ( Tile.LinksColl != null && Tile.LinksColl.Count != 0)
+                    if (Tile.LinksColl != null && Tile.LinksColl.Count != 0)
                     {
                         foreach (EbLinks Links in Tile.LinksColl)
                         {
@@ -416,6 +416,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Label")]
         [UIproperty]
         public int Top { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        [Alias("Hide Expression")]
+        public EbScript HiddenExpr { get; set; }
 
 
         [HideInPropertyGrid]

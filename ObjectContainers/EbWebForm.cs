@@ -1303,7 +1303,7 @@ namespace ExpressBase.Objects
                             else
                             {
                                 EbDGPowerSelectColumn psColCtrl = Column.Control as EbDGPowerSelectColumn;
-                                if (!psColCtrl.IsDataFromApi && psColCtrl.StrictSelect && cxtPro)
+                                if (!psColCtrl.IsDataFromApi && psColCtrl.StrictSelect && !psColCtrl.OverrideStrictSelect && cxtPro)
                                     EbSid = psColCtrl.EbSid + Row.RowId;
                                 else
                                     EbSid = psColCtrl.EbSid;

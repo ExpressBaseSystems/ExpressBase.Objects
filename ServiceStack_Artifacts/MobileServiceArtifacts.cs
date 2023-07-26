@@ -421,4 +421,153 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string AutoIdData { set; get; }
     }
+
+    public class GetAttendanceDeviceListRequest : EbServiceStackAuthRequest, IReturn<GetAttendanceDeviceListResponse>
+    {
+
+    }
+
+    [DataContract]
+    public class GetAttendanceDeviceListResponse
+    {
+        [DataMember(Order = 1)]
+        public List<AttendanceDevice> deviceList { set; get; }
+
+        [DataMember(Order = 2)]
+        public string message { set; get; }
+
+        public GetAttendanceDeviceListResponse()
+        {
+            deviceList = new List<AttendanceDevice>();
+        }
+    }
+
+    public class AttendanceDevice
+    {
+        public int id { set; get; }
+        public string deviceName { set; get; }
+        public string deviceVendor { get; set; }
+        public string ip { set; get; }
+        public int port { set; get; }
+        public string commKey { set; get; }
+        public string commKeyType { set; get; }
+        public int locationId { set; get; }
+        public string locationShortName { set; get; }
+        public string lastSyncTs { set; get; }
+    }
+
+    public class GetEmployeesListRequest : EbServiceStackAuthRequest, IReturn<GetEmployeesListResponse>
+    {
+        public int LocationId { get; set; }
+    }
+
+    [DataContract]
+    public class GetEmployeesListResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EmployeesDetails> employees { set; get; }
+
+        [DataMember(Order = 2)]
+        public string errorMessage { set; get; }
+
+        public GetEmployeesListResponse()
+        {
+            employees = new List<EmployeesDetails>();
+        }
+    }
+
+    public class EmployeesDetails
+    {
+        public int id { set; get; }
+        public string xid { set; get; }
+        public string name { set; get; }
+        public string designation { set; get; }
+        public string department { set; get; }
+        public string punchId1 { set; get; }
+        public string punchId2 { set; get; }
+        public string shiftStart { set; get; }
+        public string shiftEnd { set; get; }
+    }
+
+    [DataContract]
+    public class AttDeviceBackUpUserInfoRequest : EbServiceStackAuthRequest, IReturn<AttDeviceBackUpUserInfoResponse>
+    {
+        [DataMember(Order = 1)]
+        public List<AttDeviceUser> userList { get; set; }
+
+        [DataMember(Order = 2)]
+        public string deviceId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int locationId { get; set; }
+    }
+
+    [DataContract]
+    public class AttDeviceBackUpUserInfoResponse
+    {
+        [DataMember(Order = 1)]
+        public int status { set; get; }
+
+        [DataMember(Order = 2)]
+        public string errorMessage { set; get; }
+    }
+
+    public class AttDeviceUser
+    {
+        public int userId { set; get; }
+        public string name { set; get; }
+        public string userRole { set; get; }
+        public string palm { set; get; }
+        public string fingerprint { set; get; }
+        public string face { set; get; }
+        public string cardNumber { set; get; }
+        public string password { set; get; }
+        public string userPhoto { set; get; }
+        public string accessControlRole { set; get; }
+        public int eb_att_users_id { set; get; }
+
+        public bool IsSame(AttDeviceUser usr)
+        {
+            if (this.userId == usr.userId && this.name == usr.name && this.userRole == usr.userRole && this.palm == usr.palm &&
+                this.fingerprint == usr.fingerprint && this.face == usr.face && this.cardNumber == usr.cardNumber &&
+                this.password == usr.password && this.userPhoto == usr.userPhoto && this.accessControlRole == usr.accessControlRole)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    [DataContract]
+    public class AttDeviceSaveRawPunchRecordsReq : EbServiceStackAuthRequest, IReturn<AttDeviceSaveRawPunchRecordsResp>
+    {
+        [DataMember(Order = 1)]
+        public List<AttDeviceRawPunchRecord> punchRecords { get; set; }
+
+        [DataMember(Order = 2)]
+        public string deviceId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int locationId { get; set; }
+    }
+
+    [DataContract]
+    public class AttDeviceSaveRawPunchRecordsResp
+    {
+        [DataMember(Order = 1)]
+        public int status { set; get; }
+
+        [DataMember(Order = 2)]
+        public string errorMessage { set; get; }
+    }
+
+    public class AttDeviceRawPunchRecord
+    {
+        public int userId { set; get; }//enroll number
+        public string punchTime { set; get; }
+        public string verifyMode { get; set; }
+        public string inOutMode { get; set; }
+        public string workCode { get; set; }
+    }
+
 }
