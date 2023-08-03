@@ -1749,7 +1749,7 @@ namespace ExpressBase.Objects
                 Fill(Report, group.GroupFooter.GetFields(), EbReportSectionType.ReportGroups);
                 foreach (EbReportField field in group.GroupHeader.GetFields())
                 {
-                    if (field is EbDataField)
+                    if (field is EbDataField && !Report.Groupheaders.ContainsKey((field as EbDataField).ColumnName))
                     {
                         Report.Groupheaders.Add((field as EbDataField).ColumnName, new ReportGroupItem
                         {
@@ -1761,9 +1761,9 @@ namespace ExpressBase.Objects
                 }
                 foreach (EbReportField field in group.GroupFooter.GetFields())
                 {
-                    if (field is EbDataField)
+                    if (field is EbDataField && !Report.GroupFooters.ContainsKey((field as EbDataField).ColumnName))
                     {
-                        Report.GroupFooters.Add((field as EbDataField).Name, new ReportGroupItem
+                        Report.GroupFooters.Add((field as EbDataField).ColumnName, new ReportGroupItem
                         {
                             field = field as EbDataField,
                             PreviousValue = string.Empty,
