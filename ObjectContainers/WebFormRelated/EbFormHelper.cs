@@ -451,7 +451,7 @@ namespace ExpressBase.Objects
         //}
 
         //Create a NEW WebFormData version from EDIT mode WebFormData of 'same' form.
-        public static WebformData GetFilledNewFormData(EbWebForm FormSrc, bool Clone)// FormSrc = Source Form
+        public static WebformData GetFilledNewFormData(EbWebForm FormSrc, bool clearFyDate, bool isClone)// FormSrc = Source Form
         {
             WebformData newFormData = new WebformData() { MasterTable = FormSrc.FormSchema.MasterTable };
             foreach (TableSchema _t in FormSrc.FormSchema.Tables)
@@ -468,13 +468,13 @@ namespace ExpressBase.Objects
                             if (c != null)
                                 c.Value = 0;
                             Table[0].RowId = 0;
-                            foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true || e.Control?.DoNotImport == true))
+                            foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true || (!isClone && e.Control?.DoNotImport == true) || (isClone && e.Control?.DoNotClone == true)))
                             {
                                 SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
                                 c_.Value = t.Value;
                                 c_.F = t.F;
                             }
-                            if (Clone)
+                            if (clearFyDate)
                             {
                                 foreach (SingleColumn c__ in Table[0].Columns.FindAll(e => e.Control is EbDate _Date && _Date.RestrictionRule != DateRestrictionRule.None))
                                 {
@@ -494,7 +494,7 @@ namespace ExpressBase.Objects
                             SingleColumn c = Row.Columns.Find(e => e.Name == FormConstants.id);
                             if (c != null) c.Value = 0;
 
-                            foreach (SingleColumn c_ in Row.Columns.FindAll(e => e.Control?.IsSysControl == true || e.Control?.DoNotImport == true))
+                            foreach (SingleColumn c_ in Row.Columns.FindAll(e => e.Control?.IsSysControl == true || (!isClone && e.Control?.DoNotImport == true) || (isClone && e.Control?.DoNotClone == true)))
                             {
                                 SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null, true);
                                 c_.Value = t.Value;

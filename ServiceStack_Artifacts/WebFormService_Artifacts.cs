@@ -134,6 +134,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public string SourceCtrl { get; set; }
+
+        [DataMember(Order = 7)]
+        public bool IsClone { get; set; }
     }
 
     [DataContract]
