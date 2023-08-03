@@ -804,11 +804,52 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             set { }
         }
 
+        private string MailHtml3
+        {
+            get
+            {
+                return @"
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div style='border: 1px solid #508bf9;padding:20px 40px 20px 40px; '>
+            <div style='text-align: center;'>
+                <img src='https://myaccount.expressbase.com/images/logo/{iSolutionId}.png' style='max-height: 100px; max-width: 300px; ' />
+            </div>
+            <br />
+            <div style='line-height: 1.4;'>
+                Dear {UserName},<br />
+                <br />
+                You have been added as a user into {SolutionName}. Please find below credentials to log in.
+                <br />
+                <br />
+                URL - https://{eSolutionId}<br />
+                User name - {Email} <br />
+                Password - {Password} <br />
+                <br />
+                Please make sure you change the password after logging in (in the <b>My Profile</b> page).
+            </div>
+            <br />
+            <br />
+            Thanks,<br />
+            Team OLOI<br />
+            <div><img src='https://drive.google.com/uc?export=view&id=1nDANkSWrKWYeoMR0YcG70QG4ZpDT-aUV' style='max-height: 50px; max-width: 150px; ' /></<div>
+        </div>
+    </body>
+</html>";
+            }
+            set { }
+        }
+
         public void SendWelcomeMail(RabbitMqProducer MessageProducer3, User user, Eb_Solution solution)
         {
             string __html = this.MailHtml;
-            if (solution.SolutionID == "ebdboihyfxflxe20220224111752")
+            if (solution.SolutionID == "ebdboihyfxflxe20220224111752")//sakshyam
                 __html = this.MailHtml2;
+            else if (solution.SolutionID == "ebdbawg6osdxo920220727085204")//oloi
+                __html = this.MailHtml3;
             __html = __html
                 .Replace("{SolutionName}", solution.SolutionName)
                 .Replace("{eSolutionId}", solution.ExtSolutionID)
@@ -824,7 +865,7 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             {
                 To = this.UserCredentials.Email,
                 Message = __html,
-                Subject = (solution.SolutionID == "ebdboihyfxflxe20220224111752" ? "Welcome to Sakshyam Portal" : $"Welcome to {solution.SolutionName} Solution"),
+                Subject = (solution.SolutionID == "ebdboihyfxflxe20220224111752" ? "Welcome to Sakshyam Portal" : (solution.SolutionID == "ebdbawg6osdxo920220727085204" ? $"Welcome to {solution.SolutionName}" : $"Welcome to {solution.SolutionName} Solution")),
                 UserId = user.UserId,
                 UserAuthId = user.AuthId,
                 SolnId = solution.SolutionID
