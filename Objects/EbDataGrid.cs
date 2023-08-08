@@ -47,6 +47,11 @@ namespace ExpressBase.Objects
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("768")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int MinWidth { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("0")]
         [Alias("Left fixed column count")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
@@ -377,7 +382,8 @@ else {
     @exceluploadbtn@
     @addrowbtn@
     @copydgbtn@
-<div class='Dg_head'>
+<div class='Dg_hbf' style='overflow-x:auto;'><div class='Dg_hbf_inner' style='@dg_min_width@'>
+    <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>  
@@ -388,7 +394,8 @@ else {
 .Replace("@copydgbtn@", this.ShowCopyBtn ? "<div id='@ebsid@copydg' class='copydg-btn' tabindex='0'>Copy</div>" : string.Empty)
 .Replace("@addbtnrightstyle@", (copyBtnW + refreshBtnW + excelBtnW + 8).ToString())
 .Replace("@exelbtnrightstyle@", (copyBtnW + refreshBtnW + 8).ToString())
-.Replace("@refreshbtnrightstyle@", (copyBtnW + 8).ToString());
+.Replace("@refreshbtnrightstyle@", (copyBtnW + 8).ToString())
+.Replace("@dg_min_width@", this.MinWidth > 0 ? $"min-width:{this.MinWidth}px;" : string.Empty);
             EbDGColumn lastCtrl = (EbDGColumn)Controls.FindLast(e => !e.Hidden);
             this.AdjustColumnWidth();
             foreach (EbDGColumn col in Controls)
@@ -429,6 +436,7 @@ else {
             </tbody>
         </table>
      </div>
+</div></div>
 </div>"
             .Replace("@_height@", this.Height.ToString());
 
