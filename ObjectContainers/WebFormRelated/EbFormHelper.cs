@@ -184,6 +184,10 @@ namespace ExpressBase.Objects
                             EbDataReader _DR = GetEbObject<EbDataReader>(dg.CustomSelectDS, client, Redis, service);
                             dg.CustomSelectDSQuery = _DR.Sql.Replace(CharConstants.SEMI_COLON, CharConstants.SPACE) + CharConstants.SEMI_COLON;
                         }
+                        else if (c is EbTableLayout tl && c.IsRenderMode)
+                        {
+                            tl.AdjustColumnWidth();
+                        }
                         AfterRedisGet(c as EbControlContainer, Redis, client, service);
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls

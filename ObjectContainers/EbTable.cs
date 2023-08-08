@@ -176,6 +176,22 @@ this.Init = function(id){
 
             return (html + "</tr></table></div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
         }
+
+        public void AdjustColumnWidth()
+        {
+            float widthSum = this.Controls.Select(e => (e as EbTableTd).WidthPercentage).Sum();
+            if (widthSum == 100 || this.Controls.Count == 0)//if sum of width is 100%
+                return;
+            else if (widthSum < 100)
+                (this.Controls.Last() as EbTableTd).WidthPercentage = 100 - widthSum;
+            else
+            {
+                foreach (EbTableTd column in this.Controls)
+                {
+                    column.WidthPercentage = column.WidthPercentage * 100 / widthSum;
+                }
+            }
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -269,17 +285,18 @@ this.Init = function(id){
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div class='tdInnerDiv ebcont-inner'>" +
+            string html = "<@td@ id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div class='tdInnerDiv ebcont-inner'>" +
                 "@ppbtn@";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</div></td>")
+            return (html + "</div></@td@>")
                 .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                 .Replace("@name@", this.Name)
                 .Replace("@wperc@", (this.WidthPercentage != 0) ? this.WidthPercentage.ToString() + "%" : "auto")
-                .Replace("@ebsid@", this.EbSid);
+                .Replace("@ebsid@", this.EbSid)
+                .Replace("@td@", this.IsRenderMode ? "div" : "td");
         }
     }
 
