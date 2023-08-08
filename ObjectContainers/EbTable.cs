@@ -169,12 +169,16 @@ this.Init = function(id){
         {
             string html = @"
             <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TableLayout'>
-                <table id='@ebsid@' class='form-render-table' ><tr>";
+                <@@table@@ id='@ebsid@' class='form-render-table' ><@@tr@@>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</tr></table></div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
+            return (html + "</@@tr@@></@@table@@></div>")
+                .Replace("@name@", this.Name)
+                .Replace("@ebsid@", this.EbSid_CtxId)
+                .Replace("@@table@@", this.IsRenderMode ? "div" : "table")
+                .Replace("@@tr@@", this.IsRenderMode ? "div" : "tr");
         }
 
         public void AdjustColumnWidth()
@@ -285,18 +289,18 @@ this.Init = function(id){
 
         public override string GetHtml()
         {
-            string html = "<@td@ id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div class='tdInnerDiv ebcont-inner'>" +
+            string html = "<@@td@@ id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;' class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div class='tdInnerDiv ebcont-inner'>" +
                 "@ppbtn@";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</div></@td@>")
+            return (html + "</div></@@td@@>")
                 .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                 .Replace("@name@", this.Name)
                 .Replace("@wperc@", (this.WidthPercentage != 0) ? this.WidthPercentage.ToString() + "%" : "auto")
                 .Replace("@ebsid@", this.EbSid)
-                .Replace("@td@", this.IsRenderMode ? "div" : "td");
+                .Replace("@@td@@", this.IsRenderMode ? "div" : "td");
         }
     }
 
