@@ -156,7 +156,7 @@ this.Init = function(id)
         public override string HideJSfn
         {
             get { return @"
-debugger;
+
 var li = $('li[ebsid=' + this.EbSid_CtxId+']'); 
 li.hide();
 var wizDiv = li.closest('.RenderAsWizard');
@@ -173,7 +173,7 @@ this.isInVisibleInUI = true;"; }
         public override string ShowJSfn
         {
             get { return @"
-debugger;
+
 var li = $('li[ebsid=' + this.EbSid_CtxId+']'); 
 li.show(); 
 var wizDiv = li.closest('.RenderAsWizard');
