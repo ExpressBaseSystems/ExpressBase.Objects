@@ -184,11 +184,27 @@ this.Init = function(id){
         public void AdjustColumnWidth()
         {
             float widthSum = this.Controls.Select(e => (e as EbTableTd).WidthPercentage).Sum();
-            if (widthSum == 100 || this.Controls.Count == 0)//if sum of width is 100%
-                return;
-            else if (widthSum < 100)
-                (this.Controls.Last() as EbTableTd).WidthPercentage = 100 - widthSum;
-            else
+            List<EbControl> zeroWidthTd = this.Controls.FindAll(e => (e as EbTableTd).WidthPercentage <= 0);
+            if (zeroWidthTd.Count > 0)
+            {
+                if (widthSum < 100)
+                {
+                    float calcWidth = (100 - widthSum) / zeroWidthTd.Count;
+                    foreach (EbControl ec in zeroWidthTd)
+                    {
+                        (ec as EbTableTd).WidthPercentage = calcWidth;
+                    }
+                }
+                else
+                {
+                    float calcWidth = 100 / this.Controls.Count;
+                    foreach (EbTableTd ec in this.Controls)
+                    {
+                        ec.WidthPercentage = calcWidth;
+                    }
+                }
+            }
+            else if (widthSum != 100)
             {
                 foreach (EbTableTd column in this.Controls)
                 {
