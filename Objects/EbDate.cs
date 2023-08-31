@@ -191,6 +191,10 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [PropertyGroup(PGConstants.EXTENDED)]
         public DateShowFormat ShowDateAs_ { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+        [PropertyGroup(PGConstants.DATA)]
+        public bool DoNotConvertToUserTimeZone { get; set; }
+
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //public DateFormat DateFormat { get; set; }
 
@@ -387,7 +391,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                         if (this.EbDateType == EbDateType.DateTime)
                         {
                             DateTime dt = DateTime.ParseExact(strDate, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                            args.cField.Value = dt.ConvertToUtc(args.usr.Preference.TimeZone);
+                            args.cField.Value = this.DoNotConvertToUserTimeZone ? dt : dt.ConvertToUtc(args.usr.Preference.TimeZone);
                         }
                         else//EbDateType.Time
                             args.cField.Value = DateTime.ParseExact(strDate, "HH:mm:ss", CultureInfo.InvariantCulture);
@@ -492,7 +496,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                     }
                     else if (_this.EbDateType == EbDateType.DateTime)
                     {
-                        DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
+                        DateTime dt_cov = _this.DoNotConvertToUserTimeZone ? dt : dt.ConvertFromUtc(UserObj.Preference.TimeZone);
                         _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                     }

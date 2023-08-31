@@ -1087,6 +1087,14 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
             set { this.EbDate.IsNullable = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.DATA)]
+        public bool DoNotConvertToUserTimeZone
+        {
+            get { return this.EbDate.DoNotConvertToUserTimeZone; }
+            set { this.EbDate.DoNotConvertToUserTimeZone = value; }
+        }
+
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
