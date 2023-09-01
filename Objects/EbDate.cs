@@ -496,7 +496,11 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                     }
                     else if (_this.EbDateType == EbDateType.DateTime)
                     {
-                        DateTime dt_cov = _this.DoNotConvertToUserTimeZone ? dt : dt.ConvertFromUtc(UserObj.Preference.TimeZone);
+                        DateTime dt_cov = dt;
+                        if ((_this is EbDate || _this is EbDGDateColumn) && !_this.DoNotConvertToUserTimeZone)
+                        {
+                            dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
+                        }
                         _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                     }
