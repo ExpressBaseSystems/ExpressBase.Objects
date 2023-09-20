@@ -91,6 +91,8 @@ namespace ExpressBase.Objects
 
         public bool IsHidden { get; set; }
 
+        public EbReportSection OwningSection { get; internal set; }
+
         public BaseColor GetColor(string Color)
         {
             int colr = ColorTranslator.FromHtml(Color).ToArgb();
@@ -195,6 +197,85 @@ namespace ExpressBase.Objects
                 };
 
         }
+
+        private NotSetFalseTrue __isGroupSummaryField = NotSetFalseTrue.NOTSET;
+        public bool IsGroupSummaryField 
+        { 
+            get
+            {
+                if (__isGroupSummaryField == NotSetFalseTrue.NOTSET)
+                {
+                    if ((this.OwningSection as EbPageHeader).EbReport.GroupSummaryFields.ContainsKey(this.Name))
+                        __isGroupSummaryField = NotSetFalseTrue.TRUE;
+                    else
+                        __isGroupSummaryField = NotSetFalseTrue.FALSE;
+                }
+
+                return (__isGroupSummaryField == NotSetFalseTrue.TRUE);
+            }
+        }
+
+        private NotSetFalseTrue __isPageSummaryField = NotSetFalseTrue.NOTSET;
+        public bool IsPageSummaryField
+        {
+            get
+            {
+                if (__isPageSummaryField == NotSetFalseTrue.NOTSET)
+                {
+                    if ((this.OwningSection as EbPageHeader).EbReport.PageSummaryFields.ContainsKey(this.Name))
+                        __isPageSummaryField = NotSetFalseTrue.TRUE;
+                    else
+                        __isPageSummaryField = NotSetFalseTrue.FALSE;
+                }
+
+                return (__isPageSummaryField == NotSetFalseTrue.TRUE);
+            }
+        }
+
+        private NotSetFalseTrue __isReportSummaryField = NotSetFalseTrue.NOTSET;
+        public bool IsReportSummaryField
+        {
+            get
+            {
+                if (__isReportSummaryField == NotSetFalseTrue.NOTSET)
+                {
+                    if ((this.OwningSection as EbPageHeader).EbReport.ReportSummaryFields.ContainsKey(this.Name))
+                        __isReportSummaryField = NotSetFalseTrue.TRUE;
+                    else
+                        __isReportSummaryField = NotSetFalseTrue.FALSE;
+                }
+
+                return (__isReportSummaryField == NotSetFalseTrue.TRUE);
+            }
+        }
+
+        private NotSetFalseTrue __isInAppearanceScriptCollection = NotSetFalseTrue.NOTSET;
+        public bool IsInAppearanceScriptCollection
+        {
+            get
+            {
+                if (__isInAppearanceScriptCollection == NotSetFalseTrue.NOTSET)
+                {
+                    if ((this.OwningSection as EbPageHeader).EbReport.AppearanceScriptCollection.ContainsKey(this.Name))
+                        __isInAppearanceScriptCollection = NotSetFalseTrue.TRUE;
+                    else
+                        __isInAppearanceScriptCollection = NotSetFalseTrue.FALSE;
+                }
+
+                return (__isInAppearanceScriptCollection == NotSetFalseTrue.TRUE);
+            }
+        }
+
+        public override void AfterRedisGet()
+        {
+        }
+    }
+
+    public enum NotSetFalseTrue
+    {
+        NOTSET,
+        FALSE,
+        TRUE
     }
 
     [EnableInBuilder(BuilderType.Report)]

@@ -632,7 +632,7 @@ namespace ExpressBase.Objects
         private float rh_Yposition;
         private float rf_Yposition;
         private float pf_Yposition;
-        private float ph_Yposition;
+        public float ph_Yposition;
         private float dt_Yposition;
 
         [JsonIgnore]
@@ -754,24 +754,29 @@ namespace ExpressBase.Objects
 
         public void DrawPageHeader()
         {
-            RowHeight = 0;
-            MultiRowTop = 0;
-            detailprintingtop = 0;
-            if (PageNumber == 1)
-                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
-            else if (ReportHeaderHeightRepeatAsPH > 0)
-                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
-            else
-                ph_Yposition = this.Margin.Top;
-
             foreach (EbPageHeader p_header in PageHeaders)
             {
-                foreach (EbReportField field in p_header.GetFields())
-                {
-                    DrawFields(field, ph_Yposition, 0);
-                }
-                ph_Yposition += p_header.HeightPt;
+                p_header.Draw();
             }
+
+            //RowHeight = 0;
+            //MultiRowTop = 0;
+            //detailprintingtop = 0;
+            //if (PageNumber == 1)
+            //    ph_Yposition = ReportHeaderHeight + this.Margin.Top;
+            //else if (ReportHeaderHeightRepeatAsPH > 0)
+            //    ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
+            //else
+            //    ph_Yposition = this.Margin.Top;
+
+                //foreach (EbPageHeader p_header in PageHeaders)
+                //{
+                //    foreach (EbReportField field in p_header.GetFields())
+                //    {
+                //        DrawFields(field, ph_Yposition, 0);
+                //    }
+                //    ph_Yposition += p_header.HeightPt;
+                //}
         }
 
         public void DrawDetail()
@@ -1269,6 +1274,12 @@ namespace ExpressBase.Objects
                     }
                     if (EbDataSource.FilterDialogRefId != string.Empty)
                         EbDataSource.AfterRedisGet(Redis, client);
+                }
+
+                foreach (EbPageHeader _pheader in this.PageHeaders)
+                {
+                    _pheader.EbReport = this;
+                    _pheader.AfterRedisGet();
                 }
             }
             catch (Exception e)
@@ -2020,24 +2031,6 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbPageHeader : EbReportSection
-    {
-        public override string GetDesignHtml()
-        {
-            return "<div class='pageHeaders' eb-type='PageHeader' tabindex='1' id='@id' data_val='1' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted(); //background-color:@BackColor ;
-        }
-
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.BackColor = 'transparent';
-};";
-        }
-    }
-
-    [EnableInBuilder(BuilderType.Report)]
     public class EbReportDetail : EbReportSection
     {
         public override string GetDesignHtml()
@@ -2054,24 +2047,6 @@ namespace ExpressBase.Objects
 };";
         }
 
-    }
-
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbPageFooter : EbReportSection
-    {
-        public override string GetDesignHtml()
-        {
-            return "<div class='pageHeaders' eb-type='PageFooter' tabindex='1' id='@id' data_val='3' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted(); //background-color:@BackColor ;
-        }
-
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.BackColor = 'transparent';
-};";
-        }
     }
 
     [EnableInBuilder(BuilderType.Report)]

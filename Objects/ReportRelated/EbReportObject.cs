@@ -3,6 +3,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using ServiceStack.IO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -66,5 +67,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual string BackColor { get; set; }
+
+        public override void AfterRedisGet()
+        {
+
+        }
     }
 }
