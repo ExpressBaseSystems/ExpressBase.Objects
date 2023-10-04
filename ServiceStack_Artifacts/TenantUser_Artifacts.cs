@@ -634,10 +634,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string UserAuthId { get; set; }
-        
+
         [DataMember(Order = 5)]
         public string UserIp { get; set; }
-        
+
         [DataMember(Order = 6)]
         public string DeviceId { get; set; }
     }
@@ -702,9 +702,56 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public bool Status { get; set; }
     }
+
+    public class LockUnlockFyRequest : EbServiceStackAuthRequest, IReturn<LockUnlockFyResponse>
+    {
+        [DataMember(Order = 1)]
+        public string ReqObject { get; set; }
+    }
+    public class LockUnlockFyResponse : EbServiceStackResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbFinancialYears RespObject { get; set; }
+    }
+    public class LockUnlockFyRequestObject
+    {
+        public List<int> FpIdList { get; set; }
+        public int CurrentLoc { get; set; }
+        public string Action { get; set; }
+    }
+
+    public class CreateNewFyRequest : EbServiceStackAuthRequest, IReturn<CreateNewFyResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Duration { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Start { get; set; }
+    }
+    public class CreateNewFyResponse : EbServiceStackResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbFinancialYears RespObject { get; set; }
+    }
+
     public class GetUserDashBoardObjectsRequest : EbServiceStackAuthRequest, IReturn<GetUserDashBoardObjectsResponse>
     {
-        public List<int> ObjectIds { get; set; } 
+        public List<int> ObjectIds { get; set; }
         public bool SolutionOwner { get; set; }
     }
     public class GetUserDashBoardObjectsResponse : IEbSSResponse

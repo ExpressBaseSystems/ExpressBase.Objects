@@ -349,7 +349,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                 {
                     string strDate = Convert.ToString(args.cField.Value);
                     if (string.IsNullOrWhiteSpace(strDate))
-                        throw new FormException($"Unable to process [Date: {this.Label ?? this.Name}]", (int)HttpStatusCode.InternalServerError, "Null or empty string for Date: " + args.cField.Name, "EbDate => ParameterizeControl");
+                        throw new FormException($"Unable to process empty date value [Date: {this.Label ?? this.Name}]", (int)HttpStatusCode.InternalServerError, "Null or empty string for Date: " + args.cField.Name, "EbDate => ParameterizeControl");
 
                     if (this.EbDateType == EbDateType.Date)
                     {
@@ -366,22 +366,32 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                             if (fys != null && fys.List.Count > 0)
                             {
                                 DateTime Date = Convert.ToDateTime(args.cField.Value);
-                                bool DateIsOk = false, IsSysUser = args.usr.RoleIds.Exists(e => e < 100);
-                                string finStartEnd = null, shtDtPtn = args.usr.Preference.GetShortDatePattern();
-                                foreach (EbFinancialYear fy in fys.List)
-                                {
-                                    if (finStartEnd == null && !fy.Locked)
-                                        finStartEnd = GetFyDate(this.RestrictionRule, fy, true).ToString(shtDtPtn, CultureInfo.InvariantCulture) + " and " + GetFyDate(this.RestrictionRule, fy, false).ToString(shtDtPtn, CultureInfo.InvariantCulture);
+                                bool IsFinUser = args.usr.RoleIds.Contains((int)SystemRoles.FinancialYearAdmin) ||
+                                    args.usr.RoleIds.Contains((int)SystemRoles.FinancialYearUser) ||
+                                    args.usr.RoleIds.Contains((int)SystemRoles.SolutionOwner);
+                                int locId = (args.webForm as EbWebForm).LocationId;
+                                EbFinancialPeriod fp = fys.GetFinancialPeriod(Date);
+                                string finStartEnd = string.Empty, shtDtPtn = args.usr.Preference.GetShortDatePattern();
 
-                                    if ((!fy.Locked || IsSysUser) && GetFyDate(this.RestrictionRule, fy, true).Date <= Date.Date && GetFyDate(this.RestrictionRule, fy, false).Date >= Date.Date)
-                                    {
-                                        DateIsOk = true;
-                                        break;
-                                    }
-                                }
-                                if (!DateIsOk)
+                                if (fp == null || fp.LockedIds.Contains(locId) || (fp.PartiallyLockedIds.Contains(locId) && !IsFinUser))//if financial period is locked in the current location
                                 {
-                                    throw new FormException($"{this.Label ?? this.Name} must be between {finStartEnd ?? "Financial years"}", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
+                                    if (fp != null)
+                                        finStartEnd = "between " + fp.ActStart.ToString(shtDtPtn, CultureInfo.InvariantCulture) + " and " + fp.ActEnd.ToString(shtDtPtn, CultureInfo.InvariantCulture);
+                                    string val = Convert.ToDateTime(args.cField.Value).ToString(shtDtPtn, CultureInfo.InvariantCulture);
+                                    throw new FormException($"Financial period {finStartEnd} is locked. {this.Label ?? this.Name} with value {val} is not allowed.", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
+                                }
+
+                                if (!args.ins)
+                                {
+                                    DateTime dateOld = Convert.ToDateTime(args.ocF.Value);
+                                    EbFinancialPeriod fpOld = fys.GetFinancialPeriod(dateOld);
+                                    if (fpOld == null || fpOld.LockedIds.Contains(locId) || (fpOld.PartiallyLockedIds.Contains(locId) && !IsFinUser))
+                                    {
+                                        if (fpOld != null)
+                                            finStartEnd = "between " + fpOld.ActStart.ToString(shtDtPtn, CultureInfo.InvariantCulture) + " and " + fpOld.ActEnd.ToString(shtDtPtn, CultureInfo.InvariantCulture);
+                                        string val = Convert.ToDateTime(args.cField.Value).ToString(shtDtPtn, CultureInfo.InvariantCulture);
+                                        throw new FormException($"Form save is blocked. Financial period {finStartEnd} is locked. {this.Label ?? this.Name} with value {val} is not allowed.", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
+                                    }
                                 }
                             }
                         }
@@ -400,6 +410,10 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                     args.param.Add(args.DataDB.GetNewParameter(paramName, EbDbTypes.DateTime, args.cField.Value));
                 }
             }
+            catch (FormException e)
+            {
+                throw new FormException(e.Message, e.ExceptionCode, e.MessageInternal, e.StackTraceInternal);
+            }
             catch (Exception e)
             {
                 Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {args.cField.Name}\nValue : {args.cField.Value}\nMessage : {e.Message}"); ;
@@ -415,15 +429,6 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                 args._colvals += string.Concat(args.cField.Name, "=@", paramName, ", ");
             args.i++;
             return true;
-        }
-
-        private static DateTime GetFyDate(DateRestrictionRule rule, EbFinancialYear fy, bool IsStart)
-        {
-            if (rule == DateRestrictionRule.FinancialYear)
-                return IsStart ? fy.FyStart : fy.FyEnd;
-            if (rule == DateRestrictionRule.ActivePeriod)
-                return IsStart ? fy.ActStart : fy.ActEnd;
-            throw new FormException($"DateRestrictionRule {rule} is not valid in the current context", (int)HttpStatusCode.BadRequest, $"DateRestrictionRule must be FinancialYear/ActivePeriod", "EbDate -> GetFyDate");
         }
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
