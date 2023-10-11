@@ -183,6 +183,32 @@ this.Init = function(id)
 	this.CheckBoxes.$values.push(new EbObjects.EbCheckBox(id + '_Rd1'));
 };";
         }
+
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            base.LocalizeControl(Keys);
+
+            foreach (EbCheckBox c in this.CheckBoxes)
+            {
+                if (!string.IsNullOrWhiteSpace(c.Label) && Keys.ContainsKey(c.Label))
+                {
+                    c.Label = Keys[c.Label];
+                }
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            base.AddMultiLangKeys(keysList);
+
+            foreach (EbCheckBox c in this.CheckBoxes)
+            {
+                if (!string.IsNullOrWhiteSpace(c.Label) && !keysList.Contains(c.Label))
+                {
+                    keysList.Add(c.Label);
+                }
+            }
+        }
     }
 
     public class EbCheckBoxAbstract : EbControlUI

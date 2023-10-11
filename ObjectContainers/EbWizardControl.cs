@@ -43,7 +43,23 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         public string SubmitButtonText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
+        public string SaveAsDraftButtonText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
+        public string NextButtonText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
+        public string PreviousButtonText { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -102,6 +118,67 @@ this.Init = function(id)
             stepContentHtml += "</div></div></div>";
 
             return string.Concat(TabBtnHtml, stepContentHtml);
+        }
+
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            base.LocalizeControl(Keys);
+
+            foreach (EbControl c in this.Controls)
+            {
+                EbWizardStep step = c as EbWizardStep;
+                if (!string.IsNullOrWhiteSpace(step.Title) && Keys.ContainsKey(step.Title))
+                {
+                    step.Title = Keys[step.Title];
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.SubmitButtonText) && Keys.ContainsKey(this.SubmitButtonText))
+            {
+                this.SubmitButtonText = Keys[this.SubmitButtonText];
+            }
+            if (!string.IsNullOrWhiteSpace(this.PreviousButtonText) && Keys.ContainsKey(this.PreviousButtonText))
+            {
+                this.PreviousButtonText = Keys[this.PreviousButtonText];
+            }
+            if (!string.IsNullOrWhiteSpace(this.NextButtonText) && Keys.ContainsKey(this.NextButtonText))
+            {
+                this.NextButtonText = Keys[this.NextButtonText];
+            }
+            if (!string.IsNullOrWhiteSpace(this.SaveAsDraftButtonText) && Keys.ContainsKey(this.SaveAsDraftButtonText))
+            {
+                this.SaveAsDraftButtonText = Keys[this.SaveAsDraftButtonText];
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            base.AddMultiLangKeys(keysList);
+
+            foreach (EbControl c in this.Controls)
+            {
+                EbWizardStep step = c as EbWizardStep;
+                if (!string.IsNullOrWhiteSpace(step.Title) && !keysList.Contains(step.Title))
+                {
+                    keysList.Add(step.Title);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(this.SubmitButtonText) && !keysList.Contains(this.SubmitButtonText))
+            {
+                keysList.Add(this.SubmitButtonText);
+            }
+            if (!string.IsNullOrWhiteSpace(this.PreviousButtonText) && !keysList.Contains(this.PreviousButtonText))
+            {
+                keysList.Add(this.PreviousButtonText);
+            }
+            if (!string.IsNullOrWhiteSpace(this.NextButtonText) && !keysList.Contains(this.NextButtonText))
+            {
+                keysList.Add(this.NextButtonText);
+            }
+            if (!string.IsNullOrWhiteSpace(this.SaveAsDraftButtonText) && !keysList.Contains(this.SaveAsDraftButtonText))
+            {
+                keysList.Add(this.SaveAsDraftButtonText);
+            }
         }
     }
 

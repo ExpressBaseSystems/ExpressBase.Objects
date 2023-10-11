@@ -1070,6 +1070,46 @@ else// PS
             return s;
         }
 
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            base.LocalizeControl(Keys);
+
+            foreach (DVBaseColumn c in this.Columns)
+            {
+                if (!string.IsNullOrWhiteSpace(c.sTitle) && Keys.ContainsKey(c.sTitle))
+                {
+                    c.sTitle = Keys[c.sTitle];
+                }
+            }
+            foreach (DVBaseColumn c in this.DisplayMembers)
+            {
+                if (!string.IsNullOrWhiteSpace(c.sTitle) && Keys.ContainsKey(c.sTitle))
+                {
+                    c.sTitle = Keys[c.sTitle];
+                }
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            base.AddMultiLangKeys(keysList);
+
+            foreach (DVBaseColumn c in this.Columns)
+            {
+                if (!string.IsNullOrWhiteSpace(c.sTitle) && !keysList.Contains(c.sTitle))
+                {
+                    keysList.Add(c.sTitle);
+                }
+            }
+            foreach (DVBaseColumn c in this.DisplayMembers)
+            {
+                if (!string.IsNullOrWhiteSpace(c.sTitle) && !keysList.Contains(c.sTitle))
+                {
+                    keysList.Add(c.sTitle);
+                }
+            }
+        }
+
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             return EbPowerSelect.ParameterizeControl(this, args, false, crudContext);

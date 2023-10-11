@@ -1599,9 +1599,9 @@ namespace ExpressBase.Objects
 
             if (IsLanguageEnabled && Solution.IsMultiLanguageEnabled)
             {
-                string _locale = "ml-IN";
+                string _language = "ml";
                 string[] Keys = LabelsCollection.ToArray();
-                LabelKeyValues = EbObjectsHelper.GetKeyValues(new GetDictionaryValueRequest { Keys = Keys, Locale = _locale }, EbConnectionFactory.ObjectsDB);
+                LabelKeyValues = EbObjectsHelper.GetKeyValues(new GetDictionaryValueRequest { Keys = Keys, Language = _language }, EbConnectionFactory.ObjectsDB);
             }
             this.Doc.NewPage();
 

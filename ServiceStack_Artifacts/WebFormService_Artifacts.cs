@@ -347,7 +347,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string[] Keys { get; set; }
 
         [DataMember(Order = 2)]
-        public string Locale { get; set; }
+        public string Language { get; set; }
     }
 
     [DataContract]

@@ -236,6 +236,32 @@ this.Init = function(id)
     this.Options.$values.push(new EbObjects.EbRadioOption(id + '_Rd1'));
 };";
         }
+
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            base.LocalizeControl(Keys);
+
+            foreach (EbRadioOption c in this.Options)
+            {
+                if (!string.IsNullOrWhiteSpace(c.Label) && Keys.ContainsKey(c.Label))
+                {
+                    c.Label = Keys[c.Label];
+                }
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            base.AddMultiLangKeys(keysList);
+
+            foreach (EbRadioOption c in this.Options)
+            {
+                if (!string.IsNullOrWhiteSpace(c.Label) && !keysList.Contains(c.Label))
+                {
+                    keysList.Add(c.Label);
+                }
+            }
+        }
     }
 
     [HideInToolBox]

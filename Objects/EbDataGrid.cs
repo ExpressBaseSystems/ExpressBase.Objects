@@ -456,6 +456,34 @@ else {
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            base.LocalizeControl(Keys);
+
+            foreach (EbControl c in this.Controls)
+            {
+                EbDGColumn ct = c as EbDGColumn;
+                if (!string.IsNullOrWhiteSpace(ct.Title) && Keys.ContainsKey(ct.Title))
+                {
+                    ct.Title = Keys[ct.Title];
+                }
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            base.AddMultiLangKeys(keysList);
+
+            foreach (EbControl c in this.Controls)
+            {
+                EbDGColumn ct = c as EbDGColumn;
+                if (!string.IsNullOrWhiteSpace(ct.Title) && !keysList.Contains(ct.Title))
+                {
+                    keysList.Add(ct.Title);
+                }
+            }
+        }
     }
 
     [UsedWithTopObjectParent(typeof(EbObject))]

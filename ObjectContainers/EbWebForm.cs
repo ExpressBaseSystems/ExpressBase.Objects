@@ -3411,111 +3411,26 @@ namespace ExpressBase.Objects
 
             foreach (EbControl control in controls)
             {
-                if (control.Label != null && Keys.ContainsKey(control.Label))
-                {
-                    control.Label = Keys[control.Label];
-                }
-                if (control is EbPowerSelect)
-                {
-                    foreach (DVBaseColumn c in (control as EbPowerSelect).Columns)
-                    {
-                        if (Keys.ContainsKey(c.sTitle))
-                        {
-                            c.sTitle = Keys[c.sTitle];
-                        }
-                    }
-                    foreach (DVBaseColumn c in (control as EbPowerSelect).DisplayMembers)
-                    {
-                        if (Keys.ContainsKey(c.sTitle))
-                        {
-                            c.sTitle = Keys[c.sTitle];
-                        }
-                    }
-                }
-                else if (control is EbDataGrid)
-                {
-                    foreach (EbControl c in (control as EbDataGrid).Controls)
-                    {
-                        EbDGColumn ct = c as EbDGColumn;
-                        if (ct.Title != null && Keys.ContainsKey(ct.Title))
-                        {
-                            ct.Title = Keys[ct.Title];
-                        }
-                    }
-                }
-                else if (control is EbWizardControl)
-                {
-                    foreach (EbControl c in (control as EbWizardControl).Controls)
-                    {
-                        EbWizardStep step = c as EbWizardStep;
-                        if (step.Title != null && Keys.ContainsKey(step.Title))
-                        {
-                            step.Title = Keys[step.Title];
-                        }
-                    }
-                }
+                control.LocalizeControl(Keys);
             }
 
             return this;
         }
-        public static string[] GetKeys(object formObj)
+        public static string[] GetMultiLangKeys(object formObj)
         {
             EbControlContainer _formObj = formObj as EbControlContainer;
-            List<string> templist = new List<string>();
+            List<string> keysList = new List<string>();
             EbControl[] controls = _formObj.Controls.FlattenAllEbControls();// get all objects in the form
 
-            templist.Add(_formObj.DisplayName);
+            if (!string.IsNullOrWhiteSpace(_formObj.DisplayName))
+                keysList.Add(_formObj.DisplayName);
 
             foreach (EbControl control in controls)
             {
-                if (control.Label != null && !templist.Contains(control.Label))
-                {
-                    templist.Add(control.Label);
-                }
-
-                if (control is EbPowerSelect)
-                {
-                    foreach (DVBaseColumn c in (control as EbPowerSelect).Columns)
-                    {
-                        if (!templist.Contains(c.sTitle))
-                        {
-                            templist.Add(c.sTitle);
-                        }
-                    }
-                    foreach (DVBaseColumn c in (control as EbPowerSelect).DisplayMembers)
-                    {
-                        if (!templist.Contains(c.sTitle))
-                        {
-                            templist.Add(c.sTitle);
-                        }
-                    }
-                }
-
-                if (control is EbDataGrid)
-                {
-                    foreach (EbControl c in (control as EbDataGrid).Controls)
-                    {
-                        EbDGColumn ct = c as EbDGColumn;
-                        if (!templist.Contains(ct.Title))
-                        {
-                            templist.Add(ct.Title);
-                        }
-                    }
-                }
-
-                if (control is EbWizardControl)
-                {
-                    foreach (EbControl c in (control as EbWizardControl).Controls)
-                    {
-                        EbWizardStep step = c as EbWizardStep; if (!templist.Contains(step.Title))
-                        {
-                            templist.Add(step.Title);
-                        }
-                    }
-                }
+                control.AddMultiLangKeys(keysList);
             }
 
-            return templist.ToArray();
+            return keysList.ToArray();
         }
 
         //-------------Backup------------

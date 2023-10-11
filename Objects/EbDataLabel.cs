@@ -82,8 +82,8 @@ namespace ExpressBase.Objects
 
 
 
-        [EnableInBuilder(BuilderType.DashBoard , BuilderType.WebForm)]
-        [PropertyGroup("Core")]  
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
+        [PropertyGroup("Core")]
         public LabelStyle LabelStyle { get; set; }
 
 
@@ -103,7 +103,7 @@ namespace ExpressBase.Objects
         public int LabelBorderRadius { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DashBoard , BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
         [DefaultPropValue("#d2d2d7")]
@@ -201,6 +201,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyGroup("StaticLabel")]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [UIproperty]
         public string StaticLabel { get; set; }
 
@@ -230,7 +231,7 @@ namespace ExpressBase.Objects
 
         //dynamic label config
 
-        [EnableInBuilder(BuilderType.DashBoard , BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("DynamicLabel")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
@@ -584,6 +585,22 @@ namespace ExpressBase.Objects
         public override string GetValueFromDOMJSfn { get { return @"return this.DynamicLabel"; } set { } }
         public override string StyleJSFn { get { return @"return $('#cont_' + this.EbSid).find('.ctrl-cover').css(p1, p2);"; } set { } }
         public override string GetValueJSfn { get { return @"return this.DynamicLabel"; } set { } }
+
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            if (!string.IsNullOrWhiteSpace(this.StaticLabel) && Keys.ContainsKey(this.StaticLabel))
+            {
+                this.StaticLabel = Keys[this.StaticLabel];
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            if (!string.IsNullOrWhiteSpace(this.StaticLabel) && !keysList.Contains(this.StaticLabel))
+            {
+                keysList.Add(this.StaticLabel);
+            }
+        }
     }
     public class LabelAppearance
     {
@@ -625,4 +642,4 @@ public enum LabelStyle
     Label_3,
     Label_4,
     Label_5,
-} 
+}

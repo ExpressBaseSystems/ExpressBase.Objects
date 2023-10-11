@@ -363,7 +363,8 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                         if (this.RestrictionRule == DateRestrictionRule.FinancialYear || this.RestrictionRule == DateRestrictionRule.ActivePeriod)
                         {
                             EbFinancialYears fys = (args.webForm as EbWebForm)?.SolutionObj?.FinancialYears;
-                            if (fys != null && fys.List.Count > 0)
+                            bool fyEnabled = (args.webForm as EbWebForm)?.SolutionObj?.SolutionSettings?.EnableFinancialYear == true;
+                            if (fyEnabled && fys != null && fys.List.Count > 0)
                             {
                                 DateTime Date = Convert.ToDateTime(args.cField.Value);
                                 bool IsFinUser = args.usr.RoleIds.Contains((int)SystemRoles.FinancialYearAdmin) ||

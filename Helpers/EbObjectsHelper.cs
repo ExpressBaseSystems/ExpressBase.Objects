@@ -89,7 +89,7 @@ namespace ExpressBase.Objects.Helpers
 	                            k.id = v.key_id AND
 	                            l.id = v.lang_id AND
 	                            k.key IN ({0})
-	                            AND l.language LIKE '%({1})';";
+	                            AND l.code ILIKE '{1}';";
 
             string temp = string.Empty;
             foreach (string t in request.Keys)
@@ -99,12 +99,12 @@ namespace ExpressBase.Objects.Helpers
                     _t = _t.Replace("'", "''");
                 temp += "'" + _t + "',";
             }
-            qry = string.Format(qry, temp.Substring(0, temp.Length - 1), request.Locale);
+            qry = string.Format(qry, temp.Substring(0, temp.Length - 1), request.Language);
             EbDataTable datatbl = db.DoQuery(qry, new DbParameter[] { });
 
             foreach (EbDataRow dr in datatbl.Rows)
             {
-                Dict.Add(dr["key"].ToString(), dr["value"].ToString());
+                Dict.TryAdd(dr["key"].ToString(), dr["value"].ToString());
             }
 
             return Dict;

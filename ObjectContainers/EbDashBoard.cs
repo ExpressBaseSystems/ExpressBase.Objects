@@ -192,6 +192,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<Tiles> Tiles { get; set; }
 
+        [Alias("Is multilanguage enabled")]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public bool IsLanguageEnabled { get; set; }
+
         public static EbOperations Operations = DashBoardOperations.Instance;
 
         [JsonIgnore]
@@ -303,6 +307,55 @@ namespace ExpressBase.Objects
             }
         }
 
+        public EbDashBoard Localize(Dictionary<string, string> Keys)
+        {
+            this.DisplayName = Keys.ContainsKey(this.DisplayName) ? Keys[this.DisplayName] : this.DisplayName;
+
+            foreach (Tiles Tile in this.Tiles)
+            {
+                if (Tile.LinksColl?.Count > 0)
+                {
+                    foreach (EbLinks Link in Tile.LinksColl)
+                    {
+                        Link.LocalizeControl(Keys);
+                    }
+                }
+
+                if (Tile.LabelColl?.Count > 0)
+                {
+                    foreach (EbDataLabel Label in Tile.LabelColl)
+                    {
+                        Label.LocalizeControl(Keys);
+                    }
+                }
+            }
+
+            return this;
+        }
+
+        public void AddMultiLangKeys(List<string> keysList)
+        {
+            if (!string.IsNullOrWhiteSpace(this.DisplayName))
+                keysList.Add(this.DisplayName);
+
+            foreach (Tiles Tile in this.Tiles)
+            {
+                if (Tile.LinksColl?.Count > 0)
+                {
+                    foreach (EbLinks Link in Tile.LinksColl)
+                    {
+                        Link.AddMultiLangKeys(keysList);
+                    }
+                }
+                if (Tile.LabelColl?.Count > 0)
+                {
+                    foreach (EbDataLabel Label in Tile.LabelColl)
+                    {
+                        Label.AddMultiLangKeys(keysList);
+                    }
+                }
+            }
+        }
     }
 
     [EnableInBuilder(BuilderType.DashBoard)]

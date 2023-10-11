@@ -70,11 +70,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
-        [OSE_ObjectTypes(EbObjectTypes.iWebForm , EbObjectTypes.iDashBoard, EbObjectTypes.iTableVisualization,EbObjectTypes.iChartVisualization,EbObjectTypes.iCalendarView)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm, EbObjectTypes.iDashBoard, EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iCalendarView)]
         public string Object_Selector { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Data Settings")]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         public string LinkName { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
@@ -110,6 +111,21 @@ namespace ExpressBase.Objects
         [DefaultPropValue("")]
         public string IconBackgroundColor { get; set; }
 
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            if (!string.IsNullOrWhiteSpace(this.LinkName) && Keys.ContainsKey(this.LinkName))
+            {
+                this.LinkName = Keys[this.LinkName];
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            if (!string.IsNullOrWhiteSpace(this.LinkName) && !keysList.Contains(this.LinkName))
+            {
+                keysList.Add(this.LinkName);
+            }
+        }
     }
 
 }
