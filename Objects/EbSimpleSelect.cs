@@ -294,13 +294,13 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             _optionHtml = _html;
             this.OptionHtml = _html;
         }
-		 public void InitFromDataBase(JsonServiceClient ServiceClient, List<Param> ParamsList)
+        public void InitFromDataBase(JsonServiceClient ServiceClient, List<Param> ParamsList)
         {
             string _html = string.Empty;
             if (this.IsDynamic)
             {
                 this.Options = new List<EbSimpleSelectOption>();
-                var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId,Params=ParamsList });
+                var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId, Params = ParamsList });
                 foreach (EbDataRow option in result.Data)
                 {
                     string val = option[this.ValueMember.Data].ToString();
@@ -368,7 +368,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
 .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--": PlaceHolder) + "</option>")
+.Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--" : PlaceHolder) + "</option>")
 .Replace("@data-ebtype@", "16");
         }
 
@@ -449,6 +449,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [Alias("Option Text")]
         public string DisplayName { get; set; }
     }
