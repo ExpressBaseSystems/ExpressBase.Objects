@@ -400,6 +400,32 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             return s;
         }
 
+        public override void LocalizeControl(Dictionary<string, string> Keys)
+        {
+            base.LocalizeControl(Keys);
+
+            foreach (EbSimpleSelectOption opt in this.Options)
+            {
+                if (!string.IsNullOrWhiteSpace(opt.DisplayName) && Keys.ContainsKey(opt.DisplayName))
+                {
+                    opt.DisplayName = Keys[opt.DisplayName];
+                }
+            }
+        }
+
+        public override void AddMultiLangKeys(List<string> keysList)
+        {
+            base.AddMultiLangKeys(keysList);
+
+            foreach (EbSimpleSelectOption opt in this.Options)
+            {
+                if (!string.IsNullOrWhiteSpace(opt.DisplayName) && !keysList.Contains(opt.DisplayName))
+                {
+                    keysList.Add(opt.DisplayName);
+                }
+            }
+        }
+
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value, bool Default)
         {
             object _formattedData = null;
