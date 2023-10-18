@@ -2906,7 +2906,7 @@ namespace ExpressBase.Objects
             return false;
         }
 
-        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc, Dictionary<string, string> MetaData)
+        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc, Dictionary<string, string> MetaData, string currentLang)
         {
             bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
@@ -2971,7 +2971,7 @@ namespace ExpressBase.Objects
                     if (pc.SendWelcomeMsg && EmailCon?.Primary != null)
                     {
                         Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
-                        pc.SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
+                        pc.SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj, currentLang);
                     }
                 }
                 else if (c is EbProvisionLocation && (c as EbProvisionLocation).IsLocationCreated)

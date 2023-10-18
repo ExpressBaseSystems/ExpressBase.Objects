@@ -804,9 +804,9 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             set { }
         }
 
-        private string MailHtml3
+        private string GetOloiMailContent(string currentLang)
         {
-            get
+            if (currentLang == "ml")
             {
                 return @"
 <html>
@@ -820,9 +820,42 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             </div>
             <br />
             <div style='line-height: 1.4;'>
+                പ്രിയ {UserName},<br />
+                <br />
+                കെ-ഡിസ്ക്കിൻറെ നൂതനാശയ പോർട്ടലിന്റെ ഉപയോക്താവായി താങ്കളും കൂടി ചേർക്കപ്പെട്ട വിവരം സന്തോഷ പൂർവം അറിയിക്കുന്നു. തുടർ പ്രക്രിയകൾക്കായി താഴെ പറയുന്ന വിവരങ്ങൾ ദയവായി ശ്രദ്ധിക്കുക.
+                <br />
+                <br />
+                URL - https://{eSolutionId}<br />
+                യൂസർ നെയിം - {Email} <br />
+                പാസ്സ്‌വേർഡ് - {Password} <br />
+                <br />
+                ലോഗിൻ ചെയ്തതിനു ശേഷം താങ്കളുടെ പാസ്സ്‌വേർഡിൽ വരുത്തിയിട്ടുള്ള മാറ്റം ദയവായി ഉറപ്പു വരുത്തുക.
+            </div>
+            <br />
+            <br />
+            Thanks,<br />
+            Team OLOI<br />
+            <div><img src='https://drive.google.com/uc?export=view&id=1nDANkSWrKWYeoMR0YcG70QG4ZpDT-aUV' style='max-height: 50px; max-width: 150px; ' /></<div>
+        </div>
+    </body>
+</html>";
+            }
+
+            return @"
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div style='border: 1px solid #508bf9;padding:20px 40px 20px 40px; '>
+            <div style='text-align: center;'>
+                <img src='https://myaccount.expressbase.com/images/logo/{iSolutionId}.png' style='max-height: 100px; max-width: 300px; ' />
+            </div>
+            <br />
+            <div style='line-height: 1.4;'>
                 Dear {UserName},<br />
                 <br />
-                You have been added as a user into {SolutionName}. Please find below credentials to log in.
+                You have been added as a user in the K-DISC innovation portal. Please find below credentials to log in.
                 <br />
                 <br />
                 URL - https://{eSolutionId}<br />
@@ -839,17 +872,15 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
         </div>
     </body>
 </html>";
-            }
-            set { }
         }
 
-        public void SendWelcomeMail(RabbitMqProducer MessageProducer3, User user, Eb_Solution solution)
+        public void SendWelcomeMail(RabbitMqProducer MessageProducer3, User user, Eb_Solution solution, string currentLang)
         {
             string __html = this.MailHtml;
             if (solution.SolutionID == "ebdboihyfxflxe20220224111752")//sakshyam
                 __html = this.MailHtml2;
             else if (solution.SolutionID == "ebdbawg6osdxo920220727085204")//oloi
-                __html = this.MailHtml3;
+                __html = this.GetOloiMailContent(currentLang);
             __html = __html
                 .Replace("{SolutionName}", solution.SolutionName)
                 .Replace("{eSolutionId}", solution.ExtSolutionID)

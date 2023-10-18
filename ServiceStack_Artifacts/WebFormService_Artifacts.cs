@@ -386,6 +386,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public string FsCxtId { get; set; }
+
+        [DataMember(Order = 8)]
+        public string CurrentLang { get; set; }
     }
 
     [DataContract]
