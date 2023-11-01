@@ -67,6 +67,8 @@ namespace ExpressBase.Objects
 
         public int LocationId { get; set; }
 
+        public string CurrentLanguageCode { get; set; }
+
         public Eb_Solution SolutionObj { get; set; }
 
         public FG_Root FormGlobals { get; set; }

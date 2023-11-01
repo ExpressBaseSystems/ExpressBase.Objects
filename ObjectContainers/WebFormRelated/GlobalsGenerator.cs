@@ -238,7 +238,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 WebformData _formdata = Form.GetEmptyModel();
                 int createdBy = Form.TableRowId <= 0 ? Form.UserObj.UserId : _formdata.CreatedBy;
                 string createdAt = Form.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(Form.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
-                FG_WebForm fG_WebForm = new FG_WebForm(Form.TableName, Form.TableRowId, Form.LocationId, Form.RefId, createdBy, createdAt);
+                FG_WebForm fG_WebForm = new FG_WebForm(Form.TableName, Form.TableRowId, Form.LocationId, Form.RefId, createdBy, createdAt, Form.CurrentLanguageCode);
                 GetCSharpFormGlobalsRec_NEW(fG_WebForm, Form, _formdata, null);
                 fG_WebFormsList.Add(fG_WebForm);
             }
@@ -263,7 +263,7 @@ namespace ExpressBase.Objects.WebFormRelated
             FG_Locations fG_Locations = Get_FG_Locations(_this.SolutionObj.Locations);
             int createdBy = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
             string createdAt = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
-            FG_WebForm fG_WebForm = new FG_WebForm(_this.TableName, _this.TableRowId, _this.LocationId, _this.RefId, createdBy, createdAt);
+            FG_WebForm fG_WebForm = new FG_WebForm(_this.TableName, _this.TableRowId, _this.LocationId, _this.RefId, createdBy, createdAt, _this.CurrentLanguageCode);
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
 
             return new FG_Root(fG_WebForm, fG_User, fG_System, isSrcForm, fG_DataDB, fG_Locations);

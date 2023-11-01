@@ -691,7 +691,7 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                 for (int idx = 1; idx < _this.FormCollection.Count; idx++)
                 {
                     EbWebForm __form = _this.FormCollection[idx];
-                    FG_WebForm fG_WebForm = new FG_WebForm(__form.TableName, __form.TableRowId, __form.LocationId, __form.RefId, __form.FormData.CreatedBy, __form.FormData.CreatedAt);
+                    FG_WebForm fG_WebForm = new FG_WebForm(__form.TableName, __form.TableRowId, __form.LocationId, __form.RefId, __form.FormData.CreatedBy, __form.FormData.CreatedAt, __form.CurrentLanguageCode);
                     GlobalsGenerator.GetCSharpFormGlobalsRec_NEW(fG_WebForm, __form, __form.FormData, null);
                     globals.DestinationForms.Add(fG_WebForm);
                 }
