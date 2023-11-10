@@ -382,7 +382,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                                     throw new FormException($"Financial period {finStartEnd} is locked. {this.Label ?? this.Name} with value {val} is not allowed.", (int)HttpStatusCode.BadRequest, $"Financial year check failed. Ctrl Name: {this.Name}", "EbDate -> ParameterizeControl");
                                 }
 
-                                if (!args.ins)
+                                if (!args.ins && args.ocF?.Value != null)//args.ocF => null for batch datapusher
                                 {
                                     DateTime dateOld = Convert.ToDateTime(args.ocF.Value);
                                     EbFinancialPeriod fpOld = fys.GetFinancialPeriod(dateOld);
