@@ -1585,67 +1585,18 @@ namespace ExpressBase.Objects
 
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
-                SingleTable UserTable = null;
                 foreach (EbControl Ctrl in _schema.ExtendedControls)
                 {
                     if (Ctrl is EbProvisionUser || (Ctrl is IEbExtraQryCtrl && ((Ctrl is EbReview Rev && this.DataPusherConfig != null) || this.DataPusherConfig == null)))
                     {
                         SingleTable Table = new SingleTable();
-                        if (!(UserTable != null && Ctrl is EbProvisionUser))
-                            this.GetFormattedData(dataset.Tables[tableIndex], Table);
+                        this.GetFormattedData(dataset.Tables[tableIndex], Table);
 
-                        if (Ctrl is EbProvisionUser)
+                        if (Ctrl is EbProvisionUser provUser)
                         {
-                            EbProvisionUser provUser = Ctrl as EbProvisionUser;
                             SingleColumn Column = _FormData.MultipleTables[provUser.TableName][0].GetColumn(Ctrl.Name);
-                            if (UserTable == null)
-                            {
-                                UserTable = Table;
-                                tableIndex++; //one query is used to select required user records
-                            }
-                            SingleRow Row_U = null;
-                            foreach (SingleRow R in UserTable)
-                            {
-                                SingleColumn C = R.Columns.Find(e => e.Name == FormConstants.id);
-                                if (C != null && (Convert.ToInt32(C.Value) == Convert.ToInt32(Column.Value)))
-                                {
-                                    Row_U = R;
-                                    break;
-                                }
-                            }
-                            Dictionary<string, object> _d = new Dictionary<string, object>();
-                            if (Row_U != null)
-                            {
-                                NTV[] pArr = provUser.FuncParam;
-                                for (int k = 0; k < pArr.Length; k++)
-                                {
-                                    if (Row_U[pArr[k].Name] != null)
-                                        _d.Add(pArr[k].Name, Row_U[pArr[k].Name]);
-                                }
-                                if (!string.IsNullOrWhiteSpace(Row_U["consids"]?.ToString()) && !string.IsNullOrWhiteSpace(Row_U["consvals"]?.ToString()))
-                                {
-                                    int[] conIds = Row_U["consids"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
-                                    int[] conVals = Row_U["consvals"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
-                                    Dictionary<int, int> cons = new Dictionary<int, int>();
-                                    for (int x = 0; x < conIds.Length; x++)
-                                    {
-                                        if (!cons.ContainsKey(conIds[x]))
-                                            cons.Add(conIds[x], conVals[x]);
-                                    }
-                                    if (cons.Count > 0)
-                                        _d.Add(FormConstants.locConstraint, JsonConvert.SerializeObject(cons));
-                                }
-                            }
-                            SingleTable map_Table = new SingleTable();
-                            this.GetFormattedData(dataset.Tables[tableIndex], map_Table);
-                            if (map_Table.Count > 0)
-                            {
-                                _d.Add("map_" + FormConstants.id, map_Table[0][FormConstants.id]);
-                                _d.Add("map_" + FormConstants.fullname, map_Table[0][FormConstants.fullname]);
-                                _d.Add("map_" + FormConstants.email, map_Table[0][FormConstants.email]);
-                                _d.Add("map_" + FormConstants.phprimary, map_Table[0][FormConstants.phprimary]);
-                            }
-                            Column.F = JsonConvert.SerializeObject(_d);
+                            SingleRow Row_U = Table.Count > 0 ? Table[0] : null;
+                            Column.F = JsonConvert.SerializeObject(provUser.GetFormattedData(Row_U));
                         }
                         else if (Ctrl is EbProvisionLocation)
                         {

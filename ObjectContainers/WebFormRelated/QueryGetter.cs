@@ -129,17 +129,10 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 _qryCount++;
             }
-            bool MuCtrlFound = false;//multiple ctrl found
             foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)
             {
                 if (Ctrl is EbProvisionUser)
                 {
-                    if (!MuCtrlFound)
-                    {
-                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable, form_ver_id, _this.RefId);
-                        MuCtrlFound = true;
-                        _qryCount++;
-                    }
                     extquery += (Ctrl as EbProvisionUser).GetMappedUserQuery(_this.FormSchema.MasterTable, ebs[SystemColumns.eb_del], ebs.GetBoolFalse(SystemColumns.eb_del));
                     _qryCount++;
                 }
@@ -179,16 +172,10 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 _qryCount++;
             }
-            bool MuCtrlFound = false;//multiple ctrl found
             foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)
             {
                 if (Ctrl is EbProvisionUser)
                 {
-                    if (!MuCtrlFound)
-                    {
-                        MuCtrlFound = true;
-                        _qryCount++;
-                    }
                     _qryCount++;
                 }
                 else if (Ctrl is IEbExtraQryCtrl)

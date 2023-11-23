@@ -19,6 +19,8 @@ using ExpressBase.Common.LocationNSolution;
 using System.Net;
 using ExpressBase.Objects.WebFormRelated;
 using ServiceStack;
+using System.Data;
+using System.Threading;
 
 namespace ExpressBase.Objects
 {
@@ -84,9 +86,9 @@ namespace ExpressBase.Objects
         [ListType(typeof(UsrLocFieldAbstract))]
         public List<UsrLocFieldAbstract> Fields { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm)]
-        //[HideInPropertyGrid]
-        //public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Int32; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "UserTypeToRole", "bVisible")]
@@ -299,11 +301,114 @@ this.Init = function(id)
             }
         }
 
+        private Dictionary<string, string> GetFormattedData(IDatabase DataDB, int userId)
+        {
+            string Qry = GetRefreshDataQuery(userId);
+            try
+            {
+                EbDataTable dt = DataDB.DoQuery(Qry);
+                SingleTable Table = new SingleTable();
+                EbDataRow Row_U = dt.Rows.Count > 0 ? dt.Rows[0] : null;
+                return this.GetFormattedData(Row_U);
+            }
+            catch (Exception ex)
+            {
+                throw new FormException("Failed to fetch info of the current user.", (int)HttpStatusCode.InternalServerError, ex.Message, "EbProvisionUser => GetFormattedData...");
+            }
+        }
+
+        public Dictionary<string, string> GetFormattedData(EbDataRow Row_U)
+        {
+            Dictionary<string, string> _d = new Dictionary<string, string>();
+            if (Row_U != null)
+            {
+                NTV[] pArr = this.FuncParam;
+                for (int k = 0; k < pArr.Length; k++)
+                {
+                    if (Row_U[pArr[k].Name] != null)
+                        _d.Add(pArr[k].Name, Row_U[pArr[k].Name].ToString());
+                }
+                if (!string.IsNullOrWhiteSpace(Row_U["consids"]?.ToString()) && !string.IsNullOrWhiteSpace(Row_U["consvals"]?.ToString()))
+                {
+                    int[] conIds = Row_U["consids"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
+                    int[] conVals = Row_U["consvals"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
+                    Dictionary<int, int> cons = new Dictionary<int, int>();
+                    for (int x = 0; x < conIds.Length; x++)
+                    {
+                        if (!cons.ContainsKey(conIds[x]))
+                            cons.Add(conIds[x], conVals[x]);
+                    }
+                    if (cons.Count > 0)
+                        _d.Add(FormConstants.locConstraint, JsonConvert.SerializeObject(cons));
+                }
+                if (int.TryParse(Row_U["eb_ver_id"]?.ToString(), out int verid))
+                {
+                    _d.Add("eb_ver_id", verid.ToString());
+                }
+                if (int.TryParse(Row_U["eb_data_id"]?.ToString(), out int dataid))
+                {
+                    _d.Add("eb_data_id", dataid.ToString());
+                }
+                if (!string.IsNullOrWhiteSpace(Row_U["eb_is_mapped_user"]?.ToString()))
+                {
+                    _d.Add("eb_is_mapped_user", Row_U["eb_is_mapped_user"].ToString());
+                }
+            }
+
+            return _d;
+        }
+
+        public Dictionary<string, object> GetFormattedData(SingleRow Row_U)
+        {
+            Dictionary<string, object> _d = new Dictionary<string, object>();
+            if (Row_U != null)
+            {
+                NTV[] pArr = this.FuncParam;
+                for (int k = 0; k < pArr.Length; k++)
+                {
+                    if (Row_U[pArr[k].Name] != null)
+                        _d.Add(pArr[k].Name, Row_U[pArr[k].Name]);
+                }
+                if (!string.IsNullOrWhiteSpace(Row_U["consids"]?.ToString()) && !string.IsNullOrWhiteSpace(Row_U["consvals"]?.ToString()))
+                {
+                    int[] conIds = Row_U["consids"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
+                    int[] conVals = Row_U["consvals"].ToString().Split(",").Select(e => int.TryParse(e, out int t) ? t : 0).ToArray();
+                    Dictionary<int, int> cons = new Dictionary<int, int>();
+                    for (int x = 0; x < conIds.Length; x++)
+                    {
+                        if (!cons.ContainsKey(conIds[x]))
+                            cons.Add(conIds[x], conVals[x]);
+                    }
+                    if (cons.Count > 0)
+                        _d.Add(FormConstants.locConstraint, JsonConvert.SerializeObject(cons));
+                }
+                if (int.TryParse(Row_U["eb_ver_id"]?.ToString(), out int verid))
+                {
+                    _d.Add("eb_ver_id", verid);
+                }
+                if (int.TryParse(Row_U["eb_data_id"]?.ToString(), out int dataid))
+                {
+                    _d.Add("eb_data_id", dataid);
+                }
+                if (!string.IsNullOrWhiteSpace(Row_U["eb_is_mapped_user"]?.ToString()))
+                {
+                    _d.Add("eb_is_mapped_user", Row_U["eb_is_mapped_user"].ToString());
+                }
+            }
+
+            return _d;
+        }
+
         public string GetSelectQuery(IDatabase DataDB, string masterTbl, string form_ver_id, string form_ref_id)
         {
-            //if multiple user ctrl placed in form then one select query is enough // imp
+            return null;
+        }
+
+        public string GetRefreshDataQuery(int userId)
+        {
             return $@"
-SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid, u.forcepwreset,
+SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, 
+    u.eb_user_types_id AS usertype, u.statusid, u.forcepwreset, u.eb_ver_id, u.eb_data_id, u.eb_is_mapped_user,
     STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups, 
     STRING_AGG(cons.id::TEXT, ',') AS consids, STRING_AGG(cons.c_value::TEXT, ',') AS consvals
 FROM eb_users u 
@@ -315,32 +420,48 @@ LEFT JOIN
     WHERE m.id = l.master_id AND m.key_type = {(int)EbConstraintKeyTypes.User} AND 
     l.c_type = {(int)EbConstraintTypes.User_Location} AND eb_del = 'F' ORDER BY m.id
 ) cons ON u.id = cons.key_id 
-WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
-        }//EbConstraintKeyTypes.User, EbConstraintTypes.User_Location    
+WHERE u.id = {userId} GROUP BY u.id;";
+        }
 
         public string GetMappedUserQuery(string MasterTable, string eb_del, string false_val)
         {
             string idCol = this.TableName == MasterTable ? "id" : MasterTable + "_id";
-            return $@"SELECT B.id, B.fullname, B.email, B.phnoprimary AS phprimary
-                FROM {this.TableName} A, eb_users B
-                WHERE B.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_del}, {false_val}) = {false_val}; ";
+            return $@"
+SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, 
+    u.eb_user_types_id AS usertype, u.statusid, u.forcepwreset, u.eb_ver_id, u.eb_data_id, u.eb_is_mapped_user,
+    STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups, 
+    STRING_AGG(cons.id::TEXT, ',') AS consids, STRING_AGG(cons.c_value::TEXT, ',') AS consvals
+FROM {this.TableName} A, eb_users u 
+LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id AND r2u.eb_del='F'
+LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid AND g2u.eb_del='F'
+LEFT JOIN 
+(   SELECT m.id, m.key_id, l.c_value
+    FROM eb_constraints_master m, eb_constraints_line l
+    WHERE m.id = l.master_id AND m.key_type = {(int)EbConstraintKeyTypes.User} AND 
+    l.c_type = {(int)EbConstraintTypes.User_Location} AND eb_del = 'F' ORDER BY m.id
+) cons ON u.id = cons.key_id 
+WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_del}, {false_val}) = {false_val} GROUP BY u.id;";
+
         }
 
         //insOnUp - user create on update
-        private string GetSaveQuery(bool ins, string param, string mtbl, string pemail, string pphone, bool insOnUp)
+        private string GetSaveQuery(string param, string mtbl, bool isFormIns, int usrId, bool isMapped)
         {
-            if (ins)
+            string userId_s = usrId > 1 ? usrId.ToString() : "eb_currval('eb_users_id_seq')";
+            string mf = isMapped ? "T" : "F";
+            if (isFormIns)
             {
                 string consqry = string.Empty;
                 if (this.AddLocConstraint)
-                    consqry = "SELECT * FROM eb_security_constraints(@eb_createdby, eb_currval('eb_users_id_seq'), '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
-                string ee = $"UPDATE {this.TableName} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.TableName == mtbl ? "id" : (mtbl + "_id"))} = eb_currval('{mtbl}_id_seq'); ";
-                return $"SELECT * FROM eb_security_user(@eb_createdby, {param}); UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = eb_currval('{mtbl}_id_seq') WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" + ee + consqry;
+                    consqry = $"SELECT * FROM eb_security_constraints(@eb_createdby, {userId_s}, '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
+                string ee = $"UPDATE {this.TableName} SET {this.Name} = {userId_s} WHERE {(this.TableName == mtbl ? "id" : (mtbl + "_id"))} = eb_currval('{mtbl}_id_seq'); ";
+                return $"SELECT * FROM eb_security_user(@eb_createdby, {param}); UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = eb_currval('{mtbl}_id_seq'), eb_is_mapped_user='{mf}' WHERE id={userId_s};" + ee + consqry;
             }
             else
             {
-                string ee = insOnUp ? $"UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = @{mtbl}_id WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" : string.Empty;
-                ee += insOnUp ? $"UPDATE {this.TableName} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.TableName == mtbl ? "id" : (mtbl + "_id"))} = @{mtbl}_id; " : string.Empty;
+                string ee = $"UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = @{mtbl}_id, eb_is_mapped_user='{mf}' WHERE id={userId_s};";
+                ee += $"UPDATE {this.TableName} SET {this.Name} = {userId_s} WHERE {(this.TableName == mtbl ? "id" : (mtbl + "_id"))} = @{mtbl}_id; ";
+
                 return string.Format("SELECT * FROM eb_security_user(@eb_createdby, {0});", param) + ee;
             }
 
@@ -353,7 +474,7 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
 
         private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag, bool ins, SingleColumn ocF)
         {
-            int userId = 0;
+            int emUserId = 0;
             string _s = "SELECT id FROM eb_users WHERE LOWER(#) LIKE LOWER(@#) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2 OR statusid = 4);";
             string sql;
             List<DbParameter> parameters = new List<DbParameter>();
@@ -378,53 +499,47 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             //Dictionary<string, string> _od = ocF == null ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
             //int oCreUserId = ContainsKey(_od, "id") ? Convert.ToInt32(_od["id"]) : 0;
 
-            if (ds.Tables[0].Rows.Count > 0)
+            if (ds.Tables[0].Rows.Count > 0) //email found
             {
-                userId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
+                emUserId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
                 flag = 1;
             }
-            if (ds.Tables[1].Rows.Count > 0)
+            if (ds.Tables[1].Rows.Count > 0) //phone found
             {
-                int userId2 = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+                int phUserId = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
                 flag |= 2;
-                if (flag == 3)
+                if (flag == 3) //email & phone found
                 {
-                    if (userId != userId2)
+                    if (emUserId != phUserId)
                     {
-                        if (!ins)
-                        {
-                            if (userId == oProvUserId && oProvUserId > 0)
-                            {
-                                _d.RemoveKey("phprimary");
-                                flag &= 1;
-                            }
-                            if (userId2 == oProvUserId && oProvUserId > 0)
-                            {
-                                _d.RemoveKey("email");
-                                flag &= 2;
-                                userId = oProvUserId;
-                            }
-                        }
-                        if (userId != userId2 && flag == 3)
-                            throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
+                        throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
                     }
+                    return emUserId;
                 }
-                else if (_d.ContainsKey("email") && _d["email"] != string.Empty && oProvUserId != userId2)
+                else if (_d.ContainsKey("email") && !string.IsNullOrWhiteSpace(_d["email"])) //email is unique 
                 {
-                    _d.RemoveKey("phprimary");
                     flag &= 1;
-                    return 0;
+                    if (oProvUserId != phUserId) //given phone no of other user
+                        return phUserId;
+                    else //user id is not changed
+                        return phUserId;
                 }
-                else
-                    userId = userId2;
+                else //no email
+                    return phUserId;
             }
-            else if (flag == 1 && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty && oProvUserId != userId)
+            else if (flag == 1) //email found
             {
-                _d.RemoveKey("email");
-                flag &= 2;
-                return 0;
+                if (_d.ContainsKey("phprimary") && !string.IsNullOrWhiteSpace(_d["phprimary"])) //phone is unique
+                {
+                    if (oProvUserId != emUserId) //given email no of other user
+                        return emUserId;
+                    else
+                        return emUserId;
+                }
+                else //no phone
+                    return emUserId;
             }
-            return userId;
+            return 0;
         }
 
         private void ThrowExistingUserException(Dictionary<string, string> _d, int flag)
@@ -445,17 +560,20 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
                 _d.Add(Key, Value);
         }
 
-        private void SetUserType_Role_Status(Dictionary<string, string> _d, int nProvUserId)
+        private void SetUserType_Role_Status(Dictionary<string, string> _d, int nProvUserId, bool isIns)
         {
-            this.UserCredentials = new UserCredentials()
+            if (isIns)
             {
-                Email = _d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : string.Empty,
-                Phone = _d.ContainsKey(FormConstants.phprimary) ? _d[FormConstants.phprimary] : string.Empty,
-                Pwd = this.GetRandomPwd(),
-                Name = _d.ContainsKey(FormConstants.fullname) ? _d[FormConstants.fullname] : (_d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : _d[FormConstants.phprimary]),
-                UserId = nProvUserId
-            };
-            this.AddOrChange(_d, FormConstants.pwd, this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
+                this.UserCredentials = new UserCredentials()
+                {
+                    Email = _d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : string.Empty,
+                    Phone = _d.ContainsKey(FormConstants.phprimary) ? _d[FormConstants.phprimary] : string.Empty,
+                    Pwd = this.GetRandomPwd(),
+                    Name = _d.ContainsKey(FormConstants.fullname) ? _d[FormConstants.fullname] : (_d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : _d[FormConstants.phprimary]),
+                    UserId = nProvUserId
+                };
+                this.AddOrChange(_d, FormConstants.pwd, this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
+            }
 
             if (!_d.ContainsKey(FormConstants.usertype))
             {
@@ -482,7 +600,35 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
             }
         }
 
-        private void MergeConstraints(Dictionary<string, string> _d, int nProvUserId)
+        private void MergeConstraintsForCreate(Dictionary<string, string> _nd)
+        {
+            List<int> nCons = new List<int>();
+            if (_nd.TryGetValue(FormConstants.consadd, out string nwLocIds))
+            {
+                string[] loc_ids = nwLocIds.Split(CharConstants.COMMA);//only loc constraint is considered
+                for (int i = 0; i < loc_ids.Length; i++)
+                {
+                    if (int.TryParse(loc_ids[i], out int locId) && locId > 0 && !nCons.Contains(locId))
+                        nCons.Add(locId);
+                }
+                _nd[FormConstants.consadd] = string.Empty;
+            }
+            if (nCons.Count > 0)
+            {
+                EbConstraints consObj = new EbConstraints(nCons.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                _nd[FormConstants.consadd] = consObj.GetDataAsString();
+            }
+        }
+
+        private void CreateUser(Dictionary<string, string> nd, ParameterizeCtrl_Params args, bool isMapped)
+        {
+            this.AddOrChange(nd, FormConstants.id, "0");
+            this.SetUserType_Role_Status(nd, 0, true);
+            this.MergeConstraintsForCreate(nd);
+            this.SetExtendedSaveQuery(nd, args, isMapped);
+        }
+
+        private void MergeConstraintsForEdit(Dictionary<string, string> _d, Dictionary<string, string> _od, int nProvUserId)
         {
             List<int> nCons = new List<int>();
             Dictionary<int, int> oConsDict = null;//old constraints// key -> consMasterId, val -> locId
@@ -498,202 +644,233 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
                 _d[FormConstants.consadd] = string.Empty;
             }
 
-            if (_d.ContainsKey(FormConstants.locConstraint))
-                oConsDict = JsonConvert.DeserializeObject<Dictionary<int, int>>(_d[FormConstants.locConstraint]);
+            if (_od.ContainsKey(FormConstants.locConstraint))
+                oConsDict = JsonConvert.DeserializeObject<Dictionary<int, int>>(_od[FormConstants.locConstraint]);
 
-            if (nProvUserId <= 0)
+
+            if (oConsDict != null && nCons.Count > 0)
             {
-                if (nCons.Count > 0)
+                List<int> addLocIds = new List<int>();
+                List<int> delIds = new List<int>();
+
+                foreach (int consId in nCons)
                 {
-                    EbConstraints consObj = new EbConstraints(nCons.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                    if (!oConsDict.ContainsValue(consId))
+                        addLocIds.Add(consId);
+                }
+                foreach (KeyValuePair<int, int> item in oConsDict)
+                {
+                    if (!nCons.Contains(item.Value))
+                        delIds.Add(item.Key);
+                }
+
+                if (addLocIds.Count > 0)
+                {
+                    EbConstraints consObj = new EbConstraints(addLocIds.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
                     _d[FormConstants.consadd] = consObj.GetDataAsString();
                 }
+                if (delIds.Count > 0)
+                    this.AddOrChange(_d, FormConstants.consdel, delIds.Join(","));
+            }
+            else if (oConsDict == null && nCons.Count > 0)
+            {
+                EbConstraints consObj = new EbConstraints(nCons.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                _d[FormConstants.consadd] = consObj.GetDataAsString();
+            }
+            else if (oConsDict != null && nCons.Count == 0)
+            {
+                this.AddOrChange(_d, FormConstants.consdel, oConsDict.Keys.Join(","));
+            }
+
+        }
+
+        private void EditUser(Dictionary<string, string> nd, Dictionary<string, string> od, int oPuId, int nPuId, ParameterizeCtrl_Params args, bool isMapped)
+        {
+            this.AddOrChange(nd, FormConstants.id, nPuId.ToString());
+
+            if (!nd.ContainsKey(FormConstants.usertype)) // usertype control is not configured
+            {
+                if (od.ContainsKey(FormConstants.usertype))
+                {
+                    this.AddOrChange(nd, FormConstants.usertype, od[FormConstants.usertype]);
+                }
+                else
+                {
+                    //load usertype from prop if only one usertype is configured
+                    List<EbUserType> u_types = this.UserTypeToRole.FindAll(e => e.bVisible);
+                    if (u_types.Count == 1)
+                        nd.Add(FormConstants.usertype, Convert.ToString(u_types[0].iValue));
+                }
+            }
+
+            int oldStatus = od.TryGetValue(FormConstants.statusid, out string oldStatus_s) && int.TryParse(oldStatus_s, out int oldStatus_i) ? oldStatus_i : -1;
+
+            if (nd.TryGetValue(FormConstants.statusid, out string newStatus_s) && int.TryParse(newStatus_s, out int newStatus_i) && oldStatus >= 0 && newStatus_i == oldStatus)
+            {
+                //if status not changed
+                this.AddOrChange(nd, FormConstants.statusid, Convert.ToString(oldStatus + 100));
+            }
+
+            if (oldStatus == (int)EbUserStatus.Unapproved)
+            {
+                if (args.usr.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || args.usr.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
+                {
+                    int u_type = Convert.ToInt32(od[FormConstants.usertype]);
+                    EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
+                    if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                    {
+                        if (nd.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i) && priRole_i > 100)
+                            ebTyp.Roles.Add(priRole_i);
+                        this.AddOrChange(nd, FormConstants.statusid, ((int)EbUserStatus.Active).ToString());
+                        this.AddOrChange(nd, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
+                    }
+                }
+            }
+
+            //merge existing data(od) with partial new data(nd)
+            foreach (KeyValuePair<string, string> item in od)
+            {
+                if (!nd.ContainsKey(item.Key))
+                {
+                    string val = item.Value;
+                    if (item.Key == FormConstants.roles)
+                    {
+                        if (nd.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && priRole_i > 100)
+                        {
+                            List<string> st = string.IsNullOrWhiteSpace(item.Value) ? new List<string>() : item.Value.Split(",").ToList();
+                            if (!st.Contains(priRole_s))
+                            {
+                                if (st.Count > 0)// remove old primary roles
+                                {
+                                    string Qry = $"SELECT id FROM eb_roles WHERE is_primary='T' AND COALESCE(eb_del, 'F')='F' AND id IN(SELECT UNNEST(STRING_TO_ARRAY('{item.Value}', ',')::INTEGER[]));";
+                                    EbDataTable dt = args.DataDB.DoQuery(Qry);
+                                    foreach (EbDataRow dr in dt.Rows)
+                                    {
+                                        string old_rid = Convert.ToString(dr[0]);
+                                        if (st.Contains(old_rid))
+                                            st.Remove(old_rid);
+                                    }
+                                }
+                                st.Add(priRole_s);// add new primary role
+                                val = st.Join(",");
+                            }
+                        }
+                    }
+                    nd.Add(item.Key, val);
+                }
+            }
+
+            this.MergeConstraintsForEdit(nd, od, nPuId);////////
+
+            this.SetExtendedSaveQuery(nd, args, isMapped);
+        }
+
+        private void SetExtendedSaveQuery(Dictionary<string, string> nd, ParameterizeCtrl_Params args, bool isMapped)
+        {
+            string fnParams = string.Empty;
+            for (int k = 0; k < this.FuncParam.Length; k++, args.i++)
+            {
+                object _value = this.FuncParam[k].Value;
+                if (nd.ContainsKey(this.FuncParam[k].Name) && !string.IsNullOrEmpty(nd[this.FuncParam[k].Name]))
+                {
+                    _value = nd[this.FuncParam[k].Name];
+                }
+                fnParams += string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, args.i, CharConstants.COMMA, CharConstants.SPACE);
+                if (_value == DBNull.Value)
+                {
+                    var p = args.DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + args.i, this.FuncParam[k].Type);
+                    p.Value = _value;
+                    args.param.Add(p);
+                }
+                else
+                {
+                    args.param.Add(args.DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + args.i, this.FuncParam[k].Type, _value));
+                }
+            }
+
+            args._extqry += this.GetSaveQuery(fnParams.Substring(0, fnParams.Length - 2), args.tbl, args.ins, Convert.ToInt32(nd[FormConstants.id]), isMapped);//insertOnUpdate
+        }
+
+        private void SetControlParams(ParameterizeCtrl_Params args, int UserId)
+        {
+            if (args.ins)
+            {
+                args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
+                args._vals += CharConstants.AT + args.cField.Name + CharConstants.UNDERSCORE + args.i + CharConstants.COMMA + CharConstants.SPACE;
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type, UserId));
             }
             else
             {
-                if (oConsDict != null && nCons.Count > 0)
-                {
-                    List<int> addLocIds = new List<int>();
-                    List<int> delIds = new List<int>();
-
-                    foreach (int consId in nCons)
-                    {
-                        if (!oConsDict.ContainsValue(consId))
-                            addLocIds.Add(consId);
-                    }
-                    foreach (KeyValuePair<int, int> item in oConsDict)
-                    {
-                        if (!nCons.Contains(item.Value))
-                            delIds.Add(item.Key);
-                    }
-
-                    if (addLocIds.Count > 0)
-                    {
-                        EbConstraints consObj = new EbConstraints(addLocIds.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
-                        _d[FormConstants.consadd] = consObj.GetDataAsString();
-                    }
-                    if (delIds.Count > 0)
-                        this.AddOrChange(_d, FormConstants.consdel, delIds.Join(","));
-                }
-                else if (oConsDict == null && nCons.Count > 0)
-                {
-                    EbConstraints consObj = new EbConstraints(nCons.Select(e => e.ToString()).ToArray(), EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
-                    _d[FormConstants.consadd] = consObj.GetDataAsString();
-                }
-                else if (oConsDict != null && nCons.Count == 0)
-                {
-                    this.AddOrChange(_d, FormConstants.consdel, oConsDict.Keys.Join(","));
-                }
+                args._colvals += string.Concat(args.cField.Name, CharConstants.EQUALS, CharConstants.AT, args.cField.Name, CharConstants.UNDERSCORE, args.i, CharConstants.COMMA, CharConstants.SPACE);
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type, UserId));
             }
+            args.i++;
         }
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
             if (!this.CreateOnlyIf_b)
+            {
+                SetControlParams(args, 0);
                 return false;
-            string c = string.Empty;
-            bool doNotUpdate = false;
-            bool insertOnUpdate = false;
+            }
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.cField.F));
-            int nProvUserId = 0;
+            int nProvUserId;
             int flag = 0;
             if ((_d.ContainsKey(FormConstants.email) && _d[FormConstants.email].Trim() != string.Empty) || (_d.ContainsKey(FormConstants.phprimary) && _d[FormConstants.phprimary].Trim() != string.Empty))
-                nProvUserId = this.GetUserIdByEmailOrPhone(args.DataDB, _d, ref flag, args.ins, args.ocF);
-            else
-                return false;
-            if (args.ins)
             {
-                if (nProvUserId > 0)// user already exists
+                nProvUserId = this.GetUserIdByEmailOrPhone(args.DataDB, _d, ref flag, args.ins, args.ocF);
+                if (nProvUserId == 1)
+                {
+                    SetControlParams(args, 0);
+                    return false;
+                }
+            }
+            else
+            {
+                SetControlParams(args, 0);
+                return false;
+            }
+
+            int oProvUserId = args.ins ? 0 : (int.TryParse(args.ocF?.Value?.ToString(), out int qq) ? qq : 0);
+
+            if (oProvUserId == 0 && nProvUserId == 0) //Create new user
+            {
+                this.CreateUser(_d, args, false);
+            }
+            else if (oProvUserId == 0 && nProvUserId > 0) //Link and edit existing user
+            {
+                if (!this.AllowExistingUser)
+                    this.ThrowExistingUserException(_d, flag);
+
+                Dictionary<string, string> od = this.GetFormattedData(args.DataDB, nProvUserId);
+                this.EditUser(_d, od, 0, nProvUserId, args, true);
+                SetControlParams(args, nProvUserId);
+            }
+            else if (oProvUserId > 0 && nProvUserId == 0) //Edit already linked/created user
+            {
+                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
+                this.EditUser(_d, _od, 0, oProvUserId, args, _od["eb_is_mapped_user"].ToString() == "T");
+                SetControlParams(args, nProvUserId);
+            }
+            else if (oProvUserId > 0 && nProvUserId > 0)
+            {
+                if (oProvUserId == nProvUserId) //Edit existing user
+                {
+                    Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
+                    this.EditUser(_d, _od, oProvUserId, nProvUserId, args, _od["eb_is_mapped_user"].ToString() == "T");
+                    SetControlParams(args, nProvUserId);
+                }
+                else //Link and edit another user
                 {
                     if (!this.AllowExistingUser)
                         this.ThrowExistingUserException(_d, flag);
-
-                    args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
-                    args._vals += CharConstants.AT + args.cField.Name + CharConstants.UNDERSCORE + args.i + CharConstants.COMMA + CharConstants.SPACE;
-                    args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type, nProvUserId));
-                    args.i++;
-                    doNotUpdate = true;
-                }
-                else
-                    this.SetUserType_Role_Status(_d, nProvUserId);
-            }
-            else
-            {
-                int oProvUserId = Convert.ToInt32(args.ocF.Value);
-                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
-                if (_od.ContainsKey(FormConstants.id) && (oProvUserId == nProvUserId))// means user created by this control
-                {
-                    this.AddOrChange(_d, FormConstants.id, _od[FormConstants.id]);
-                    int oCreUserId = Convert.ToInt32(_od[FormConstants.id]);
-                    if (oCreUserId != nProvUserId || !_d.ContainsKey(FormConstants.email))
-                        this.AddOrChange(_d, FormConstants.email, _od[FormConstants.email]);// remove this line if you want to edit email via prov user ctrl
-                    if (oCreUserId != nProvUserId || !_d.ContainsKey(FormConstants.phprimary))
-                        this.AddOrChange(_d, FormConstants.phprimary, _od[FormConstants.phprimary]);
-                    this.AddOrChange(_d, FormConstants.usertype, _od[FormConstants.usertype]);
-                    int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
-                    if (!(_d.TryGetValue(FormConstants.statusid, out string newStatus_s) && int.TryParse(newStatus_s, out int newStatus_i) && newStatus_i != oldStatus))//if not status changed
-                        this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));
-                    if (_od.ContainsKey(FormConstants.locConstraint))
-                        this.AddOrChange(_d, FormConstants.locConstraint, _od[FormConstants.locConstraint]);
-
-                    if (oldStatus == (int)EbUserStatus.Unapproved)
-                    {
-                        if (args.usr.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || args.usr.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
-                        {
-                            int u_type = Convert.ToInt32(_od[FormConstants.usertype]);
-                            EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
-                            if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
-                            {
-                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && !ebTyp.Roles.Contains(priRole_i) && priRole_i > 100)
-                                    ebTyp.Roles.Add(priRole_i);
-                                this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Active).ToString());
-                                this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
-                            }
-                        }
-                    }
-
-                    foreach (KeyValuePair<string, string> item in _od)
-                    {
-                        if (!_d.ContainsKey(item.Key))
-                        {
-                            string val = item.Value;
-                            if (item.Key == FormConstants.roles)
-                            {
-                                if (_d.TryGetValue(FormConstants.primary_role, out string priRole_s) && int.TryParse(priRole_s, out int priRole_i) && priRole_i > 100)
-                                {
-                                    List<string> st = string.IsNullOrWhiteSpace(item.Value) ? new List<string>() : item.Value.Split(",").ToList();
-                                    if (!st.Contains(priRole_s))
-                                    {
-                                        if (st.Count > 0)// remove old primary roles
-                                        {
-                                            string Qry = $"SELECT id FROM eb_roles WHERE is_primary='T' AND COALESCE(eb_del, 'F')='F' AND id IN(SELECT UNNEST(STRING_TO_ARRAY('{item.Value}', ',')::INTEGER[]));";
-                                            EbDataTable dt = args.DataDB.DoQuery(Qry);
-                                            foreach (EbDataRow dr in dt.Rows)
-                                            {
-                                                string old_rid = Convert.ToString(dr[0]);
-                                                if (st.Contains(old_rid))
-                                                    st.Remove(old_rid);
-                                            }
-                                        }
-                                        st.Add(priRole_s);// add new primary role
-                                        val = st.Join(",");
-                                    }
-                                }
-                            }
-                            _d.Add(item.Key, val);
-                        }
-                    }
-                }
-                else
-                {
-                    doNotUpdate = true;
-                    if (nProvUserId > 1 && oProvUserId != nProvUserId)
-                    {
-                        if (!this.AllowExistingUser)
-                            this.ThrowExistingUserException(_d, flag);
-
-                        args._colvals += string.Concat(args.cField.Name, CharConstants.EQUALS, CharConstants.AT, args.cField.Name, CharConstants.UNDERSCORE, args.i, CharConstants.COMMA, CharConstants.SPACE);
-                        args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type, nProvUserId));
-                        args.i++;
-                    }
-                    else if (nProvUserId <= 0)
-                    {
-                        insertOnUpdate = true;
-                        this.SetUserType_Role_Status(_d, nProvUserId);
-                    }
+                    Dictionary<string, string> od = this.GetFormattedData(args.DataDB, nProvUserId);
+                    this.EditUser(_d, od, 0, nProvUserId, args, true);
+                    SetControlParams(args, nProvUserId);
                 }
             }
-            if (!doNotUpdate || insertOnUpdate)
-            {
-                this.MergeConstraints(_d, nProvUserId);
 
-                string p_email = string.Empty, p_phone = string.Empty;
-                for (int k = 0; k < this.FuncParam.Length; k++, args.i++)
-                {
-                    object _value = this.FuncParam[k].Value;
-                    if (_d.ContainsKey(this.FuncParam[k].Name) && !string.IsNullOrEmpty(_d[this.FuncParam[k].Name]))
-                    {
-                        _value = _d[this.FuncParam[k].Name];
-                        if (this.FuncParam[k].Name.Equals(FormConstants.email))
-                            p_email = string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, args.i);
-                        if (this.FuncParam[k].Name.Equals(FormConstants.phprimary))
-                            p_phone = string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, args.i);
-                    }
-                    c += string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, args.i, CharConstants.COMMA, CharConstants.SPACE);
-                    if (_value == DBNull.Value)
-                    {
-                        var p = args.DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + args.i, this.FuncParam[k].Type);
-                        p.Value = _value;
-                        args.param.Add(p);
-                    }
-                    else
-                    {
-                        args.param.Add(args.DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + args.i, this.FuncParam[k].Type, _value));
-                    }
-                }
-
-                args._extqry += this.GetSaveQuery(args.ins, c.Substring(0, c.Length - 2), args.tbl, p_email, p_phone, insertOnUpdate);
-            }
             return true;
         }
 
@@ -716,7 +893,7 @@ WHERE eb_ver_id = {form_ver_id} AND eb_data_id = @{masterTbl}_id GROUP BY u.id; 
         {
             string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
             StringBuilder builder = new StringBuilder();
-            Random random = new Random();
+            System.Random random = new System.Random();
             char ch;
             for (int i = 0; i < 10; i++)
             {
