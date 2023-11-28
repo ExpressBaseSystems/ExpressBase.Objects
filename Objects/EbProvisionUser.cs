@@ -686,6 +686,20 @@ WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_
 
         private void EditUser(Dictionary<string, string> nd, Dictionary<string, string> od, int oPuId, int nPuId, ParameterizeCtrl_Params args, bool isMapped)
         {
+            if (od["eb_is_mapped_user"] == "T" || od["eb_is_mapped_user"] == "F")
+            {
+                int dataId = Convert.ToInt32(od["eb_data_id"]);
+                int verId = Convert.ToInt32(od["eb_ver_id"]);
+                if (dataId > 0 && verId > 0)
+                {
+                    if (dataId != (args.webForm as EbWebForm).TableRowId || verId != Convert.ToInt32(this.RefId.Split(CharConstants.DASH)[4]))
+                        throw new FormException("Selected user already linked with another form submission.", (int)HttpStatusCode.BadRequest, $"Unlink the selected user first then try again. (uid, did, vid)=({nPuId}, {dataId}, {verId})", "EbProvisionUser => EditUser....");
+                }
+            }
+
+            //eb_is_mapped_user='P' WHERE id={userId_s} AND eb_ver_id = @{args.tbl}_eb_ver_id AND eb_data_id 
+            //this.RefId.Split(CharConstants.DASH)[4])
+
             this.AddOrChange(nd, FormConstants.id, nPuId.ToString());
 
             if (!nd.ContainsKey(FormConstants.usertype)) // usertype control is not configured
@@ -791,6 +805,12 @@ WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_
             args._extqry += this.GetSaveQuery(fnParams.Substring(0, fnParams.Length - 2), args.tbl, args.ins, Convert.ToInt32(nd[FormConstants.id]), isMapped);//insertOnUpdate
         }
 
+        private void SetExtendedUnlinkQuery(ParameterizeCtrl_Params args, string userId_s)
+        {
+            string ee = $"UPDATE eb_users SET eb_is_mapped_user='P' WHERE id={userId_s} AND eb_ver_id = @{args.tbl}_eb_ver_id AND eb_data_id = @{args.tbl}_id AND (eb_is_mapped_user='T' OR eb_is_mapped_user='F');";
+            args._extqry += ee;
+        }
+
         private void SetControlParams(ParameterizeCtrl_Params args, int UserId)
         {
             if (args.ins)
@@ -809,9 +829,13 @@ WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_
 
         public override bool ParameterizeControl(ParameterizeCtrl_Params args, string crudContext)
         {
+            int oProvUserId = args.ins ? 0 : (int.TryParse(args.ocF?.Value?.ToString(), out int qq) ? qq : 0);
+
             if (!this.CreateOnlyIf_b)
             {
                 SetControlParams(args, 0);
+                if (oProvUserId > 0)
+                    this.SetExtendedUnlinkQuery(args, oProvUserId.ToString());
                 return false;
             }
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.cField.F));
@@ -823,16 +847,18 @@ WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_
                 if (nProvUserId == 1)
                 {
                     SetControlParams(args, 0);
+                    if (oProvUserId > 0)
+                        this.SetExtendedUnlinkQuery(args, oProvUserId.ToString());
                     return false;
                 }
             }
             else
             {
                 SetControlParams(args, 0);
+                if (oProvUserId > 0)
+                    this.SetExtendedUnlinkQuery(args, oProvUserId.ToString());
                 return false;
             }
-
-            int oProvUserId = args.ins ? 0 : (int.TryParse(args.ocF?.Value?.ToString(), out int qq) ? qq : 0);
 
             if (oProvUserId == 0 && nProvUserId == 0) //Create new user
             {
@@ -868,6 +894,7 @@ WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_
                     Dictionary<string, string> od = this.GetFormattedData(args.DataDB, nProvUserId);
                     this.EditUser(_d, od, 0, nProvUserId, args, true);
                     SetControlParams(args, nProvUserId);
+                    this.SetExtendedUnlinkQuery(args, oProvUserId.ToString());
                 }
             }
 
