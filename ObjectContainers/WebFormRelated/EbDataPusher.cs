@@ -17,6 +17,7 @@ using System.Data.Common;
 using Newtonsoft.Json;
 using System.Linq;
 using ExpressBase.Objects.Helpers;
+using System.Text;
 
 namespace ExpressBase.Objects
 {
@@ -704,13 +705,13 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                 MergeFormData(FormCollection, FormCollectionBkUp, pushers);
                 if (FormCollection.Count == 0)
                     return "Nothing to push";
-                string fullqry = string.Empty;
+                StringBuilder fullqry = new StringBuilder();
                 string _extqry = string.Empty;
                 List<DbParameter> param = new List<DbParameter>();
                 int i = 0;
 
-                FormCollection.Update_Batch(DataDB, param, ref fullqry, ref _extqry, ref i);
-                fullqry += GetAfterBatchDpQueries(_this, IsUpdate);
+                FormCollection.Update_Batch(DataDB, param, fullqry, ref _extqry, ref i);
+                fullqry.Append(GetAfterBatchDpQueries(_this, IsUpdate));
 
                 param.Add(DataDB.GetNewParameter(_this.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, _this.RefId.Split(CharConstants.DASH)[4]));
                 param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, _this.UserObj.UserId));
@@ -719,7 +720,7 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                 param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, _this.LocationId));
                 param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, _this.UserObj.SignInLogId));
 
-                int tem = DataDB.DoNonQuery(_this.DbConnection, fullqry, param.ToArray());
+                int tem = DataDB.DoNonQuery(_this.DbConnection, fullqry.ToString(), param.ToArray());
                 _this.RefreshFormData(DataDB, service, false, false);
                 return "rows affected " + tem;
             }

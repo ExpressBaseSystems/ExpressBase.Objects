@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Net;
+using System.Text;
 
 namespace ExpressBase.Objects
 {
@@ -193,7 +194,7 @@ namespace ExpressBase.Objects
             pList.Add(DataDB.GetNewParameter(pName, dbType, value));
         }
 
-        public void Update_Batch(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
+        public void Update_Batch(IDatabase DataDB, List<DbParameter> param, StringBuilder fullqry, ref string _extqry, ref int i)
         {
             ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
             foreach (EbWebForm WebForm in this)
@@ -205,11 +206,13 @@ namespace ExpressBase.Objects
                 {
                     if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
                         continue;
-
+                    bool isFirstRow = true;
+                    int insertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
+                    int currentInsertRow = 0;
                     foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
                         args.ResetColVals();
-                        if (row.RowId > 0)
+                        if (row.RowId > 0)//edit
                         {
                             string t = string.Empty;
                             if (!row.IsDelete)
@@ -232,8 +235,8 @@ namespace ExpressBase.Objects
                             bool DGCustSelect = _table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery);
 
                             string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, _table.TableName, row.IsDelete, row.RowId, DGCustSelect);
-                            fullqry += string.Format(_qry, args._colvals);
-                            fullqry += t;
+                            fullqry.Append(string.Format(_qry, args._colvals));
+                            fullqry.Append(t);
                         }
                         else
                         {
@@ -247,10 +250,14 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName, _table);
-                            fullqry += string.Format(_qry, args._cols, args._vals);
+                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName, _table, isFirstRow);
+                            isFirstRow = false;
+                            currentInsertRow++;
+                            if (insertCount == currentInsertRow)
+                                _qry += "; ";
+                            fullqry.Append(string.Format(_qry, args._cols, args._vals));
                         }
-                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
+                        fullqry.Append(WebForm.InsertUpdateLines(_table.TableName, row, args));
                     }
                 }
 

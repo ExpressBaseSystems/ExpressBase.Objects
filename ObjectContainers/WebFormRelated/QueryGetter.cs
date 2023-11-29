@@ -690,11 +690,11 @@ VALUES (
             return _qry;
         }
 
-        public static string GetInsertQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, TableSchema _table)
+        public static string GetInsertQuery_Batch(EbWebForm _this, IDatabase DataDB, string tblName, TableSchema _table, bool bFirstRow)
         {
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
             EbDataPusherConfig conf = _this.DataPusherConfig;
-            string _qry;
+            string _qry = string.Empty;
 
             if (tblName.Equals(_this.TableName))
             {
@@ -704,37 +704,37 @@ VALUES (
 
                 _qry = $@"
 INSERT INTO {tblName} 
-    ({{0}} 
-    {ebs[SystemColumns.eb_created_by]}, 
-    {ebs[SystemColumns.eb_created_at]}, 
-    {ebs[SystemColumns.eb_loc_id]}, 
-    {ebs[SystemColumns.eb_ver_id]}, 
-    {ebs[SystemColumns.eb_src_ver_id]}, 
-    {ebs[SystemColumns.eb_src_id]}, 
-    {ebs[SystemColumns.eb_push_id]}, 
-    {ebs[SystemColumns.eb_lock]}, 
-    {ebs[SystemColumns.eb_signin_log_id]},
-    {ebs[SystemColumns.eb_ro]},
-    {ebs[SystemColumns.eb_void]},
-    {ebs[SystemColumns.eb_del]},
-    {(refCtrlExists ? string.Empty : (conf.SourceTable + "_id,"))}
-    {conf.GridTableName}_id)
+({{0}} 
+{ebs[SystemColumns.eb_created_by]}, 
+{ebs[SystemColumns.eb_created_at]}, 
+{ebs[SystemColumns.eb_loc_id]}, 
+{ebs[SystemColumns.eb_ver_id]}, 
+{ebs[SystemColumns.eb_src_ver_id]}, 
+{ebs[SystemColumns.eb_src_id]}, 
+{ebs[SystemColumns.eb_push_id]}, 
+{ebs[SystemColumns.eb_lock]}, 
+{ebs[SystemColumns.eb_signin_log_id]},
+{ebs[SystemColumns.eb_ro]},
+{ebs[SystemColumns.eb_void]},
+{ebs[SystemColumns.eb_del]},
+{(refCtrlExists ? string.Empty : (conf.SourceTable + "_id,"))}
+{conf.GridTableName}_id)
 VALUES
-    ({{1}}
-    @eb_createdby,
-    {DataDB.EB_CURRENT_TIMESTAMP},
-    @{FormConstants.eb_loc_id_ + _this.CrudContext},
-    @{_this.TableName}_eb_ver_id,
-    @{conf.SourceTable}_eb_ver_id,
-    {conf.SourceRecId},
-    {(conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'")},
-    {(conf.DisableAutoLock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock))},
-    @eb_signin_log_id,
-    {(conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro))},
-    {ebs.GetBoolFalse(SystemColumns.eb_void)},
-    {ebs.GetBoolFalse(SystemColumns.eb_del)},
-    {(refCtrlExists ? string.Empty : (conf.SourceRecId + ","))}
-    {conf.GridDataId}); ";
+({{1}}
+@eb_createdby,
+{DataDB.EB_CURRENT_TIMESTAMP},
+@{FormConstants.eb_loc_id_ + _this.CrudContext},
+@{_this.TableName}_eb_ver_id,
+@{conf.SourceTable}_eb_ver_id,
+{conf.SourceRecId},
+{(conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'")},
+{(conf.DisableAutoLock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock))},
+@eb_signin_log_id,
+{(conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro))},
+{ebs.GetBoolFalse(SystemColumns.eb_void)},
+{ebs.GetBoolFalse(SystemColumns.eb_del)},
+{(refCtrlExists ? string.Empty : (conf.SourceRecId + ","))}
+{conf.GridDataId}); ".Replace("\r", "").Replace("\n", "");
 
                 //if (_this.IsLocEditable)
                 //    _qry = _qry.Replace("@eb_loc_id,", string.Empty).Replace($"{ebs[SystemColumns.eb_loc_id]},", string.Empty);
@@ -745,25 +745,32 @@ VALUES
             else
             {
                 string srcRef = _this.TableRowId > 0 ? $"{_this.TableRowId}" : $"(SELECT eb_currval('{_this.TableName}_id_seq'))";
-                _qry = $@"
+                if (bFirstRow)
+                {
+                    _qry = $@"
 INSERT INTO {tblName} 
-    ({{0}} 
-    {ebs[SystemColumns.eb_created_by]}, 
-    {ebs[SystemColumns.eb_created_at]}, 
-    {ebs[SystemColumns.eb_loc_id]}, 
-    {_this.TableName}_id, 
-    {ebs[SystemColumns.eb_signin_log_id]},
-    {ebs[SystemColumns.eb_void]},
-    {ebs[SystemColumns.eb_del]}) 
-VALUES 
-    ({{1}} 
-    @eb_createdby, 
-    {DataDB.EB_CURRENT_TIMESTAMP}, 
-    @{FormConstants.eb_loc_id_ + _this.CrudContext}, 
-    {srcRef}, 
-    @eb_signin_log_id,
-    {ebs.GetBoolFalse(SystemColumns.eb_void)},
-    {ebs.GetBoolFalse(SystemColumns.eb_del)}); ";
+({{0}} 
+{ebs[SystemColumns.eb_created_by]}, 
+{ebs[SystemColumns.eb_created_at]}, 
+{ebs[SystemColumns.eb_loc_id]}, 
+{_this.TableName}_id, 
+{ebs[SystemColumns.eb_signin_log_id]},
+{ebs[SystemColumns.eb_void]},
+{ebs[SystemColumns.eb_del]}) 
+VALUES ".Replace("\r", "").Replace("\n", "");
+                }
+
+                _qry += $@"
+{(bFirstRow ? "" : ",")}
+({{1}} 
+@eb_createdby, 
+{DataDB.EB_CURRENT_TIMESTAMP}, 
+@{FormConstants.eb_loc_id_ + _this.CrudContext}, 
+{srcRef}, 
+@eb_signin_log_id,
+{ebs.GetBoolFalse(SystemColumns.eb_void)},
+{ebs.GetBoolFalse(SystemColumns.eb_del)}) ".Replace("\r", "").Replace("\n", "");
+
             }
 
             return _qry;
@@ -802,7 +809,7 @@ SET
 WHERE 
     {parentTblChk}
     COALESCE({ebs[SystemColumns.eb_del]}, {ebs.GetBoolFalse(SystemColumns.eb_del)}) = {ebs.GetBoolFalse(SystemColumns.eb_del)} 
-    {pushIdChk}; ";
+    {pushIdChk}; ".Replace("\r", "").Replace("\n", "");
 
             return _qry;
         }
