@@ -1130,6 +1130,12 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                                         dupliCount = this.WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => !e.IsDelete).Count;
                                     break;
                                 }
+                                else if (_co.Contains($"form.{_table.ContainerName}.GroupBy("))
+                                {
+                                    if (this.WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
+                                        dupliCount = GetGroupByDupliCount(_table, this.WebForm.FormData.MultipleTables[_table.TableName], _co);
+                                    break;
+                                }
                             }
                             if (dupliCount == 0)
                             {
@@ -1149,6 +1155,23 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                 foreach (JToken jt in jArr)
                     PreprocessJsonRec(jt);
             }
+        }
+
+        private int GetGroupByDupliCount(TableSchema _table, SingleTable Table, string _co)
+        {
+            string colName = Regex.Match(_co, @"\((""[^)]*"")\)").Groups[0].Value;
+            colName = colName.Replace("(\"", string.Empty).Replace("\")", string.Empty);
+            ColumnSchema _column = _table.Columns.Find(e => e.ColumnName == colName);
+            if (_column == null)
+                return 0;
+            List<object> vals = new List<object>();
+            foreach (SingleRow Row in Table.FindAll(e => !e.IsDelete))
+            {
+                object t = Row[_column.ColumnName];
+                if (t != null && !vals.Contains(t))
+                    vals.Add(t);
+            }
+            return vals.Count;
         }
 
         //ApiDataPusher
