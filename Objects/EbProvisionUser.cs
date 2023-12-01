@@ -692,13 +692,10 @@ WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_
                 int verId = Convert.ToInt32(od["eb_ver_id"]);
                 if (dataId > 0 && verId > 0)
                 {
-                    if (dataId != (args.webForm as EbWebForm).TableRowId || verId != Convert.ToInt32(this.RefId.Split(CharConstants.DASH)[4]))
+                    if (dataId != (args.webForm as EbWebForm).TableRowId || verId != Convert.ToInt32((args.webForm as EbWebForm).RefId.Split(CharConstants.DASH)[4]))
                         throw new FormException("Selected user already linked with another form submission.", (int)HttpStatusCode.BadRequest, $"Unlink the selected user first then try again. (uid, did, vid)=({nPuId}, {dataId}, {verId})", "EbProvisionUser => EditUser....");
                 }
             }
-
-            //eb_is_mapped_user='P' WHERE id={userId_s} AND eb_ver_id = @{args.tbl}_eb_ver_id AND eb_data_id 
-            //this.RefId.Split(CharConstants.DASH)[4])
 
             this.AddOrChange(nd, FormConstants.id, nPuId.ToString());
 
