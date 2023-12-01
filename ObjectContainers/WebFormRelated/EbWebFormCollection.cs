@@ -41,13 +41,16 @@ namespace ExpressBase.Objects
                 WebForm.DoRequiredCheck(WebForm == MasterForm);
                 if (!(WebForm.FormData.MultipleTables.ContainsKey(WebForm.FormSchema.MasterTable) && WebForm.FormData.MultipleTables[WebForm.FormSchema.MasterTable].Count > 0))
                 {
-                    string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
+                    string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true, true);
                     fullqry += string.Format(_q, string.Empty, string.Empty);
                 }
                 foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
                 {
                     if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
                         continue;
+
+                    int rowCounter = 0;
+                    int insertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
 
                     foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
@@ -63,7 +66,10 @@ namespace ExpressBase.Objects
                                 WebForm.ParameterizeUnknown(args);
                         }
 
-                        string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, true);
+                        string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, true, rowCounter == 0);
+                        rowCounter++;
+                        if (insertCount == rowCounter)
+                            _qry += "; ";
                         fullqry += string.Format(_qry, args._cols, args._vals);
 
                         fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
@@ -93,6 +99,9 @@ namespace ExpressBase.Objects
                 {
                     if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
                         continue;
+
+                    int rowCounter = 0;
+                    int insertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
 
                     foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
@@ -172,8 +181,13 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, WebForm.TableRowId == 0);
+                            string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, WebForm.TableRowId == 0, rowCounter == 0);
+                            rowCounter++;
+                            if (insertCount == rowCounter)
+                                _qry += "; ";
+
                             fullqry += string.Format(_qry, args._cols, args._vals);
+
                         }
                         fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }

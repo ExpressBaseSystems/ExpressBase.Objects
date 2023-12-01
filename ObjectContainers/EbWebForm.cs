@@ -2430,19 +2430,19 @@ namespace ExpressBase.Objects
 
                     if (this.TableRowId <= 0 && parentRow.RowId <= 0 && _lineRow.RowId <= 0)//III
                     {
-                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, true);
+                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, true, true);
                         _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} (SELECT eb_currval('{pTable}_id_seq')),");
                         fullqry += string.Format(_qry, inArgs._cols, inArgs._vals);
                     }
                     else if (this.TableRowId > 0 && parentRow.RowId <= 0 && _lineRow.RowId <= 0)//EII
                     {
-                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, false);
+                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, false, true);
                         _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} (SELECT eb_currval('{pTable}_id_seq')),");
                         fullqry += string.Format(_qry, inArgs._cols, inArgs._vals);
                     }
                     else if (this.TableRowId > 0 && parentRow.RowId > 0 && _lineRow.RowId <= 0)//EEI
                     {
-                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, false);
+                        string _qry = QueryGetter.GetInsertQuery(this, inArgs.DataDB, parentRow.LinesTable.Key, false, true);
                         _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} {parentRow.RowId},");
                         fullqry += string.Format(_qry, inArgs._cols, inArgs._vals);
                     }

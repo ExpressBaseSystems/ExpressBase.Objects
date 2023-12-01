@@ -488,7 +488,7 @@ WHERE
             return Qry;
         }
 
-        public static string GetInsertQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
+        public static string GetInsertQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns, bool bFirstRow)
         {
             string _qry = string.Empty;
             EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
@@ -544,8 +544,8 @@ WHERE
 
                     string srcRef = conf.SourceRecId <= 0 ? $"(SELECT eb_currval('{conf.SourceTable}_id_seq'))" : $"@{conf.SourceTable}_id";
 
-                    _qry = string.Format(@"INSERT INTO {0} ({27} {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}{24}) 
-                                    VALUES ({28} @eb_createdby, {10}, @{26}, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
+                    _qry = string.Format(@"INSERT INTO {0} ({27} {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {15}, {16}, {20}, {21}{18}{24}) " +
+                                    "VALUES ({28} @eb_createdby, {10}, @{26}, @{11}_eb_ver_id, {12}, {13}, {14}, @eb_signin_log_id, @{9}_eb_ver_id, {17}, {22}, {23}{19}{25}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -595,29 +595,35 @@ WHERE
             else
             {
                 string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"@{_this.TableName}_id" + (conf == null ? string.Empty : _this.CrudContext);
-                _qry = $@"
+                if (bFirstRow)
+                {
+                    _qry = $@"
 INSERT INTO {tblName} (
-    {{0}} 
-    {ebs[SystemColumns.eb_created_by]}, 
-    {ebs[SystemColumns.eb_created_at]}, 
-    {ebs[SystemColumns.eb_loc_id]}, 
-    {_this.TableName}_id, 
-    {ebs[SystemColumns.eb_signin_log_id]},
-    {ebs[SystemColumns.eb_void]},
-    {ebs[SystemColumns.eb_del]}
-    {currencyCols}
+{{0}} 
+{ebs[SystemColumns.eb_created_by]}, 
+{ebs[SystemColumns.eb_created_at]}, 
+{ebs[SystemColumns.eb_loc_id]}, 
+{_this.TableName}_id, 
+{ebs[SystemColumns.eb_signin_log_id]}, 
+{ebs[SystemColumns.eb_void]}, 
+{ebs[SystemColumns.eb_del]} 
+{currencyCols}
 ) 
-VALUES (
-    {{1}} 
-    @eb_createdby, 
-    {DataDB.EB_CURRENT_TIMESTAMP},
-    @{FormConstants.eb_loc_id_ + _this.CrudContext},
-    {srcRef},
-    @eb_signin_log_id,
-    {ebs.GetBoolFalse(SystemColumns.eb_void)},
-    {ebs.GetBoolFalse(SystemColumns.eb_del)}
-    {currencyVals}
-); ";
+VALUES ".Replace("\r", "").Replace("\n", "");
+                }
+                _qry += $@"
+{(bFirstRow ? "" : ",")} 
+(
+{{1}} 
+@eb_createdby, 
+{DataDB.EB_CURRENT_TIMESTAMP}, 
+@{FormConstants.eb_loc_id_ + _this.CrudContext}, 
+{srcRef}, 
+@eb_signin_log_id, 
+{ebs.GetBoolFalse(SystemColumns.eb_void)}, 
+{ebs.GetBoolFalse(SystemColumns.eb_del)} 
+{currencyVals}
+)".Replace("\r", "").Replace("\n", "");
                 if (isIns && DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
             }
