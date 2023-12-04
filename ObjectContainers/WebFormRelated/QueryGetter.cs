@@ -607,13 +607,13 @@ INSERT INTO {tblName} (
 {ebs[SystemColumns.eb_signin_log_id]}, 
 {ebs[SystemColumns.eb_void]}, 
 {ebs[SystemColumns.eb_del]} 
-{currencyCols}
+{currencyCols} 
 ) 
 VALUES ".Replace("\r", "").Replace("\n", "");
                 }
                 _qry += $@"
-{(bFirstRow ? "" : ",")} 
-(
+{(bFirstRow ? "" : ", ")} 
+( 
 {{1}} 
 @eb_createdby, 
 {DataDB.EB_CURRENT_TIMESTAMP}, 
@@ -622,7 +622,7 @@ VALUES ".Replace("\r", "").Replace("\n", "");
 @eb_signin_log_id, 
 {ebs.GetBoolFalse(SystemColumns.eb_void)}, 
 {ebs.GetBoolFalse(SystemColumns.eb_del)} 
-{currencyVals}
+{currencyVals} 
 )".Replace("\r", "").Replace("\n", "");
                 if (isIns && DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
@@ -719,27 +719,27 @@ INSERT INTO {tblName}
 {ebs[SystemColumns.eb_src_id]}, 
 {ebs[SystemColumns.eb_push_id]}, 
 {ebs[SystemColumns.eb_lock]}, 
-{ebs[SystemColumns.eb_signin_log_id]},
-{ebs[SystemColumns.eb_ro]},
-{ebs[SystemColumns.eb_void]},
-{ebs[SystemColumns.eb_del]},
-{(refCtrlExists ? string.Empty : (conf.SourceTable + "_id,"))}
-{conf.GridTableName}_id)
-VALUES
-({{1}}
-@eb_createdby,
-{DataDB.EB_CURRENT_TIMESTAMP},
-@{FormConstants.eb_loc_id_ + _this.CrudContext},
-@{_this.TableName}_eb_ver_id,
-@{conf.SourceTable}_eb_ver_id,
-{conf.SourceRecId},
-{(conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'")},
-{(conf.DisableAutoLock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock))},
-@eb_signin_log_id,
-{(conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro))},
-{ebs.GetBoolFalse(SystemColumns.eb_void)},
-{ebs.GetBoolFalse(SystemColumns.eb_del)},
-{(refCtrlExists ? string.Empty : (conf.SourceRecId + ","))}
+{ebs[SystemColumns.eb_signin_log_id]}, 
+{ebs[SystemColumns.eb_ro]}, 
+{ebs[SystemColumns.eb_void]}, 
+{ebs[SystemColumns.eb_del]}, 
+{(refCtrlExists ? string.Empty : (conf.SourceTable + "_id,"))} 
+{conf.GridTableName}_id) 
+VALUES 
+({{1}} 
+@eb_createdby, 
+{DataDB.EB_CURRENT_TIMESTAMP}, 
+@{FormConstants.eb_loc_id_ + _this.CrudContext}, 
+@{_this.TableName}_eb_ver_id, 
+@{conf.SourceTable}_eb_ver_id, 
+{conf.SourceRecId}, 
+{(conf.MultiPushId == null ? "null" : $"'{conf.MultiPushId}'")}, 
+{(conf.DisableAutoLock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock))}, 
+@eb_signin_log_id, 
+{(conf.DisableAutoReadOnly ? ebs.GetBoolFalse(SystemColumns.eb_ro) : ebs.GetBoolTrue(SystemColumns.eb_ro))}, 
+{ebs.GetBoolFalse(SystemColumns.eb_void)}, 
+{ebs.GetBoolFalse(SystemColumns.eb_del)}, 
+{(refCtrlExists ? string.Empty : (conf.SourceRecId + ","))} 
 {conf.GridDataId}); ".Replace("\r", "").Replace("\n", "");
 
                 //if (_this.IsLocEditable)
@@ -760,21 +760,21 @@ INSERT INTO {tblName}
 {ebs[SystemColumns.eb_created_at]}, 
 {ebs[SystemColumns.eb_loc_id]}, 
 {_this.TableName}_id, 
-{ebs[SystemColumns.eb_signin_log_id]},
-{ebs[SystemColumns.eb_void]},
+{ebs[SystemColumns.eb_signin_log_id]}, 
+{ebs[SystemColumns.eb_void]}, 
 {ebs[SystemColumns.eb_del]}) 
 VALUES ".Replace("\r", "").Replace("\n", "");
                 }
 
                 _qry += $@"
-{(bFirstRow ? "" : ",")}
+{(bFirstRow ? "" : ", ")}
 ({{1}} 
 @eb_createdby, 
 {DataDB.EB_CURRENT_TIMESTAMP}, 
 @{FormConstants.eb_loc_id_ + _this.CrudContext}, 
 {srcRef}, 
-@eb_signin_log_id,
-{ebs.GetBoolFalse(SystemColumns.eb_void)},
+@eb_signin_log_id, 
+{ebs.GetBoolFalse(SystemColumns.eb_void)}, 
 {ebs.GetBoolFalse(SystemColumns.eb_del)}) ".Replace("\r", "").Replace("\n", "");
 
             }

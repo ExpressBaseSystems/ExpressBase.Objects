@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
                         continue;
 
                     int rowCounter = 0;
-                    int insertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
+                    int totalInsertCount = WebForm.FormData.MultipleTables[_table.TableName].Count;
 
                     foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
@@ -68,8 +68,9 @@ namespace ExpressBase.Objects
 
                         string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, true, rowCounter == 0);
                         rowCounter++;
-                        if (insertCount == rowCounter)
+                        if (totalInsertCount == rowCounter && _table.TableName != WebForm.TableName)
                             _qry += "; ";
+
                         fullqry += string.Format(_qry, args._cols, args._vals);
 
                         fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
@@ -101,7 +102,7 @@ namespace ExpressBase.Objects
                         continue;
 
                     int rowCounter = 0;
-                    int insertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
+                    int totalInsertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
 
                     foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
@@ -166,6 +167,12 @@ namespace ExpressBase.Objects
                             bool DGCustSelect = _table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery);
 
                             string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, _table.TableName, row.IsDelete, DGCustSelect);
+                            if (rowCounter > 0)
+                            {
+                                fullqry += "; ";
+                                totalInsertCount -= rowCounter;
+                                rowCounter = 0;
+                            }
                             fullqry += string.Format(_qry, args._colvals, row.RowId);
                             fullqry += t;
                         }
@@ -183,7 +190,7 @@ namespace ExpressBase.Objects
                             }
                             string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, WebForm.TableRowId == 0, rowCounter == 0);
                             rowCounter++;
-                            if (insertCount == rowCounter)
+                            if (totalInsertCount == rowCounter && _table.TableName != WebForm.TableName)
                                 _qry += "; ";
 
                             fullqry += string.Format(_qry, args._cols, args._vals);
@@ -220,9 +227,9 @@ namespace ExpressBase.Objects
                 {
                     if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
                         continue;
-                    bool isFirstRow = true;
-                    int insertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
-                    int currentInsertRow = 0;
+
+                    int totalInsertCount = WebForm.FormData.MultipleTables[_table.TableName].FindAll(e => e.RowId <= 0).Count;
+                    int rowCounter = 0;
                     foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
                         args.ResetColVals();
@@ -249,6 +256,12 @@ namespace ExpressBase.Objects
                             bool DGCustSelect = _table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery);
 
                             string _qry = QueryGetter.GetUpdateQuery_Batch(WebForm, DataDB, _table.TableName, row.IsDelete, row.RowId, DGCustSelect);
+                            if (rowCounter > 0)
+                            {
+                                fullqry.Append("; ");
+                                totalInsertCount -= rowCounter;
+                                rowCounter = 0;
+                            }
                             fullqry.Append(string.Format(_qry, args._colvals));
                             fullqry.Append(t);
                         }
@@ -264,11 +277,12 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
-                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName, _table, isFirstRow);
-                            isFirstRow = false;
-                            currentInsertRow++;
-                            if (insertCount == currentInsertRow)
+                            string _qry = QueryGetter.GetInsertQuery_Batch(WebForm, DataDB, _table.TableName, _table, rowCounter == 0);
+                            rowCounter++;
+
+                            if (totalInsertCount == rowCounter && _table.TableName != WebForm.TableName)
                                 _qry += "; ";
+
                             fullqry.Append(string.Format(_qry, args._cols, args._vals));
                         }
                         fullqry.Append(WebForm.InsertUpdateLines(_table.TableName, row, args));
