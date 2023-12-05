@@ -783,14 +783,15 @@ namespace ExpressBase.Objects
                     string str_row_num = this.SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
                     for (int i = 0, j = count; i < count; i++, j--)
                     {
+                        FormData.MultipleTables[dgCtrl.TableName][i].RemoveColumn(str_row_num);
 
-                        if (FormData.MultipleTables[dgCtrl.TableName][i].GetColumn(str_row_num) == null)
-                            FormData.MultipleTables[dgCtrl.TableName][i].Columns.Add(new SingleColumn
-                            {
-                                Name = str_row_num,
-                                Type = (int)EbDbTypes.Int32,
-                                Value = 0
-                            });
+                        FormData.MultipleTables[dgCtrl.TableName][i].Columns.Add(new SingleColumn
+                        {
+                            Name = str_row_num,
+                            Type = (int)EbDbTypes.Int32,
+                            Value = 0
+                        });
+
                         if (dgCtrl.AscendingOrder)
                             FormData.MultipleTables[dgCtrl.TableName][i][str_row_num] = i + 1;
                         else
