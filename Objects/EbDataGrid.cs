@@ -144,6 +144,16 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         public bool DeferRender { get; set; }
 
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        //[PropertyGroup(PGConstants.APPEARANCE)]
+        //public bool EnableRowColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        //[HelpText("This will override Enable Row Color property.")]
+        public EbScript RowColorExpr { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
         [DefaultPropValue("true")]
