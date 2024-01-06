@@ -228,9 +228,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     EbDataGrid DataGrid = Allctrls[i] as EbDataGrid;
                     string _tn = DataGrid.TableName;
                     if (string.IsNullOrEmpty(DataGrid.TableName))
-                        throw new FormException("Please enter a valid table name for " + Allctrls[i].Label + " (data grid)");
+                        throw new FormException("Please enter a valid table name for " + DataGrid.Label + " (data grid)");
                     if (tbls.ContainsKey(_tn))
-                        throw new FormException(string.Format("Same table not allowed for {1} and {2}(data grid) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
+                        throw new FormException(string.Format("Same table not allowed for {1} and {2}(data grid) : {0}", _tn, tbls[_tn], DataGrid.Label));
                     tbls.Add(_tn, Allctrls[i].Label + "(data grid)");
 
                     for (int j = 0; j < DataGrid.Controls.Count; j++)
@@ -244,6 +244,14 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     }
                     if (!string.IsNullOrEmpty(DataGrid.DataSourceId))
                         DataGrid.InitDSRelated(serviceClient, redis, Allctrls, service);
+
+                    if (DataGrid.EnableAutoMatch)
+                    {
+                        if (string.IsNullOrWhiteSpace(DataGrid.AutoMatchScript.Code))
+                            throw new FormException("Please enter Auto match script for " + DataGrid.Label + " (data grid)");
+                        if (!DataGrid.Controls.Exists(e => e is EbDGBooleanColumn))
+                            throw new FormException("Please add a boolean column for Auto match enabled Datagrid: " + DataGrid.Label);
+                    }
                 }
                 else if (Allctrls[i] is EbProvisionUser)
                 {

@@ -271,6 +271,17 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(98)]
+        public bool EnableAutoMatch { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyPriority(98)]
+        public EbScript AutoMatchScript { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyPriority(98)]
         [Alias("Show Refresh Button")]
         public bool ShowRefreshBtn { get; set; }
 
@@ -380,11 +391,12 @@ else {
         public override string GetBareHtml()
         {
             //SetCols();
-            int copyBtnW = 0, refreshBtnW = 0, excelBtnW = 0;
+            int copyBtnW = 0, refreshBtnW = 0, excelBtnW = 0, matchBtnW = 0;
 
-            if (this.ShowCopyBtn) copyBtnW = 50;
-            if (this.ShowRefreshBtn) refreshBtnW = 64;
-            if (this.EnableExcelUpload) excelBtnW = 90;
+            if (this.ShowCopyBtn) copyBtnW = 53;
+            if (this.ShowRefreshBtn) refreshBtnW = 69;
+            if (this.EnableExcelUpload) excelBtnW = 100;
+            if (this.EnableAutoMatch) matchBtnW = 92;
 
             string html = @"
 <div class='grid-cont'>
@@ -392,6 +404,7 @@ else {
     @exceluploadbtn@
     @addrowbtn@
     @copydgbtn@
+    @matchbtn@
 <div class='Dg_hbf' style='overflow-x:auto;'><div class='Dg_hbf_inner' style='@dg_min_width@'>
     <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
@@ -399,10 +412,12 @@ else {
               <tr>  
                 <th class='slno' style='width:30px'><span class='grid-col-title'>#</span></th>"
 .Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0' title='Add Row (Alt+R)' style='right: @addbtnrightstyle@px;'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty)
+.Replace("@matchbtn@", this.EnableAutoMatch ? "<div id='@ebsid@match' class='match-btn' tabindex='0' style='right: @matchbtnrightstyle@px;'>Auto Match</div>" : string.Empty)
 .Replace("@exceluploadbtn@", this.EnableExcelUpload ? "<div id='@ebsid@excelupload' class='excelupload-btn' tabindex='0' style='right: @exelbtnrightstyle@px;'>Upload Excel</div>" : string.Empty)
 .Replace("@refreshdgdrbtn@", this.ShowRefreshBtn ? "<div id='@ebsid@refreshdgdr' class='refreshdgdr-btn' tabindex='0' style='right: @refreshbtnrightstyle@px;'>Refresh</div>" : string.Empty)
 .Replace("@copydgbtn@", this.ShowCopyBtn ? "<div id='@ebsid@copydg' class='copydg-btn' tabindex='0'>Copy</div>" : string.Empty)
-.Replace("@addbtnrightstyle@", (copyBtnW + refreshBtnW + excelBtnW + 8).ToString())
+.Replace("@addbtnrightstyle@", (copyBtnW + refreshBtnW + excelBtnW + matchBtnW + 8).ToString())
+.Replace("@matchbtnrightstyle@", (copyBtnW + refreshBtnW + excelBtnW + 8).ToString())
 .Replace("@exelbtnrightstyle@", (copyBtnW + refreshBtnW + 8).ToString())
 .Replace("@refreshbtnrightstyle@", (copyBtnW + 8).ToString())
 .Replace("@dg_min_width@", this.MinWidth > 0 ? $"min-width:{this.MinWidth}px;" : string.Empty);
