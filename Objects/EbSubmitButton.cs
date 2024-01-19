@@ -90,7 +90,7 @@ namespace ExpressBase.Objects.Objects
 
         //[HideInPropertyGrid]
         //public override EbScript HiddenExpr { get; set; }
-        
+
         //[HideInPropertyGrid]
         //public override EbScript DisableExpr { get; set; }
 
@@ -121,7 +121,7 @@ namespace ExpressBase.Objects.Objects
 
         public override string GetBareHtml()
         {
-            return @"<button id='webform_submit' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle'>@Label@</button>"
+            return @"<button id='webform_submit_@ebsid@' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle'>@Label@</button>"
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@Label@", this.Label ?? "Submit")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
