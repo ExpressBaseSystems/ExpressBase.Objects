@@ -50,11 +50,11 @@ namespace ExpressBase.Objects
             IDatabase db;
 
             if (EbConFactory.DataDB.ConId == this.DataStore)
-                db = EbConFactory.DataDB;
+                db = EbConFactory.DataDBRO;
             else if (EbConFactory.SupportingDataDB != null && EbConFactory.SupportingDataDB.TryGetValue(this.DataStore, out IDatabase supportDb))
                 db = supportDb;
             else
-                db = EbConFactory.DataDB;
+                db = EbConFactory.DataDBRO;
 
             return db;
         }
