@@ -50,7 +50,12 @@ namespace ExpressBase.Objects
             IDatabase db;
 
             if (EbConFactory.DataDB.ConId == this.DataStore)
-                db = EbConFactory.DataDBRO;
+            {
+                if (this is EbDataReader dr && !dr.UseReadWriteConnection)
+                    db = EbConFactory.DataDBRO;
+                else
+                    db = EbConFactory.DataDB;
+            }
             else if (EbConFactory.SupportingDataDB != null && EbConFactory.SupportingDataDB.TryGetValue(this.DataStore, out IDatabase supportDb))
                 db = supportDb;
             else
@@ -89,6 +94,9 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DataReader)]
         public bool EnableSqlFunction { get; set; }
+
+        [EnableInBuilder(BuilderType.DataReader)]
+        public bool UseReadWriteConnection { get; set; }
 
         //public string VersionNumber { get; set; }
 
