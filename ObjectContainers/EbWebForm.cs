@@ -265,6 +265,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("true")]
         public bool CheckDataConsistency { get; set; }
 
         [PropertyGroup(PGConstants.DATA)]
