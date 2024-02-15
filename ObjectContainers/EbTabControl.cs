@@ -32,6 +32,7 @@ namespace ExpressBase.Objects
                     $(`li[ebsid='${elementId}'] .eb-label-editable`).text(props.Title);
                 },
                 adjustPanesHeightToHighest : function(elementId, props) {
+                    if (!props.MinHeight) return;
                     var maxH = 0;
                     let $panes = $(`#cont_${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`);
                     $panes.css('min-height', 'inherit');

@@ -268,6 +268,11 @@ namespace ExpressBase.Objects
         [DefaultPropValue("true")]
         public bool CheckDataConsistency { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("true")]
+        public bool CompactControlSpacing { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -323,7 +328,8 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl ebcont-inner' eb-form='true'  eb-root-obj-container ui-inp eb-type='WebForm' @tabindex@>";
+            string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl ebcont-inner @ctrl_space@' eb-form='true'  eb-root-obj-container ui-inp eb-type='WebForm' @tabindex@>"
+                .Replace("@ctrl_space@", CompactControlSpacing ? "eb_cmpt_ctrl_spc" : string.Empty);
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
