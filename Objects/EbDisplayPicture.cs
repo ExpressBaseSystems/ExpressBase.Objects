@@ -119,9 +119,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbScript DefaultValueExpression { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public override EbScript DefaultValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -131,9 +131,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbScript ValueExpr { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public override EbScript ValueExpr { get; set; }
 
         public override bool SelfTrigger { get; set; }
 
