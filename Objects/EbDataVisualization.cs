@@ -46,6 +46,13 @@ namespace ExpressBase.Objects
         right
     }
 
+    public enum ChartLibrary
+    {
+        ChartJs = 0,
+        ApexChart,
+    }
+
+
     public enum LinkTypeEnum
     {
         Popout,
@@ -744,7 +751,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("0")]
         [HideInPropertyGrid]
-        public ChartType Charttype { get; set; }
+        public ChartType Charttype { get; set; } 
+        
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("0")]
+        [Alias("Chart Library")]
+        [PropertyGroup(PGConstants.CORE)]
+        public ChartLibrary ChartLibrary { get; set; }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
