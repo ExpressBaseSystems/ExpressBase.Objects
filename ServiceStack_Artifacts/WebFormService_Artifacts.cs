@@ -1167,4 +1167,87 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string StackTraceInternal { get; set; }
     }
+
+    [DataContract]
+    public class CalendarDataReaderRequest : EbServiceStackAuthRequest, IReturn<CalendarDataReaderResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 4)]
+        public string TriggeredCtrl { get; set; }
+
+
+        [DataMember(Order = 6)]
+        public string FromDate { get; set; }
+
+        [DataMember(Order = 7)]
+        public string ToDate { get; set; }
+
+        [DataMember(Order = 8)]
+        public string Location { get; set; }
+
+
+
+    }
+
+    [DataContract]
+    public class CalendarDataReaderResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string FormDataWrap { get; set; }
+        [DataMember(Order = 2)]
+        public List<CalendarEvent> EventList { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<CalendarDataRow> DataList { get; set; }
+        public CalendarDataReaderResponse()
+        {
+            this.DataList = new List<CalendarDataRow>();
+            this.EventList = new List<CalendarEvent>();
+        }
+    }
+
+    public class CalendarDataRow
+    {
+        public List<CalendarDataColumn> Datarow { get; set; }
+        public CalendarDataRow()
+        {
+            this.Datarow = new List<CalendarDataColumn>();
+        }
+    }
+    public class CalendarDataColumn
+    {
+        public string ColumnName { get; set; }
+        public dynamic ColumnValue { get; set; }
+        public int Index { get; set; }
+        public string ColumnType { get; set; }
+    }
+
+    [DataContract]
+    public class CalendarEvent
+    {
+        [DataMember(Order = 0)]
+        public int EventId { get; set; }
+        [DataMember(Order = 1)]
+        public string EventName { get; set; }
+        [DataMember(Order = 2)]
+        public string EventDescription { get; set; }
+        [DataMember(Order = 3)]
+        public DateTime StartDate { get; set; }
+        [DataMember(Order = 4)]
+        public DateTime EndDate { get; set; }
+        [DataMember(Order = 5)]
+        public string Color { get; set; }
+
+    }
 }
