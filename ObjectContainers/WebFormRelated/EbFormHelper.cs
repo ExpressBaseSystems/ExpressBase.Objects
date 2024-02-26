@@ -319,13 +319,16 @@ namespace ExpressBase.Objects
             }
         }
 
-        public static T GetEbObject<T>(string RefId, IServiceClient ServiceClient, IRedisClient Redis, Service Service)
+        public static T GetEbObject<T>(string RefId, IServiceClient ServiceClient, IRedisClient Redis, Service Service, IRedisClient RedisReadOnly = null)
         {
             if (string.IsNullOrEmpty(RefId))
                 throw new Exception("RefId is null or empty. FormHelper >GetEbObject. Type: " + typeof(T).Name);
 
             T _ebObject = default;
-            if (Redis != null) _ebObject = Redis.Get<T>(RefId);
+            if (RedisReadOnly != null)
+                _ebObject = RedisReadOnly.Get<T>(RefId);
+            else if (Redis != null)
+                _ebObject = Redis.Get<T>(RefId);
 
             if (_ebObject == null)
             {
