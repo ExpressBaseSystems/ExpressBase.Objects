@@ -328,7 +328,7 @@ else
         [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [DefaultPropValue(7, 10, 7, 10)]
-        [OnChangeUIFunction("Common.INP_PADDING")]
+        [OnChangeUIFunction("Common.PS_PADDING")]
         public UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

@@ -57,6 +57,14 @@ namespace ExpressBase.Objects
         [Alias("DropdownMaxHeight")]
         public int DropdownHeight { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [UIproperty]
+        [DefaultPropValue(7, 10, 7, 10)]
+        [OnChangeUIFunction("Common.SS_PADDING")]
+        public UISides Padding { get; set; }
+
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
         {

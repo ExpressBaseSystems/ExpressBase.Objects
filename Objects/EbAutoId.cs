@@ -88,6 +88,14 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [UIproperty]
+        [DefaultPropValue(7, 10, 7, 10)]
+        [OnChangeUIFunction("Common.AUTO_ID_PADDING")]
+        public UISides Padding { get; set; }
+
         public string TableName { get; set; }
 
         public bool DpAutoIdPrefix { get; set; }
@@ -163,8 +171,8 @@ namespace ExpressBase.Objects
         {
             return @"
             <div class='input-group' style='width:100%;'>
-                <span class='input-group-addon' style='@BackColor@ font-size: 18px; color: #aaa;'> <i class='fa fa-key' aria-hidden='true'></i> </span>
-                <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='font-weight: 500; width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled />
+                <span class='input-group-addon' style='@BackColor@'> <i class='fa fa-key' aria-hidden='true'></i> </span>
+                <input id='@ebsid@' data-ebtype='@data-ebtype@' data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='@BackColor@ @ForeColor@ @fontStyle@' @required@ @placeHolder@ disabled />
             </div>
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
