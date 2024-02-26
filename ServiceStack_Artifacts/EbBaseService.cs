@@ -16,6 +16,7 @@ using ServiceStack.RabbitMq;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using ServiceStack.Redis;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -45,6 +46,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         protected EbMqClient MQClient { get; private set; }
 
         protected EbStaticFileClient FileClient { get; private set; }
+
+        protected IRedisClient RedisReadOnly { get; private set; }
 
         protected EbConnectionFactory InfraConnectionFactory
         {
@@ -119,6 +122,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
+        }
+
+        public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, PooledRedisClientManager pooledRedisManager)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.RedisReadOnly = pooledRedisManager.GetReadOnlyClient();
         }
 
         public EbBaseService(IEbConnectionFactory _dbf, IEbMqClient _mq)
