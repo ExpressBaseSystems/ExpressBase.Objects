@@ -47,7 +47,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         protected EbStaticFileClient FileClient { get; private set; }
 
-        protected IRedisClient RedisReadOnly { get; private set; }
+        protected PooledRedisClientManager PooledRedisManager { get; private set; }
 
         protected EbConnectionFactory InfraConnectionFactory
         {
@@ -128,7 +128,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
-            this.RedisReadOnly = pooledRedisManager.GetReadOnlyClient();
+            this.PooledRedisManager = pooledRedisManager;
         }
 
         public EbBaseService(IEbConnectionFactory _dbf, IEbMqClient _mq)
