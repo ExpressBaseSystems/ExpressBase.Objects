@@ -272,9 +272,18 @@ namespace ExpressBase.Objects
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
+            AfterRedisGet(Redis, client, null);
+        }
+
+        public void AfterRedisGet(RedisClient Redis, IServiceClient client, IRedisClient RedisReadOnly)
+        {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataReader>(this.DataSourceRefId);
+                if (RedisReadOnly != null)
+                    this.EbDataSource = RedisReadOnly.Get<EbDataReader>(this.DataSourceRefId);
+                else
+                    this.EbDataSource = Redis.Get<EbDataReader>(this.DataSourceRefId);
+
                 if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
@@ -282,7 +291,7 @@ namespace ExpressBase.Objects
                     Redis.Set<EbDataReader>(this.DataSourceRefId, this.EbDataSource);
                 }
                 if (this.EbDataSource.FilterDialogRefId != string.Empty)
-                    this.EbDataSource.AfterRedisGet(Redis, client);
+                    this.EbDataSource.AfterRedisGet(Redis, client, RedisReadOnly);
             }
             catch (Exception e)
             {
@@ -310,11 +319,11 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void AfterRedisGetforFilter(RedisClient Redis, IServiceClient client)
+        public void AfterRedisGetforFilter(RedisClient Redis, IServiceClient client, IRedisClient RedisReadOnly)
         {
             try
             {
-                this.EbFilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+                this.EbFilterDialog = RedisReadOnly.Get<EbFilterDialog>(this.FilterDialogRefId);
                 if (this.EbFilterDialog == null)
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.FilterDialogRefId });

@@ -109,14 +109,19 @@ namespace ExpressBase.Objects.Helpers
 
             return Dict;
         }
-        public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis)
+        public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis, IRedisClient RedisReadOnly)
         {
             DataSourceDataSetResponse resp = new DataSourceDataSetResponse();
             resp.Columns = new List<ColumnColletion>();
             string _sql = string.Empty;
             try
             {
-                EbDataReader _ds = Redis.Get<EbDataReader>(RefId);
+                EbDataReader _ds;
+                if (RedisReadOnly != null)
+                    _ds = RedisReadOnly.Get<EbDataReader>(RefId);
+                else
+                    _ds = Redis.Get<EbDataReader>(RefId);
+
                 if (_ds == null)
                 {
                     List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ebConnectionFactory.ObjectsDB, RefId);
@@ -130,7 +135,12 @@ namespace ExpressBase.Objects.Helpers
                 }
                 if (_ds.FilterDialogRefId != string.Empty && _ds.FilterDialogRefId != null)
                 {
-                    EbFilterDialog _dsf = Redis.Get<EbFilterDialog>(_ds.FilterDialogRefId);
+                    EbFilterDialog _dsf;
+                    if (RedisReadOnly != null)
+                        _dsf = RedisReadOnly.Get<EbFilterDialog>(_ds.FilterDialogRefId);
+                    else
+                        _dsf = Redis.Get<EbFilterDialog>(_ds.FilterDialogRefId);
+
                     if (_dsf == null)
                     {
                         List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ebConnectionFactory.ObjectsDB, _ds.FilterDialogRefId);

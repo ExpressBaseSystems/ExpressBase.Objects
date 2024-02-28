@@ -128,9 +128,17 @@ namespace ExpressBase.Objects
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
+            AfterRedisGet(Redis, client, null);
+        }
+
+        public void AfterRedisGet(RedisClient Redis, IServiceClient client, IRedisClient RedisReadOnly)
+        {
             try
             {
-                this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+                if (RedisReadOnly != null)
+                    this.FilterDialog = RedisReadOnly.Get<EbFilterDialog>(this.FilterDialogRefId);
+                else
+                    this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
                 if (this.FilterDialog == null && this.FilterDialogRefId != "")
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.FilterDialogRefId });

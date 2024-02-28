@@ -668,6 +668,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public IRedisClient Redis { get; set; }
 
+        [JsonIgnore]
+        public PooledRedisClientManager pooledRedisManager { get; set; }
+
         public dynamic GetDataFieldValue(string column_name, int iterator, int tableIndex)
         {
             dynamic value = null;
@@ -1254,13 +1257,13 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        public void AfterRedisGet(RedisClient Redis, IServiceClient client, RedisClient RedisReadOnly)
         {
             try
             {
                 if (DataSourceRefId != string.Empty)
                 {
-                    EbDataSource = Redis.Get<EbDataReader>(DataSourceRefId);
+                    EbDataSource = RedisReadOnly.Get<EbDataReader>(DataSourceRefId);
                     if (EbDataSource == null || EbDataSource.Sql == null || EbDataSource.Sql == string.Empty)
                     {
                         EbObjectParticularVersionResponse result = client.Get(new EbObjectParticularVersionRequest { RefId = DataSourceRefId });
@@ -1268,7 +1271,7 @@ namespace ExpressBase.Objects
                         Redis.Set<EbDataReader>(DataSourceRefId, EbDataSource);
                     }
                     if (EbDataSource.FilterDialogRefId != string.Empty)
-                        EbDataSource.AfterRedisGet(Redis, client);
+                        EbDataSource.AfterRedisGet(Redis, client, RedisReadOnly);
                 }
             }
             catch (Exception e)
@@ -1613,7 +1616,9 @@ namespace ExpressBase.Objects
 
         public void GetData4Pdf(List<Param> _params, EbConnectionFactory EbConnectionFactory)
         {
-            DataSourceDataSetResponse resp = EbObjectsHelper.ExecuteDataset(this.DataSourceRefId, this.RenderingUser.Id, _params, EbConnectionFactory, this.Redis);
+            DataSourceDataSetResponse resp = null;
+            using (var redisReadOnly = this.pooledRedisManager.GetReadOnlyClient())
+                resp = EbObjectsHelper.ExecuteDataset(this.DataSourceRefId, this.RenderingUser.Id, _params, EbConnectionFactory, this.Redis, redisReadOnly);
             this.Parameters = _params;
             this.DataSet = resp.DataSet;
 
@@ -1870,7 +1875,9 @@ namespace ExpressBase.Objects
             else if (res[0].EbObjectType == 17)
                 linkDsRefid = EbSerializers.Json_Deserialize<EbChartVisualization>(res[0].Json).DataSourceRefId;//Getting the linked chart viz
 
-            EbDataReader LinkDatasource = Redis.Get<EbDataReader>(linkDsRefid);
+            EbDataReader LinkDatasource = null;
+            using (var redisReadOnly = this.pooledRedisManager.GetReadOnlyClient())
+                LinkDatasource = redisReadOnly.Get<EbDataReader>(linkDsRefid);
             if (LinkDatasource == null || LinkDatasource.Sql == null || LinkDatasource.Sql == string.Empty)
             {
                 List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ObjectsDB, linkDsRefid);
@@ -1880,7 +1887,8 @@ namespace ExpressBase.Objects
 
             if (!string.IsNullOrEmpty(LinkDatasource.FilterDialogRefId))
             {
-                LinkDatasource.FilterDialog = Redis.Get<EbFilterDialog>(LinkDatasource.FilterDialogRefId);
+                using (var redisReadOnly = this.pooledRedisManager.GetReadOnlyClient())
+                    LinkDatasource.FilterDialog = redisReadOnly.Get<EbFilterDialog>(LinkDatasource.FilterDialogRefId);
                 if (LinkDatasource.FilterDialog == null)
                 {
                     List<EbObjectWrapper> result = EbObjectsHelper.GetParticularVersion(ObjectsDB, LinkDatasource.FilterDialogRefId);

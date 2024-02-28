@@ -69,6 +69,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
         }
 
+        public EbBaseService(IEbConnectionFactory _dbf, PooledRedisClientManager pooledRedisManager)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.PooledRedisManager = pooledRedisManager;
+        }
+
         public EbBaseService(IMessageProducer _mqp)
         {
             this.MessageProducer3 = _mqp as RabbitMqProducer;
@@ -83,7 +89,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.FileClient = _sfc as EbStaticFileClient;
+        }
 
+        public EbBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, PooledRedisClientManager pooledRedisManager)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.FileClient = _sfc as EbStaticFileClient;
+            this.PooledRedisManager = pooledRedisManager;
         }
 
         public EbBaseService(IEbConnectionFactory _dbf, IEbServerEventClient _sec)
@@ -181,6 +193,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
         }
 
+        public EbBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc, PooledRedisClientManager pooledRedisManager)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.FileClient = _sfc as EbStaticFileClient;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.MessageQueueClient = _mqc as RabbitMqQueueClient;
+            this.PooledRedisManager = pooledRedisManager;
+        }
+
         private static Dictionary<string, string> _infraDbSqlQueries;
 
         public static Dictionary<string, string> InfraDbSqlQueries
@@ -251,7 +272,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Eb_Solution s_obj = null;
             try
             {
-                s_obj = this.Redis.Get<Eb_Solution>(String.Format("solution_{0}", cid));
+                if (this.PooledRedisManager != null)
+                {
+                    using (IRedisClient RedisReadOnly = this.PooledRedisManager.GetReadOnlyClient())
+                        s_obj = RedisReadOnly.Get<Eb_Solution>(String.Format("solution_{0}", cid));
+                }
+                else
+                    s_obj = this.Redis.Get<Eb_Solution>(String.Format("solution_{0}", cid));
 
                 if (s_obj == null)
                 {
@@ -276,7 +303,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     string[] parts = userAuthId.Split(":"); // iSolutionId:UserId:WhichConsole
                     if (parts.Length == 3)
                     {
-                        user = this.Redis.Get<User>(userAuthId);
+                        if (this.PooledRedisManager != null)
+                        {
+                            using (IRedisClient RedisReadOnly = this.PooledRedisManager.GetReadOnlyClient())
+                                user = RedisReadOnly.Get<User>(userAuthId);
+                        }
+                        else
+                            user = this.Redis.Get<User>(userAuthId);
                         if (user == null || forceUpdate)
                         {
                             Gateway.Send<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId = Convert.ToInt32(parts[1]), UserAuthId = userAuthId, WC = parts[2] });
