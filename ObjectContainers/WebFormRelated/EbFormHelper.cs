@@ -801,89 +801,104 @@ namespace ExpressBase.Objects
             return Tables;
         }
 
-        public static void InitFromDataBase(EbWebForm WebForm_L, JsonServiceClient ServiceClient, IRedisClient Redis, string WC)
+        public static Dictionary<string, object> GetFormObjectRelatedData(EbWebForm WebForm_L, JsonServiceClient ServiceClient, IRedisClient Redis, string WC)
         {
             //foreach (EbControl control in WebForm_L.Controls.FlattenAllEbControls().ToList().FindAll(e => e is EbDataGrid_New))// for old objects
             //{
             //	(control as EbDataGrid_New).ProcessDvColumnCollection();
             //}
 
+            Dictionary<string, object> dataDict = new Dictionary<string, object>();
+
             foreach (EbControl control in WebForm_L.Controls.FlattenAllEbControls())
             {
-                if (control is EbSimpleSelect)
+                if (control is EbSimpleSelect ssCtrl)
                 {
-                    (control as EbSimpleSelect).InitFromDataBase(ServiceClient);
+                    ssCtrl.InitFromDataBase(ServiceClient);
+                    //if (ssCtrl.IsDynamic)
+                    //    dataDict.Add(ssCtrl.EbSid_CtxId, ssCtrl.Options);
                 }
-                if (control is EbChartControl)
+                if (control is EbChartControl chrtCtrl)
                 {
-                    (control as EbChartControl).InitFromDataBase(ServiceClient, Redis);
+                    chrtCtrl.InitFromDataBase(ServiceClient, Redis);
                 }
-                else if (control is EbTVcontrol)
+                else if (control is EbTVcontrol tvCtrl)
                 {
-                    (control as EbTVcontrol).InitFromDataBase(ServiceClient, Redis);
+                    tvCtrl.InitFromDataBase(ServiceClient, Redis);
                 }
-                else if (control is IEbPowerSelect && (control as IEbPowerSelect).RenderAsSimpleSelect)
+                else if (control is IEbPowerSelect psCtrl && psCtrl.RenderAsSimpleSelect)
                 {
-                    (control as IEbPowerSelect).InitFromDataBase_SS(ServiceClient);
+                    psCtrl.InitFromDataBase_SS(ServiceClient);
+                    //dataDict.Add(psCtrl.EbSid_CtxId, psCtrl.Options);
                 }
-                else if (control is EbDGSimpleSelectColumn)
+                else if (control is EbDGSimpleSelectColumn dgssCtrl)
                 {
-                    EbDGSimpleSelectColumn SimpleSelectColumn = (control as EbDGSimpleSelectColumn);
-                    SimpleSelectColumn.EbSimpleSelect.InitFromDataBase(ServiceClient);
-
-                    SimpleSelectColumn.DBareHtml = SimpleSelectColumn.EbSimpleSelect.GetBareHtml();
+                    dgssCtrl.EbSimpleSelect.InitFromDataBase(ServiceClient);
+                    dgssCtrl.DBareHtml = dgssCtrl.EbSimpleSelect.GetBareHtml();
+                    //dataDict.Add(dgssCtrl.EbSid_CtxId, dgssCtrl.Options);
                 }
                 else if (control is EbUserLocation uloc)
                 {
                     uloc.InitFromDataBase(WebForm_L.UserObj, WebForm_L.SolutionObj, WebForm_L.RefId);
+                    dataDict.Add(uloc.EbSid_CtxId, uloc.IsGlobalLocAvail);
                 }
                 else if ((control is EbRadioButton) && control.Name.Equals("eb_default"))
                 {
                     if (WC == RoutingConstants.UC)
                     {
                         if (!(WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()) || WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionPM.ToString())))
+                        {
                             control.IsDisable = true;
+                            dataDict.Add(control.EbSid_CtxId, control.IsDisable);
+                        }
                     }
                 }
-                else if (control is EbUserSelect)
+                else if (control is EbUserSelect usrSelCtrl)
                 {
-                    (control as EbUserSelect).InitOptions(WebForm_L.SolutionObj.Users);
+                    usrSelCtrl.InitOptions(WebForm_L.SolutionObj.Users);
+                    dataDict.Add(usrSelCtrl.EbSid_CtxId, usrSelCtrl.UserList);
                 }
-                else if (control is EbDGUserSelectColumn)
+                else if (control is EbDGUserSelectColumn dgUsrSelCtrl)
                 {
-                    (control as EbDGUserSelectColumn).InitOptions(WebForm_L.SolutionObj.Users);
+                    dgUsrSelCtrl.InitOptions(WebForm_L.SolutionObj.Users);
+                    dataDict.Add(dgUsrSelCtrl.EbSid_CtxId, dgUsrSelCtrl.UserList);
                 }
-                else if (control is EbTextBox)
+                else if (control is EbTextBox txtCtrl)
                 {
-                    (control as EbTextBox).InitFromDataBase(ServiceClient);
+                    txtCtrl.InitFromDataBase(ServiceClient);
+                    dataDict.Add(txtCtrl.EbSid_CtxId, txtCtrl.Suggestions);
                 }
-                else if (control is EbDGStringColumn)
+                else if (control is EbDGStringColumn dgTxtCtrl)
                 {
-                    (control as EbDGStringColumn).InitFromDataBase(ServiceClient);
+                    dgTxtCtrl.InitFromDataBase(ServiceClient);
+                    dataDict.Add(dgTxtCtrl.EbSid_CtxId, dgTxtCtrl.Suggestions);
                 }
                 else if (control is EbMeetingScheduler)
                 {
                     //(control as EbMeetingScheduler).UsersList = WebForm.SolutionObj.Users;
                     (control as EbMeetingScheduler).InitParticipantsList(ServiceClient);
                 }
-                else if (control is EbInputGeoLocation)
+                else if (control is EbInputGeoLocation geoLocCtrl)
                 {
-                    (control as EbInputGeoLocation).GetDefaultApikey(ServiceClient);
+                    geoLocCtrl.GetDefaultApikey(ServiceClient);
                 }
-                else if (control is EbTagInput)
+                else if (control is EbTagInput tagCtrl)
                 {
-                    (control as EbTagInput).InitFromDataBase(ServiceClient);
+                    tagCtrl.InitFromDataBase(ServiceClient);
+                    dataDict.Add(tagCtrl.EbSid_CtxId, tagCtrl.Suggestions);
                 }
-                else if (control is EbQuestionnaireConfigurator)
+                else if (control is EbQuestionnaireConfigurator qusCtrl)
                 {
-                    (control as EbQuestionnaireConfigurator).InitFromDataBase(ServiceClient);
+                    qusCtrl.InitFromDataBase(ServiceClient);
                 }
-                else if (control is EbRenderQuestionsControl)
+                else if (control is EbRenderQuestionsControl qusrCtrl)
                 {
-                    (control as EbRenderQuestionsControl).InitFromDataBase(ServiceClient);
+                    qusrCtrl.InitFromDataBase(ServiceClient);
                 }
             }
+            return dataDict;
         }
+
 
         //change the redis get of soln and user objects if making this a common function
         public static InsertOrUpdateFormDataResp InsertOrUpdateFormData(InsertOrUpdateFormDataRqst request, IDatabase DataDB, Service Service,
@@ -1220,8 +1235,10 @@ VALUES({Code}, '{Title}', '{Message}', {SourceId}, {SourceVerId}, {UserId}, {Dat
         public Dictionary<int, List<int>> FormPermissions { get; set; }
         public string WebFormHtml { get; set; }
         public string WebFormObj { get; set; }
+        public string WebFormObjJsUrl { get; set; }
         public Dictionary<string, string> DisableEditButton { get; set; }
         public bool IsPartial { get; set; }//can avoid last
+        public Dictionary<string, object> RelatedData { get; set; }
 
         public string HtmlHead { get; set; }//
 
@@ -1230,4 +1247,5 @@ VALUES({Code}, '{Title}', '{Message}', {SourceId}, {SourceVerId}, {UserId}, {Dat
         public string ErrorMessage { get; set; }
         public string Message { get; set; }
     }
+
 }

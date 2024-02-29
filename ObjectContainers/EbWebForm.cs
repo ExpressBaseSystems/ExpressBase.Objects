@@ -273,6 +273,10 @@ namespace ExpressBase.Objects
         [DefaultPropValue("true")]
         public bool CompactControlSpacing { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool EnableCaching { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
