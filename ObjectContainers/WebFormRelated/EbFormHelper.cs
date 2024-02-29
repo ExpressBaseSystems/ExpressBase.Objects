@@ -840,7 +840,8 @@ namespace ExpressBase.Objects
                 else if (control is EbUserLocation uloc)
                 {
                     uloc.InitFromDataBase(WebForm_L.UserObj, WebForm_L.SolutionObj, WebForm_L.RefId);
-                    dataDict.Add(uloc.EbSid_CtxId, uloc.IsGlobalLocAvail);
+                    if (!string.IsNullOrWhiteSpace(uloc.EbSid_CtxId))
+                        dataDict.TryAdd(uloc.EbSid_CtxId, uloc.IsGlobalLocAvail);
                 }
                 else if ((control is EbRadioButton) && control.Name.Equals("eb_default"))
                 {
@@ -849,29 +850,34 @@ namespace ExpressBase.Objects
                         if (!(WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()) || WebForm_L.UserObj.Roles.Contains(SystemRoles.SolutionPM.ToString())))
                         {
                             control.IsDisable = true;
-                            dataDict.Add(control.EbSid_CtxId, control.IsDisable);
+                            if (!string.IsNullOrWhiteSpace(control.EbSid_CtxId))
+                                dataDict.TryAdd(control.EbSid_CtxId, control.IsDisable);
                         }
                     }
                 }
                 else if (control is EbUserSelect usrSelCtrl)
                 {
                     usrSelCtrl.InitOptions(WebForm_L.SolutionObj.Users);
-                    dataDict.Add(usrSelCtrl.EbSid_CtxId, usrSelCtrl.UserList);
+                    if (!string.IsNullOrWhiteSpace(usrSelCtrl.EbSid_CtxId))
+                        dataDict.TryAdd(usrSelCtrl.EbSid_CtxId, usrSelCtrl.UserList);
                 }
                 else if (control is EbDGUserSelectColumn dgUsrSelCtrl)
                 {
                     dgUsrSelCtrl.InitOptions(WebForm_L.SolutionObj.Users);
-                    dataDict.Add(dgUsrSelCtrl.EbSid_CtxId, dgUsrSelCtrl.UserList);
+                    if (!string.IsNullOrWhiteSpace(dgUsrSelCtrl.EbSid_CtxId))
+                        dataDict.TryAdd(dgUsrSelCtrl.EbSid_CtxId, dgUsrSelCtrl.UserList);
                 }
                 else if (control is EbTextBox txtCtrl)
                 {
                     txtCtrl.InitFromDataBase(ServiceClient);
-                    dataDict.Add(txtCtrl.EbSid_CtxId, txtCtrl.Suggestions);
+                    if (txtCtrl.AutoSuggestion && !string.IsNullOrWhiteSpace(txtCtrl.EbSid_CtxId))
+                        dataDict.TryAdd(txtCtrl.EbSid_CtxId, txtCtrl.Suggestions);
                 }
                 else if (control is EbDGStringColumn dgTxtCtrl)
                 {
                     dgTxtCtrl.InitFromDataBase(ServiceClient);
-                    dataDict.Add(dgTxtCtrl.EbSid_CtxId, dgTxtCtrl.Suggestions);
+                    if (dgTxtCtrl.AutoSuggestion && !string.IsNullOrWhiteSpace(dgTxtCtrl.EbSid_CtxId))
+                        dataDict.TryAdd(dgTxtCtrl.EbSid_CtxId, dgTxtCtrl.Suggestions);
                 }
                 else if (control is EbMeetingScheduler)
                 {
@@ -885,7 +891,8 @@ namespace ExpressBase.Objects
                 else if (control is EbTagInput tagCtrl)
                 {
                     tagCtrl.InitFromDataBase(ServiceClient);
-                    dataDict.Add(tagCtrl.EbSid_CtxId, tagCtrl.Suggestions);
+                    if (tagCtrl.AutoSuggestion && !string.IsNullOrWhiteSpace(tagCtrl.EbSid_CtxId))
+                        dataDict.TryAdd(tagCtrl.EbSid_CtxId, tagCtrl.Suggestions);
                 }
                 else if (control is EbQuestionnaireConfigurator qusCtrl)
                 {
