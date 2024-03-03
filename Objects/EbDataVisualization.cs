@@ -441,6 +441,12 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.CORE)]
         public List<ObjectBasicInfo> PrintDocs { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [PropertyGroup(PGConstants.CORE)]
+        public List<ObjectBasicInfo> WebFormLinks { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public bool DisableRowGrouping { get; set; }
@@ -642,28 +648,40 @@ namespace ExpressBase.Objects
         public void AfterRedisGetBasicInfo(IServiceClient client, IRedisClient Redis)
         {
             this.FormLinks = new List<FormLink>();
-            foreach (DVBaseColumn col in this.Columns)
+
+            if (this.WebFormLinks?.Count > 0)
             {
-                if (col.Check4FormLink())
+                foreach (ObjectBasicForm f in this.WebFormLinks)
                 {
-                    try
-                    {
-                        this.WebForm = Redis.Get<EbWebForm>(col.LinkRefId);
-                        if (this.WebForm == null)
-                        {
-                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = col.LinkRefId });
-                            this.WebForm = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                            Redis.Set<EbWebForm>(col.LinkRefId, this.WebForm);
-                        }
-                        this.FormLinks.Add(new FormLink { DisplayName = this.WebForm.DisplayName, Refid = col.LinkRefId, Params = col.FormParameters });
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("AfterRedisGetBasicInfo " + e.Message);
-                    }
+                    this.FormLinks.Add(new FormLink { DisplayName = string.IsNullOrWhiteSpace(f.Title) ? f.ObjDisplayName : f.Title, Refid = f.ObjRefId });
                 }
             }
-            this.FormLinks = this.FormLinks.GroupBy(x => x.Refid).Select(x => x.First()).ToList();
+            else
+            {
+                foreach (DVBaseColumn col in this.Columns)
+                {
+                    if (col.Check4FormLink())
+                    {
+                        try
+                        {
+                            this.WebForm = Redis.Get<EbWebForm>(col.LinkRefId);
+                            if (this.WebForm == null)
+                            {
+                                var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = col.LinkRefId });
+                                this.WebForm = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                                Redis.Set<EbWebForm>(col.LinkRefId, this.WebForm);
+                            }
+                            this.FormLinks.Add(new FormLink { DisplayName = this.WebForm.DisplayName, Refid = col.LinkRefId, Params = col.FormParameters });
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("AfterRedisGetBasicInfo " + e.Message);
+                        }
+                    }
+                }
+                this.FormLinks = this.FormLinks.GroupBy(x => x.Refid).Select(x => x.First()).ToList();
+            }
+
             DVBaseColumn Col = this.Columns.Get("eb_action");
             if (Col != null)
             {
@@ -1098,7 +1116,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.Calendar)]
     public class ObjectBasicForm : ObjectBasicInfo
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if(this.FormMode === 1){
@@ -1115,26 +1133,29 @@ else {
 }")]
         public WebFormDVModes FormMode { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.LinesColumns")]
         public List<DVBaseColumn> FormId { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Mapper, "Parent.LinesColumns", "Refid", "FormControl")]
         public List<DVBaseColumn> FormParameters { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.Calendar)]
         [HideInPropertyGrid]
         public EbControl FormControl { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<DataFlowMapAbstract> DataFlowMap { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string Title { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
