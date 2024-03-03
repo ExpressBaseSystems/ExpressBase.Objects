@@ -98,6 +98,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 24)]
         public List<GfcPrpEntry> GfcPrpList { get; set; }
+
+        [DataMember(Order = 25)]
+        public bool DisbleSave { get; set; }
     }
 
     [DataContract]
