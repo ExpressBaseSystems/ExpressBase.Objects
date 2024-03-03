@@ -143,7 +143,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         extquery += Rev.GetSelectQuery(_this, _pshId, ebs[SystemColumns.eb_del], ebs.GetBoolFalse(SystemColumns.eb_del));
                         _qryCount++;
                     }
-                    else if (_this.DataPusherConfig == null)
+                    else if (_this.DataPusherConfig == null && !Ctrl.DoNotPersist)
                     {
                         extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable, form_ver_id, _this.RefId);
                         _qryCount++;

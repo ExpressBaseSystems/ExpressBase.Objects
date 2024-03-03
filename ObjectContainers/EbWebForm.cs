@@ -1599,7 +1599,7 @@ namespace ExpressBase.Objects
             {
                 foreach (EbControl Ctrl in _schema.ExtendedControls)
                 {
-                    if (Ctrl is EbProvisionUser || (Ctrl is IEbExtraQryCtrl && ((Ctrl is EbReview Rev && this.DataPusherConfig != null) || this.DataPusherConfig == null)))
+                    if (Ctrl is EbProvisionUser || (Ctrl is IEbExtraQryCtrl && !Ctrl.DoNotPersist && ((Ctrl is EbReview Rev && this.DataPusherConfig != null) || this.DataPusherConfig == null)))
                     {
                         SingleTable Table = new SingleTable();
                         this.GetFormattedData(dataset.Tables[tableIndex], Table);
