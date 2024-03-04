@@ -52,6 +52,14 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [UIproperty]
+        [DefaultPropValue(7, 10, 7, 10)]
+        [OnChangeUIFunction("Common.INP_PADDING")]
+        public UISides Padding { get; set; }
+
         //public override string GetToolHtml()
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created From </div>".Replace("@toolName", this.GetType().Name.Substring(2));
