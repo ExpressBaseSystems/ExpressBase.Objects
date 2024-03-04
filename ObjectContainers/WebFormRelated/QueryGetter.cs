@@ -184,7 +184,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     {
                         _qryCount++;
                     }
-                    else if (_this.DataPusherConfig == null && !_this.DoNotPersist)
+                    else if (_this.DataPusherConfig == null && !Ctrl.DoNotPersist)
                     {
                         _qryCount++;
                     }
