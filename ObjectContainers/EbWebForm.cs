@@ -135,6 +135,12 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public virtual List<EbURL> InfoVideoURLs { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [PropertyGroup(PGConstants.HELP)]
+        public List<ObjectBasicInfo> WebFormLinks { get; set; }
+
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         [Alias("Form mode after new")]
