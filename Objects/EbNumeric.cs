@@ -146,6 +146,10 @@ namespace ExpressBase.Objects
         public bool HideInputIcon { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool ShowAddInput { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
@@ -191,23 +195,26 @@ else {
         public override string GetBareHtml()
         {
             string html = @"
-        <div class='input-group' style='width:100%;'>
-             @attachedLbl@
-            <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block;' @required@ @tabIndex@ />
-        </div>"
+<div class='input-group' style='width:100%;'>
+    @attachedLbl@
+    <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style='@width@ @backColor@ @foreColor@ @fontStyle@ display:inline-block;' @required@ @tabIndex@ />
+    @AddButton@
+</div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
 .Replace("@value@", "")//"value='" + this.Value + "'")
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
-    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+.Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+.Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+.Replace("@width@", this.ShowAddInput ? "width:calc(100% - 75px);" : "width:100%;")
 .Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@max@", this.MaxLimit != 0 ? "max='" + this.MaxLimit + "'" : string.Empty)
 .Replace("@min@", this.MinLimit != 0 ? "min='" + this.MinLimit + "'" : string.Empty)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@datetype@", "11");
+.Replace("@datetype@", "11")
+.Replace("@AddButton@", this.ShowAddInput ? "<span class='numplus-btn'><i aria-hidden='true' class='fa fa-plus'></i></span> <input class='numplus-inp' type='text' />" : string.Empty);
             //.Replace("@fontStyle@", (this.FontSerialized != null) ?
             //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
             //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")

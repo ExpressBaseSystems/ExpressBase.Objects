@@ -813,6 +813,20 @@ else {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGNumericColumn : EbDGColumn
     {
+        [JsonIgnore]
+        public EbNumeric EbNumeric { get; set; }
+
+        public EbDGNumericColumn()
+        {
+            this.EbNumeric = new EbNumeric();
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            DBareHtml = EbNumeric.GetBareHtml();
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
@@ -846,6 +860,14 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         public NumInpMode InputMode { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool ShowAddInput
+        {
+            get { return this.EbNumeric.ShowAddInput; }
+            set { this.EbNumeric.ShowAddInput = value; }
+        }
 
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
