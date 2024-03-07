@@ -208,7 +208,7 @@ else {
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
 .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
 .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-.Replace("@width@", this.ShowAddInput ? "width:calc(100% - 75px);" : "width:100%;")
+.Replace("@width@", this.ShowAddInput ? "width:calc(100% - 48px);" : "width:100%;")
 .Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@max@", this.MaxLimit != 0 ? "max='" + this.MaxLimit + "'" : string.Empty)
 .Replace("@min@", this.MinLimit != 0 ? "min='" + this.MinLimit + "'" : string.Empty)
