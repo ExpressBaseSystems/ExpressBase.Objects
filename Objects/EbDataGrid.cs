@@ -595,7 +595,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
     //td.style.pointerEvents = 'inherit';
     td.setAttribute('eb-readonly','false');
     //td.querySelector('.ctrl-cover').setAttribute('eb-readonly','false');
-    td.querySelectorAll('input,select,button').disabled = false;
+    td.querySelectorAll('input,select,button').forEach( x=> x.disabled = false);
     td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',0));
     document.getElementById(this.EbSid_CtxId).disabled = false;
 //}
@@ -611,7 +611,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
     //td.style.pointerEvents = 'none';
     td.setAttribute('eb-readonly','true');
     //td.querySelector('.ctrl-cover').setAttribute('eb-readonly','true');
-    td.querySelectorAll('input,select,button').disabled = true;
+    td.querySelectorAll('input,select,button').forEach( x=> x.disabled = true);
     td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',-1));
     document.getElementById(this.EbSid_CtxId).disabled = true;
 //}
