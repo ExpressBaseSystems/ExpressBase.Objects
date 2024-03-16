@@ -121,7 +121,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public List<OrderBy> OrderBy { get; set; }
-        
+
         [DataMember(Order = 6)]
         public string Token { get; set; }
 
@@ -165,7 +165,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool ReplaceEbColumns { get; set; }
 
         [DataMember(Order = 19)]
-        public string  TableId { get; set; }
+        public string TableId { get; set; }
 
         [DataMember(Order = 19)]
         public bool Modifydv { get; set; }
@@ -179,7 +179,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 21)]
         public bool showCheckboxColumn { get; set; }
 
-         [DataMember(Order = 22)]
+        [DataMember(Order = 22)]
         public string Source { get; set; }
 
         [DataMember(Order = 23)]
@@ -277,7 +277,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class OrderBy
     {
-        
+
         [DataMember(Order = 1)]
         public string Column { get; set; }
 
@@ -285,7 +285,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Direction { get; set; }
     }
 
-    
+
     [DataContract]
     public class InlineTableDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
     {
@@ -296,7 +296,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Start { get; set; }
 
         [DataMember(Order = 2)]
-        public int Length { get; set; }        
+        public int Length { get; set; }
 
         [DataMember(Order = 6)]
         public string Token { get; set; }
@@ -339,6 +339,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 16)]
         public string TableId { get; set; }
+    }
+
+    [DataContract]
+    public class ExportToExcelSyncRequest : EbServiceStackAuthRequest, IReturn<ExportToExcelSyncResponse>
+    {
+        [DataMember(Order = 1)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 2)]
+        public string dvRefId { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<TFilters> TFilters { get; set; }
+    }
+
+    [DataContract]
+    public class ExportToExcelSyncResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Msg { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]

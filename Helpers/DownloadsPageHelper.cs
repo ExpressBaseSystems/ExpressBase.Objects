@@ -34,6 +34,28 @@ namespace ExpressBase.Objects.Helpers
             return id;
         }
 
+        public (int, string) InsertDownloadFileEntry(IDatabase Datadb, string filename, int userId, byte[] filebytea)
+        {
+            try
+            {
+                string s = @"INSERT INTO 
+                            eb_downloads(filename, eb_created_by, eb_created_at, bytea) 
+                        VALUES ( :filename, :eb_created_by, NOW(), :bytea) RETURNING id";
+
+                DbParameter[] parameters = new DbParameter[] {
+                    Datadb.GetNewParameter("filename", EbDbTypes.String, filename),
+                    Datadb.GetNewParameter("eb_created_by", EbDbTypes.Int32, userId),
+                    Datadb.GetNewParameter("bytea", EbDbTypes.Bytea, filebytea)
+                };
+                int id = Datadb.ExecuteScalar<int>(s, parameters);
+                return (id, "/DV/GetExcel?id=" + id);
+            }
+            catch (Exception e)
+            {
+                return (-1, e.Message);
+            }
+        }
+
         public int SaveDownloadFileBytea(IDatabase Datadb, byte[] filebytea, int id)
         {
             try
@@ -102,7 +124,8 @@ namespace ExpressBase.Objects.Helpers
                 {
 
                     for (int i = 0; i < dt.Rows.Count; i++)
-                    { DateTime _date = Convert.ToDateTime(dt.Rows[i][3]);
+                    {
+                        DateTime _date = Convert.ToDateTime(dt.Rows[i][3]);
                         FileDownloadObjects.Add(new FileDownloadObject
                         {
                             Id = Convert.ToInt32(dt.Rows[i][0]),
