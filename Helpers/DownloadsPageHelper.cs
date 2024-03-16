@@ -17,9 +17,9 @@ namespace ExpressBase.Objects.Helpers
             int id = 0;
             try
             {
-                string s = @"INSERT INTO 
+                string s = $@"INSERT INTO 
                             eb_downloads(filename, eb_created_by, eb_created_at) 
-                        VALUES ( :filename, :eb_created_by, NOW()) RETURNING id";
+                        VALUES ( :filename, :eb_created_by, {Datadb.EB_CURRENT_TIMESTAMP}) RETURNING id";
 
                 DbParameter[] parameters = new DbParameter[] {
                     Datadb.GetNewParameter("filename", EbDbTypes.String, filename) ,
@@ -38,9 +38,9 @@ namespace ExpressBase.Objects.Helpers
         {
             try
             {
-                string s = @"INSERT INTO 
+                string s = $@"INSERT INTO 
                             eb_downloads(filename, eb_created_by, eb_created_at, bytea) 
-                        VALUES ( :filename, :eb_created_by, NOW(), :bytea) RETURNING id";
+                        VALUES ( :filename, :eb_created_by, {Datadb.EB_CURRENT_TIMESTAMP}, :bytea) RETURNING id";
 
                 DbParameter[] parameters = new DbParameter[] {
                     Datadb.GetNewParameter("filename", EbDbTypes.String, filename),
