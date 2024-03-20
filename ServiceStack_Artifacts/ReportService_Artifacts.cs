@@ -43,7 +43,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SubscriptionId { get; set; }
     }
 
-      public class ReportRenderMultipleMQRequest: EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
+    public class ReportRenderMultipleSyncRequest : EbServiceStackAuthRequest, IReturn<ReportRenderMultipleSyncResponse>
+    {
+        public string Refid { get; set; }
+
+        public string RenderingUserAuthId { get; set; }
+
+        public List<Param> Params { get; set; }
+    }
+
+    [DataContract]
+    public class ReportRenderMultipleSyncResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public String Message { get; set; }
+    }
+
+    public class ReportRenderMultipleMQRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
     {
         public string RefId { get; set; }
 

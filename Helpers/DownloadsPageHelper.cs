@@ -34,7 +34,7 @@ namespace ExpressBase.Objects.Helpers
             return id;
         }
 
-        public (int, string) InsertDownloadFileEntry(IDatabase Datadb, string filename, int userId, byte[] filebytea)
+        public (int, string) InsertDownloadFileEntry(IDatabase Datadb, string filename, int userId, byte[] filebytea, bool isPdf)
         {
             try
             {
@@ -48,6 +48,8 @@ namespace ExpressBase.Objects.Helpers
                     Datadb.GetNewParameter("bytea", EbDbTypes.Bytea, filebytea)
                 };
                 int id = Datadb.ExecuteScalar<int>(s, parameters);
+                if (isPdf)
+                    return (id, "/DV/GetPdf?id=" + id);
                 return (id, "/DV/GetExcel?id=" + id);
             }
             catch (Exception e)
