@@ -213,15 +213,18 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
             for (int i = 0; i < Allctrls.Length; i++)
             {
-                if (!(Allctrls[i] is EbDGColumn))
+                if (!(Allctrls[i] is EbDGColumn) && !(Allctrls[i] is EbTableTd))
                 {
                     tempStr = Allctrls[i].Name;
-                    if (string.IsNullOrWhiteSpace(tempStr) && string.IsNullOrWhiteSpace(Allctrls[i].Label))
+                    if (string.IsNullOrWhiteSpace(tempStr) && !string.IsNullOrWhiteSpace(Allctrls[i].Label))
                         throw new FormException($"Invalid control name: {Allctrls[i].Label}");
 
-                    if (!string.IsNullOrWhiteSpace(tempStr) && CtrlNames.Contains(tempStr))
-                        throw new FormException($"Duplicate control name: {tempStr}");
-                    CtrlNames.Add(tempStr);
+                    if (!string.IsNullOrWhiteSpace(tempStr))
+                    {
+                        if (CtrlNames.Contains(tempStr))
+                            throw new FormException($"Duplicate control name: {tempStr}");
+                        CtrlNames.Add(tempStr);
+                    }
                 }
 
                 if (OneCtrls.ContainsKey(Allctrls[i].GetType()))
