@@ -1865,6 +1865,10 @@ pg.HideProperty('IsDynamic');
         public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool UseCurlyBrackets { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.VALIDATIONS)]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
