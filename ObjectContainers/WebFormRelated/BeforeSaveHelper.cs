@@ -208,9 +208,22 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             ebReviewCtrl = null;
             for (int i = 0; i < Allctrls.Length; i++)//DataGrid.InitDSRelated
                 Allctrls[i].DependedDG = new List<string>();
+            List<string> CtrlNames = new List<string>();
+            string tempStr;
 
             for (int i = 0; i < Allctrls.Length; i++)
             {
+                if (!(Allctrls[i] is EbDGColumn))
+                {
+                    tempStr = Allctrls[i].Name;
+                    if (string.IsNullOrWhiteSpace(tempStr) && string.IsNullOrWhiteSpace(Allctrls[i].Label))
+                        throw new FormException($"Invalid control name: {Allctrls[i].Label}");
+
+                    if (!string.IsNullOrWhiteSpace(tempStr) && CtrlNames.Contains(tempStr))
+                        throw new FormException($"Duplicate control name: {tempStr}");
+                    CtrlNames.Add(tempStr);
+                }
+
                 if (OneCtrls.ContainsKey(Allctrls[i].GetType()))
                 {
                     Type _type = Allctrls[i].GetType();
