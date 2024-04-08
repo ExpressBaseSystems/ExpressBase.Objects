@@ -113,6 +113,9 @@ namespace ExpressBase.Objects
         public bool AllowExistingUser { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        public bool BlockUserEditing { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [Alias("Send verification message")]
         public bool SendVerificationMsg { get; set; }
 
@@ -866,30 +869,43 @@ WHERE u.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_
                 if (!this.AllowExistingUser)
                     this.ThrowExistingUserException(_d, flag);
 
-                Dictionary<string, string> od = this.GetFormattedData(args.DataDB, nProvUserId);
-                this.EditUser(_d, od, 0, nProvUserId, args, true);
+                if (!this.BlockUserEditing)
+                {
+                    Dictionary<string, string> od = this.GetFormattedData(args.DataDB, nProvUserId);
+                    this.EditUser(_d, od, 0, nProvUserId, args, true);
+                }
                 SetControlParams(args, nProvUserId);
             }
             else if (oProvUserId > 0 && nProvUserId == 0) //Edit already linked/created user
             {
-                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
-                this.EditUser(_d, _od, 0, oProvUserId, args, _od["eb_is_mapped_user"].ToString() == "T");
+                if (!this.BlockUserEditing)
+                {
+                    Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
+                    this.EditUser(_d, _od, 0, oProvUserId, args, _od["eb_is_mapped_user"].ToString() == "T");
+                }
                 SetControlParams(args, nProvUserId);
             }
             else if (oProvUserId > 0 && nProvUserId > 0)
             {
                 if (oProvUserId == nProvUserId) //Edit existing user
                 {
-                    Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
-                    this.EditUser(_d, _od, oProvUserId, nProvUserId, args, _od["eb_is_mapped_user"].ToString() == "T");
+                    if (!this.BlockUserEditing)
+                    {
+                        Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
+                        this.EditUser(_d, _od, oProvUserId, nProvUserId, args, _od["eb_is_mapped_user"].ToString() == "T");
+                    }
                     SetControlParams(args, nProvUserId);
                 }
                 else //Link and edit another user
                 {
                     if (!this.AllowExistingUser)
                         this.ThrowExistingUserException(_d, flag);
-                    Dictionary<string, string> od = this.GetFormattedData(args.DataDB, nProvUserId);
-                    this.EditUser(_d, od, 0, nProvUserId, args, true);
+
+                    if (!this.BlockUserEditing)
+                    {
+                        Dictionary<string, string> od = this.GetFormattedData(args.DataDB, nProvUserId);
+                        this.EditUser(_d, od, 0, nProvUserId, args, true);
+                    }
                     SetControlParams(args, nProvUserId);
                     this.SetExtendedUnlinkQuery(args, oProvUserId.ToString());
                 }
