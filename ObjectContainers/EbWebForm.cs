@@ -1741,14 +1741,17 @@ namespace ExpressBase.Objects
                         else if (Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader)
                         {
                             List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                            DateTime dt;
                             foreach (SingleRow dr in Table)
                             {
+                                dt = Convert.ToDateTime(dr[FormConstants.uploadts]);
+                                dt = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                                 FileMetaInfo info = new FileMetaInfo
                                 {
                                     FileRefId = Convert.ToInt32(dr[FormConstants.id]),
                                     FileName = Convert.ToString(dr[FormConstants.filename]),
                                     Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
-                                    UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
+                                    UploadTime = dt.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture),
                                     FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                                 };
 
@@ -1814,14 +1817,17 @@ namespace ExpressBase.Objects
                         this.GetFormattedData(dt, Table);
 
                         List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                        DateTime _date;
                         foreach (SingleRow dr in Table)
                         {
+                            _date = Convert.ToDateTime(dr[FormConstants.uploadts]);
+                            _date = _date.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             FileMetaInfo info = new FileMetaInfo
                             {
                                 FileRefId = Convert.ToInt32(dr[FormConstants.id]),
                                 FileName = Convert.ToString(dr[FormConstants.filename]),
                                 Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
-                                UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
+                                UploadTime = _date.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture),
                                 FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                             };
 
