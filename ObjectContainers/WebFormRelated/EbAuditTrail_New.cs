@@ -43,7 +43,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         public int UpdateAuditTrail(DataModificationAction action, bool MasterFormOnly)
         {
             List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>();
-
+            string matViewQry = string.Empty;
             foreach (EbWebForm ebWebForm in this.WebForm.FormCollection)
             {
                 auditTrails.Add(new AuditTrailInsertData
@@ -54,15 +54,19 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                     TableRowId = ebWebForm.TableRowId
                 });
 
+                if (action == DataModificationAction.Cancelled || action == DataModificationAction.CancelReverted || action == DataModificationAction.Deleted)
+                    matViewQry += ebWebForm.MatViewConfig.GetInsertModeQuery(true);
+
                 if (MasterFormOnly)
                     break;
             }
-            return this.UpdateAuditTrail(auditTrails);
+            return this.UpdateAuditTrail(auditTrails, matViewQry);
         }
 
         public int UpdateAuditTrail()
         {
             List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>();
+            string matViewQry = string.Empty;
             foreach (EbWebForm _webForm in this.WebForm.FormCollection)
             {
                 if (_webForm.TableRowId <= 0)
@@ -78,6 +82,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         RefId = _webForm.RefId,
                         TableRowId = _webForm.TableRowId
                     });
+                    matViewQry += _webForm.MatViewConfig.GetInsertModeQuery(false);
                 }
                 else if (_webForm.DataPusherConfig != null && _webForm.FormData.MultipleTables[_webForm.TableName].Count == 0)
                 {
@@ -88,6 +93,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         RefId = _webForm.RefId,
                         TableRowId = _webForm.TableRowId
                     });
+                    matViewQry += _webForm.MatViewConfig.GetInsertModeQuery(false);
                 }
                 else
                 {
@@ -137,9 +143,10 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                             TableRowId = _webForm.TableRowId
                         });
                     }
+                    matViewQry += _webForm.MatViewConfig.GetUpdateModeQuery();
                 }
             }
-            return this.UpdateAuditTrail(auditTrails);
+            return this.UpdateAuditTrail(auditTrails, matViewQry);
         }
 
         private List<AuditTrailEntry> GetTrailEntries(EbWebForm _webForm, TableSchema _table, SingleRow Row, SingleRow RowBkup)
@@ -213,7 +220,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             return trailEntries;
         }
 
-        private int UpdateAuditTrail(List<AuditTrailInsertData> Data)
+        private int UpdateAuditTrail(List<AuditTrailInsertData> Data, string MatViewQuery)
         {
             List<DbParameter> parameters = new List<DbParameter>
             {
@@ -249,6 +256,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 }
                 i++;
             }
+            fullQry += MatViewQuery;
+
             if (fullQry.IsEmpty())
                 return 0;
             return this.DataDB.DoNonQuery(this.WebForm.DbConnection, fullQry, parameters.ToArray());

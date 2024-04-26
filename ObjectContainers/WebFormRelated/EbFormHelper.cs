@@ -254,6 +254,21 @@ namespace ExpressBase.Objects
                         //}
                     }
                 }
+
+                if (_this is EbWebForm ebWebForm)
+                {
+                    ebWebForm.MatViewConfig = new EbMaterializedViewConfig(ebWebForm);
+                    if (!string.IsNullOrWhiteSpace(ebWebForm.MatViewRefId))
+                    {
+                        string date_s = ebWebForm.SolutionObj?.SolutionSettings?.MaterializedViewDate;
+                        List<string> matVws = ebWebForm.SolutionObj?.SolutionSettings?.MaterializedViews;
+
+                        if (!string.IsNullOrWhiteSpace(date_s) && matVws != null && matVws.Contains(ebWebForm.MatViewRefId))
+                        {
+                            ebWebForm.MatViewConfig.SetMatViewObject(GetEbObject<EbMaterializedView>(ebWebForm.MatViewRefId, client, Redis, service));
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {

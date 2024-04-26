@@ -81,7 +81,10 @@ namespace ExpressBase.Objects
                 AddSysParam(DataDB, param, FormConstants.eb_loc_id_ + WebForm.CrudContext, EbDbTypes.Int32, WebForm.LocationId);
 
                 if (pushAuditTrail)
+                {
                     fullqry += EbAuditTrail.GetInsertModeQuery(DataDB, WebForm.RefId, WebForm.TableName);
+                    fullqry += WebForm.MatViewConfig.GetInsertModeQuery(false);
+                }
             }
 
             args.CopyBack(ref _extqry, ref i);

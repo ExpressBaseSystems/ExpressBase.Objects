@@ -110,6 +110,36 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                 }
             }
+
+            if (!string.IsNullOrWhiteSpace(_this.MatViewRefId))
+            {
+                EbControl dt_ctrl = ValidateControlNameConfig(Allctrls, _this.MatViewDateCtrl, "Materialized view Date control");
+                if (!(dt_ctrl is EbDate))
+                    throw new FormException($"Materialized view Date control '{_this.MatViewDateCtrl}' is not a valid DATE control");
+                if (dt_ctrl is EbDate _dt_ctrl && _dt_ctrl.IsNullable)
+                    throw new FormException($"Materialized view Date control '{_this.MatViewDateCtrl}' is nullable control, which is not allowed");
+                EbControl ky_ctrl = ValidateControlNameConfig(Allctrls, _this.MatViewKeyCtrl, "Materialized view Key control");
+                if (!(ky_ctrl is EbNumeric || ky_ctrl is EbPowerSelect || ky_ctrl is EbDGNumericColumn || ky_ctrl is EbDGPowerSelectColumn))
+                    throw new FormException($"Materialized view Key control '{_this.MatViewKeyCtrl}' must be a numeric or powerselect control");
+
+                if (_this.MatViewComputeCtrls?.Count == 0)
+                    throw new FormException($"Required: Materialized view Compute control names");
+                foreach (AssociatedCtrl ac in _this.MatViewComputeCtrls)
+                {
+                    ValidateControlNameConfig(Allctrls, ac.ControlName, "Materialized view Compute control");
+                }
+            }
+        }
+
+        private static EbControl ValidateControlNameConfig(EbControl[] Allctrls, string ctrlName, string msg)
+        {
+            if (string.IsNullOrWhiteSpace(ctrlName))
+                throw new FormException($"Required: {msg}");
+
+            EbControl _ctrl = Allctrls.FirstOrDefault(e => e.Name == ctrlName);
+            if (_ctrl == null)
+                throw new FormException($"Not found: {msg} '{ctrlName}'");
+            return _ctrl;
         }
 
         private static void ValidateAndUpdateReviewCtrl(EbWebForm _this, EbReview ebReviewCtrl, Dictionary<int, EbControlWrapper> _dict)

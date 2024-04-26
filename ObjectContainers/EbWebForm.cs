@@ -91,6 +91,8 @@ namespace ExpressBase.Objects
 
         public MyActionNotification MyActNotification { get; set; }
 
+        public EbMaterializedViewConfig MatViewConfig { get; set; }
+
         [JsonIgnore]
         internal DbConnection DbConnection { get; set; }
 
@@ -291,8 +293,30 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [DefaultPropValue("1")]
-
         public EvaluatorVersion EvaluatorVersion { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Materialized view refid")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMaterializedView)]
+        public string MatViewRefId { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Date control name")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string MatViewDateCtrl { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Key control name")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string MatViewKeyCtrl { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Compute control names")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public List<AssociatedCtrlAbstract> MatViewComputeCtrls { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
