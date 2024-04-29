@@ -595,7 +595,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
     //td.style.pointerEvents = 'inherit';
     td.setAttribute('eb-readonly','false');
     //td.querySelector('.ctrl-cover').setAttribute('eb-readonly','false');
-    td.querySelectorAll('input,select,button').disabled = false;
+    td.querySelectorAll('input,select,button').forEach( x=> x.disabled = false);
     td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',0));
     document.getElementById(this.EbSid_CtxId).disabled = false;
 //}
@@ -611,7 +611,7 @@ document.getElementById(this.EbSid_CtxId).value = p1;}"; }
     //td.style.pointerEvents = 'none';
     td.setAttribute('eb-readonly','true');
     //td.querySelector('.ctrl-cover').setAttribute('eb-readonly','true');
-    td.querySelectorAll('input,select,button').disabled = true;
+    td.querySelectorAll('input,select,button').forEach( x=> x.disabled = true);
     td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',-1));
     document.getElementById(this.EbSid_CtxId).disabled = true;
 //}
@@ -813,6 +813,20 @@ else {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGNumericColumn : EbDGColumn
     {
+        [JsonIgnore]
+        public EbNumeric EbNumeric { get; set; }
+
+        public EbDGNumericColumn()
+        {
+            this.EbNumeric = new EbNumeric();
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            DBareHtml = EbNumeric.GetBareHtml();
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
@@ -846,6 +860,14 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         public NumInpMode InputMode { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool ShowAddInput
+        {
+            get { return this.EbNumeric.ShowAddInput; }
+            set { this.EbNumeric.ShowAddInput = value; }
+        }
 
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
@@ -1841,6 +1863,10 @@ pg.HideProperty('IsDynamic');
                     pg.setSimpleProperty('MaxLimit', 1);
             }")]
         public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool UseCurlyBrackets { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.VALIDATIONS)]

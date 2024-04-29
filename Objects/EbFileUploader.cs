@@ -71,6 +71,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
+        public bool ShowFileName { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
         public bool EnableTag { set; get; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]

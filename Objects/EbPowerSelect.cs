@@ -471,35 +471,42 @@ else
         [PropertyPriority(65)]
         //[DefaultPropValue("1")]
         [OnChangeExec(@"
-            if (this.MultiSelect === true ){
-                pg.MakeReadWrite('MaxLimit');   
-                if (this.Required === true ){
-                    if(this.MinLimit < 1){
-                        pg.setSimpleProperty('MinLimit', 1);
-                    }
-                    pg.MakeReadWrite('MinLimit');
-                }
-                else{
-                    pg.setSimpleProperty('MinLimit', 0);
-                    pg.MakeReadOnly('MinLimit');                 
-                }
-                if(this.MaxLimit === 1)
-                    pg.setSimpleProperty('MaxLimit', 0);
+if (this.MultiSelect === true ){
+    pg.ShowProperty('UseCurlyBrackets');
+    pg.MakeReadWrite('MaxLimit');   
+    if (this.Required === true ){
+        if(this.MinLimit < 1){
+            pg.setSimpleProperty('MinLimit', 1);
+        }
+        pg.MakeReadWrite('MinLimit');
+    }
+    else{
+        pg.setSimpleProperty('MinLimit', 0);
+        pg.MakeReadOnly('MinLimit');                 
+    }
+    if(this.MaxLimit === 1)
+        pg.setSimpleProperty('MaxLimit', 0);
                     
-            } 
-            else {
-                pg.setSimpleProperty('MaxLimit', 1);
-                pg.MakeReadOnly(['MaxLimit','MinLimit']);
-                if (this.Required === true ){
-                    pg.setSimpleProperty('MinLimit', 1);
-                }
-                else{
-                    pg.setSimpleProperty('MinLimit', 0);
-                }
-                if(this.MaxLimit !== 1)
-                    pg.setSimpleProperty('MaxLimit', 1);
-            }")]
+} 
+else {
+    pg.HideProperty('UseCurlyBrackets');
+    pg.setSimpleProperty('MaxLimit', 1);
+    pg.MakeReadOnly(['MaxLimit','MinLimit']);
+    if (this.Required === true ){
+        pg.setSimpleProperty('MinLimit', 1);
+    }
+    else{
+        pg.setSimpleProperty('MinLimit', 0);
+    }
+    if(this.MaxLimit !== 1)
+        pg.setSimpleProperty('MaxLimit', 1);
+}")]
         public bool MultiSelect { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [HelpText("Data stored inside curly brackets")]
+        public bool UseCurlyBrackets { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[DefaultPropValue(1)]
@@ -1125,9 +1132,16 @@ else// PS
             string _sv = Convert.ToString(args.cField.Value);
             if (args.cField.Value == null || _sv == string.Empty)
             {
-                var p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
-                p.Value = DBNull.Value;
-                args.param.Add(p);
+                if (!_ctrl.BypassParameterization && _this.MultiSelect && _this.UseCurlyBrackets)
+                {
+                    args.param.Add(args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type, "{}"));
+                }
+                else
+                {
+                    var p = args.DataDB.GetNewParameter(paramName, (EbDbTypes)args.cField.Type);
+                    p.Value = DBNull.Value;
+                    args.param.Add(p);
+                }
             }
             else if (!_ctrl.BypassParameterization)
             {
@@ -1135,8 +1149,10 @@ else// PS
                 if (_this.MultiSelect)
                 {
                     string[] arr = _sv.Split(',');
-                    if (arr.Length != arr.Select(e => int.TryParse(e, out int t)).Count())
+                    if (_sv != string.Empty && arr.Select(e => int.TryParse(e, out int t)).ToList().Exists(e => !e))
                         throwException = true;
+                    else if (_this.UseCurlyBrackets)
+                        args.cField.Value = '{' + _sv + '}';
                 }
                 else
                 {
@@ -1176,11 +1192,23 @@ else// PS
             string _sv = Convert.ToString(Value);
             if (Value != null)
             {
+                bool throwException = false;
                 if (_this.MultiSelect)
+                {
+                    if (_this.UseCurlyBrackets)
+                        _sv = _sv.Replace("{", string.Empty).Replace("}", string.Empty);
                     Value = _sv;
+
+                    string[] arr = _sv.Split(',');
+                    if (_sv != string.Empty && arr.Select(e => int.TryParse(e, out int t)).ToList().Exists(e => !e))
+                        throwException = true;
+                }
                 else if (int.TryParse(_sv, out int _iv))
                     Value = _iv;
                 else
+                    throwException = true;
+
+                if (throwException)
                     throw new FormException($"Invalid value({_sv}) found for PowerSelect: {_this.Name}", (int)HttpStatusCode.InternalServerError, $"Unable to parse '{_sv}' as numeric value for {_this.Name}", "From EbPowerSelect.GetSingleColumn()");
             }
             return new SingleColumn()

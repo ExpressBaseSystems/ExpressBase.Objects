@@ -144,15 +144,15 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                let val;
-                if(this.IsDisable)
-                    val = $('#' + this.EbSid_CtxId).attr('data-id');
-                else
-                    val = $('#' + this.EbSid_CtxId).val();
-                val = parseInt(val);
-                if(isNaN(val)) val = 0;
-                return val;
-                ";
+let val;
+if(this.IsDisable)
+    val = $('#' + this.EbSid_CtxId).attr('data-id');
+else
+    val = $('#' + this.EbSid_CtxId).val();
+val = parseInt(val);
+if(isNaN(val)) val = 0;
+return val;
+";
             }
             set { }
         }
@@ -162,18 +162,19 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    if(this.IsDisable){
-                        if(!p1)
-                            return false;
-                        $('#' + this.EbSid_CtxId).attr('data-id', p1);
-                        let obj = ebcontext.locations.Locations.find(e => e.LocId === p1);
-                        if (obj){
-                            $('#' + this.EbSid_CtxId).val(obj.ShortName).trigger('change');
-                        }
-                    }
-                    else
-                        $('#' + this.EbSid_CtxId).val(p1).trigger('change');
-                    ";
+if(this.IsDisable){
+    if(!p1)
+        return false;
+    $('#' + this.EbSid_CtxId).attr('data-id', p1);
+    let obj = ebcontext.locations.Locations.find(e => e.LocId === p1);
+    if (obj) {
+        let propN = this.ShowLongName ? 'LongName' : 'ShortName';
+        $('#' + this.EbSid_CtxId).val(obj[propN]).trigger('change');
+    }
+}
+else
+    $('#' + this.EbSid_CtxId).val(p1).trigger('change');
+";
             }
             set { }
         }
@@ -203,6 +204,9 @@ namespace ExpressBase.Objects
         [DefaultPropValue("true")]
         public override bool IsDisable { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool ShowLongName { get; set; }
 
         public override bool Unique { get { return false; } }
         public override bool Required { get { return false; } }
@@ -227,7 +231,12 @@ namespace ExpressBase.Objects
                 loc_id = Convert.ToInt32(Value);
 
             if (SoluObj.Locations.ContainsKey(loc_id))
-                _displayMember = SoluObj.Locations[loc_id].ShortName;
+            {
+                if (this.ShowLongName)
+                    _displayMember = SoluObj.Locations[loc_id].LongName;
+                else
+                    _displayMember = SoluObj.Locations[loc_id].ShortName;
+            }
 
             return new SingleColumn()
             {

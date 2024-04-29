@@ -17,9 +17,9 @@ namespace ExpressBase.Objects.Helpers
             int id = 0;
             try
             {
-                string s = @"INSERT INTO 
+                string s = $@"INSERT INTO 
                             eb_downloads(filename, eb_created_by, eb_created_at) 
-                        VALUES ( :filename, :eb_created_by, NOW()) RETURNING id";
+                        VALUES ( :filename, :eb_created_by, {Datadb.EB_CURRENT_TIMESTAMP}) RETURNING id";
 
                 DbParameter[] parameters = new DbParameter[] {
                     Datadb.GetNewParameter("filename", EbDbTypes.String, filename) ,
@@ -32,6 +32,30 @@ namespace ExpressBase.Objects.Helpers
                 Console.WriteLine(e.Message + e.StackTrace);
             }
             return id;
+        }
+
+        public (int, string) InsertDownloadFileEntry(IDatabase Datadb, string filename, int userId, byte[] filebytea, bool isPdf)
+        {
+            try
+            {
+                string s = $@"INSERT INTO 
+                            eb_downloads(filename, eb_created_by, eb_created_at, bytea) 
+                        VALUES ( :filename, :eb_created_by, {Datadb.EB_CURRENT_TIMESTAMP}, :bytea) RETURNING id";
+
+                DbParameter[] parameters = new DbParameter[] {
+                    Datadb.GetNewParameter("filename", EbDbTypes.String, filename),
+                    Datadb.GetNewParameter("eb_created_by", EbDbTypes.Int32, userId),
+                    Datadb.GetNewParameter("bytea", EbDbTypes.Bytea, filebytea)
+                };
+                int id = Datadb.ExecuteScalar<int>(s, parameters);
+                if (isPdf)
+                    return (id, "/DV/GetPdf?id=" + id);
+                return (id, "/DV/GetExcel?id=" + id);
+            }
+            catch (Exception e)
+            {
+                return (-1, e.Message);
+            }
         }
 
         public int SaveDownloadFileBytea(IDatabase Datadb, byte[] filebytea, int id)
@@ -102,7 +126,8 @@ namespace ExpressBase.Objects.Helpers
                 {
 
                     for (int i = 0; i < dt.Rows.Count; i++)
-                    { DateTime _date = Convert.ToDateTime(dt.Rows[i][3]);
+                    {
+                        DateTime _date = Convert.ToDateTime(dt.Rows[i][3]);
                         FileDownloadObjects.Add(new FileDownloadObject
                         {
                             Id = Convert.ToInt32(dt.Rows[i][0]),

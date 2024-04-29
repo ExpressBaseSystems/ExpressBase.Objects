@@ -91,6 +91,8 @@ namespace ExpressBase.Objects
 
         public MyActionNotification MyActNotification { get; set; }
 
+        public EbMaterializedViewConfig MatViewConfig { get; set; }
+
         [JsonIgnore]
         internal DbConnection DbConnection { get; set; }
 
@@ -291,8 +293,30 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [DefaultPropValue("1")]
-
         public EvaluatorVersion EvaluatorVersion { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Materialized view refid")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMaterializedView)]
+        public string MatViewRefId { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Date control name")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string MatViewDateCtrl { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Key control name")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string MatViewKeyCtrl { get; set; }
+
+        [PropertyGroup("Materialized view")]
+        [Alias("Compute control names")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public List<AssociatedCtrlAbstract> MatViewComputeCtrls { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -1717,14 +1741,17 @@ namespace ExpressBase.Objects
                         else if (Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader)
                         {
                             List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                            DateTime dt;
                             foreach (SingleRow dr in Table)
                             {
+                                dt = Convert.ToDateTime(dr[FormConstants.uploadts]);
+                                dt = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                                 FileMetaInfo info = new FileMetaInfo
                                 {
                                     FileRefId = Convert.ToInt32(dr[FormConstants.id]),
                                     FileName = Convert.ToString(dr[FormConstants.filename]),
                                     Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
-                                    UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
+                                    UploadTime = dt.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture),
                                     FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                                 };
 
@@ -1790,14 +1817,17 @@ namespace ExpressBase.Objects
                         this.GetFormattedData(dt, Table);
 
                         List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                        DateTime _date;
                         foreach (SingleRow dr in Table)
                         {
+                            _date = Convert.ToDateTime(dr[FormConstants.uploadts]);
+                            _date = _date.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             FileMetaInfo info = new FileMetaInfo
                             {
                                 FileRefId = Convert.ToInt32(dr[FormConstants.id]),
                                 FileName = Convert.ToString(dr[FormConstants.filename]),
                                 Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
-                                UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
+                                UploadTime = _date.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture),
                                 FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                             };
 
