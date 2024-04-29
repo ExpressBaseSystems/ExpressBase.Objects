@@ -118,7 +118,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class LoopLocation
     {
-        public EbLoop Loop { get; set; }
+        public EbLoop1 Loop { get; set; }
 
         public int Step { get; set; }
 

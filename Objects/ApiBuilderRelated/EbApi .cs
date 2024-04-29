@@ -228,6 +228,65 @@ namespace ExpressBase.Objects
             return p == null || p.Required;
         }
 
+        [MetaOnly]
+        //[HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public ColumnColletion FirstReaderKeyColumnsColl { get; set; }
+
+        private List<string> _firstReaderKeyColumns = null;
+        public List<string> FirstReaderKeyColumns
+
+        {
+            get
+            {
+                if (_firstReaderKeyColumns == null)
+                {
+                    _firstReaderKeyColumns = new List<string>();
+                    foreach (EbDataColumn c in FirstReaderKeyColumnsTemp)
+                        if (c != null)
+                            _firstReaderKeyColumns.Add(c.ColumnName);
+                }
+                return _firstReaderKeyColumns;
+            }
+        }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "FirstReaderKeyColumnsColl")]
+        [Alias("First Reader Key Column")]
+        public ColumnColletion FirstReaderKeyColumnsTemp { get; set; }
+
+        [MetaOnly]
+        //[HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public List<Param> ParameterKeyColumnsColl { get; set; }
+
+
+        private List<string> _parameterKeyColumns = null;
+        public List<string> ParameterKeyColumns
+        {
+            get
+            {
+                if (_parameterKeyColumns == null)
+                {
+                    _parameterKeyColumns = new List<string>();
+                    foreach (Param _p in ParameterKeyColumnsTemp)
+                    {
+                        if (_p != null)
+                            _parameterKeyColumns.Add(_p.Name);
+                    }
+                }
+                return _parameterKeyColumns;
+            }
+        }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [Alias("Parameter Key Column")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ParameterKeyColumnsColl")]
+
+        public List<Param> ParameterKeyColumnsTemp { get; set; }
+
+
+
         public EbApi GetApi(string RefId, IRedisClient Redis, IDatabase ObjectsDB, IDatabase DataDB)
         {
             EbApi Api = GetEbObject<EbApi>(RefId, Redis, ObjectsDB);
@@ -239,6 +298,13 @@ namespace ExpressBase.Objects
 
         public EbApi()
         {
+            ParameterKeyColumnsColl = new List<Param>();
+
+            ParameterKeyColumnsTemp = new List<Param>();
+
+            FirstReaderKeyColumnsTemp = new ColumnColletion();
+
+            FirstReaderKeyColumnsColl = new ColumnColletion();
         }
     }
 
@@ -260,6 +326,8 @@ namespace ExpressBase.Objects
         public virtual object GetResult() { return this.Result; }
 
         public virtual List<Param> GetParameters(Dictionary<string, object> requestParams) { return null; }
+
+        public virtual List<Param> GetOutParams(List<Param> _param, int step) { return new List<Param>(); }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -956,6 +1024,87 @@ namespace ExpressBase.Objects
                             <div class='CompLabel'> @Label </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbLoop : ApiResources, IApiCtrlCollection
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [HideInPropertyGrid]
+        public OrderedList InnerResources { get; set; }
+        public override List<Param> GetOutParams(List<Param> _param, int step)
+        {
+            List<Param> OutParams;
+            if (this.InnerResources[0] is IApiCtrlCollection)
+                OutParams = ((this.InnerResources[0] as IApiCtrlCollection).InnerResources[step - 1]).GetOutParams(_param, step);
+            else
+                OutParams = this.InnerResources[step - 1].GetOutParams(_param, step);
+
+            return OutParams;
+        }
+        public override string GetDesignHtml()
+        {
+            return @"<div  class='apiPrcItem jobItem dropped api-item-border' eb-type='Loop' id='@id'> <div class='api-item-inner'>
+                        <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_LpStr' >  
+                            <div class='CompLabel'> Loop Start</div>
+                        </div>
+                        <div class='Sql_Dropable'> </div>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_LpEnd'>  
+                            <div class='CompLabel'> Loop End</div>
+                        </div>
+                    </div></div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbTransaction : ApiResources, IApiCtrlCollection
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [HideInPropertyGrid]
+        public OrderedList InnerResources { get; set; }
+
+        public override List<Param> GetOutParams
+            (List<Param> _param, int step)
+        {
+            List<Param> OutParams;
+            if (this.InnerResources[0] is IApiCtrlCollection)
+                OutParams = ((this.InnerResources[0] as IApiCtrlCollection).InnerResources[step - 1]).GetOutParams(_param, step);
+            else
+                OutParams = this.InnerResources[step - 1].GetOutParams(_param, step);
+
+            foreach (Param p in OutParams)
+            {
+                p.Value = (this.Result as Param).Value;
+            }
+            return _param;
+        }
+        public override string GetDesignHtml()
+        {
+            return @"<div id='@id' class='apiPrcItem jobItem dropped api-item-border' eb-type='Transaction'> <div class='api-item-inner'>
+                        <div tabindex='1' class='drpboxInt lineDrp apiPrcItem' onclick='$(this).focus();' id='@id_TrStr'>  
+                            <div class='CompLabel'> Transaction Start</div>
+                        </div>
+                        <div class='Sql_Dropable'> </div>
+                        <div tabindex='1' class='drpbox lineDrp apiPrcItem' onclick='$(this).focus();' id='@id_TrEnd'>  
+                            <div class='CompLabel'> Transaction End</div>
+                        </div>
+                    </div></div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    public interface IApiCtrlCollection
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        OrderedList InnerResources { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class OrderedList : List<ApiResources>
+    {
+        public OrderedList()
+        {
+            this.Sort((x, y) => x.RouteIndex.CompareTo(y.RouteIndex));
         }
     }
 }

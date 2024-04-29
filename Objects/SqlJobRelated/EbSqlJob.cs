@@ -84,7 +84,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
-        public OrderedList Resources { set; get; }
+        public OrderedList1 Resources { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
@@ -186,15 +186,15 @@ namespace ExpressBase.Objects
             {
                 if (Resources[i] is ISqlJobCollection)
                 {
-                    if (Resources[i] is EbLoop)
-                        LoopLocation = new LoopLocation { Loop = Resources[i] as EbLoop, Step = i, ParentIndex = i };
+                    if (Resources[i] is EbLoop1)
+                        LoopLocation = new LoopLocation { Loop = Resources[i] as EbLoop1, Step = i, ParentIndex = i };
                     else
                     {
                         for (int j = 0; j < (Resources[i] as ISqlJobCollection).InnerResources.Count; j++)
 
                         {
-                            if ((Resources[i] as ISqlJobCollection).InnerResources[j] is EbLoop)
-                                LoopLocation = new LoopLocation { Loop = (Resources[i] as ISqlJobCollection).InnerResources[j] as EbLoop, Step = j, ParentIndex = i };
+                            if ((Resources[i] as ISqlJobCollection).InnerResources[j] is EbLoop1)
+                                LoopLocation = new LoopLocation { Loop = (Resources[i] as ISqlJobCollection).InnerResources[j] as EbLoop1, Step = j, ParentIndex = i };
                         }
                     }
                 }
@@ -214,9 +214,9 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.SqlJob)]
-    public class OrderedList : List<SqlJobResource>
+    public class OrderedList1 : List<SqlJobResource>
     {
-        public OrderedList()
+        public OrderedList1()
         {
             this.Sort((x, y) => x.RouteIndex.CompareTo(y.RouteIndex));
         }
@@ -230,11 +230,11 @@ namespace ExpressBase.Objects
 
 
     [EnableInBuilder(BuilderType.SqlJob)]
-    public class EbLoop : SqlJobResource, ISqlJobCollection
+    public class EbLoop1 : SqlJobResource, ISqlJobCollection
     {
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
-        public OrderedList InnerResources { get; set; }
+        public OrderedList1 InnerResources { get; set; }
         public override List<Param> GetOutParams(List<Param> _param, int step)
         {
             List<Param> OutParams;
@@ -261,13 +261,14 @@ namespace ExpressBase.Objects
 
 
     [EnableInBuilder(BuilderType.SqlJob)]
-    public class EbTransaction : SqlJobResource, ISqlJobCollection
+    public class EbTransaction1 : SqlJobResource, ISqlJobCollection
     {
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
-        public OrderedList InnerResources { get; set; }
+        public OrderedList1 InnerResources { get; set; }
 
-        public override List<Param> GetOutParams(List<Param> _param, int step)
+        public override List<Param> GetOutParams 
+            (List<Param> _param, int step)
         {
             List<Param> OutParams;
             if (this.InnerResources[0] is ISqlJobCollection)
@@ -506,7 +507,7 @@ namespace ExpressBase.Objects
     public interface ISqlJobCollection
     {
         [EnableInBuilder(BuilderType.SqlJob)]
-        OrderedList InnerResources { get; set; }
+        OrderedList1 InnerResources { get; set; }
     }
 
     [RuntimeSerializable]
