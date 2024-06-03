@@ -71,13 +71,10 @@ namespace ExpressBase.Objects.Services
 			this.EbConnectionFactory = _dbf as EbConnectionFactory;
 		}
 
-        public EbMqBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IServiceClient _ssclient, IMessageProducer _mqp)
+        public EbMqBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp)
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
-            this.ServiceStackClient = _ssclient as JsonServiceClient;
-            this.FileClient = _sfc as EbStaticFileClient;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
-
         } 
 
         public EbMqBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc, IServiceClient _ssclient, IEbServerEventClient _sec)

@@ -44,6 +44,27 @@ namespace ExpressBase.Objects.Helpers
             return wrap;
         }
 
+        public static List<EbObjectWrapper> GetLiveVersion(IDatabase objectsDb, int ObjId)
+        {
+            List<EbObjectWrapper> wrap = new List<EbObjectWrapper>();
+            DbParameter[] parameters = { objectsDb.GetNewParameter("id", EbDbTypes.Int32, ObjId) };
+            EbDataTable dt = objectsDb.DoQuery(objectsDb.EB_LIVE_VERSION_OF_OBJS, parameters);
+
+            foreach (EbDataRow dr in dt.Rows)
+            {
+                EbObjectWrapper _ebObject = (new EbObjectWrapper
+                {
+                    RefId = dr[11].ToString(),
+                    Name = dr[1].ToString(),
+                    EbObjectType = Convert.ToInt32(dr[2]),
+                    VersionNumber = dr[6].ToString(),
+                    Json = dr[10].ToString()
+                });
+                wrap.Add(_ebObject);
+            }
+            return wrap;
+        }
+
         public static SqlFuncTestResponse SqlFuncTest(List<Param> Parameters, string FunctionName, IDatabase DataDB)
         {
             SqlFuncTestResponse resp = new SqlFuncTestResponse();
@@ -109,6 +130,7 @@ namespace ExpressBase.Objects.Helpers
 
             return Dict;
         }
+
         public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis, IRedisClient RedisReadOnly)
         {
             DataSourceDataSetResponse resp = new DataSourceDataSetResponse();

@@ -30,6 +30,16 @@ using Org.BouncyCastle.Crypto.Encodings;
 using Org.BouncyCastle.Crypto.Engines;
 using System.Text;
 using Org.BouncyCastle.Crypto.Parameters;
+using FluentFTP;
+using DocumentFormat.OpenXml.Packaging;
+using Microsoft.AspNetCore.Http;
+using DocumentFormat.OpenXml.Spreadsheet;
+using ExpressBase.Common.Excel;
+using Newtonsoft.Json;
+using System.Text.RegularExpressions;
+using System.Dynamic;
+using DocumentFormat.OpenXml.Presentation;
+
 namespace ExpressBase.Objects
 {
     public class ListOrdered : List<ApiResources>
@@ -175,6 +185,21 @@ namespace ExpressBase.Objects
             return ebObject;
         }
 
+        public T GetEbObject<T>(int ObjId, IRedisClient Redis, IDatabase ObjectsDB)
+        {
+
+            T ebObject = EbApiHelper.GetEbObject<T>(ObjId, Redis, ObjectsDB);
+
+            if (ebObject == null)
+            {
+                string message = $"{typeof(T).Name} not found";
+                this.ApiResponse.Message.Description = message;
+
+                throw new ApiException(message);
+            }
+            return ebObject;
+        }
+
         public void FillParams(List<Param> inputParam)
         {
             try
@@ -228,12 +253,25 @@ namespace ExpressBase.Objects
             return p == null || p.Required;
         }
 
-        public EbApi GetApi(string RefId, IRedisClient Redis, IDatabase ObjectsDB, IDatabase DataDB)
+        public EbApi GetApi(string RefId, int ObjId, IRedisClient Redis, IDatabase ObjectsDB, IDatabase DataDB)
         {
-            EbApi Api = GetEbObject<EbApi>(RefId, Redis, ObjectsDB);
-            Api.Redis = Redis;
-            Api.ObjectsDB = ObjectsDB;
-            Api.DataDB = DataDB;
+            EbApi Api = null;
+
+            if (ObjId > 0)
+            {
+                Api = GetEbObject<EbApi>(ObjId, Redis, ObjectsDB);
+            }
+            else if (RefId != string.Empty)
+            {
+                Api = GetEbObject<EbApi>(RefId, Redis, ObjectsDB);
+            }
+            if (Api != null)
+            {
+                Api.Redis = Redis;
+                Api.ObjectsDB = ObjectsDB;
+                Api.DataDB = DataDB;
+                Api.ApiResponse = new ApiResponse();
+            }
             return Api;
         }
 
@@ -802,14 +840,14 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public object ExecuteEmailRetriever(EbApi Api, Service Service, EbStaticFileClient FileClient, bool isMq)
+        public object ExecuteEmailRetriever(EbApi Api, Service Service, bool isMq)
         {
             try
             {
                 EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
                 if (EbConnectionFactory.EmailRetrieveConnection[this.MailConnection] != null)
                 {
-                    RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection].Retrieve(Service, this.DefaultSyncDate, FileClient, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
+                    RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection].Retrieve(Service, this.DefaultSyncDate, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
 
                     EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
                     SchemaHelper.GetWebFormSchema(_form);
@@ -880,6 +918,237 @@ namespace ExpressBase.Objects
 
             return response.RowId;
         }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbFtpPuller : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string UserName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string ServerAddress { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string Password { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string FileName { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string DirectoryPath { get; set; } = "/";
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public bool DeleteAfterProcessing { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='FtpPuller' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public object ExecuteFtpPuller()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(ServerAddress))
+                {
+                    MemoryStream ms = new MemoryStream();
+                    FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
+                    client.AutoConnect();
+                    string fName = this.DirectoryPath + this.FileName;
+                    string datePart = DateTime.Today.ToString("dd/MM/yyyy");
+
+                    //client.MoveFile(fName, fName + datePart);
+
+                    //client.DownloadStream(ms, fName + datePart);
+                    ms.Position = 0;
+                    this.Result = ms;
+
+                    client.Disconnect();
+                }
+                else
+                {
+                    throw new ApiException("[ExecuteFtpPuller], ServerAddress doesn't exist.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteFtpPuller], " + ex.Message);
+            }
+            return this.Result;
+        }
+        public override object GetResult()
+        {
+            return this.Result;
+        }
+
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbCSVPusher : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public override string Reference { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='CSVPusher' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public object ExecuteCSVPusher(EbApi Api, Service Service, EbStaticFileClient FileClient, bool isMq)
+        {
+            try
+            {
+                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
+                object data = (Api.Resources[Api.Step - 1])?.Result;
+                if (data != null && (data as Stream).Length > 0)
+                {
+                    UploadCSVByLoopHoc(data as Stream, Service, Api);
+                }
+                else
+                {
+                    throw new ApiException("[ExecuteCSVPusher], No input.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ApiException("[ExecuteCSVPusher], " + ex.Message);
+            }
+            return this.Result;
+        }
+
+        public void UploadCSVByLoopHoc(Stream stream, Service Service, EbApi Api)
+        {
+            using (StreamReader CsvReader = new StreamReader(stream))
+            {
+                string inputLine = "";
+                int line_number = 1;
+
+                EbDataTable dt = new EbDataTable();
+                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
+
+                EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
+                SchemaHelper.GetWebFormSchema(_form);
+                if (!(_form is null))
+                {
+                    List<int> RowIds = new List<int>();
+                    while ((inputLine = CsvReader.ReadLine()) != null)
+                    {
+                        string[] values = inputLine.Split('\t');
+
+                        if (line_number > 1)
+                        {
+                            WebformData data = _form.GetEmptyModel();
+                            data.MultipleTables[_form.TableName][0]["campaign_name"] = values[0];
+                            data.MultipleTables[_form.TableName][0]["name"] = values[1];
+                            data.MultipleTables[_form.TableName][0]["genurl"] = values[2];
+                            data.MultipleTables[_form.TableName][0]["genemail"] = values[3];
+                            data.MultipleTables[_form.TableName][0]["city"] = values[4];
+
+                            InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
+                            {
+                                RefId = this.Reference,
+                                FormData = EbSerializers.Json_Serialize(data),
+                                CurrentLoc = Api.UserObject.Preference.DefaultLocation,
+                                UserId = Api.UserObject.UserId,
+                                UserAuthId = Api.UserObject.AuthId,
+                                SolnId = Api.SolutionId
+                            };
+
+                            InsertDataFromWebformResponse response = EbFormHelper.InsertDataFromWebform(request, Api.Redis, Service, EbConnectionFactory);
+                            RowIds.Add(response.RowId);
+                        }
+                        line_number++;
+                    }
+                    CsvReader.Close();
+
+
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        this.Result = RowIds;
+                    }
+                }
+            }
+        }
+        public void UploadCSVByBatch(Stream stream, Service Service, EbApi Api)
+        {
+            using (StreamReader CsvReader = new StreamReader(stream))
+            {
+                string inputLine = "";
+                int line_number = 1;
+                EbDataTable dt = new EbDataTable();
+                List<ColumnsInfo> _colInfo = new List<ColumnsInfo>();
+
+                EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
+                dt.TableName = _form.TableName;
+
+                while ((inputLine = CsvReader.ReadLine()) != null)
+                {
+                    string[] values = inputLine.Split('\t');
+
+                    if (line_number == 1)
+                    {
+                        int colIndex = 0;
+                        foreach (string value in values)
+                        {
+                            EbDataColumn dc = new EbDataColumn
+                            {
+                                ColumnName = value.ToLower().Replace(" ", "_"),
+                                Type = EbDbTypes.String,
+                                ColumnIndex = colIndex,
+                                TableName = dt.TableName
+                            };
+                            dt.Columns.Add(dc);
+                            colIndex++;
+                        }
+                    }
+                    else
+                    {
+                        EbDataRow dr = dt.NewDataRow2();
+                        int colIndex = 0;
+                        foreach (string value in values)
+                        {
+                            dr[colIndex] = value;
+                            colIndex++;
+                        }
+                        dt.Rows.Add(dr);
+                    }
+                    line_number++;
+                }
+                CsvReader.Close();
+
+                if (dt.Rows.Count > 0)
+                {
+                    InsertBatchDataResponse response = Service.Gateway.Send<InsertBatchDataResponse>(new InsertBatchDataRequest
+                    {
+                        Data = dt,
+                        RefId = this.Reference,
+                        UserId = Api.UserObject.UserId,
+                        UserAuthId = Api.UserObject.AuthId,
+                        SolnId = Api.SolutionId
+                    });
+                    this.Result = response?.RecordIds;
+                }
+
+            }
+        }
+
+        public override object GetResult()
+        {
+            return this.Result;
+        }
 
     }
 
@@ -921,7 +1190,7 @@ namespace ExpressBase.Objects
                             <div class='CompLabel'> @Label </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
-        }          
+        }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
