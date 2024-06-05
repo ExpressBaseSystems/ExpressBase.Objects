@@ -312,7 +312,7 @@ namespace ExpressBase.Objects
 
 
 
-        public EbApi GetApi(string RefId, IRedisClient Redis, IDatabase ObjectsDB, IDatabase DataDB)
+        public EbApi GetApi(string RefId, int ObjId, IRedisClient Redis, IDatabase ObjectsDB, IDatabase DataDB)
         {
             EbApi Api = null;
 
