@@ -74,7 +74,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string RefId { set; get; }
 
-       public EbJobArguments JobArgs { set; get; }
+        public EbJobArguments JobArgs { set; get; }
 
         public bool HasRefId()
         {
@@ -82,7 +82,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-     public class ApiMqRequest : EbMqRequest, IReturn<ApiResponse>
+    public class ApiMqRequest : EbMqRequest, IReturn<ApiResponse>
     {
         [DataMember(Order = 1)]
         public string Version { set; get; }
@@ -96,10 +96,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string RefId { set; get; }
         public EbJobArguments JobArgs { set; get; }
-        
+
         public bool HasRefId()
         {
             return !string.IsNullOrEmpty(JobArgs?.RefId);
+        }
+
+        public bool HasObjectId()
+        {
+            return (JobArgs?.ObjId > 0);
         }
     }
 

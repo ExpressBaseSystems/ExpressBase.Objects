@@ -30,6 +30,13 @@ namespace ExpressBase.Common.Helpers
             return ebObject;
         }
 
+        public static T GetEbObject<T>(int ObjId, IRedisClient Redis, IDatabase ObjectsDB)
+        {
+            List<EbObjectWrapper> wrap = EbObjectsHelper.GetLiveVersion(ObjectsDB, ObjId);
+            T ebObject = EbSerializers.Json_Deserialize<T>(wrap[0].Json);
+            return ebObject;
+        }
+
         public static EbApi GetApiByName(string name, string version, IDatabase ObjectsDB)
         {
             EbApi api_o = null;
@@ -161,7 +168,13 @@ namespace ExpressBase.Common.Helpers
                     res.Result = (form as EbFormResource).ExecuteFormResource(Api, service);
                     break;
                 case EbEmailRetriever retriever:
-                    res.Result = (retriever as EbEmailRetriever).ExecuteEmailRetriever(Api, service, FileClient, true);
+                    res.Result = (retriever as EbEmailRetriever).ExecuteEmailRetriever(Api, service, true);
+                    break;
+                case EbFtpPuller puller:
+                    res.Result = (puller as EbFtpPuller).ExecuteFtpPuller();
+                    break;
+                case EbCSVPusher pusher:
+                    res.Result = (pusher as EbCSVPusher).ExecuteCSVPusher(Api, service, FileClient, true);
                     break;
                 default:
                     res.Result = null;
