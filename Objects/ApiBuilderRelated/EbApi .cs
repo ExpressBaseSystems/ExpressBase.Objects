@@ -961,7 +961,6 @@ namespace ExpressBase.Objects
                     FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
                     client.AutoConnect();
                     
-                    string fName = this.DirectoryPath + this.FileName;
                     if (DeleteAfterProcessing)
                     {
                         string datePart = DateTime.Today.ToString("dd/MM/yyyy");
