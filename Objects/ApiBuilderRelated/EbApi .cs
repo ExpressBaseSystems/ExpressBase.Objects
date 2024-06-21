@@ -959,12 +959,19 @@ namespace ExpressBase.Objects
                     MemoryStream ms = new MemoryStream();
                     FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
                     client.AutoConnect();
-                    string fName = this.DirectoryPath + this.FileName;
-                    string datePart = DateTime.Today.ToString("dd/MM/yyyy");
-
-                    client.MoveFile(fName, fName + datePart);
-                    client.DownloadStream(ms, fName + datePart);
                     
+                    string fName = this.DirectoryPath + this.FileName;
+                    if (DeleteAfterProcessing)
+                    {
+                        string datePart = DateTime.Today.ToString("dd/MM/yyyy");
+                        client.MoveFile(fName, fName + datePart);
+                        client.DownloadStream(ms, fName + datePart);
+                    }
+                    else
+                    {
+                        client.DownloadStream(ms, fName);
+                    }
+
                     ms.Position = 0;
                     this.Result = ms;
 
