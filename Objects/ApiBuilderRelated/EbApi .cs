@@ -1020,6 +1020,7 @@ namespace ExpressBase.Objects
 
         public object ExecuteFtpPuller()
         {
+            string fName = this.DirectoryPath + this.FileName;
             try
             {
                 if (!string.IsNullOrEmpty(ServerAddress))
@@ -1027,12 +1028,18 @@ namespace ExpressBase.Objects
                     MemoryStream ms = new MemoryStream();
                     FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
                     client.AutoConnect();
-                    string fName = this.DirectoryPath + this.FileName;
-                    string datePart = DateTime.Today.ToString("dd/MM/yyyy");
+                    
+                    if (DeleteAfterProcessing)
+                    {
+                        string datePart = DateTime.Today.ToString("dd/MM/yyyy");
+                        client.MoveFile(fName, fName + datePart);
+                        client.DownloadStream(ms, fName + datePart);
+                    }
+                    else
+                    {
+                        client.DownloadStream(ms, fName);
+                    }
 
-                    //client.MoveFile(fName, fName + datePart);
-
-                    //client.DownloadStream(ms, fName + datePart);
                     ms.Position = 0;
                     this.Result = ms;
 
@@ -1045,7 +1052,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception ex)
             {
-                throw new ApiException("[ExecuteFtpPuller], " + ex.Message);
+                throw new ApiException("[ExecuteFtpPuller], " + ex.Message + "path: " + fName);
             }
             return this.Result;
         }
