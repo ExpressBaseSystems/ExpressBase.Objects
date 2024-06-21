@@ -952,6 +952,7 @@ namespace ExpressBase.Objects
 
         public object ExecuteFtpPuller()
         {
+            string fName = this.DirectoryPath + this.FileName;
             try
             {
                 if (!string.IsNullOrEmpty(ServerAddress))
@@ -984,7 +985,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception ex)
             {
-                throw new ApiException("[ExecuteFtpPuller], " + ex.Message);
+                throw new ApiException("[ExecuteFtpPuller], " + ex.Message + "path: " + fName);
             }
             return this.Result;
         }
