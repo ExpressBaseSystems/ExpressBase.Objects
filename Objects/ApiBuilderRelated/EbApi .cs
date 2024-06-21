@@ -962,9 +962,9 @@ namespace ExpressBase.Objects
                     string fName = this.DirectoryPath + this.FileName;
                     string datePart = DateTime.Today.ToString("dd/MM/yyyy");
 
-                    //client.MoveFile(fName, fName + datePart);
-
-                    //client.DownloadStream(ms, fName + datePart);
+                    client.MoveFile(fName, fName + datePart);
+                    client.DownloadStream(ms, fName + datePart);
+                    
                     ms.Position = 0;
                     this.Result = ms;
 
