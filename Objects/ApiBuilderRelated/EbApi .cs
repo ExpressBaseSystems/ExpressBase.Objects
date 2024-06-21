@@ -964,8 +964,9 @@ namespace ExpressBase.Objects
                     if (DeleteAfterProcessing)
                     {
                         string datePart = DateTime.Today.ToString("dd/MM/yyyy");
-                        client.MoveFile(fName, fName + datePart);
-                        client.DownloadStream(ms, fName + datePart);
+                        string fileName = Path.GetFileNameWithoutExtension(fName) + datePart + Path.GetExtension(fName);
+                        client.MoveFile(fName, fileName);
+                        client.DownloadStream(ms, fileName);
                     }
                     else
                     {
@@ -984,7 +985,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception ex)
             {
-                throw new ApiException("[ExecuteFtpPuller], " + ex.Message + "path: " + fName);
+                throw new ApiException("[ExecuteFtpPuller], " + ex.Message + " path: " + fName);
             }
             return this.Result;
         }
