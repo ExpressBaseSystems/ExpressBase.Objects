@@ -949,9 +949,10 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
-
+        
         public object ExecuteFtpPuller()
         {
+            string message = string.Empty;
             string fName = this.DirectoryPath + this.FileName;
             try
             {
@@ -960,11 +961,11 @@ namespace ExpressBase.Objects
                     MemoryStream ms = new MemoryStream();
                     FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
                     client.AutoConnect();
-                    
                     if (DeleteAfterProcessing)
                     {
                         string datePart = DateTime.Today.ToString("dd/MM/yyyy");
                         string fileName = Path.GetFileNameWithoutExtension(fName) + datePart + Path.GetExtension(fName);
+                        message += " path: " + fName + " to path: " + fileName;
                         client.MoveFile(fName, fileName);
                         client.DownloadStream(ms, fileName);
                     }
@@ -985,10 +986,12 @@ namespace ExpressBase.Objects
             }
             catch (Exception ex)
             {
-                throw new ApiException("[ExecuteFtpPuller], " + ex.Message + " path: " + fName);
+                message += "[ExecuteFtpPuller], " + ex.Message;
+                throw new ApiException(message);
             }
             return this.Result;
         }
+        
         public override object GetResult()
         {
             return this.Result;
