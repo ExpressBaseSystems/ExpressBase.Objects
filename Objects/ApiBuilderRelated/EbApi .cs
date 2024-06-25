@@ -963,7 +963,7 @@ namespace ExpressBase.Objects
                     client.AutoConnect();
                     if (DeleteAfterProcessing)
                     {
-                        string datePart = DateTime.Today.ToString("dd/MM/yyyy");
+                        string datePart = DateTime.Today.ToString("dd-MM-yyyy");
                         string fileName = Path.GetFileNameWithoutExtension(fName) + datePart + Path.GetExtension(fName);
                         message += " path: " + fName + " to path: " + fileName;
                         client.MoveFile(fName, fileName);
