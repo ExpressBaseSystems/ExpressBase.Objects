@@ -949,11 +949,12 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
-        
+
         public object ExecuteFtpPuller()
         {
             string message = string.Empty;
             string fName = this.DirectoryPath + this.FileName;
+            bool is_downloaded;
             try
             {
                 if (!string.IsNullOrEmpty(ServerAddress))
@@ -961,17 +962,19 @@ namespace ExpressBase.Objects
                     MemoryStream ms = new MemoryStream();
                     FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
                     client.AutoConnect();
+                    //client.UploadFile("C:/Users/donag/Downloads/copy2.csv", "/Expressbase-test.csv");
                     if (DeleteAfterProcessing)
                     {
                         string datePart = DateTime.Today.ToString("dd-MM-yyyy");
                         string fileName = Path.GetFileNameWithoutExtension(fName) + datePart + Path.GetExtension(fName);
                         message += " path: " + fName + " to path: " + fileName;
-                        client.MoveFile(fName, fileName);
-                        client.DownloadStream(ms, fileName);
+                        bool is_renamed = client.MoveFile(fName, fileName);
+                        if (is_renamed)
+                            is_downloaded = client.DownloadStream(ms, fileName);
                     }
                     else
                     {
-                        client.DownloadStream(ms, fName);
+                        is_downloaded = client.DownloadStream(ms, fName);
                     }
 
                     ms.Position = 0;
@@ -991,7 +994,7 @@ namespace ExpressBase.Objects
             }
             return this.Result;
         }
-        
+
         public override object GetResult()
         {
             return this.Result;
