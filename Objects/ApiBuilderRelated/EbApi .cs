@@ -1069,6 +1069,7 @@ namespace ExpressBase.Objects
                             data.MultipleTables[_form.TableName][0]["genurl"] = values[2];
                             data.MultipleTables[_form.TableName][0]["genemail"] = values[3];
                             data.MultipleTables[_form.TableName][0]["city"] = values[4];
+                            data.MultipleTables[_form.TableName][0]["fb_lead"] = "Yes";
 
                             InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
                             {
