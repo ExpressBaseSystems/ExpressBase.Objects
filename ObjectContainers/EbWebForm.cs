@@ -2889,6 +2889,9 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
+                if (!param.Exists(e => e.ParameterName == this.TableName + FormConstants._id))
+                    param.Add(DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, 0));
+
                 return DataDB.DoNonQuery(this.DbConnection, q, param.ToArray());
             }
             return 0;

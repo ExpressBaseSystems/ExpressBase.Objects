@@ -1020,7 +1020,9 @@ namespace ExpressBase.Objects
 
         public object ExecuteFtpPuller()
         {
+            string message = string.Empty;
             string fName = this.DirectoryPath + this.FileName;
+            bool is_downloaded;
             try
             {
                 if (!string.IsNullOrEmpty(ServerAddress))
@@ -1028,16 +1030,19 @@ namespace ExpressBase.Objects
                     MemoryStream ms = new MemoryStream();
                     FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
                     client.AutoConnect();
-                    
+                    //client.UploadFile("C:/Users/donag/Downloads/copy2.csv", "/Expressbase-test.csv");
                     if (DeleteAfterProcessing)
                     {
-                        string datePart = DateTime.Today.ToString("dd/MM/yyyy");
-                        client.MoveFile(fName, fName + datePart);
-                        client.DownloadStream(ms, fName + datePart);
+                        string datePart = DateTime.Today.ToString("dd-MM-yyyy");
+                        string fileName = Path.GetFileNameWithoutExtension(fName) + datePart + Path.GetExtension(fName);
+                        message += " path: " + fName + " to path: " + fileName;
+                        bool is_renamed = client.MoveFile(fName, fileName);
+                        if (is_renamed)
+                            is_downloaded = client.DownloadStream(ms, fileName);
                     }
                     else
                     {
-                        client.DownloadStream(ms, fName);
+                        is_downloaded = client.DownloadStream(ms, fName);
                     }
 
                     ms.Position = 0;
@@ -1052,10 +1057,12 @@ namespace ExpressBase.Objects
             }
             catch (Exception ex)
             {
-                throw new ApiException("[ExecuteFtpPuller], " + ex.Message + "path: " + fName);
+                message += "[ExecuteFtpPuller], " + ex.Message;
+                throw new ApiException(message);
             }
             return this.Result;
         }
+
         public override object GetResult()
         {
             return this.Result;
@@ -1130,6 +1137,7 @@ namespace ExpressBase.Objects
                             data.MultipleTables[_form.TableName][0]["genurl"] = values[2];
                             data.MultipleTables[_form.TableName][0]["genemail"] = values[3];
                             data.MultipleTables[_form.TableName][0]["city"] = values[4];
+                            data.MultipleTables[_form.TableName][0]["fb_lead"] = "Yes";
 
                             InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
                             {
