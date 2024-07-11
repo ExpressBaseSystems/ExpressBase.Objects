@@ -270,7 +270,7 @@ else if (this.MultiPushIdType === 2)
 
                             if (SrcWebForm.AutoId != null && Convert.ToString(val).Contains(FG_Constants.AutoId_PlaceHolder))
                             {
-                                if (_column.Control is EbAutoId || _column.Control is EbTextBox)
+                                if (_column.Control is EbAutoId || _column.Control is EbTextBox || _column.Control is EbDGStringColumn)
                                 {
                                     _column.Control.BypassParameterization = true;
                                     string[] val_s = Convert.ToString(val).Split(FG_Constants.AutoId_PlaceHolder);
