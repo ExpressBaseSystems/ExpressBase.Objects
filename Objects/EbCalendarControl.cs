@@ -98,7 +98,7 @@ namespace ExpressBase.Objects.Objects
             <span class='helpText' ui-helptxt=''> </span>
         </div>
         <div id='@ebsid@_month' name='month'  ctype='Date' eb-hidden='false'>
-            <span class='eb-ctrl-label eb-label-editable' ui-label=''>month</span>
+            <span class='eb-ctrl-label eb-label-editable' ui-label=''>Month</span>
             <input id='@ebsid@_monthlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_monthWraper' class='ctrl-cover' eb-readonly='false'>                    
                 <div class='input-group' style='width:100%;'>            
@@ -130,8 +130,10 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-       Range : <input type='text' class='date' id='datefrom' /*hidden*/ style='width: 30%;'/>
-       -<input type='text' class='date' id='dateto' /*hidden*/style='width: 30%;'/>
+        <span class='eb-ctrl-label'> From </span> 
+        <input type='text' class='date' id='datefrom' disabled /*hidden*/ style='width: 30%;'/>
+        <span class='eb-ctrl-label'> To </span> 
+        <input type='text' class='date' id='dateto' disabled /*hidden*/style='width: 30%;'/>
         <input type = 'text' id ='id' value = '0' hidden>
 </div>
         "
