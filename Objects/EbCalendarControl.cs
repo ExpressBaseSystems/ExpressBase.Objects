@@ -54,6 +54,16 @@ namespace ExpressBase.Objects.Objects
             set { }
         }
 
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"return this.getValueFromDOM(p1, p2, p3, p4);
+                ";
+            }
+            set { }
+        }
+
         public override string OnChangeBindJSFn
         {
             get
@@ -86,7 +96,7 @@ namespace ExpressBase.Objects.Objects
         <select id='@ebsid@_dd'  class='selectpicker' style='width: 100%;'>
             @options@
         </select>
-        <div id='@ebsid@_date' name='date' ctype='Date' eb-hidden='false'>
+        <div id='@ebsid@_date' name='date' ctype='Date' eb-hidden='true'>
             <span class='eb-ctrl-label eb-label-editable' ui-label=''>Date</span>
             <input id='@ebsid@_datelbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_dateWraper' class='ctrl-cover' eb-readonly='false'>                    
@@ -97,7 +107,7 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <div id='@ebsid@_month' name='month'  ctype='Date' eb-hidden='false'>
+        <div id='@ebsid@_month' name='month'  ctype='Date' eb-hidden='true'>
             <span class='eb-ctrl-label eb-label-editable' ui-label=''>Month</span>
             <input id='@ebsid@_monthlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_monthWraper' class='ctrl-cover' eb-readonly='false'>                    
@@ -108,7 +118,7 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <div id='@ebsid@_fromyear' name='fromyear'  ctype='Date' eb-hidden='false'>
+        <div id='@ebsid@_fromyear' name='fromyear'  ctype='Date' eb-hidden='true'>
             <span class='eb-ctrl-label eb-label-editable' ui-label=''>From Year</span>
             <input id='@ebsid@_fromyearlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_fromyearWraper' class='ctrl-cover' eb-readonly='false'>                    
@@ -119,7 +129,7 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <div id='@ebsid@_toyear' name='toyear'  ctype='Date' eb-hidden='false'>
+        <div id='@ebsid@_toyear' name='toyear'  ctype='Date' eb-hidden='true'>
             <span class='eb-ctrl-label eb-label-editable' ui-label=''>To Year</span>
             <input id='@ebsid@_toyearlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_toyearWraper' class='ctrl-cover' eb-readonly='false'>                    
