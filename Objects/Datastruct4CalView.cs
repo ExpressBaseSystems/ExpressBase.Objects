@@ -26,7 +26,7 @@ namespace ExpressBase.Objects.Objects
 
         private Dictionary<int, DataStruct4CalViewRow> _innerDict = new Dictionary<int, DataStruct4CalViewRow>();//dict<partyid, dict<int column_index, long value>
 
-        Dictionary<int, List<long>> Totals = new Dictionary<int, List<long>>();
+        Dictionary<int, List<double>> Totals = new Dictionary<int, List<double>>();
 
         public List<ColumnCondition> ConditionalFormating { get; set; }
 
@@ -63,7 +63,7 @@ namespace ExpressBase.Objects.Objects
                 foreach (DVBaseColumn col in DataColumns)
                 {
                     _innerDict[Convert.ToInt32(row[this.ForeignKeyColumnName])]
-                        .Add(Columns.GetColumnKey(dt), col.Name, Convert.ToInt64(row[col.Name]));
+                        .Add(Columns.GetColumnKey(dt), col.Name, Convert.ToDouble(row[col.Name]));
                 }
             }
         }
@@ -81,8 +81,8 @@ namespace ExpressBase.Objects.Objects
             CultureInfo _user_culture = CultureHelper.GetSerializedCultureInfo(_user.Preference.Locale).GetCultureInfo();
             _user_culture.NumberFormat.NumberDecimalDigits = 0;
             EbDataRow Row;
-            long value;
-            long prev_value;
+            double value;
+            double prev_value;
             int summary_last_index = summary.Keys.Last();
             string total;
             for (int i = 0; i < _formattedTable.Rows.Count; i++)//filling consolidated data
@@ -93,7 +93,7 @@ namespace ExpressBase.Objects.Objects
                 {
                     if (!Totals.ContainsKey(_id))
                     {
-                        Totals.Add(_id, new List<long>());
+                        Totals.Add(_id, new List<double>());
                     }
                     total = string.Empty;
                     foreach (int columnIndex in _innerDict[_id].GetKeys())
@@ -121,8 +121,8 @@ namespace ExpressBase.Objects.Objects
                             {
                                 Console.WriteLine(e.Message + "   " + _id);
                             }
-                            summary[columnIndex][j] = (Convert.ToDecimal(summary[columnIndex][0]) + Convert.ToDecimal(value)).ToString("N", _user_culture.NumberFormat);
-                            summary[summary_last_index][j] = (Convert.ToDecimal(summary[summary_last_index][0]) + Convert.ToDecimal(value)).ToString("N", _user_culture.NumberFormat); ;
+                            summary[columnIndex][j] = (Convert.ToDecimal(summary[columnIndex][0]) + Convert.ToDecimal(value)).ToString("N", CultureInfo.InvariantCulture);
+                            summary[summary_last_index][j] = (Convert.ToDecimal(summary[summary_last_index][0]) + Convert.ToDecimal(value)).ToString("N", CultureInfo.InvariantCulture); ;
                             j++;
                         }
                         Row[columnIndex] = val;
@@ -130,7 +130,7 @@ namespace ExpressBase.Objects.Objects
                     for (int k = 0; k < DataColumns.Count; k++)
                     {
                         if (Totals[_id].Count > k)
-                            total += $"<div class='dataclass {DataColumns[k].Name}_class'>{Convert.ToDecimal(Totals[_id][k]).ToString("N", _user_culture.NumberFormat) }</div>";
+                            total += $"<div class='dataclass {DataColumns[k].Name}_class'>{Convert.ToDecimal(Totals[_id][k]).ToString("N", CultureInfo.InvariantCulture)}</div>";
                     }
                     Row["Total"] = total;
                 }
@@ -138,9 +138,9 @@ namespace ExpressBase.Objects.Objects
 
         }
 
-        private string GetFormattedValue(long value, EbDataRow row, int columnIndex, long prev_value, CultureInfo _user_culture, DVBaseColumn col)
+        private string GetFormattedValue(double value, EbDataRow row, int columnIndex, double prev_value, CultureInfo _user_culture, DVBaseColumn col)
         {
-            string Val = (value == 0) ? string.Empty : Convert.ToDecimal(value).ToString("N", _user_culture.NumberFormat);
+            string Val = (value == 0) ? string.Empty : Convert.ToDecimal(value).ToString("N", CultureInfo.InvariantCulture);
             string formatteddata = string.Empty;
             if (ConditionalFormating.Count > 0)
             {
@@ -159,7 +159,7 @@ namespace ExpressBase.Objects.Objects
 
                 if (ShowGrowthPercentage && CalendarType != AttendanceType.DayWise && prev_value > 0 && value > 0)
                 {
-                    long percent = ((value - prev_value) * 100) / value;
+                    int percent = Convert.ToInt32(((value - prev_value) * 100) / value);
                     string color = "green", direction = "up";
                     if (percent < 0)
                     {
@@ -173,11 +173,11 @@ namespace ExpressBase.Objects.Objects
                                         "</span>";
                 }
             }
-            formatteddata = $"<div class='dataclass {col.Name}_class'>{formatteddata }</div>";
+            formatteddata = $"<div class='dataclass {col.Name}_class'>{formatteddata}</div>";
             return formatteddata;
         }
 
-        public void DoConditionalFormating(ref string formattedVal, long value, EbDataRow row)
+        public void DoConditionalFormating(ref string formattedVal, double value, EbDataRow row)
         {
 
             foreach (ColumnCondition cond in ConditionalFormating)
@@ -205,7 +205,7 @@ namespace ExpressBase.Objects.Objects
             }
         }
 
-        public bool EvaluateExpression(EbDataRow _datarow, ref EbVisualizationGlobals globals, AdvancedCondition condition, long value)
+        public bool EvaluateExpression(EbDataRow _datarow, ref EbVisualizationGlobals globals, AdvancedCondition condition, double value)
         {
             foreach (FormulaPart formulaPart in condition.FormulaParts)
             {
@@ -295,25 +295,25 @@ namespace ExpressBase.Objects.Objects
 
     public class DataStruct4CalViewRow
     {
-        private Dictionary<int, Dictionary<string, long>> _innerDict = new Dictionary<int, Dictionary<string, long>>();
+        private Dictionary<int, Dictionary<string, double>> _innerDict = new Dictionary<int, Dictionary<string, double>>();
 
         public int GetCount()
         {
             return _innerDict.Count;
         }
-        public Dictionary<int, Dictionary<string, long>>.KeyCollection GetKeys()
+        public Dictionary<int, Dictionary<string, double>>.KeyCollection GetKeys()
         {
             return _innerDict.Keys;
         }
-        public long GetValue(int index, string name)
+        public double GetValue(int index, string name)
         {
             if (_innerDict.ContainsKey(index))
                 return _innerDict[index][name];
             else return 0;
         }
-        public void Add(int columnKey, string name, long value)
+        public void Add(int columnKey, string name, double value)
         {
-            Dictionary<string, long> d = new Dictionary<string, long>();
+            Dictionary<string, double> d = new Dictionary<string, double>();
             d.Add(name, 0);
             if (!_innerDict.ContainsKey(columnKey))
                 _innerDict.Add(columnKey, d);
