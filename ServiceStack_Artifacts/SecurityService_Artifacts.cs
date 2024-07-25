@@ -852,11 +852,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 var ob_type = Convert.ToInt32(dr[2]);
                 if (app_id != 0)
                 {
-                    if (!this.GetApplication(app_id).ObjectTypes.ContainsKey(ob_type))
-                        this.GetApplication(app_id).ObjectTypes.Add(ob_type);
+                    Application _app = this.GetApplication(app_id);
+                    if (_app == null)
+                        continue;
+                    if (!_app.ObjectTypes.ContainsKey(ob_type))
+                        _app.ObjectTypes.Add(ob_type);
 
-
-                    this.GetApplication(app_id).ObjectTypes[ob_type].Add(new Eb_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
+                    _app.ObjectTypes[ob_type].Add(new Eb_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
                 }
             }
         }
