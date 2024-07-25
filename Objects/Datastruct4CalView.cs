@@ -121,8 +121,8 @@ namespace ExpressBase.Objects.Objects
                             {
                                 Console.WriteLine(e.Message + "   " + _id);
                             }
-                            summary[columnIndex][j] = (Convert.ToDecimal(summary[columnIndex][0]) + Convert.ToDecimal(value)).ToString("N", CultureInfo.InvariantCulture);
-                            summary[summary_last_index][j] = (Convert.ToDecimal(summary[summary_last_index][0]) + Convert.ToDecimal(value)).ToString("N", CultureInfo.InvariantCulture); ;
+                            summary[columnIndex][j] = (Convert.ToDecimal(summary[columnIndex][j], CultureInfo.InvariantCulture) + Convert.ToDecimal(value)).ToString("N", CultureInfo.InvariantCulture);
+                            summary[summary_last_index][j] = (Convert.ToDecimal(summary[summary_last_index][j], CultureInfo.InvariantCulture) + Convert.ToDecimal(value)).ToString("N", CultureInfo.InvariantCulture); ;
                             j++;
                         }
                         Row[columnIndex] = val;
