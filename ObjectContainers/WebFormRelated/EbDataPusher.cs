@@ -453,7 +453,7 @@ else if (this.MultiPushIdType === 2)
                 EbDataPusherConfig conf = pusher.WebForm.DataPusherConfig;
                 int startIndex = Index;
                 FnCall += $"\ndestinationform = BatchDestinationForms[{DpCounter++}];";
-                FnCall += $"\nfor (int i = 0; i < {conf.GridSingleTable.Count}; i++) \n{{";
+                FnCall += $"\nfor (int i_{DpCounter} = 0; i_{DpCounter} < {conf.GridSingleTable.Count}; i_{DpCounter}++) \n{{";
                 FnCall += $"\nsourceform.{conf.GridName}.GetEnumerator();";
                 JObject JObj = JObject.Parse(pusher.Json);
 
@@ -498,7 +498,7 @@ else if (this.MultiPushIdType === 2)
                         FnCall += GetFunctionCall(Index, true);
                         Index++;
                     }
-                    FnCall = FnCall.Replace("$Multiplier$", $"(i*{Index - startIndex})+");
+                    FnCall = FnCall.Replace("$Multiplier$", $"(i_{DpCounter}*{Index - startIndex})+");
                     conf.ScriptCount = Index - startIndex;
                 }
                 FnCall += "\n}";
