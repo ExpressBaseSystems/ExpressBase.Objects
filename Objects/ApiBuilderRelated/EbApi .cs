@@ -1068,14 +1068,14 @@ namespace ExpressBase.Objects
                             data.MultipleTables[_form.TableName][0]["name"] = values[1];
                             data.MultipleTables[_form.TableName][0]["genurl"] = values[2];
                             data.MultipleTables[_form.TableName][0]["genemail"] = values[3];
-                            data.MultipleTables[_form.TableName][0]["city"] = values[4];
+                            data.MultipleTables[_form.TableName][0]["city"] = (values.Length >= 5) ? values[4] : "";
                             data.MultipleTables[_form.TableName][0]["fb_lead"] = "Yes";
 
                             InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
                             {
                                 RefId = this.Reference,
                                 FormData = EbSerializers.Json_Serialize(data),
-                                CurrentLoc = Api.UserObject.Preference.DefaultLocation,
+                                CurrentLoc = 22,
                                 UserId = Api.UserObject.UserId,
                                 UserAuthId = Api.UserObject.AuthId,
                                 SolnId = Api.SolutionId
