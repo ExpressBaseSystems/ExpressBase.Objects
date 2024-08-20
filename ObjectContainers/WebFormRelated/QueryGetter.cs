@@ -312,7 +312,7 @@ WHERE
                     else
                         _cols = $"{ebs[SystemColumns.eb_loc_id]}, id" + _cols;
 
-                    query += string.Format("SELECT {0} FROM {2} WHERE {1}_id = (SELECT id FROM {1} WHERE {3}_id={8} AND COALESCE({4}, {5})={5}) AND COALESCE({4}, {5})={5} {6} {7};",
+                    query += string.Format("SELECT {0} FROM {2} WHERE {1}_id = (SELECT id FROM {1} WHERE {3}_id={8} AND COALESCE({4}, {5})={5} {6}) AND COALESCE({4}, {5})={5} {7};",
                         _cols,//0
                         _this.FormSchema.MasterTable,//1
                         _table.TableName,//2
