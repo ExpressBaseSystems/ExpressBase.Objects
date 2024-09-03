@@ -339,6 +339,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("true")]
         public bool CancelReason { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -1824,12 +1825,9 @@ namespace ExpressBase.Objects
                         else
                             dt = DataDB.DoQuery(this.DbConnection, qry, param);
 
-                        SingleTable Table = new SingleTable();
-                        this.GetFormattedData(dt, Table);
-
                         List<FileMetaInfo> _list = new List<FileMetaInfo>();
                         DateTime _date;
-                        foreach (SingleRow dr in Table)
+                        foreach (EbDataRow dr in dt.Rows)
                         {
                             _date = Convert.ToDateTime(dr[FormConstants.uploadts]);
                             _date = _date.ConvertFromUtc(this.UserObj.Preference.TimeZone);
