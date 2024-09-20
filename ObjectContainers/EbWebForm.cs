@@ -339,6 +339,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("true")]
         public bool CancelReason { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -1149,6 +1150,7 @@ namespace ExpressBase.Objects
             {
                 int _locId = 0, i = 0, j = 0;
                 int _rowId = 0;
+                bool checkIdSrcId = false;
                 if (_table != null)
                 {
                     if (!(_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery)))
@@ -1172,6 +1174,7 @@ namespace ExpressBase.Objects
                             DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                             this.FormData.CancelReason = this.CancelReason ? Convert.ToString(dataRow[i++]) : string.Empty;
+                            checkIdSrcId = true;
 
                             string p = this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetLongTimePattern();
                             this.FormData.Info = new WebformDataInfo()
@@ -1200,6 +1203,15 @@ namespace ExpressBase.Objects
                     }
                     else
                         _rowId = Convert.ToInt32(dataRow[i]);
+
+                    if (checkIdSrcId)
+                    {
+                        if (_rowId == this.FormData.SrcDataId && this.FormData.FormVersionId == this.FormData.SrcVerId)
+                        {
+                            this.FormData.SrcDataId = 0;
+                            this.FormData.SrcVerId = 0;
+                        }
+                    }
 
                     if (_rowId <= 0)
                         throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"Invalid data found. TableName: {_table.TableName}, RowId: {_rowId}, LocId: {_locId}", "EbWebForm -> GetFormattedData");
@@ -1813,12 +1825,9 @@ namespace ExpressBase.Objects
                         else
                             dt = DataDB.DoQuery(this.DbConnection, qry, param);
 
-                        SingleTable Table = new SingleTable();
-                        this.GetFormattedData(dt, Table);
-
                         List<FileMetaInfo> _list = new List<FileMetaInfo>();
                         DateTime _date;
-                        foreach (SingleRow dr in Table)
+                        foreach (EbDataRow dr in dt.Rows)
                         {
                             _date = Convert.ToDateTime(dr[FormConstants.uploadts]);
                             _date = _date.ConvertFromUtc(this.UserObj.Preference.TimeZone);
@@ -2890,7 +2899,7 @@ namespace ExpressBase.Objects
                     }
                 }
                 if (!param.Exists(e => e.ParameterName == this.TableName + FormConstants._id))
-                    param.Add(DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, 0));
+                    param.Add(DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId));
 
                 return DataDB.DoNonQuery(this.DbConnection, q, param.ToArray());
             }

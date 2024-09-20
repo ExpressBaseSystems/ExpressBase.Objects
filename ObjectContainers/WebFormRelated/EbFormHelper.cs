@@ -1051,7 +1051,7 @@ namespace ExpressBase.Objects
 
         public static int SetFsWebReceivedCxtId(IServiceClient ServiceClient, IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return 0;
 
             int DataId = 0;
@@ -1060,7 +1060,7 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.WebReceived, new TimeSpan(0, 1, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.WebReceived, new TimeSpan(0, 3, 1));
             }
             else if (status == FormSubmissionJobStatus.WebReceived || status == FormSubmissionJobStatus.SsReceived)
             {
@@ -1079,7 +1079,7 @@ namespace ExpressBase.Objects
                 {
 
                 }
-                throw new FormException("This form submission is already in progress. Please check after sometime.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
+                throw new FormException("This form submission is already in progress.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
             }
             else if (status == FormSubmissionJobStatus.SsProcessed || status == FormSubmissionJobStatus.WebProcessed)
             {
@@ -1106,7 +1106,7 @@ namespace ExpressBase.Objects
 
         public static void SetFsWebProcessedCxtId(IServiceClient ServiceClient, IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];
@@ -1139,7 +1139,7 @@ namespace ExpressBase.Objects
 
         public static void SetFsSsReceivedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];
@@ -1147,11 +1147,11 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.WebReceived)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.SsReceived, new TimeSpan(0, 5, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.SsReceived, new TimeSpan(0, 2, 1));//form save timeout is 2 min
             }
             else if (status == FormSubmissionJobStatus.SsReceived)
             {
-                throw new FormException("This form submission is already in progress. Please check after sometime.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "SsCheck");
+                throw new FormException("This form submission is already in progress.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "SsCheck");
             }
             else if (status == FormSubmissionJobStatus.SsProcessed || status == FormSubmissionJobStatus.WebProcessed)
             {
@@ -1161,7 +1161,7 @@ namespace ExpressBase.Objects
 
         public static void SetFsSsProcessedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId, int NewRowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];
@@ -1181,7 +1181,7 @@ namespace ExpressBase.Objects
 
         public static void ReSetFormSubmissionCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];

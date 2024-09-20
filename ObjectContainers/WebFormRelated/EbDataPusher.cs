@@ -124,6 +124,9 @@ else if (this.MultiPushIdType === 2)
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        public MultiPushIdTypes MultiPushIdType { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [Alias("Source datagrid")]
         public string SourceDG { get; set; }
 
@@ -270,7 +273,7 @@ else if (this.MultiPushIdType === 2)
 
                             if (SrcWebForm.AutoId != null && Convert.ToString(val).Contains(FG_Constants.AutoId_PlaceHolder))
                             {
-                                if (_column.Control is EbAutoId || _column.Control is EbTextBox)
+                                if (_column.Control is EbAutoId || _column.Control is EbTextBox || _column.Control is EbDGStringColumn)
                                 {
                                     _column.Control.BypassParameterization = true;
                                     string[] val_s = Convert.ToString(val).Split(FG_Constants.AutoId_PlaceHolder);
@@ -453,7 +456,7 @@ else if (this.MultiPushIdType === 2)
                 EbDataPusherConfig conf = pusher.WebForm.DataPusherConfig;
                 int startIndex = Index;
                 FnCall += $"\ndestinationform = BatchDestinationForms[{DpCounter++}];";
-                FnCall += $"\nfor (int i = 0; i < {conf.GridSingleTable.Count}; i++) \n{{";
+                FnCall += $"\nfor (int i_{DpCounter} = 0; i_{DpCounter} < {conf.GridSingleTable.Count}; i_{DpCounter}++) \n{{";
                 FnCall += $"\nsourceform.{conf.GridName}.GetEnumerator();";
                 JObject JObj = JObject.Parse(pusher.Json);
 
@@ -498,8 +501,9 @@ else if (this.MultiPushIdType === 2)
                         FnCall += GetFunctionCall(Index, true);
                         Index++;
                     }
-                    FnCall = FnCall.Replace("$Multiplier$", $"(i*{Index - startIndex})+");
+                    FnCall = FnCall.Replace("$Multiplier$", $"(i_{DpCounter}*{Index - startIndex})+");
                     conf.ScriptCount = Index - startIndex;
+                    Index = conf.GridSingleTable.Count > 1 ? (conf.GridSingleTable.Count - 1) * (Index - startIndex) + Index : Index;
                 }
                 FnCall += "\n}";
             }
@@ -676,7 +680,8 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                     AllowPush = true,
                     DisableAutoReadOnly = batchDp.DisableAutoReadOnly,
                     DisableAutoLock = batchDp.DisableAutoLock,
-                    DisableReverseLink = batchDp.DisableReverseLink
+                    DisableReverseLink = batchDp.DisableReverseLink,
+                    MultiPushId = batchDp.MultiPushIdType == MultiPushIdTypes.Row ? batchDp.Name : null
                 };
             }
             if (!ChangeDetected)
@@ -782,7 +787,8 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
                     SourceRecId = _this.TableRowId,
                     AllowPush = true,
                     DisableAutoReadOnly = batchDp.DisableAutoReadOnly,
-                    DisableAutoLock = batchDp.DisableAutoLock
+                    DisableAutoLock = batchDp.DisableAutoLock,
+                    MultiPushId = batchDp.MultiPushIdType == MultiPushIdTypes.Row ? batchDp.Name : null
                 };
                 batchDp.WebForm = _form;
             }
@@ -824,6 +830,7 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
             SingleTable TableDeleted = new SingleTable();
             if (OldTable == null)
                 return (NewTable, TableDeleted);
+            OldTable = JsonConvert.DeserializeObject<SingleTable>(JsonConvert.SerializeObject(OldTable));
 
             foreach (SingleRow nRow in NewTable)
             {
@@ -863,58 +870,55 @@ MultiplierPlaceHolder ? "$Multiplier$" : string.Empty);
 
         private static void MergeFormData(EbWebFormCollection FormCollection, EbWebFormCollection FormCollectionBkUp, List<EbBatchFormDataPusher> Pushers)
         {
-            foreach (EbBatchFormDataPusher batchDp in Pushers)
+            List<EbWebForm> RmForm = new List<EbWebForm>();
+            foreach (EbWebForm Form in FormCollection)
             {
-                List<EbWebForm> RmForm = new List<EbWebForm>();
-                foreach (EbWebForm Form in FormCollection)
+                EbDataPusherConfig conf = Form.DataPusherConfig;
+                EbWebForm FormBkUp = FormCollectionBkUp.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName && e.DataPusherConfig.MultiPushId == conf.MultiPushId);
+
+                bool FormBkUpDataFound = false;
+                if (FormBkUp != null)
+                    FormBkUpDataFound = FormBkUp.FormDataBackup.MultipleTables[FormBkUp.FormSchema.MasterTable].Count > 0;
+
+                if (!conf.AllowPush && !FormBkUpDataFound)
+                    RmForm.Add(Form);
+                if (!FormBkUpDataFound)//new
+                    continue;
+                else
                 {
-                    EbDataPusherConfig conf = Form.DataPusherConfig;
-                    EbWebForm FormBkUp = FormCollectionBkUp.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
+                    Form.FormDataBackup = FormBkUp.FormDataBackup;
+                    Form.TableRowId = FormBkUp.TableRowId;
+                    Form.FormData = MergeFormDataWithBackUp(Form.FormData, Form.FormDataBackup, conf.AllowPush, Form.FormSchema);
 
-                    bool FormBkUpDataFound = false;
-                    if (FormBkUp != null)
-                        FormBkUpDataFound = FormBkUp.FormDataBackup.MultipleTables[FormBkUp.FormSchema.MasterTable].Count > 0;
-
-                    if (!conf.AllowPush && !FormBkUpDataFound)
-                        RmForm.Add(Form);
-                    if (!FormBkUpDataFound)//new
-                        continue;
-                    else
-                    {
-                        Form.FormDataBackup = FormBkUp.FormDataBackup;
-                        Form.TableRowId = FormBkUp.TableRowId;
-                        Form.FormData = MergeFormDataWithBackUp(Form.FormData, Form.FormDataBackup, conf.AllowPush, Form.FormSchema);
-
-                        //foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
-                        //{
-                        //    for (int i = 0; i < entry.Value.Count; i++)
-                        //    {
-                        //        if (Form.FormDataBackup.MultipleTables[entry.Key].Count > i)
-                        //            entry.Value[i].RowId = Form.FormDataBackup.MultipleTables[entry.Key][i].RowId;
-                        //    }
-                        //}
-                        //if (!conf.AllowPush)
-                        //{
-                        //    foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
-                        //        entry.Value.ForEach(e => e.IsDelete = true);
-                        //}
-                    }
+                    //foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
+                    //{
+                    //    for (int i = 0; i < entry.Value.Count; i++)
+                    //    {
+                    //        if (Form.FormDataBackup.MultipleTables[entry.Key].Count > i)
+                    //            entry.Value[i].RowId = Form.FormDataBackup.MultipleTables[entry.Key][i].RowId;
+                    //    }
+                    //}
+                    //if (!conf.AllowPush)
+                    //{
+                    //    foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
+                    //        entry.Value.ForEach(e => e.IsDelete = true);
+                    //}
                 }
+            }
 
-                RmForm.ForEach(e => FormCollection.Remove(e));
+            RmForm.ForEach(e => FormCollection.Remove(e));
 
-                foreach (EbWebForm FormBkUp in FormCollectionBkUp)//set IsDelete flag if Bakup form not in FormData
+            foreach (EbWebForm FormBkUp in FormCollectionBkUp)//set IsDelete flag if Bakup form not in FormData
+            {
+                EbDataPusherConfig conf = FormBkUp.DataPusherConfig;
+                EbWebForm Form = FormCollection.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
+
+                if (Form == null)
                 {
-                    EbDataPusherConfig conf = FormBkUp.DataPusherConfig;
-                    EbWebForm Form = FormCollection.Find(e => e.DataPusherConfig.GridDataId == conf.GridDataId && e.DataPusherConfig.GridName == conf.GridName);
-
-                    if (Form == null)
-                    {
-                        FormBkUp.FormData = FormBkUp.FormDataBackup;
-                        foreach (KeyValuePair<string, SingleTable> entry in FormBkUp.FormData.MultipleTables)
-                            entry.Value.ForEach(e => e.IsDelete = true);
-                        FormCollection.Add(FormBkUp);
-                    }
+                    FormBkUp.FormData = FormBkUp.FormDataBackup;
+                    foreach (KeyValuePair<string, SingleTable> entry in FormBkUp.FormData.MultipleTables)
+                        entry.Value.ForEach(e => e.IsDelete = true);
+                    FormCollection.Add(FormBkUp);
                 }
             }
         }

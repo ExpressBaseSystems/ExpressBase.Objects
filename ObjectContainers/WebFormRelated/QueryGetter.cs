@@ -312,7 +312,7 @@ WHERE
                     else
                         _cols = $"{ebs[SystemColumns.eb_loc_id]}, id" + _cols;
 
-                    query += string.Format("SELECT {0} FROM {2} WHERE {1}_id = (SELECT id FROM {1} WHERE {3}_id={8} AND COALESCE({4}, {5})={5}) AND COALESCE({4}, {5})={5} {6} {7};",
+                    query += string.Format("SELECT {0} FROM {2} WHERE {1}_id = (SELECT id FROM {1} WHERE {3}_id={8} AND COALESCE({4}, {5})={5} {6}) AND COALESCE({4}, {5})={5} {7};",
                         _cols,//0
                         _this.FormSchema.MasterTable,//1
                         _table.TableName,//2
@@ -513,7 +513,7 @@ WHERE
                     //if (_this.AutoId != null)
                     //    _qry = $"LOCK TABLE ONLY {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
 
-                    _qry += string.Format("INSERT INTO {0} ({19} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({20} @eb_createdby, {6}, @{18}, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
+                    _qry += string.Format("INSERT INTO {0} ({20} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}, {19}{8}) VALUES ({21} @eb_createdby, {6}, @{18}, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}, @{7}_eb_ver_id{9}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -533,8 +533,10 @@ WHERE
                         _this.LockOnSave ? ebs.GetBoolTrue(SystemColumns.eb_lock) : ebs.GetBoolFalse(SystemColumns.eb_lock),//16
                         ebs.GetBoolFalse(SystemColumns.eb_ro),//17
                         FormConstants.eb_loc_id_ + _this.CrudContext,//18
-                        "{0}",//19
-                        "{1}");//20
+                        ebs[SystemColumns.eb_src_ver_id],//19
+                        "{0}",//20
+                        "{1}");//21
+                    _qry += $"UPDATE {tblName} SET {ebs[SystemColumns.eb_src_id]}=id WHERE id=(SELECT eb_currval('{tblName}_id_seq'));";
                 }
                 else
                 {
