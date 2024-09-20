@@ -170,6 +170,8 @@ namespace ExpressBase.Objects
 
         public IDatabase DataDB { get; set; }
 
+        public int LogMasterId { get; set; }
+
         public T GetEbObject<T>(string refId, IRedisClient Redis, IDatabase ObjectsDB)
         {
 
@@ -273,6 +275,64 @@ namespace ExpressBase.Objects
                 Api.ApiResponse = new ApiResponse();
             }
             return Api;
+        }
+
+        public void InsertLog()
+        {
+            string query = @" 
+                        INSERT INTO 
+                            eb_api_logs_master(refid, type, params, status, message, result, eb_created_by, eb_created_at) 
+                        VALUES
+                            (:refid, :type, :params, :status, :message, :result, :eb_created_by, NOW()) 
+                        RETURNING id;";
+            DbParameter[] parameters = new DbParameter[] {
+                            DataDB.GetNewParameter("refid", EbDbTypes.String, this.RefId) ,
+                            DataDB.GetNewParameter("type", EbDbTypes.Int32, 1),
+                            DataDB.GetNewParameter("message", EbDbTypes.String, this.ApiResponse.Message.Description),
+                            DataDB.GetNewParameter("status", EbDbTypes.String, this.ApiResponse.Message.Status),
+                            DataDB.GetNewParameter("params", EbDbTypes.Json, JsonConvert.SerializeObject(this.GlobalParams)),
+                            DataDB.GetNewParameter("result", EbDbTypes.Json, JsonConvert.SerializeObject(this.ApiResponse.Result)),
+                            DataDB.GetNewParameter("eb_created_by", EbDbTypes.Int32, this.UserObject.UserId)
+                        };
+            EbDataTable dt = DataDB.DoQuery(query, parameters);
+
+            //this.LogMasterId = Convert.ToInt32(dt?.Rows[0][0]);
+        }
+
+        public int InsertLinesLog(string status, string source)
+        {
+            string query = @"
+                        INSERT INTO
+                            eb_api_logs_lines(eb_api_logs_master_id, source, status, , eb_created_by, eb_created_at)
+                        VALUES
+                            (:eb_api_logs_master_id, :source, :status, , :eb_created_by, NOW())
+                        RETURNING id;";
+            DbParameter[] parameters = new DbParameter[]
+            {
+                DataDB.GetNewParameter(":eb_api_logs_master_id", EbDbTypes.Int32, this.LogMasterId),
+                DataDB.GetNewParameter("source", EbDbTypes.Int32, source),
+                DataDB.GetNewParameter("status", EbDbTypes.String, status),
+                DataDB.GetNewParameter("eb_created_by", EbDbTypes.Int32, this.UserObject.UserId),
+            };
+            EbDataTable dt = DataDB.DoQuery(query, parameters);
+
+            return Convert.ToInt32(dt?.Rows[0][0]);
+        }
+
+        public void UpdateLog()
+        {
+            DbParameter[] _dbparameters = new DbParameter[]
+                       {
+                            DataDB.GetNewParameter("id", EbDbTypes.Int32, LogMasterId),
+                            DataDB.GetNewParameter("refid", EbDbTypes.String, this.RefId),
+                            DataDB.GetNewParameter("message", EbDbTypes.String, this.ApiResponse.Message.Description),
+                            DataDB.GetNewParameter("status", EbDbTypes.String, this.ApiResponse.Message.Status),
+                            DataDB.GetNewParameter("params", EbDbTypes.Json, JsonConvert.SerializeObject(this.GlobalParams)),
+                            DataDB.GetNewParameter("result", EbDbTypes.Json, JsonConvert.SerializeObject(this.ApiResponse.Result))
+                       };
+
+            this.DataDB.DoNonQuery("UPDATE eb_api_logs_master SET refid = :refid, params = :params, status = :status, message = :message, result =:result WHERE id = :id;", _dbparameters);
+
         }
 
         public EbApi()
@@ -952,7 +1012,6 @@ namespace ExpressBase.Objects
 
         public object ExecuteFtpPuller()
         {
-            string message = string.Empty;
             string fName = this.DirectoryPath + this.FileName;
             bool is_downloaded;
             try
@@ -962,12 +1021,10 @@ namespace ExpressBase.Objects
                     MemoryStream ms = new MemoryStream();
                     FtpClient client = new FtpClient(this.ServerAddress, this.UserName, this.Password);
                     client.AutoConnect();
-                    //client.UploadFile("C:/Users/donag/Downloads/copy2.csv", "/Expressbase-test.csv");
                     if (DeleteAfterProcessing)
                     {
                         string datePart = DateTime.Today.ToString("dd-MM-yyyy");
                         string fileName = Path.GetFileNameWithoutExtension(fName) + datePart + Path.GetExtension(fName);
-                        message += " path: " + fName + " to path: " + fileName;
                         bool is_renamed = client.MoveFile(fName, fileName);
                         if (is_renamed)
                             is_downloaded = client.DownloadStream(ms, fileName);
@@ -989,7 +1046,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception ex)
             {
-                message += "[ExecuteFtpPuller], " + ex.Message;
+                string message = "[ExecuteFtpPuller], " + ex.Message;
                 throw new ApiException(message);
             }
             return this.Result;
@@ -1060,37 +1117,53 @@ namespace ExpressBase.Objects
                     while ((inputLine = CsvReader.ReadLine()) != null)
                     {
                         string[] values = inputLine.Split('\t');
-
-                        if (line_number > 1)
+                        try
                         {
-                            WebformData data = _form.GetEmptyModel();
-                            data.MultipleTables[_form.TableName][0]["campaign_name"] = values[0];
-                            data.MultipleTables[_form.TableName][0]["name"] = values[1];
-                            data.MultipleTables[_form.TableName][0]["genurl"] = values[2];
-                            data.MultipleTables[_form.TableName][0]["genemail"] = values[3];
-                            data.MultipleTables[_form.TableName][0]["city"] = values[4];
-                            data.MultipleTables[_form.TableName][0]["fb_lead"] = "Yes";
-
-                            InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
+                            if (values?.Length > 0)
                             {
-                                RefId = this.Reference,
-                                FormData = EbSerializers.Json_Serialize(data),
-                                CurrentLoc = Api.UserObject.Preference.DefaultLocation,
-                                UserId = Api.UserObject.UserId,
-                                UserAuthId = Api.UserObject.AuthId,
-                                SolnId = Api.SolutionId
-                            };
+                                if (line_number > 1)
+                                {
+                                    WebformData data = _form.GetEmptyModel();
+                                    data.MultipleTables[_form.TableName][0]["campaign_name"] = values[0];
+                                    data.MultipleTables[_form.TableName][0]["name"] = values[1];
+                                    data.MultipleTables[_form.TableName][0]["genurl"] = values[2];
+                                    data.MultipleTables[_form.TableName][0]["genemail"] = values[3];
+                                    data.MultipleTables[_form.TableName][0]["city"] = (values.Length >= 5) ? values[4] : "";
+                                    data.MultipleTables[_form.TableName][0]["treatment"] = (values.Length >= 6) ? values[5] : "";
+                                    if (values.Length >= 7 && values[6].ToLower() == "google")
+                                        data.MultipleTables[_form.TableName][0]["google_lead"] = "Yes";
+                                    else
+                                        data.MultipleTables[_form.TableName][0]["fb_lead"] = "Yes";
 
-                            InsertDataFromWebformResponse response = EbFormHelper.InsertDataFromWebform(request, Api.Redis, Service, EbConnectionFactory);
-                            RowIds.Add(response.RowId);
+                                    InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
+                                    {
+                                        RefId = this.Reference,
+                                        FormData = EbSerializers.Json_Serialize(data),
+                                        CurrentLoc = 22,
+                                        UserId = Api.UserObject.UserId,
+                                        UserAuthId = Api.UserObject.AuthId,
+                                        SolnId = Api.SolutionId
+                                    };
+
+                                    InsertDataFromWebformResponse response = EbFormHelper.InsertDataFromWebform(request, Api.Redis, Service, EbConnectionFactory);
+                                    //Api.InsertLinesLog(response.Status.ToString(), "CsvPusherForm");
+                                    RowIds.Add(response.RowId);
+                                }
+                            }
+                            else
+                            {
+                                // Api.InsertLinesLog("Error", "CsvPusherForm");
+                            }
+                            line_number++;
                         }
-                        line_number++;
+                        catch (Exception)
+                        {
+
+                        }
                     }
                     CsvReader.Close();
 
-
-
-                    if (dt.Rows.Count > 0)
+                    if (RowIds.Count > 0)
                     {
                         this.Result = RowIds;
                     }
