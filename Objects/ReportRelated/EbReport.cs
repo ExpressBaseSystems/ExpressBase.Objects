@@ -1102,6 +1102,15 @@ namespace ExpressBase.Objects
 
             foreach (EbReportFooter r_footer in ReportFooters)
             {
+                if (r_footer.AlwaysPrintTogether && PageNumber != 1)
+                {
+                    if (HeightPt - (rf_Yposition+Margin.Bottom) < r_footer.HeightPt)
+                    {
+                        FooterDrawn = true;
+                        AddNewPage();
+                        rf_Yposition = Margin.Top;
+                    }
+                }
                 if (!IsCallFromNewPageEvent || (IsCallFromNewPageEvent && r_footer.RepeatOnAllPages))
                 {
                     float footer_diffrence = 0;
@@ -2087,6 +2096,10 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         public bool RepeatOnAllPages { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public bool AlwaysPrintTogether { get; set; }
+
         public override string GetDesignHtml()
         {
             return "<div class='pageHeaders' eb-type='ReportFooter' tabindex='1' id='@id' data_val='4' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted(); //background-color:@BackColor ;

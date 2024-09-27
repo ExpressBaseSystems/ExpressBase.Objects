@@ -37,11 +37,11 @@ namespace ExpressBase.Objects.Helpers
 
             if (!Report.FooterDrawn && (Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0))
             {
-                if (!(Report.PageNumber == 1))
+                if (!(Report.PageNumber == 1 && Report.ReportHeaderHeightRepeatAsPH > 0))
                     Report.DrawReportHeader(true);
                 Report.DrawPageHeader();
                 Report.DrawPageFooter();
-                if (!Report.IsLastpage)
+                if (!Report.IsLastpage && Report.ReportFooterHeightRepeatAsPf > 0)
                     Report.DrawReportFooter(true);
             }
             //if (Report.IsLastpage == true)
