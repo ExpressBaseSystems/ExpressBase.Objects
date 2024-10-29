@@ -285,6 +285,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool DisableCaching { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool EnableShareUrl { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]

@@ -1261,6 +1261,7 @@ VALUES({Code}, '{Title}', '{Message}', {SourceId}, {SourceVerId}, {UserId}, {Dat
         public Dictionary<string, string> DisableEditButton { get; set; }
         public bool IsPartial { get; set; }//can avoid last
         public Dictionary<string, object> RelatedData { get; set; }
+        public bool DisableLocCheck { get; set; }
 
         public string HtmlHead { get; set; }//
 
