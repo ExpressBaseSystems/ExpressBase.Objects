@@ -289,6 +289,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableShareUrl { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Multi location access")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool MultiLocAccess { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -1178,6 +1183,16 @@ namespace ExpressBase.Objects
                             DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                             this.FormData.CancelReason = this.CancelReason ? Convert.ToString(dataRow[i++]) : string.Empty;
+                            if (this.MultiLocAccess)
+                            {
+                                string st = Convert.ToString(dataRow[i++]);
+                                if (!string.IsNullOrWhiteSpace(st))
+                                {
+                                    string[] arr = st.Split(',');
+                                    if (!arr.Select(e => int.TryParse(e, out int t)).ToList().Exists(e => !e))
+                                        this.FormData.LocPermissions = arr.Select(int.Parse).ToList();
+                                }
+                            }
                             checkIdSrcId = true;
 
                             string p = this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetLongTimePattern();
@@ -1194,6 +1209,8 @@ namespace ExpressBase.Objects
                         {
                             i += 11;// 11 => Count of above properties
                             if (this.CancelReason)
+                                i++;
+                            if (this.MultiLocAccess)
                                 i++;
                         }
                     }
