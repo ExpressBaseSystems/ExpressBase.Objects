@@ -1060,7 +1060,7 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.WebReceived, new TimeSpan(0, 3, 1));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.WebReceived, new TimeSpan(0, 5, 0));
             }
             else if (status == FormSubmissionJobStatus.WebReceived || status == FormSubmissionJobStatus.SsReceived)
             {
@@ -1114,7 +1114,7 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.SsProcessed)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.WebProcessed, new TimeSpan(0, 15, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.WebProcessed, new TimeSpan(1, 0, 0));
             }
             else
             {
@@ -1147,7 +1147,7 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.WebReceived)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.SsReceived, new TimeSpan(0, 2, 1));//form save timeout is 2 min
+                Redis.Set(RedisKey, FormSubmissionJobStatus.SsReceived, new TimeSpan(0, 5, 0));//form save timeout is 2 min
             }
             else if (status == FormSubmissionJobStatus.SsReceived)
             {
@@ -1169,9 +1169,9 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.SsReceived)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.SsProcessed, new TimeSpan(0, 15, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.SsProcessed, new TimeSpan(1, 0, 0));
                 RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionDataId, SolnId, ObjVerId, UserId, fsCxtId);
-                Redis.Set(RedisKey, NewRowId, new TimeSpan(0, 15, 0));
+                Redis.Set(RedisKey, NewRowId, new TimeSpan(1, 0, 0));
             }
             //else
             //{
