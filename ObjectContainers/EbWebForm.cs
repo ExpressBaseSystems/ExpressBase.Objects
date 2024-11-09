@@ -2246,6 +2246,17 @@ namespace ExpressBase.Objects
                 DbCon.Close();
         }
 
+        //change location
+        private void CheckConstraints(string ModifiedAt)
+        {
+            if (this.FormDataBackup.IsReadOnly)
+                throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> ChangeLocation");
+            if (this.FormDataBackup.IsLocked)
+                throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> ChangeLocation");
+
+            this.CheckConstraintsInner(ModifiedAt, this.FormDataBackup);
+        }
+
         //edit mode
         private void CheckConstraints(string wc, bool reviewFlow, string ts, string mobPageRefId)
         {
@@ -2268,16 +2279,22 @@ namespace ExpressBase.Objects
                     throw new FormException("Access denied to edit!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
             }
 
-            if (!reviewFlow && !string.IsNullOrWhiteSpace(ts) && !string.IsNullOrWhiteSpace(this.FormData.ModifiedAt))
+            if (!reviewFlow)
+                this.CheckConstraintsInner(ts, this.FormData);
+        }
+
+        private void CheckConstraintsInner(string ModifiedAtInRequest, WebformData _FormData)
+        {
+            if (!string.IsNullOrWhiteSpace(ModifiedAtInRequest) && !string.IsNullOrWhiteSpace(_FormData.ModifiedAt))
             {
-                if (DateTime.TryParseExact(ts, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt1))
+                if (DateTime.TryParseExact(ModifiedAtInRequest, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt1))
                 {
-                    if (DateTime.TryParseExact(this.FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 < dt2)
+                    if (DateTime.TryParseExact(_FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 < dt2)
                     {
-                        string modBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? (" by " + this.SolutionObj.Users[this.FormData.ModifiedBy]) : string.Empty;
+                        string modBy = this.SolutionObj.Users.ContainsKey(_FormData.ModifiedBy) ? (" by " + this.SolutionObj.Users[_FormData.ModifiedBy]) : string.Empty;
                         string modAt = dt2.ToString(this.UserObj.Preference.GetLongTimePattern(), CultureInfo.InvariantCulture);
                         string st = $"This form submission was modified{modBy} at {modAt}, while you were trying to edit it.  Please close and redo edit.";
-                        throw new FormException(st, (int)HttpStatusCode.Forbidden, st + ": " + this.FormData.ModifiedBy, "EbWebForm -> Save");
+                        throw new FormException(st, (int)HttpStatusCode.Forbidden, st + ": " + _FormData.ModifiedBy, "EbWebForm -> Save");
                     }
                 }
             }
@@ -3199,6 +3216,55 @@ namespace ExpressBase.Objects
                 }
             }
             return (status, modifiedAt);
+        }
+
+        public (int, string) ChangeLocation(IDatabase DataDB, Service service, int NewLocId, string ModifiedAtReq)
+        {
+            int status = -2;
+            string msg = null;
+
+            using (this.DbConnection = DataDB.GetNewConnection())
+            {
+                try
+                {
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                    this.RefreshFormData(DataDB, service, true, true);
+
+                    this.FormCollection.AddRange(EbDataPushHelper.GetBatchPushedForms(this, service, DataDB, this.DbConnection));
+
+                    this.CheckConstraints(ModifiedAtReq);
+
+                    string query = QueryGetter.GetChangeLocationQuery(this, DataDB, this.UserObj.UserId, NewLocId);
+
+                    status = DataDB.DoNonQuery(this.DbConnection, query);
+                    if (status > 0)
+                    {
+                        msg = this.GetLastModifiedAt(DataDB);
+                        EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                        ebAuditTrail.UpdateAuditTrail4LocationChange(NewLocId, this.LocationId);
+                    }
+                    this.DbTransaction.Commit();
+                    CloseDbConnection(this.DbConnection, this.DbTransaction, false);
+                }
+                catch (NpgsqlException ex)
+                {
+                    if ((uint)ex.ErrorCode == 0x80004005)
+                        NpgsqlConnection.ClearPool(this.DbConnection as NpgsqlConnection);
+                    CloseDbConnection(this.DbConnection, this.DbTransaction, true);
+                    Console.WriteLine("Exception in ChangeLocation: " + ex.Message + "\n" + ex.StackTrace);
+                    msg = ex.Message;
+                }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(this.DbConnection, this.DbTransaction, true);
+                    Console.WriteLine("Exception in ChangeLocation: " + ex.Message + "\n" + ex.StackTrace);
+                    msg = ex.Message;
+                }
+            }
+
+            return (status, msg);
         }
 
         private string GetLastModifiedAt(IDatabase DataDB)

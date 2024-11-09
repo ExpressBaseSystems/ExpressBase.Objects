@@ -1,5 +1,7 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
@@ -22,7 +24,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         CancelReverted = 6,
         Saved_with_no_changes = 7, //Updated but no changes to show
         Locked = 8,
-        Unlocked = 9
+        Unlocked = 9,
+        Location_Changed = 10
     }
 
     class EbAuditTrail
@@ -38,6 +41,34 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             this.WebForm = ebWebForm;
             this.DataDB = dataDB;
             this.Service = service;
+        }
+
+        public int UpdateAuditTrail4LocationChange(int NewLocId, int OldLocId)
+        {
+            List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>();
+            string matViewQry = string.Empty;
+            foreach (EbWebForm ebWebForm in this.WebForm.FormCollection)
+            {
+                auditTrails.Add(new AuditTrailInsertData
+                {
+                    Action = (int)DataModificationAction.Location_Changed,
+                    Fields = new List<AuditTrailEntry>()
+                    {
+                        new AuditTrailEntry()
+                        {
+                            Name = SystemColumns.eb_loc_id,
+                            NewVal = NewLocId.ToString(),
+                            OldVal = OldLocId.ToString(),
+                            DataRel = ebWebForm.TableRowId.ToString(),
+                            TableName = ebWebForm.TableName
+                        }
+                    },
+                    RefId = ebWebForm.RefId,
+                    TableRowId = ebWebForm.TableRowId
+                });
+                matViewQry += ebWebForm.MatViewConfig.GetInsertModeQuery(true);
+            }
+            return this.UpdateAuditTrail(auditTrails, matViewQry);
         }
 
         public int UpdateAuditTrail(DataModificationAction action, bool MasterFormOnly)
@@ -345,14 +376,31 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ConvertFromUtc(this.WebForm.UserObj.Preference.TimeZone).ToString(this.WebForm.UserObj.Preference.GetShortDatePattern() + " " + this.WebForm.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture)
                     });
                 }
-                if (action != DataModificationAction.Updated)
+                if (action != DataModificationAction.Updated && action != DataModificationAction.Location_Changed)
                     continue;
 
                 string[] rel_ids = Convert.ToString(dr["idrelation"]).Split('-');
                 string new_val = dr.IsDBNull(10) ? null : Convert.ToString(dr["newvalue"]);
                 string old_val = dr.IsDBNull(9) ? null : Convert.ToString(dr["oldvalue"]);
 
-                if (_table.TableType != WebFormTableTypes.Normal)
+                if (action == DataModificationAction.Location_Changed)
+                {
+                    string TableName = Convert.ToString(dr["tablename"]);
+                    if (!Trans[m_id].Tables.ContainsKey(TableName))
+                        Trans[m_id].Tables.Add(TableName, new FormTransactionRow() { });
+
+                    Dictionary<int, EbLocation> _locs = this.WebForm.SolutionObj.Locations;
+
+                    FormTransactionEntry curtrans = new FormTransactionEntry()
+                    {
+                        OldValue = _locs.ContainsKey(Convert.ToInt32(old_val)) ? _locs[Convert.ToInt32(old_val)].ShortName : old_val,
+                        NewValue = _locs.ContainsKey(Convert.ToInt32(new_val)) ? _locs[Convert.ToInt32(new_val)].ShortName : new_val,
+                        IsModified = true,
+                        Title = "Location"
+                    };
+                    Trans[m_id].Tables[TableName].Columns.Add(SystemColumns.eb_loc_id, curtrans);
+                }
+                else if (_table.TableType != WebFormTableTypes.Normal)
                 {
                     Dictionary<string, string> new_val_dict = (new_val == null || new_val == "[null]") ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
                     Dictionary<string, string> old_val_dict = (old_val == null || old_val == "[null]") ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);

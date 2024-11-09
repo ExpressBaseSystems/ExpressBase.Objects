@@ -459,6 +459,43 @@ WHERE
             return FullQry;
         }
 
+        public static string GetChangeLocationQuery(EbWebForm _this, IDatabase DataDB, int UserId, int NewLocId)
+        {
+            string FullQry = string.Empty;
+            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+
+            foreach (EbWebForm ebWebForm in _this.FormCollection)
+            {
+                WebFormSchema _schema = ebWebForm.FormSchema;
+                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
+                {
+                    if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
+                        continue;
+
+                    if (ebWebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0)
+                    {
+                        string Ids = Table.Select(e => e.RowId).Join(",");
+
+                        //USE ANY
+                        string Qry = string.Format("UPDATE {0} SET {1} = {2}, {3} = {9}, {4} = {5} WHERE id IN ({6}) AND COALESCE({7}, {8}) = {8};",
+                            _table.TableName,//0
+                            ebs[SystemColumns.eb_loc_id],//1
+                            NewLocId,//2
+                            ebs[SystemColumns.eb_lastmodified_by],//3
+                            ebs[SystemColumns.eb_lastmodified_at],//4
+                            DataDB.EB_CURRENT_TIMESTAMP,//5
+                            Ids,//6
+                            ebs[SystemColumns.eb_del],//7
+                            ebs.GetBoolFalse(SystemColumns.eb_del),//8
+                            UserId);//9
+
+                        FullQry = Qry + FullQry;//Lines table data is processed first
+                    }
+                }
+            }
+            return FullQry;
+        }
+
         //public static string GetCancelQuery(EbWebForm _this, IDatabase DataDB)
         //{
         //    string query = string.Empty;
