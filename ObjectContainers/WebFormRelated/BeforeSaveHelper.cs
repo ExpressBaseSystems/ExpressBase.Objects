@@ -130,7 +130,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
             }
 
-            if (_this.MultiLocAccess)
+            if (_this.MultiLocView || _this.MultiLocEdit)
             {
                 EbControlWrapper _locCtrl = _dict.Values.FirstOrDefault(e => e.Control.Name == SystemColumns.eb_loc_permissions);
                 if (_locCtrl == null)

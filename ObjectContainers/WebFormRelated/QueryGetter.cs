@@ -43,7 +43,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_lastmodified_by],//10
                         ebs[SystemColumns.eb_lastmodified_at],//11
                         _this.CancelReason ? ", " + ebs[SystemColumns.eb_void_reason] : string.Empty,//12
-                        _this.MultiLocAccess ? ", " + SystemColumns.eb_loc_permissions : string.Empty);//13
+                        (_this.MultiLocView || _this.MultiLocEdit) ? ", " + SystemColumns.eb_loc_permissions : string.Empty);//13
                 else if (_table.TableType == WebFormTableTypes.Review)
                 {
                     _id = $"eb_ver_id = {form_ver_id} AND eb_src_id";

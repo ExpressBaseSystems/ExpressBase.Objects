@@ -290,9 +290,16 @@ namespace ExpressBase.Objects
         public bool EnableShareUrl { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
-        [Alias("Multi location access")]
+        [Alias("Multi location view")]
         [EnableInBuilder(BuilderType.WebForm)]
-        public bool MultiLocAccess { get; set; }
+        [HelpText("Enables view access from multi location")]
+        public bool MultiLocView { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Multi location edit")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HelpText("Enables edit access from multi location")]
+        public bool MultiLocEdit { get; set; }
 
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -1183,14 +1190,24 @@ namespace ExpressBase.Objects
                             DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                             this.FormData.CancelReason = this.CancelReason ? Convert.ToString(dataRow[i++]) : string.Empty;
-                            if (this.MultiLocAccess)
+                            if (this.MultiLocView || this.MultiLocEdit)
                             {
                                 string st = Convert.ToString(dataRow[i++]);
                                 if (!string.IsNullOrWhiteSpace(st))
                                 {
                                     string[] arr = st.Split(',');
                                     if (!arr.Select(e => int.TryParse(e, out int t)).ToList().Exists(e => !e))
+                                    {
                                         this.FormData.LocPermissions = arr.Select(int.Parse).ToList();
+                                        List<int> objlocs = this.UserObj.GetLocationsByObject(this.RefId);
+                                        if (objlocs.Contains(-1) || this.FormData.LocPermissions.Any(x => objlocs.Contains(x)))
+                                        {
+                                            if (this.MultiLocView)
+                                                this.FormData.MultiLocViewAccess = true;
+                                            if (this.MultiLocEdit)
+                                                this.FormData.MultiLocEditAccess = true;
+                                        }
+                                    }
                                 }
                             }
                             checkIdSrcId = true;
@@ -1210,7 +1227,7 @@ namespace ExpressBase.Objects
                             i += 11;// 11 => Count of above properties
                             if (this.CancelReason)
                                 i++;
-                            if (this.MultiLocAccess)
+                            if (this.MultiLocView || this.MultiLocEdit)
                                 i++;
                         }
                     }
@@ -2269,9 +2286,16 @@ namespace ExpressBase.Objects
             if (this.FormData.IsCancelled)
                 throw new FormException("This form submission is CANCELLED!", (int)HttpStatusCode.Forbidden, "Cancelled record", "EbWebForm -> Save");
 
-            if (!reviewFlow && wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
-                        (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
-                throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+            if (!reviewFlow && wc == TokenConstants.UC)
+            {
+                bool neglectLoc = this.MultiLocEdit && this.FormData.MultiLocEditAccess;
+
+                if (!(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent || neglectLoc) ||
+                     (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
+                {
+                    throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                }
+            }
 
             if (!reviewFlow && wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(mobPageRefId))
             {
