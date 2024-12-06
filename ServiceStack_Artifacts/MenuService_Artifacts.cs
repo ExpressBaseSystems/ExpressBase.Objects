@@ -62,7 +62,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int IntCode { get; set; }
 
         [DataMember(Order = 1)]
-        public string BMW { get; set; }
+        public string BMWP { get; set; }
 
         [DataMember(Order = 1)]
         public bool IsUserFacing { get; set; }
