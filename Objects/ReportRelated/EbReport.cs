@@ -230,7 +230,7 @@ namespace ExpressBase.Objects
                         string str = _col.Replace("{{", "").Replace("}}", "");
                         int tbl = Convert.ToInt32(str.Split('.')[0].Replace("T", ""));
                         string colval = string.Empty;
-                        if (DataSet?.Tables[tbl]?.Rows.Count > 0)
+                        if (this.DataSet?.Tables[tbl]?.Rows.Count > 0)
                             colval = DataSet?.Tables[tbl]?.Rows[0][str.Split('.')[1]].ToString();
                         _docName = _docName.Replace(_col, colval);
                     }
@@ -671,16 +671,29 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public PooledRedisClientManager pooledRedisManager { get; set; }
 
-        public dynamic GetDataFieldValue(string column_name, int iterator, int tableIndex)
-        {
-            dynamic value = null;
-            int index;
-            if (DataSet != null && DataSet.Tables.Count > 0 && DataSet.Tables[tableIndex].Rows != null)
-            {
-                index = (DataSet.Tables[tableIndex].Rows.Count > 1) ? iterator : 0;
-                EbDbTypes type = (DataSet.Tables[tableIndex].Columns[column_name].Type);
-                value = (type == EbDbTypes.Bytea) ? DataSet.Tables[tableIndex].Rows[index][column_name] : DataSet.Tables[tableIndex].Rows[index][column_name].ToString();
-            }
+        public dynamic GetDataFieldValue(string columnName, int iterator, int tableIndex)
+        { 
+            if (DataSet == null)
+                throw new ArgumentNullException(nameof(DataSet), "DataSet cannot be null.");
+             
+            if (tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
+                throw new ArgumentOutOfRangeException(nameof(tableIndex), $"Table index {tableIndex} is out of range. Total tables: {DataSet.Tables.Count}");
+
+            var table = DataSet.Tables[tableIndex];
+             
+            if (!table.Columns.Contains(columnName))
+                throw new ArgumentException($"Column '{columnName}' does not exist in the table at index {tableIndex}.");
+
+            if (table.Rows.Count == 0)
+                throw new InvalidOperationException($"The table at index {tableIndex} contains no rows.");
+
+            int rowIndex = (table.Rows.Count > 1) ? iterator : 0;
+
+            if (rowIndex < 0 || rowIndex >= table.Rows.Count)
+                throw new ArgumentOutOfRangeException(nameof(iterator), $"Row index {rowIndex} is out of range. Total rows: {table.Rows.Count}");
+
+            dynamic value = (table.Columns[columnName].Type == EbDbTypes.Bytea) ? table.Rows[rowIndex][columnName] : table.Rows[rowIndex][columnName]?.ToString();
+
             return value;
         }
 
@@ -1102,7 +1115,7 @@ namespace ExpressBase.Objects
 
             foreach (EbReportFooter r_footer in ReportFooters)
             {
-                if (r_footer.AlwaysPrintTogether && PageNumber != 1)
+                if (r_footer.AlwaysPrintTogether)
                 {
                     if (HeightPt - (rf_Yposition+Margin.Bottom) < r_footer.HeightPt)
                     {
@@ -1663,7 +1676,6 @@ namespace ExpressBase.Objects
                 this.Writer = PdfWriter.GetInstance(this.Doc, Ms1);
                 this.Writer.Open();
                 this.Doc.Open();
-                this.Doc.AddTitle(this.DocumentName);
                 this.Writer.PageEvent = new HeaderFooter(this);
                 this.Writer.CloseStream = true;//important
                 this.Canvas = this.Writer.DirectContent;
@@ -1701,19 +1713,19 @@ namespace ExpressBase.Objects
             this.DrawReportFooter();
         }
 
-        public void HandleExceptionPdf()
+        public void HandleExceptionPdf(Exception e)
         {
             ColumnText ct = new ColumnText(this.Canvas);
             Phrase phrase;
             if (this?.DataSet?.Tables[this.DetailTableIndex]?.Rows.Count > 0)
-                phrase = new Phrase("Something went wrong. Please check the parameters or contact admin");
+                phrase = new Phrase("Something went wrong. Please check the parameters or contact admin" + e.Message + e.StackTrace);
             else
-                phrase = new Phrase("No Data available. Please check the parameters or contact admin");
+                phrase = new Phrase("No Data available. Please check the parameters or contact admin" + e.Message+e.StackTrace);
 
             phrase.Font.Size = 10;
             float y = this.HeightPt - (this.ReportHeaderHeight + this.Margin.Top + this.PageHeaderHeight);
 
-            ct.SetSimpleColumn(phrase, this.LeftPt + 30, y - 30, this.WidthPt - 30, y, 15, Element.ALIGN_CENTER);
+            ct.SetSimpleColumn(phrase, this.LeftPt + 30, y - 80, this.WidthPt - 30, y, 15, Element.ALIGN_CENTER);
             ct.Go();
         }
 

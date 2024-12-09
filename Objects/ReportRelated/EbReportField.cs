@@ -258,7 +258,8 @@ namespace ExpressBase.Objects
                 myImage.ScaleToFit(WidthPt, HeightPt);
                 myImage.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
                 myImage.Alignment = (int)TextAlign;
-                Rep.Doc.Add(myImage);
+                if (Rep.Doc.IsOpen())
+                    Rep.Doc.Add(myImage);
             }
         }
     }
