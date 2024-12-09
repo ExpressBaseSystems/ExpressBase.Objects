@@ -25,6 +25,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string BToken { get; set; }
 
         public string RToken { get; set; }
+
+        public bool UseRwDb { get; set; }
     }
     public class ReportRenderMultipleRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
     {

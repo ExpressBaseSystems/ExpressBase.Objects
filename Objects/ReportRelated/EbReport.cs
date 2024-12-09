@@ -1601,13 +1601,13 @@ namespace ExpressBase.Objects
             field.SetValuesFromGlobals(globals.CurrentField);
         }
 
-        public void ExecuteRendering(string BToken, string RToken, Document Document, MemoryStream Ms1, List<Param> _params, EbConnectionFactory EbConnectionFactory)
+        public void ExecuteRendering(string BToken, string RToken, Document Document, MemoryStream Ms1, List<Param> _params, EbConnectionFactory EbConnectionFactory, bool useRwDb)
         {
             this.InitializeReportObects(BToken, RToken);
 
             this.InitializePdfObjects(Document, Ms1);
 
-            this.GetData4Pdf(_params, EbConnectionFactory);
+            this.GetData4Pdf(_params, EbConnectionFactory, useRwDb);
 
             if (IsLanguageEnabled && Solution.IsMultiLanguageEnabled)
             {
@@ -1623,11 +1623,11 @@ namespace ExpressBase.Objects
                 throw new Exception();
         }
 
-        public void GetData4Pdf(List<Param> _params, EbConnectionFactory EbConnectionFactory)
+        public void GetData4Pdf(List<Param> _params, EbConnectionFactory EbConnectionFactory, bool useRwDb = false)
         {
             DataSourceDataSetResponse resp = null;
             using (var redisReadOnly = this.pooledRedisManager.GetReadOnlyClient())
-                resp = EbObjectsHelper.ExecuteDataset(this.DataSourceRefId, this.RenderingUser.Id, _params, EbConnectionFactory, this.Redis, redisReadOnly);
+                resp = EbObjectsHelper.ExecuteDataset(this.DataSourceRefId, this.RenderingUser.Id, _params, EbConnectionFactory, this.Redis, redisReadOnly, useRwDb);
             this.Parameters = _params;
             this.DataSet = resp.DataSet;
 
