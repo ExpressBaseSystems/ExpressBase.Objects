@@ -131,7 +131,7 @@ namespace ExpressBase.Objects.Helpers
             return Dict;
         }
 
-        public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis, IRedisClient RedisReadOnly)
+        public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis, IRedisClient RedisReadOnly, bool useRwDb)
         {
             DataSourceDataSetResponse resp = new DataSourceDataSetResponse();
             resp.Columns = new List<ColumnColletion>();
@@ -155,6 +155,8 @@ namespace ExpressBase.Objects.Helpers
                     }
                     Redis.Set<EbDataReader>(RefId, _ds);
                 }
+                if (useRwDb)
+                    _ds.UseReadWriteConnection = true;
                 if (_ds.FilterDialogRefId != string.Empty && _ds.FilterDialogRefId != null)
                 {
                     EbFilterDialog _dsf;
