@@ -155,8 +155,6 @@ namespace ExpressBase.Objects.Helpers
                     }
                     Redis.Set<EbDataReader>(RefId, _ds);
                 }
-                if (useRwDb)
-                    _ds.UseReadWriteConnection = true;
                 if (_ds.FilterDialogRefId != string.Empty && _ds.FilterDialogRefId != null)
                 {
                     EbFilterDialog _dsf;
@@ -187,6 +185,11 @@ namespace ExpressBase.Objects.Helpers
                 {
                     IEnumerable<DbParameter> parameters = DataHelper.GetParams(MyDataStore, false, Params, 0, 0);
                     resp.DataSet = MyDataStore.DoQueries(_sql, parameters.ToArray<System.Data.Common.DbParameter>());
+
+                    if (useRwDb && resp.DataSet?.Tables?.Count > 0 && resp.DataSet.Tables[0]?.Rows?.Count == 0 && MyDataStore.ConId != ebConnectionFactory.DataDB.ConId)
+                    {
+                        resp.DataSet = ebConnectionFactory.DataDB.DoQueries(_sql, parameters.ToArray<System.Data.Common.DbParameter>());
+                    }
 
                     foreach (EbDataTable dt in resp.DataSet.Tables)
                         resp.Columns.Add(dt.Columns);
