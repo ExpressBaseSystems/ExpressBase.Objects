@@ -301,6 +301,12 @@ namespace ExpressBase.Objects
         [HelpText("Enables edit access from multi location")]
         public bool MultiLocEdit { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Enable default expr for clone")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HelpText("Enable execution of default value expression after clone")]
+        public bool EnableDefValExprForClone { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
