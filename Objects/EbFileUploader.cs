@@ -301,17 +301,15 @@ namespace ExpressBase.Objects
 
             if (isAddDelFlow)
             {
-                for (int k = 0; k < refIdsAdd.Count; k++)
-                {
-                    fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ , lastmodifiedby = @eb_createdby, lastmodifiedat = {3} 
-                                WHERE id = {1} AND COALESCE(eb_del, '') <> 'T' AND context = 'default' @secCxt@;"
-                                    .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
-                                    .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIdsAdd[k], sCxtSetVal, DataDB.EB_CURRENT_TIMESTAMP);
-                }
-                if (refIdsDel.Count > 0)
+                fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ , lastmodifiedby = @eb_createdby, lastmodifiedat = {3} 
+                                WHERE id = ANY({1}) AND eb_del <> 'T' AND context = 'default' @secCxt@;"
+                                .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
+                                .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIdsAdd.Join(","), sCxtSetVal, DataDB.EB_CURRENT_TIMESTAMP);
+
+                if (refIdsDel.Count > 0 && dataId > 0)
                 {
                     fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T', lastmodifiedby = @eb_createdby, lastmodifiedat = {3}
-                                WHERE (context = {0} @secCxt@) AND COALESCE(eb_del, 'F')='F' AND id IN ({1});"
+                                WHERE (context = {0} @secCxt@) AND eb_del='F' AND id IN ({1});"
                                     .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{2}" : ""), pCxtVal, refIdsDel.Join(","), sCxtGetVal, DataDB.EB_CURRENT_TIMESTAMP);
                 }
             }
@@ -319,23 +317,21 @@ namespace ExpressBase.Objects
             {
                 if (refIds.Count > 0)
                 {
-
-                    for (int k = 0; k < refIds.Count; k++)
+                    if (dataId > 0) // edit mode
                     {
-                        fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ , lastmodifiedby = @eb_createdby, lastmodifiedat = {3}
-                                                    WHERE id = {1} AND COALESCE(eb_del, '') <> 'T' AND context = 'default' @secCxt@;"
-                                                    .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
-                                                    .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIds[k], sCxtSetVal, DataDB.EB_CURRENT_TIMESTAMP);
-                    }
-
-                    fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T', lastmodifiedby = @eb_createdby, lastmodifiedat = {3}
-                                            WHERE (context = {0} @secCxt@) AND COALESCE(eb_del, 'F')='F' AND id NOT IN ({1});"
+                        fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T', lastmodifiedby = @eb_createdby, lastmodifiedat = {3}
+                                            WHERE (context = {0} @secCxt@) AND eb_del='F' AND id NOT IN ({1});"
                                                 .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{2}" : ""), pCxtVal, refIds.Join(","), sCxtGetVal, DataDB.EB_CURRENT_TIMESTAMP);
+                    }
+                    fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ , lastmodifiedby = @eb_createdby, lastmodifiedat = {3}
+                                                    WHERE id = ANY({1}) AND eb_del <> 'T' AND context = 'default' @secCxt@;"
+                                                .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
+                                                .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIds.Join(","), sCxtSetVal, DataDB.EB_CURRENT_TIMESTAMP);
                 }
-                else // if all files deleted
+                else if (dataId > 0) // if all files deleted
                 {
                     fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T', lastmodifiedby = @eb_createdby, lastmodifiedat = {2}
-                                            WHERE (context = {0} @secCxt@) AND COALESCE(eb_del, 'F')='F';"
+                                            WHERE (context = {0} @secCxt@) AND eb_del='F';"
                                                 .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{1}" : ""), pCxtVal, sCxtGetVal, DataDB.EB_CURRENT_TIMESTAMP);
                 }
             }
