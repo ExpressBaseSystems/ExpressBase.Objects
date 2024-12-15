@@ -2389,7 +2389,7 @@ namespace ExpressBase.Objects
                 resp += " - AfterSave: " + afterSaveStat;
                 if (this.RefreshDataAfterSave && afterSaveStat > 0)
                     this.RefreshFormData(DataDB, service, false, true);
-                this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
+                this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection, IsMobInsert);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, IsUpdate);
