@@ -365,19 +365,20 @@ namespace ExpressBase.Objects.WebFormRelated
         public static string GetSearchResults(IDatabase DataDB, Eb_Solution SolutionObj, User UserObj, string searchTxt)
         {
             List<SearchRsltData> _data = new List<SearchRsltData>();
-            string Qry = @"SELECT COUNT(*) FROM eb_index_table eit WHERE COALESCE(eit.eb_del, 'F') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0;
-                SELECT eit.id, eit.display_name, eit.data_json, eit.ref_id, eit.data_id, eit.created_by, eit.created_at, eit.modified_by, eit.modified_at, eit.link_type FROM eb_index_table eit
-                WHERE COALESCE(eit.eb_del, 'F') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0 ORDER BY eit.modified_at DESC LIMIT 100; ";
+            string Qry = @"
+SELECT eit.id, eit.display_name, eit.data_json, eit.ref_id, eit.data_id, eit.created_by, eit.created_at, eit.modified_by, eit.modified_at, eit.link_type 
+FROM eb_index_table eit, jsonb_each_text(eit.data_json :: JSONB)
+WHERE eit.eb_del = 'F' AND value ilike '%' || @searchTxt || '%' ORDER BY eit.modified_at DESC LIMIT 20; ";
 
-            EbDataSet ds = DataDB.DoQueries(Qry, new DbParameter[]
+            EbDataTable dt = DataDB.DoQuery(Qry, new DbParameter[]
             {
-                DataDB.GetNewParameter("searchTxt", EbDbTypes.String, string.IsNullOrEmpty(searchTxt) ? "" : searchTxt.ToLower())
+                DataDB.GetNewParameter("searchTxt", EbDbTypes.String, string.IsNullOrEmpty(searchTxt) ? "" : searchTxt)
             });
-            int rowCount = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
-            foreach (EbDataRow dr in ds.Tables[1].Rows)
+            
+            foreach (EbDataRow dr in dt.Rows)
                 _data.Add(new SearchRsltData(dr, SolutionObj, UserObj));
 
-            return JsonConvert.SerializeObject(new SearchResponse() { Data = _data, RowCount = rowCount });
+            return JsonConvert.SerializeObject(new SearchResponse() { Data = _data, RowCount = dt.Rows.Count });
         }
 
         public static void InsertOrUpdate_LM(IDatabase DataDB, string JsonData, int DataId, int UserId)
