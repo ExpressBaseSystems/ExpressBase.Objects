@@ -301,11 +301,13 @@ namespace ExpressBase.Objects
 
             if (isAddDelFlow)
             {
-                fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ , lastmodifiedby = @eb_createdby, lastmodifiedat = {3} 
-                                WHERE id = ANY({1}) AND eb_del <> 'T' AND context = 'default' @secCxt@;"
-                                .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
-                                .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIdsAdd.Join(","), sCxtSetVal, DataDB.EB_CURRENT_TIMESTAMP);
-
+                if (refIdsAdd.Count > 0)
+                {
+                    fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ , lastmodifiedby = @eb_createdby, lastmodifiedat = {3} 
+                                WHERE id = ANY(ARRAY[{1}]) AND eb_del <> 'T' AND context = 'default' @secCxt@;"
+                                    .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
+                                    .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIdsAdd.Join(","), sCxtSetVal, DataDB.EB_CURRENT_TIMESTAMP);
+                }
                 if (refIdsDel.Count > 0 && dataId > 0)
                 {
                     fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T', lastmodifiedby = @eb_createdby, lastmodifiedat = {3}
@@ -324,7 +326,7 @@ namespace ExpressBase.Objects
                                                 .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{2}" : ""), pCxtVal, refIds.Join(","), sCxtGetVal, DataDB.EB_CURRENT_TIMESTAMP);
                     }
                     fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ , lastmodifiedby = @eb_createdby, lastmodifiedat = {3}
-                                                    WHERE id = ANY({1}) AND eb_del <> 'T' AND context = 'default' @secCxt@;"
+                                                    WHERE id = ANY(ARRAY[{1}]) AND eb_del <> 'T' AND context = 'default' @secCxt@;"
                                                 .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
                                                 .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIds.Join(","), sCxtSetVal, DataDB.EB_CURRENT_TIMESTAMP);
                 }
