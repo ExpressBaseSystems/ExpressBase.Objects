@@ -366,7 +366,7 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             List<SearchRsltData> _data = new List<SearchRsltData>();
             string Qry = @"
-SELECT eit.id, eit.display_name, eit.data_json, eit.ref_id, eit.data_id, eit.created_by, eit.created_at, eit.modified_by, eit.modified_at, eit.link_type 
+SELECT distinct eit.id, eit.display_name, eit.data_json, eit.ref_id, eit.data_id, eit.created_by, eit.created_at, eit.modified_by, eit.modified_at, eit.link_type 
 FROM eb_index_table eit, jsonb_each_text(eit.data_json :: JSONB)
 WHERE eit.eb_del = 'F' AND value ilike '%' || @searchTxt || '%' ORDER BY eit.modified_at DESC LIMIT 20; ";
 
