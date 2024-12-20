@@ -397,12 +397,16 @@ namespace ExpressBase.Objects
                 Op = EbTableVisualization.Operations.Get(ForWhat);
             else if (EbType.IntCode == EbObjectTypes.MobilePage)
                 Op = EbMobilePage.Operations.Get(ForWhat);
+            else if (EbType.IntCode == EbObjectTypes.PosForm)
+                Op = EbMobilePage.Operations.Get(ForWhat);
 
             if (WC == TokenConstants.UC && !Op.IsAvailableInWeb)
                 return false;
             else if (WC == TokenConstants.BC && !Op.IsAvailableInBot)
                 return false;
             else if (WC == TokenConstants.MC && !Op.IsAvailableInMobile)
+                return false;
+            else if (WC == TokenConstants.PC && !Op.IsAvailableInPos)
                 return false;
 
             try
