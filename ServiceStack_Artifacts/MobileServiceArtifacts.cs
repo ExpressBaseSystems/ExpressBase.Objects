@@ -634,6 +634,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbPosSolutionData()
         {
             MetaData = new Dictionary<string, object>();
+            Applications = new List<AppDataToPos>();
         }
     }
 
