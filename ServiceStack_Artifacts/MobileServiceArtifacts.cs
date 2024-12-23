@@ -617,7 +617,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<AppDataToPos> Applications { set; get; }
 
         [DataMember(Order = 2)]
-        public List<EbLocation> Locations { get; set; }
+        public EbLocation Location { get; set; }
 
         [DataMember(Order = 3)]
         public User CurrentUser { set; get; }
