@@ -881,9 +881,9 @@ namespace ExpressBase.Objects
                     bool isMobOfflineData = false, isErrorDraftGet = false, isDraftSave = false;
 
                     if (this.FormData.MultipleTables.TryGetValue(this.TableName, out SingleTable MTable) &&
-                        MTable.Count > 0 && MTable[0].GetColumn("eb_created_at_device") != null)
+                        MTable.Count > 0 && (MTable[0].GetColumn(SystemColumns.eb_created_at_device) != null || MTable[0].GetColumn(SystemColumns.eb_created_at_pos) != null))
                     {
-                        if (this.UserObj.wc == TokenConstants.MC)
+                        if (this.UserObj.wc == TokenConstants.MC || this.UserObj.wc == TokenConstants.PC)
                             isMobOfflineData = true;
                         else if (this.UserObj.wc == TokenConstants.UC)
                             isErrorDraftGet = true;
@@ -2341,7 +2341,7 @@ namespace ExpressBase.Objects
                 WebformData in_data = JsonConvert.DeserializeObject<WebformData>(JsonConvert.SerializeObject(this.FormData));
                 this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
-                bool IsMobInsert = !IsUpdate && wc == RoutingConstants.MC;
+                bool IsMobInsert = !IsUpdate && (wc == RoutingConstants.MC || wc == RoutingConstants.PC);
                 bool IsMobSignUp = IsMobInsert && !string.IsNullOrWhiteSpace(MobilePageRefId) && MobilePageRefId == this.SolutionObj?.SolutionSettings?.MobileAppSettings?.SignUpPageRefId;
                 if (IsUpdate)
                 {
