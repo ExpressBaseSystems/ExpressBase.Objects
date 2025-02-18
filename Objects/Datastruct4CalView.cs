@@ -88,7 +88,7 @@ namespace ExpressBase.Objects.Objects
             for (int i = 0; i < _formattedTable.Rows.Count; i++)//filling consolidated data
             {
                 Row = _formattedTable.Rows[i];
-                int _id = (int)Row[PrimaryKeyColumnName];
+                int _id = Convert.ToInt32(Row[PrimaryKeyColumnName]);
                 if (_innerDict.ContainsKey(_id))
                 {
                     if (!Totals.ContainsKey(_id))
