@@ -121,6 +121,10 @@ namespace ExpressBase.Objects
         [Alias("Associated controls")]
         public List<AssociatedCtrlAbstract> AssocCtrls { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HelpText("Entire page is refreshed after this count limit")]
+        public int SelfRefreshLimit { get; set; }
+
         public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
