@@ -640,6 +640,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public string DeviceId { get; set; }
+
+        [DataMember(Order = 7)]
+        public bool IsApiUser { get; set; }
     }
 
     [DataContract]
