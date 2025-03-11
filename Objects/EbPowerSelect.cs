@@ -177,10 +177,10 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
                     else{
                         let val = this.getValue();
                         if(this.MultiSelect){
-                            return !(val === '' || val === undefined|| val === null || typeof val === 'number');
+                            return !(val === '' || val === undefined || val === null || typeof val === 'number');
                         }
                         else
-                            return Number.isInteger(val);
+                            return Number.isInteger(val) && !!val;
                     }
                 ";
             }
