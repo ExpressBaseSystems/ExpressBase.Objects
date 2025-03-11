@@ -3491,7 +3491,7 @@ namespace ExpressBase.Objects
                         if (Row.IsDelete)
                             continue;
                         SingleColumn cField = Row.GetColumn(_column.ColumnName);
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (cField.Type == (int)EbDbTypes.Decimal && Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+                        if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (IsEbDbTypeNumber(cField.Type) && Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                         {
                             string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                             if (_table.TableType == WebFormTableTypes.Grid)
@@ -3503,6 +3503,13 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+        }
+
+        private bool IsEbDbTypeNumber(int type)
+        {
+            return type == (int)EbDbTypes.Decimal || type == (int)EbDbTypes.Double || type == (int)EbDbTypes.Int ||
+                type == (int)EbDbTypes.Int16 || type == (int)EbDbTypes.Int32 || type == (int)EbDbTypes.Int64 ||
+                type == (int)EbDbTypes.UInt16 || type == (int)EbDbTypes.UInt32 || type == (int)EbDbTypes.UInt64;
         }
 
         public void AfterRedisGet_All(Service service)
