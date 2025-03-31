@@ -1229,6 +1229,16 @@ else {
         public bool UseParams { get; set; }
     }
 
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage, BuilderType.DVBuilder)]
+    public class ObjectBasicPrintLayout : ObjectBasicInfo
+    {
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.MobilePage, BuilderType.DVBuilder)]
+        public string Title { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool UseParams { get; set; }
+    }
+
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]
     public class ObjectBasicSMS : ObjectBasicInfo
     {
