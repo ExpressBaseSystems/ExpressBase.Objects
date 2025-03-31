@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
-        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport, EbObjectTypes.iPrintLayout)]
         [Alias("Print Documents")]
         [PropertyGroup("Core")]
         public List<ObjectBasicInfo> PrintDocs { get; set; }
