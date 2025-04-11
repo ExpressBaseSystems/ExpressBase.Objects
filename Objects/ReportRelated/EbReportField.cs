@@ -291,6 +291,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
+        [Alias("Fill Opacity (%)")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public float FillOpacity { get; set; } = 10;
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [Alias("Stroke Opacity (%)")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public float StrokeOpacity { get; set; } = 10;
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public new EbTextAlign TextAlign { get; set; } = EbTextAlign.Center;
 
@@ -327,7 +339,7 @@ namespace ExpressBase.Objects
                 img.RotationDegrees = Rotation;
                 img.ScaleToFit(WidthPt, HeightPt);
                 img.SetAbsolutePosition(LeftPt, Rep.HeightPt - TopPt - HeightPt);
-                PdfGState _state = new PdfGState() { FillOpacity = 0.1F, StrokeOpacity = 0.1F };
+                PdfGState _state = new PdfGState() { FillOpacity = FillOpacity/100, StrokeOpacity =  StrokeOpacity/100 };
                 PdfContentByte cb = Rep.Writer.DirectContentUnder;
                 cb.SaveState();
                 cb.SetGState(_state);
