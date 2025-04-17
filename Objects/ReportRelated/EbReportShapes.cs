@@ -53,7 +53,7 @@ namespace ExpressBase.Objects
             {
                 float radius = WidthPt / 2;
                 float xval = LeftPt + radius;
-                float yval = Rep.HeightPt - (printingTop + TopPt + radius + Rep.detailprintingtop);
+                float yval = Rep.HeightPt - (printingTop + TopPt + radius + Rep.detailCursorPosition);
 
                 Rep.Canvas.SetColorStroke(GetColor(BorderColor));
                 Rep.Canvas.SetColorFill(GetColor(BackColor));
@@ -65,8 +65,8 @@ namespace ExpressBase.Objects
             }
             else
             {
-                float y1 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-                float y2 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+                float y1 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
+                float y2 = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
                 Rep.Canvas.SetColorStroke(GetColor(BorderColor));
                 Rep.Canvas.SetColorFill(GetColor(BackColor));
                 Rep.Canvas.SetLineWidth(Border);
@@ -97,7 +97,7 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float y = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float y = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BackColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -127,7 +127,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             base.DrawMe(printingTop, Rep, Linkparams, slno);
-            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -159,7 +159,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             base.DrawMe(printingTop, Rep, Linkparams, slno);
-            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -191,7 +191,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             base.DrawMe(printingTop, Rep, Linkparams, slno);
-            float y = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float y = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -223,7 +223,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             base.DrawMe(printingTop, Rep, Linkparams, slno);
-            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -256,7 +256,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             base.DrawMe(printingTop, Rep, Linkparams, slno);
-            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -294,7 +294,7 @@ namespace ExpressBase.Objects
         {
             float rowH = (TopPt > Rep.MultiRowTop) ? Rep.RowHeight : 0;
             base.DrawMe(printingTop, Rep, Linkparams, slno);
-            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetColorFill(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -304,7 +304,7 @@ namespace ExpressBase.Objects
             Rep.Canvas.LineTo(Llx + 3, y1 - 3);
             Rep.Canvas.LineTo(Llx - 3, y1 - 3);
             Rep.Canvas.ClosePathFillStroke();
-            float y2 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + rowH);
+            float y2 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + rowH);
             Rep.Canvas.MoveTo(Llx, y2);
             Rep.Canvas.LineTo(Llx - 3, y2 + 3);
             Rep.Canvas.LineTo(Llx + 3, y2 + 3);
@@ -332,7 +332,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             float rowH = (TopPt > Rep.MultiRowTop) ? Rep.RowHeight : 0;
-            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop + rowH);
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition + rowH);
             float y2 = y1;
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
@@ -363,8 +363,8 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float y2 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float y2 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             Rep.Canvas.SetColorStroke(GetColor(BorderColor));
             Rep.Canvas.SetLineWidth(Border);
             if (Dotted)

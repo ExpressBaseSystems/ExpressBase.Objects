@@ -1,4 +1,6 @@
-﻿using ExpressBase.Common;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using ExpressBase.Common;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
@@ -32,6 +34,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static ExpressBase.CoreBase.Globals.PdfGEbFont;
 using HeaderFooter = ExpressBase.Objects.Helpers.HeaderFooter;
+using Paragraph = iTextSharp.text.Paragraph;
+using Rectangle = iTextSharp.text.Rectangle;
 
 namespace ExpressBase.Objects
 {
@@ -345,6 +349,12 @@ namespace ExpressBase.Objects
         public int MaxRowCount { get; set; } = 0;
 
         [JsonIgnore]
+        public bool DrawDetailCompleted = false;
+
+        [JsonIgnore]
+        public bool IsInEndPageEvent = false;
+
+        [JsonIgnore]
         public bool HasRows = false;
 
         [JsonIgnore]
@@ -539,7 +549,7 @@ namespace ExpressBase.Objects
 
         private float _dtHeight = 0;
         [JsonIgnore]
-        public float DetailHeight
+        public float DetailsHeight
         {
             get
             {
@@ -584,38 +594,19 @@ namespace ExpressBase.Objects
             }
         }
 
-        private float dt_fillheight = 0;
+        private float possibleSpaceForDetail = 0;
         [JsonIgnore]
-        public float DT_FillHeight
+        public float PossibleSpaceForDetail
         {
             get
             {
-                RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
-                //if (rows != null)
-                //{
-                //    if (rows.Count > 0)
-                //    {
-                //        float a = rows.Count * DetailHeight;
-                //        float b = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
-                //        if (a < b && PageNumber == 1)
-                //            IsLastpage = true;
-                //    }
-                //}
+                float headerHeight = PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH;
+                float footerHeight =/* IsLastpage ? ReportFooterHeight :*/ ReportFooterHeightRepeatAsPf;
+                possibleSpaceForDetail = HeightPt - (headerHeight + PageHeaderHeight + PageFooterHeight + footerHeight + Margin.Top + Margin.Bottom);
 
-                if (PageNumber == 1 && IsLastpage)
-                    dt_fillheight = HeightPt - (ReportHeaderHeight + ReportFooterHeight + PageHeaderHeight + PageFooterHeight + Margin.Top + Margin.Bottom);
-                else if (PageNumber == 1)
-                    dt_fillheight = HeightPt - (ReportHeaderHeight + Margin.Top + PageHeaderHeight + PageFooterHeight + Margin.Bottom + ReportFooterHeightRepeatAsPf);
-                else if (IsLastpage == true)
-                    dt_fillheight = HeightPt - (ReportHeaderHeightRepeatAsPH + PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top + ReportFooterHeight);
-                else
-                    dt_fillheight = HeightPt - (ReportHeaderHeightRepeatAsPH + PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top + ReportFooterHeightRepeatAsPf);
-                return dt_fillheight;
+                return possibleSpaceForDetail;
             }
         }
-
-        //[JsonIgnore]
-        //public EbBaseService ReportService { get; set; }
 
         [JsonIgnore]
         public EbStaticFileClient FileClient { get; set; }
@@ -636,10 +627,10 @@ namespace ExpressBase.Objects
         private float dt_Yposition;
 
         [JsonIgnore]
-        public float detailprintingtop = 0;
+        public float detailCursorPosition = 0;
 
         [JsonIgnore]
-        public double detailEnd = 0;
+        public float detailEnd = 0;
 
         [JsonIgnore]
         public bool FooterDrawn = false;
@@ -672,15 +663,15 @@ namespace ExpressBase.Objects
         public PooledRedisClientManager pooledRedisManager { get; set; }
 
         public dynamic GetDataFieldValue(string columnName, int iterator, int tableIndex)
-        { 
+        {
             if (DataSet == null)
                 throw new ArgumentNullException(nameof(DataSet), "DataSet cannot be null.");
-             
+
             if (tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
                 throw new ArgumentOutOfRangeException(nameof(tableIndex), $"Table index {tableIndex} is out of range. Total tables: {DataSet.Tables.Count}");
 
             var table = DataSet.Tables[tableIndex];
-             
+
             if (!table.Columns.Contains(columnName))
                 throw new ArgumentException($"Column '{columnName}' does not exist in the table at index {tableIndex}.");
 
@@ -710,18 +701,11 @@ namespace ExpressBase.Objects
 
         public void CallSummerize(EbDataField field, int iterator)
         {
-            string column_val;
-            EbPdfGlobals globals = new EbPdfGlobals();
-
-            if (field is EbCalcField)
-            {
-                column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, iterator, this);
-            }
-            else
-            {
-                column_val = GetDataFieldValue(field.ColumnName, iterator, field.TableIndex);
-            }
             List<EbDataField> SummaryList;
+            string column_val = field is EbCalcField calcField
+                                ? calcField.GetCalcFieldValue(new EbPdfGlobals(), DataSet, iterator, this)
+                                : GetDataFieldValue(field.ColumnName, iterator, field.TableIndex);
+
             if (GroupSummaryFields.ContainsKey(field.Name))
             {
                 SummaryList = GroupSummaryFields[field.Name];
@@ -754,10 +738,10 @@ namespace ExpressBase.Objects
             RowHeight = 0;
             MultiRowTop = 0;
             rh_Yposition = this.Margin.Top;
-            detailprintingtop = 0;
+            detailCursorPosition = 0;
             foreach (EbReportHeader r_header in ReportHeaders)
             {
-                if (!IsCallFromNewPageEvent || (IsCallFromNewPageEvent && r_header.RepeatOnAllPages))
+                //if (!IsCallFromNewPageEvent || (IsCallFromNewPageEvent && r_header.RepeatOnAllPages))
                 {
                     foreach (EbReportField field in r_header.GetFields())
                     {
@@ -772,13 +756,8 @@ namespace ExpressBase.Objects
         {
             RowHeight = 0;
             MultiRowTop = 0;
-            detailprintingtop = 0;
-            if (PageNumber == 1)
-                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
-            else if (ReportHeaderHeightRepeatAsPH > 0)
-                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
-            else
-                ph_Yposition = this.Margin.Top;
+            detailCursorPosition = 0;
+            ph_Yposition = Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
 
             foreach (EbPageHeader p_header in PageHeaders)
             {
@@ -794,30 +773,21 @@ namespace ExpressBase.Objects
         {
             RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[DetailTableIndex].Rows : null;
 
-            if (PageNumber == 1)
-                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
-            else if (ReportHeaderHeightRepeatAsPH > 0)
-                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
-            else
-                ph_Yposition = this.Margin.Top;
+            ph_Yposition = this.Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
 
             dt_Yposition = ph_Yposition + PageHeaderHeight;
-            if (rows != null && HasRows == true)
+            if (HasRows)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
                     SerialNumber++;
                     if (Groupheaders?.Count > 0)
                         DrawGroup();
-                    if (detailprintingtop < DT_FillHeight && DT_FillHeight - detailprintingtop >= DetailHeight)
-                    {
-                        DoLoopInDetail(iDetailRowPos);
-                    }
-                    else
-                    {
+
+                    if (PossibleSpaceForDetail - detailCursorPosition < DetailsHeight)
                         AddNewPage();
-                        DoLoopInDetail(iDetailRowPos);
-                    }
+
+                    DoLoopInDetail(iDetailRowPos);
                 }
                 if (GroupFooters?.Count > 0)
                     EndGroups();
@@ -827,6 +797,20 @@ namespace ExpressBase.Objects
             {
                 IsLastpage = true;
                 DoLoopInDetail(0);
+            }
+            DrawDetailCompleted = true;
+            if (ReportFooterHeightRepeatAsPf > 0)
+            {
+                float remainingSpaceAfterDetailsDrawn = PossibleSpaceForDetail - detailCursorPosition;
+                float spaceNeededForNonRepeatingFooters = ReportFooterHeight - ReportFooterHeightRepeatAsPf;
+                if (remainingSpaceAfterDetailsDrawn < spaceNeededForNonRepeatingFooters)
+                {
+                    IsLastpage = false;
+                    detailEnd = ReportHeaderHeightRepeatAsPH;//no [age header as it is lastpg
+                    detailCursorPosition = 0;
+                    AddNewPage();
+                    IsLastpage = true;
+                }
             }
         }
 
@@ -913,20 +897,14 @@ namespace ExpressBase.Objects
 
         public void AddNewPage()
         {
-            detailprintingtop = 0;
+            detailCursorPosition = 0;
             Doc.NewPage();
             ph_Yposition = this.Margin.Top;
-            PageNumber = Writer.PageNumber;
         }
 
         public void DoLoopInDetail(int iterator)
         {
-            if (PageNumber == 1)
-                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
-            else if (ReportHeaderHeightRepeatAsPH > 0)
-                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
-            else
-                ph_Yposition = this.Margin.Top;
+            ph_Yposition = Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             string column_val = string.Empty;
 
@@ -960,8 +938,8 @@ namespace ExpressBase.Objects
 
                         if (field.RenderInMultiLine)
                         {
-                            float ury = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop);
-                            float lly = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop + field.HeightPt);
+                            float ury = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition);
+                            float lly = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition + field.HeightPt);
                             field.DoRenderInMultiLine2(column_val, this, false, lly, ury);
                         }
                     }
@@ -975,12 +953,12 @@ namespace ExpressBase.Objects
                             //    field.HeightPt += RowHeight;
                             DrawFields(field, dt_Yposition, iterator);
                         }
-                        detailprintingtop += detail.HeightPt + RowHeight;
-                        detailEnd = detailprintingtop;
+                        detailCursorPosition += detail.HeightPt + RowHeight;
+                        detailEnd = detailCursorPosition;
                     }
                     else
                     {
-                        detailEnd = detailprintingtop;
+                        detailEnd = detailCursorPosition;
                         IsLastpage = true;
                         Writer.PageEvent.OnEndPage(Writer, Doc);
                         return;
@@ -1013,30 +991,30 @@ namespace ExpressBase.Objects
 
                             if (field is EbDataField && (field as EbDataField).RenderInMultiLine)
                             {
-                                float ury = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop);
-                                float lly = HeightPt - (dt_Yposition + field.TopPt + detailprintingtop + field.HeightPt);
+                                float ury = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition);
+                                float lly = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition + field.HeightPt);
                                 (field as EbDataField).DoRenderInMultiLine2(column_val, this, false, lly, ury);
                             }
                             //if (DT_FillHeight < field.TopPt - nextpage_quotient + field.HeightPt + RowHeight)
-                            if (this.DT_FillHeight < detailprintingtop + Margin.Bottom)
+                            if (this.PossibleSpaceForDetail < detailCursorPosition + Margin.Bottom)
                             {
                                 AddNewPage();
-                                detailprintingtop = 0;
+                                detailCursorPosition = 0;
                                 nextpage_quotient = field.TopPt;
                             }
                             field.TopPt -= nextpage_quotient;
                             DrawFields(field, dt_Yposition, iterator);
                             if (RowHeight > 0)
-                                detailprintingtop += RowHeight;
+                                detailCursorPosition += RowHeight;
                             // detailprintingtop += field.HeightPt;
-                            detailEnd = detailprintingtop;
+                            detailEnd = detailCursorPosition;
                             RowHeight = 0;
                         }
-                        detailprintingtop += detail.HeightPt;
+                        detailCursorPosition += detail.HeightPt;
                     }
                     else
                     {
-                        detailEnd = detailprintingtop;
+                        detailEnd = detailCursorPosition;
                         IsLastpage = true;
                         Writer.PageEvent.OnEndPage(Writer, Doc);
                         return;
@@ -1047,17 +1025,22 @@ namespace ExpressBase.Objects
 
         public void DrawGroupHeader(int order, int iterator)
         {
-            if ((PreviousGheadersIterator != iterator && GroupHeaderHeight + DetailHeight > DT_FillHeight - detailprintingtop) || (ReportGroups[order].GroupHeader.GroupInNewPage && iterator > 0))
+            bool IsNewGroup = PreviousGheadersIterator != iterator;
+            bool GroupInNewPageEnabled = ReportGroups[order].GroupHeader.GroupInNewPage && iterator > 0;
+
+            if ((IsNewGroup && GroupHeaderHeight + DetailsHeight > possibleSpaceForDetail - detailCursorPosition) || GroupInNewPageEnabled)
             {
                 AddNewPage();
-                dt_Yposition = PageHeaderHeight + this.Margin.Top;
+                dt_Yposition = ReportHeaderHeightRepeatAsPH + PageHeaderHeight + this.Margin.Top;
             }
 
             foreach (EbReportField field in ReportGroups[order].GroupHeader.GetFields())
             {
                 DrawFields(field, dt_Yposition, iterator);
             }
-            detailprintingtop += ReportGroups[order].GroupHeader.HeightPt;
+            detailCursorPosition += ReportGroups[order].GroupHeader.HeightPt;
+            detailEnd = detailCursorPosition;
+
             PreviousGheadersIterator = iterator;
         }
 
@@ -1067,7 +1050,8 @@ namespace ExpressBase.Objects
             {
                 DrawFields(field, dt_Yposition, iterator);
             }
-            detailprintingtop += ReportGroups[order].GroupFooter.HeightPt;
+            detailCursorPosition += ReportGroups[order].GroupFooter.HeightPt;
+            detailEnd = detailCursorPosition;
             if (RestartSerialNumberOnGroup)
                 SerialNumber = 1;
         }
@@ -1076,16 +1060,12 @@ namespace ExpressBase.Objects
         {
             RowHeight = 0;
             MultiRowTop = 0;
-            detailprintingtop = 0;
-            if (PageNumber == 1)
-                ph_Yposition = ReportHeaderHeight + this.Margin.Top;
-            else if (ReportHeaderHeightRepeatAsPH > 0)
-                ph_Yposition = ReportHeaderHeightRepeatAsPH + this.Margin.Top;
-            else
-                ph_Yposition = this.Margin.Top;
+            detailCursorPosition = 0;
+
+            ph_Yposition = Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
             dt_Yposition = ph_Yposition + PageHeaderHeight;
-            //  pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd + /*DetailHeight +*/ dt_Yposition;
+            pf_Yposition = detailEnd + dt_Yposition;
+
             foreach (EbPageFooter p_footer in PageFooters)
             {
                 foreach (EbReportField field in p_footer.GetFields())
@@ -1096,53 +1076,69 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void DrawReportFooter(bool IsCallFromNewPageEvent = false)
+        public void DrawReportFooter()
         {
             RowHeight = 0;
             MultiRowTop = 0;
-            detailprintingtop = 0;
+            detailCursorPosition = 0;
+
             dt_Yposition = ph_Yposition + PageHeaderHeight;
-            //pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd /*+ DetailHeight*/ + dt_Yposition;
-            if (RenderReportFooterInBottom && !IsCallFromNewPageEvent)
+            pf_Yposition = detailEnd + dt_Yposition;
+            rf_Yposition = pf_Yposition + PageFooterHeight;
+
+            if (RenderReportFooterInBottom)
             {
-                rf_Yposition = HeightPt - ReportFooterHeight;
-            }
-            else
-            {
-                rf_Yposition = pf_Yposition + PageFooterHeight;
+                float remainingHeight = HeightPt - rf_Yposition; 
+                float requiredHeight = ReportFooterHeight + Margin.Bottom;
+
+                if (remainingHeight < requiredHeight)
+                {
+                    IsLastpage = false;
+                    AddNewPage();
+                    IsLastpage = true;
+                }
+                rf_Yposition = HeightPt - requiredHeight;
             }
 
             foreach (EbReportFooter r_footer in ReportFooters)
             {
-                if (r_footer.AlwaysPrintTogether)
+                if (!r_footer.RepeatOnAllPages)
                 {
-                    if (HeightPt - (rf_Yposition+Margin.Bottom) < r_footer.HeightPt)
+                    if (r_footer.AlwaysPrintTogether)
                     {
-                        FooterDrawn = true;
-                        AddNewPage();
-                        rf_Yposition = Margin.Top;
+                        float remainingHeight = HeightPt - (pf_Yposition + PageFooterHeight) - Margin.Bottom;
+
+                        if (remainingHeight < r_footer.HeightPt)
+                        {
+                            FooterDrawn = true;
+
+                            IsLastpage = false;
+                            AddNewPage();
+                            IsLastpage = true;
+
+                            rf_Yposition = RenderReportFooterInBottom
+                                ? HeightPt - (r_footer.HeightPt + Margin.Bottom)
+                                : Margin.Top;
+                        }
                     }
-                }
-                if (!IsCallFromNewPageEvent || (IsCallFromNewPageEvent && r_footer.RepeatOnAllPages))
-                {
-                    float footer_diffrence = 0;
+
+                    float footerOffset = 0;
                     EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
                     if (SortedReportFields.Length > 0)
                     {
                         for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                         {
                             EbReportField field = SortedReportFields[iSortPos];
-                            // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
-                            if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
+
+                            if ((HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom) && !RenderReportFooterInBottom)
                             {
                                 AddNewPage();
-                                //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
-                                footer_diffrence = field.TopPt;
+
+                                footerOffset = field.TopPt;
                                 FooterDrawn = true;
                                 rf_Yposition = Margin.Top;
                             }
-                            field.TopPt -= footer_diffrence;
+                            field.TopPt -= footerOffset;
                             DrawFields(field, rf_Yposition, 0);
                         }
                     }
@@ -1150,6 +1146,50 @@ namespace ExpressBase.Objects
                 }
             }
         }
+
+        public void DrawRepeatingReportFooter()
+        {
+            RowHeight = 0;
+            MultiRowTop = 0;
+            detailCursorPosition = 0;
+
+            dt_Yposition = ph_Yposition + (DrawDetailCompleted ? 0 : PageHeaderHeight);//PageHeaderHeight wont draw on last page if detail is completed and only footer is remaining 
+            pf_Yposition = detailEnd + dt_Yposition;
+            rf_Yposition = pf_Yposition + PageFooterHeight;
+
+            if (RenderReportFooterInBottom)
+            {
+                float requiredHeight = ReportFooterHeightRepeatAsPf + Margin.Bottom;
+
+                rf_Yposition = HeightPt - requiredHeight;
+            }
+
+            foreach (EbReportFooter r_footer in ReportFooters)
+            {
+                if (r_footer.RepeatOnAllPages)
+                {
+
+                    if (ReportFooterHeightRepeatAsPf != ReportFooterHeight)
+                        rf_Yposition = HeightPt - r_footer.HeightPt - Margin.Bottom;
+
+                    float footerOffset = 0;
+
+                    EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
+                    if (SortedReportFields.Length > 0)
+                    {
+                        for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                        {
+                            EbReportField field = SortedReportFields[iSortPos];
+
+                            field.TopPt -= footerOffset;
+                            DrawFields(field, rf_Yposition, 0);
+                        }
+                    }
+                    rf_Yposition += r_footer.HeightPt;
+                }
+            }
+        }
+
 
         public void DrawFields(EbReportField field, float section_Yposition, int iterator)
         {
@@ -1628,7 +1668,9 @@ namespace ExpressBase.Objects
                 string[] Keys = LabelsCollection.ToArray();
                 LabelKeyValues = EbObjectsHelper.GetKeyValues(new GetDictionaryValueRequest { Keys = Keys, Language = _language }, EbConnectionFactory.ObjectsDB);
             }
-            this.Doc.NewPage();
+            detailCursorPosition = 0;
+
+            this.Doc.Open();
 
             if (this.DataSet != null)
                 this.Draw();
@@ -1674,29 +1716,22 @@ namespace ExpressBase.Objects
                 this.Doc = new Document(rec);
                 this.Doc.SetMargins(this.Margin.Left, this.Margin.Right, this.Margin.Top, this.Margin.Bottom);
                 this.Writer = PdfWriter.GetInstance(this.Doc, Ms1);
-                this.Writer.Open();
-                this.Doc.Open();
                 this.Writer.PageEvent = new HeaderFooter(this);
+                this.Writer.Open();
                 this.Writer.CloseStream = true;//important
                 this.Canvas = this.Writer.DirectContent;
                 this.PageNumber = this.Writer.PageNumber;
                 Document = this.Doc;
-                this.Writer = this.Writer;
-                this.Canvas = this.Canvas;
             }
             else
             {
                 this.Doc = Document;
-                this.Writer = this.Writer;
-                this.Canvas = this.Canvas;
-                this.PageNumber = 1/*Report.Writer.PageNumber*/;
+                this.PageNumber = 1;
             }
         }
 
         public void Draw()
         {
-            this.DrawReportHeader();
-
             if (this?.DataSet?.Tables[this.DetailTableIndex]?.Rows.Count > 0)
             {
                 this.DrawDetail();
@@ -1709,8 +1744,8 @@ namespace ExpressBase.Objects
                 this.DrawReportFooter();
                 throw new Exception("Dataset is null, refid " + this.DataSourceRefId);
             }
-
-            this.DrawReportFooter();
+            if (ReportFooterHeightRepeatAsPf != ReportFooterHeight)
+                this.DrawReportFooter();
         }
 
         public void HandleExceptionPdf(Exception e)
@@ -1720,7 +1755,7 @@ namespace ExpressBase.Objects
             if (this?.DataSet?.Tables[this.DetailTableIndex]?.Rows.Count > 0)
                 phrase = new Phrase("Something went wrong. Please check the parameters or contact admin" + e.Message + e.StackTrace);
             else
-                phrase = new Phrase("No Data available. Please check the parameters or contact admin" + e.Message+e.StackTrace);
+                phrase = new Phrase("No Data available. Please check the parameters or contact admin" + e.Message + e.StackTrace);
 
             phrase.Font.Size = 10;
             float y = this.HeightPt - (this.ReportHeaderHeight + this.Margin.Top + this.PageHeaderHeight);

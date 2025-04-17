@@ -119,8 +119,8 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -348,8 +348,8 @@ namespace ExpressBase.Objects
             else
                 ct.AddText(phrase);
 
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -408,8 +408,8 @@ namespace ExpressBase.Objects
                 {
                     ct.AddText(phrase);
                 }
-                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
                 ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
                 ct.Go();
             }
@@ -457,8 +457,8 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -522,8 +522,8 @@ namespace ExpressBase.Objects
                     column_val = Prefix + " " + column_val + " " + Suffix;
             }
 
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (RenderInMultiLine && AmountInWords)
@@ -661,8 +661,8 @@ namespace ExpressBase.Objects
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             string column_val = SummarizedValue.ToString();
             ResetSummary();
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat, FormatUsingCulture, DecimalCurrency);
@@ -764,8 +764,8 @@ namespace ExpressBase.Objects
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             string column_val = SummarizedValue.ToString();
             ResetSummary();
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
@@ -869,8 +869,8 @@ namespace ExpressBase.Objects
                 Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
 
                 ct.AddText(phrase);
-                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
                 ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
                 ct.Go();
             }
@@ -950,8 +950,8 @@ namespace ExpressBase.Objects
             }
             else
                 ct.AddText(phrase);
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -1089,8 +1089,8 @@ namespace ExpressBase.Objects
                 ct.AddText(phrase);
             }
 
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -1218,8 +1218,8 @@ namespace ExpressBase.Objects
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             string column_val = SummarizedValue.ToString();
             ResetSummary();
 
@@ -1332,8 +1332,8 @@ namespace ExpressBase.Objects
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             string column_val = SummarizedValue.ToString();
             ResetSummary();
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
@@ -1436,8 +1436,8 @@ namespace ExpressBase.Objects
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             string column_val = SummarizedValue.ToString();
             ResetSummary();
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
@@ -1513,8 +1513,8 @@ namespace ExpressBase.Objects
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int iterator)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             string column_val = SummarizedValue.ToString();
             ResetSummary();
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
