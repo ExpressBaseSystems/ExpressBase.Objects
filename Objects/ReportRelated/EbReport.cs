@@ -1407,45 +1407,52 @@ namespace ExpressBase.Objects
 
         public byte[] GetImage(int refId)
         {
-            if (ImageCollection.ContainsKey(refId))
-            {
-                return ImageCollection[refId];
-            }
-            else
-            {
-                DownloadFileResponse dfs = null;
-                byte[] fileByte = new byte[0];
+            if (ImageCollection.TryGetValue(refId, out var ImageBytea))
+                return ImageBytea;
 
-                try
+            byte[] ImgBytes = new byte[0];
+            try
+            {
+                bool isSpecificSoln = Solution.SolutionID == "ebdbxrogi7imbm20220927054819"; 
+                string key = string.Format("Img_{0}_{1}_{2}", Solution.SolutionID, 0, refId); //solnid, quality, filerefid
+
+                if (isSpecificSoln)
                 {
-                    if (FileClient?.BearerToken != string.Empty)
+                    using (var redisReadOnly = this.pooledRedisManager.GetReadOnlyClient())
                     {
-                        dfs = FileClient.Get
-                            (new DownloadImageByIdRequest
-                            {
-                                ImageInfo = new ImageMeta
-                                {
-                                    FileRefId = refId,
-                                    FileCategory = Common.Enums.EbFileCategory.Images
-                                }
-                            });
-                        if (dfs.StreamWrapper != null)
-                        {
-                            dfs.StreamWrapper.Memorystream.Position = 0;
-                            fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
-                        }
+                        ImgBytes = redisReadOnly.Get<byte[]>(key)?? new byte[0];
                     }
-
-                    ImageCollection.Add(refId, fileByte);
-
                 }
-                catch (Exception e)
+
+                if (ImgBytes.Length == 0 && !string.IsNullOrEmpty(FileClient?.BearerToken))
                 {
-                    Console.WriteLine(e.Message + e.StackTrace);
+                    DownloadFileResponse response = FileClient.Get(new DownloadImageByIdRequest
+                    {
+                        ImageInfo = new ImageMeta
+                        {
+                            FileRefId = refId,
+                            FileCategory = Common.Enums.EbFileCategory.Images
+                        }
+                    });
+                    MemoryStream stream = response?.StreamWrapper?.Memorystream;
+                    if (stream != null)
+                    {
+                        stream.Position = 0;
+                        ImgBytes = stream.ToBytes();
+
+                        if (isSpecificSoln && ImgBytes.Length > 0)
+                            Redis.Set(key, ImgBytes);
+                    }
                 }
 
-                return fileByte;
+                ImageCollection.Add(refId, ImgBytes);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
+
+            return ImgBytes;
         }
 
         public void AddParamsNCalcsInGlobal(EbPdfGlobals globals)
