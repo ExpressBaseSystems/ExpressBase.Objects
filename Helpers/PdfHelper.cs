@@ -25,14 +25,19 @@ namespace ExpressBase.Objects.Helpers
                 bool needRH = Report.CurrentReportPageNumber == 1 || Report.ReportHeaderHeightRepeatAsPH > 0;
                 if (needRH)
                     Report.DrawReportHeader();
-                if (!Report.DrawDetailCompleted)// omit draw page header if detail section is completed
+
+                Report.HasPageheader = !Report.DrawDetailCompleted;
+                if (Report.HasPageheader)
+                {
                     Report.DrawPageHeader();
+                }
             }
         }
 
         public override void OnEndPage(PdfWriter writer, Document d)
         {
-            if (Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0)
+            bool needPF = !Report.IsInsideReportFooter && Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0;
+            if (needPF)
             {
                 Report.DrawPageFooter();
                 if (Report.ReportFooterHeightRepeatAsPf > 0)

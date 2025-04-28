@@ -356,6 +356,12 @@ namespace ExpressBase.Objects
         public bool IsInEndPageEvent = false;
 
         [JsonIgnore]
+        public bool HasPageheader { get; set; } = true;
+
+        [JsonIgnore]
+        public bool IsInsideReportFooter { get; set; } = false;
+
+        [JsonIgnore]
         public bool HasRows = false;
 
         [JsonIgnore]
@@ -751,7 +757,6 @@ namespace ExpressBase.Objects
                     foreach (EbReportField field in r_header.GetFields())
                     {
                         DrawFields(field, rh_Yposition, 0);
-                        Console.WriteLine(rh_Yposition);
                     }
                     rh_Yposition += r_header.HeightPt;
                 }
@@ -779,9 +784,9 @@ namespace ExpressBase.Objects
         {
             RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[DetailTableIndex].Rows : null;
 
-            ph_Yposition = this.Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            dt_Yposition = ph_Yposition + (HasPageheader ? PageHeaderHeight : 0);//PageHeaderHeight wont draw on last page if detail is completed and only footer is remaining
 
-            dt_Yposition = ph_Yposition + PageHeaderHeight;
             if (HasRows)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
@@ -906,12 +911,14 @@ namespace ExpressBase.Objects
             detailCursorPosition = 0;
             Doc.NewPage();
             ph_Yposition = this.Margin.Top;
+            detailEnd = 0;
         }
 
         public void DoLoopInDetail(int iterator)
         {
             ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
-            dt_Yposition = ph_Yposition + PageHeaderHeight;
+            dt_Yposition = ph_Yposition + (HasPageheader ? PageHeaderHeight : 0);//PageHeaderHeight wont draw on last page if detail is completed and only footer is remaining
+
             string column_val = string.Empty;
 
             foreach (EbReportDetail detail in Detail)
@@ -1052,6 +1059,11 @@ namespace ExpressBase.Objects
 
         public void DrawGroupFooter(int order, int iterator)
         {
+            if ((GroupFooterHeight > possibleSpaceForDetail - detailCursorPosition))
+            {
+                AddNewPage();
+                dt_Yposition = ReportHeaderHeightRepeatAsPH + PageHeaderHeight + this.Margin.Top;
+            }
             foreach (EbReportField field in ReportGroups[order].GroupFooter.GetFields())
             {
                 DrawFields(field, dt_Yposition, iterator);
@@ -1069,7 +1081,7 @@ namespace ExpressBase.Objects
             detailCursorPosition = 0;
 
             ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
-            dt_Yposition = ph_Yposition + PageHeaderHeight;
+            dt_Yposition = ph_Yposition + (HasPageheader ? PageHeaderHeight : 0);//PageHeaderHeight wont draw on last page if detail is completed and only footer is remaining
             pf_Yposition = detailEnd + dt_Yposition;
 
             foreach (EbPageFooter p_footer in PageFooters)
@@ -1084,11 +1096,13 @@ namespace ExpressBase.Objects
 
         public void DrawReportFooter()
         {
+            IsInsideReportFooter = true;
             RowHeight = 0;
             MultiRowTop = 0;
             detailCursorPosition = 0;
 
-            dt_Yposition = ph_Yposition + PageHeaderHeight;
+            ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            dt_Yposition = ph_Yposition + (HasPageheader ? PageHeaderHeight : 0);//PageHeaderHeight wont draw on last page if detail is completed and only footer is remaining
             pf_Yposition = detailEnd + dt_Yposition;
             rf_Yposition = pf_Yposition + PageFooterHeight;
 
@@ -1163,7 +1177,8 @@ namespace ExpressBase.Objects
             MultiRowTop = 0;
             detailCursorPosition = 0;
 
-            dt_Yposition = ph_Yposition + (DrawDetailCompleted ? 0 : PageHeaderHeight);//PageHeaderHeight wont draw on last page if detail is completed and only footer is remaining 
+            ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            dt_Yposition = ph_Yposition + (HasPageheader ? PageHeaderHeight : 0);//PageHeaderHeight wont draw on last page if detail is completed and only footer is remaining
             pf_Yposition = detailEnd + dt_Yposition;
             rf_Yposition = pf_Yposition + PageFooterHeight;
 
@@ -1760,6 +1775,7 @@ namespace ExpressBase.Objects
                 this.DrawReportFooter();
                 throw new Exception("Dataset is null, refid " + this.DataSourceRefId);
             }
+
             if (ReportFooterHeightRepeatAsPf != ReportFooterHeight)
                 this.DrawReportFooter();
         }
@@ -2033,7 +2049,7 @@ namespace ExpressBase.Objects
             dt_Yposition = 0f;
 
             detailCursorPosition = 0;
-            detailEnd = 0;
+            //detailEnd = 0;
             FooterDrawn = false;
             PreviousGheadersIterator = 0;
 
@@ -2058,18 +2074,17 @@ namespace ExpressBase.Objects
 
             LinkCollection?.Clear();
 
-            SerialNumber = 0;
-            //CurrentReportPageNumber = 1;
+            SerialNumber = 0; 
             MasterPageNumber = 0;
             IsLastpage = false;
-            //IsFirstpage = false;
+            IsInsideReportFooter = false;
             _currentTimeStamp = DateTime.MinValue;
 
             __fieldsNotSummaryPerDetail = null;
             __reportFieldsSortedPerDetail = null;
             __reportFieldsSortedPerRFooter = null;
 
-            DataSet.Tables.Clear();
+            DataSet?.Tables?.Clear();
             DataSet = null;
             DataSet = null;
             evaluator = new EbSciptEvaluator
