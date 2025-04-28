@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using ExpressBase.Common;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
@@ -400,7 +401,11 @@ namespace ExpressBase.Objects
         public bool IsLastpage { get; set; } = false;
 
         [JsonIgnore]
-        public int PageNumber { get; set; }
+        public int CurrentReportPageNumber { get; set; }
+        [JsonIgnore]
+        public bool NextReport { get; set; }
+        [JsonIgnore]
+        public int MasterPageNumber { get; set; }
 
         [JsonIgnore]
         public int SerialNumber = 0;
@@ -600,7 +605,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                float headerHeight = PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH;
+                float headerHeight = CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH;
                 float footerHeight =/* IsLastpage ? ReportFooterHeight :*/ ReportFooterHeightRepeatAsPf;
                 possibleSpaceForDetail = HeightPt - (headerHeight + PageHeaderHeight + PageFooterHeight + footerHeight + Margin.Top + Margin.Bottom);
 
@@ -733,7 +738,7 @@ namespace ExpressBase.Objects
 
         }
 
-        public void DrawReportHeader(bool IsCallFromNewPageEvent = false)
+        public void DrawReportHeader()
         {
             RowHeight = 0;
             MultiRowTop = 0;
@@ -741,11 +746,12 @@ namespace ExpressBase.Objects
             detailCursorPosition = 0;
             foreach (EbReportHeader r_header in ReportHeaders)
             {
-                //if (!IsCallFromNewPageEvent || (IsCallFromNewPageEvent && r_header.RepeatOnAllPages))
+                if ((CurrentReportPageNumber == 1 || r_header.RepeatOnAllPages))
                 {
                     foreach (EbReportField field in r_header.GetFields())
                     {
                         DrawFields(field, rh_Yposition, 0);
+                        Console.WriteLine(rh_Yposition);
                     }
                     rh_Yposition += r_header.HeightPt;
                 }
@@ -757,7 +763,7 @@ namespace ExpressBase.Objects
             RowHeight = 0;
             MultiRowTop = 0;
             detailCursorPosition = 0;
-            ph_Yposition = Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
 
             foreach (EbPageHeader p_header in PageHeaders)
             {
@@ -773,7 +779,7 @@ namespace ExpressBase.Objects
         {
             RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[DetailTableIndex].Rows : null;
 
-            ph_Yposition = this.Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            ph_Yposition = this.Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
 
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             if (HasRows)
@@ -904,7 +910,7 @@ namespace ExpressBase.Objects
 
         public void DoLoopInDetail(int iterator)
         {
-            ph_Yposition = Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             string column_val = string.Empty;
 
@@ -960,7 +966,7 @@ namespace ExpressBase.Objects
                     {
                         detailEnd = detailCursorPosition;
                         IsLastpage = true;
-                        Writer.PageEvent.OnEndPage(Writer, Doc);
+                        //Writer.PageEvent.OnEndPage(Writer, Doc);
                         return;
                     }
                 }
@@ -1062,7 +1068,7 @@ namespace ExpressBase.Objects
             MultiRowTop = 0;
             detailCursorPosition = 0;
 
-            ph_Yposition = Margin.Top + (PageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
+            ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             pf_Yposition = detailEnd + dt_Yposition;
 
@@ -1088,7 +1094,7 @@ namespace ExpressBase.Objects
 
             if (RenderReportFooterInBottom)
             {
-                float remainingHeight = HeightPt - rf_Yposition; 
+                float remainingHeight = HeightPt - rf_Yposition;
                 float requiredHeight = ReportFooterHeight + Margin.Bottom;
 
                 if (remainingHeight < requiredHeight)
@@ -1140,9 +1146,13 @@ namespace ExpressBase.Objects
                             }
                             field.TopPt -= footerOffset;
                             DrawFields(field, rf_Yposition, 0);
+                            field.TopPt += footerOffset;
                         }
                     }
+
                     rf_Yposition += r_footer.HeightPt;
+                    if (footerOffset > 0)
+                        rf_Yposition = rf_Yposition - footerOffset;
                 }
             }
         }
@@ -1183,13 +1193,14 @@ namespace ExpressBase.Objects
 
                             field.TopPt -= footerOffset;
                             DrawFields(field, rf_Yposition, 0);
+                            field.TopPt += footerOffset;
+
                         }
                     }
                     rf_Yposition += r_footer.HeightPt;
                 }
             }
         }
-
 
         public void DrawFields(EbReportField field, float section_Yposition, int iterator)
         {
@@ -1311,7 +1322,7 @@ namespace ExpressBase.Objects
             {
                 string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
                 ColumnText ct = new ColumnText(Canvas);
-                Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + (RenderingUser?.FullName ?? "Machine User") + ", " + timestamp);
+                Phrase phrase = new Phrase("page:" + CurrentReportPageNumber.ToString() + /*IsFirstpage.ToString() +*/ ", " + (RenderingUser?.FullName ?? "Machine User") + ", " + timestamp);
                 phrase.Font.Size = 6;
                 phrase.Font.Color = BaseColor.Gray;
                 ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - 20 - Margin.Left) - 20, 20 + Margin.Bottom, 15, Element.ALIGN_LEFT);
@@ -1413,14 +1424,14 @@ namespace ExpressBase.Objects
             byte[] ImgBytes = new byte[0];
             try
             {
-                bool isSpecificSoln = Solution.SolutionID == "ebdbxrogi7imbm20220927054819"; 
+                bool isSpecificSoln = Solution.SolutionID == "ebdbxrogi7imbm20220927054819";
                 string key = string.Format("Img_{0}_{1}_{2}", Solution.SolutionID, 0, refId); //solnid, quality, filerefid
 
                 if (isSpecificSoln)
                 {
                     using (var redisReadOnly = this.pooledRedisManager.GetReadOnlyClient())
                     {
-                        ImgBytes = redisReadOnly.Get<byte[]>(key)?? new byte[0];
+                        ImgBytes = redisReadOnly.Get<byte[]>(key) ?? new byte[0];
                     }
                 }
 
@@ -1661,13 +1672,13 @@ namespace ExpressBase.Objects
             field.SetValuesFromGlobals(globals.CurrentField);
         }
 
-        public void ExecuteRendering(string BToken, string RToken, Document Document, MemoryStream Ms1, List<Param> _params, EbConnectionFactory EbConnectionFactory, bool useRwDb)
+        public void ExecuteRendering(string BToken, string RToken, MemoryStream Ms1, List<Param> _params, EbConnectionFactory EbConnectionFactory, bool useRwDb, Document MainDocument = null)
         {
             this.InitializeReportObects(BToken, RToken);
 
-            this.InitializePdfObjects(Document, Ms1);
-
             this.GetData4Pdf(_params, EbConnectionFactory, useRwDb);
+
+            this.InitializePdfObjects(Ms1, MainDocument);
 
             if (IsLanguageEnabled && Solution.IsMultiLanguageEnabled)
             {
@@ -1711,30 +1722,28 @@ namespace ExpressBase.Objects
             this.GetWatermarkImages();
         }
 
-        public void InitializePdfObjects(Document Document, MemoryStream Ms1)
+        public void InitializePdfObjects(MemoryStream Ms1, Document MainDocument = null)
         {
-            float _width = this.WidthPt - this.Margin.Left;// - Report.Margin.Right;
-            float _height = this.HeightPt - this.Margin.Top - this.Margin.Bottom;
-            this.HeightPt = _height;
-
-            Rectangle rec = new Rectangle(_width, _height);
-            if (Document == null)
+            if (MainDocument == null)
             {
+                float _width = this.WidthPt - this.Margin.Left;
+                float _height = this.HeightPt - this.Margin.Top - this.Margin.Bottom;
+                this.HeightPt = _height;
+                Rectangle rec = new Rectangle(_width, _height);
+
                 this.Doc = new Document(rec);
                 this.Doc.SetMargins(this.Margin.Left, this.Margin.Right, this.Margin.Top, this.Margin.Bottom);
                 this.Writer = PdfWriter.GetInstance(this.Doc, Ms1);
                 this.Writer.PageEvent = new HeaderFooter(this);
                 this.Writer.Open();
                 this.Writer.CloseStream = true;//important
+                this.MasterPageNumber = this.Writer.PageNumber;
+                this.CurrentReportPageNumber = 1;
                 this.Canvas = this.Writer.DirectContent;
-                this.PageNumber = this.Writer.PageNumber;
-                Document = this.Doc;
+                MainDocument = this.Doc;
             }
             else
-            {
-                this.Doc = Document;
-                this.PageNumber = 1;
-            }
+                this.Doc = MainDocument;
         }
 
         public void Draw()
@@ -1998,6 +2007,76 @@ namespace ExpressBase.Objects
                     report.ReportSummaryFields[field.SummaryOf].Add(field);
                 }
             }
+        }
+
+        [JsonIgnore]
+        public bool IsRenderingComplete { get; set; } = false;
+
+        public void Reset()
+        {
+            _docName = null;
+            _rhHeight = 0;
+            _rhHeightAsPh = 0;
+            _phHeight = 0;
+            _pfHeight = 0;
+            _rfHeight = 0;
+            _rfHeightAsPf = 0;
+            _dtHeight = 0;
+            _ghHeight = 0;
+            _gfHeight = 0;
+            possibleSpaceForDetail = 0;
+
+            rh_Yposition = 0f;
+            rf_Yposition = 0f;
+            pf_Yposition = 0f;
+            ph_Yposition = 0f;
+            dt_Yposition = 0f;
+
+            detailCursorPosition = 0;
+            detailEnd = 0;
+            FooterDrawn = false;
+            PreviousGheadersIterator = 0;
+
+            Groupheaders?.Values.ToList().ForEach(g => g.PreviousValue = string.Empty);
+            GroupFooters?.Clear();
+
+            PageSummaryFields?.Clear();
+            ReportSummaryFields?.Clear();
+            GroupSummaryFields?.Clear();
+
+            WatermarkImages?.Clear();
+            WaterMarkList?.Clear();
+
+            ValueScriptCollection?.Clear();
+            AppearanceScriptCollection?.Clear();
+
+            CalcValInRow?.Clear();
+            SummaryValInRow?.Clear();
+
+            LabelsCollection?.Clear();
+            LabelKeyValues?.Clear();
+
+            LinkCollection?.Clear();
+
+            SerialNumber = 0;
+            //CurrentReportPageNumber = 1;
+            MasterPageNumber = 0;
+            IsLastpage = false;
+            //IsFirstpage = false;
+            _currentTimeStamp = DateTime.MinValue;
+
+            __fieldsNotSummaryPerDetail = null;
+            __reportFieldsSortedPerDetail = null;
+            __reportFieldsSortedPerRFooter = null;
+
+            DataSet.Tables.Clear();
+            DataSet = null;
+            DataSet = null;
+            evaluator = new EbSciptEvaluator
+            {
+                OptionScriptNeedSemicolonAtTheEndOfLastExpression = false
+            };
+
         }
 
     }

@@ -19,20 +19,19 @@ namespace ExpressBase.Objects.Helpers
 
         public override void OnStartPage(PdfWriter writer, Document document)
         {
-            Report.PageNumber = writer.PageNumber;
-
-            bool needRH = Report.PageNumber == 1 || (Report.ReportHeaderHeightRepeatAsPH > 0);
-
-            if (needRH)
-                Report.DrawReportHeader(true);
-            if (!Report.DrawDetailCompleted)// omit draw page header if detail section is completed
-                Report.DrawPageHeader();
-
+            Report.MasterPageNumber = writer.PageNumber;
+            if (!Report.IsRenderingComplete)
+            {
+                bool needRH = Report.CurrentReportPageNumber == 1 || Report.ReportHeaderHeightRepeatAsPH > 0;
+                if (needRH)
+                    Report.DrawReportHeader();
+                if (!Report.DrawDetailCompleted)// omit draw page header if detail section is completed
+                    Report.DrawPageHeader();
+            }
         }
 
         public override void OnEndPage(PdfWriter writer, Document d)
         {
-
             if (Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0)
             {
                 Report.DrawPageFooter();
@@ -43,6 +42,13 @@ namespace ExpressBase.Objects.Helpers
 
             Report.DrawWaterMark(d, writer);
             Report.SetDetail();
+            if (Report.NextReport)
+            {
+                Report.CurrentReportPageNumber = 1;
+                Report.NextReport = false;
+            }
+            else
+                Report.CurrentReportPageNumber++;
         }
 
         public HeaderFooter(EbReport _c) : base()

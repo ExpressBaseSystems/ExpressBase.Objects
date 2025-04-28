@@ -436,7 +436,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber.ToString());
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.CurrentReportPageNumber.ToString());
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -476,7 +476,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber + "/"/* + writer.PageCount*/);
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.CurrentReportPageNumber + "/"/* + writer.PageCount*/);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
