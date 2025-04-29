@@ -395,6 +395,8 @@ namespace ExpressBase.Objects
                 Op = EbReport.Operations.Get(ForWhat);
             else if (EbType.IntCode == EbObjectTypes.TableVisualization)
                 Op = EbTableVisualization.Operations.Get(ForWhat);
+            else if (EbType.IntCode == EbObjectTypes.ChartVisualization)
+                Op = EbChartVisualization.Operations.Get(ForWhat);
             else if (EbType.IntCode == EbObjectTypes.MobilePage)
                 Op = EbMobilePage.Operations.Get(ForWhat);
             else if (EbType.IntCode == EbObjectTypes.PosForm)
