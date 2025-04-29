@@ -1059,7 +1059,7 @@ namespace ExpressBase.Objects
 
         public void DrawGroupFooter(int order, int iterator)
         {
-            if ((GroupFooterHeight > possibleSpaceForDetail - detailCursorPosition))
+            if ((GroupFooterHeight + PageFooterHeight > possibleSpaceForDetail - detailCursorPosition))
             {
                 AddNewPage();
                 dt_Yposition = ReportHeaderHeightRepeatAsPH + PageHeaderHeight + this.Margin.Top;
@@ -2074,7 +2074,7 @@ namespace ExpressBase.Objects
 
             LinkCollection?.Clear();
 
-            SerialNumber = 0; 
+            SerialNumber = 0;
             MasterPageNumber = 0;
             IsLastpage = false;
             IsInsideReportFooter = false;

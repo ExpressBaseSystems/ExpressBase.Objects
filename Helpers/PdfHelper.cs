@@ -36,7 +36,7 @@ namespace ExpressBase.Objects.Helpers
 
         public override void OnEndPage(PdfWriter writer, Document d)
         {
-            bool needPF = !Report.IsInsideReportFooter && Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0;
+            bool needPF = Report.CurrentReportPageNumber == 1 || (!Report.IsInsideReportFooter && Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0);
             if (needPF)
             {
                 Report.DrawPageFooter();
