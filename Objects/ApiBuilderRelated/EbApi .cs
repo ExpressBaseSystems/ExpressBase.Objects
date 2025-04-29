@@ -1106,53 +1106,48 @@ namespace ExpressBase.Objects
                 string inputLine = "";
                 int line_number = 1;
 
-                EbDataTable dt = new EbDataTable();
                 EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
-
                 EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
-                SchemaHelper.GetWebFormSchema(_form);
-                if (!(_form is null))
+                if (_form != null)
                 {
+                    SchemaHelper.GetWebFormSchema(_form);
                     List<int> RowIds = new List<int>();
+
                     while ((inputLine = CsvReader.ReadLine()) != null)
                     {
                         string[] values = inputLine.Split('\t');
                         try
                         {
-                            if (values?.Length > 0)
+                            if (values?.Length > 0 && line_number > 1) // line 1 is header
                             {
-                                if (line_number > 1)
+                                WebformData data = _form.GetEmptyModel();
+                                SingleRow row = data.MultipleTables[_form.TableName][0];
+
+                                row["campaign_name"] = values[0];
+                                row["name"] = values[1];
+                                row["genurl"] = values[2];
+                                row["genemail"] = values[3];
+                                row["city"] = (values.Length >= 5) ? values[4] : "";
+                                row["treatment"] = (values.Length >= 6) ? values[5] : "";
+                                if (values.Length >= 7 && values[6].ToLower() == "google")
+                                    row["google_lead"] = "Yes";
+                                else
+                                    row["fb_lead"] = "Yes";
+
+                                row["preferred_location"] = (values.Length >=8 )?values[7] : ""; 
+                                InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
                                 {
-                                    WebformData data = _form.GetEmptyModel();
-                                    data.MultipleTables[_form.TableName][0]["campaign_name"] = values[0];
-                                    data.MultipleTables[_form.TableName][0]["name"] = values[1];
-                                    data.MultipleTables[_form.TableName][0]["genurl"] = values[2];
-                                    data.MultipleTables[_form.TableName][0]["genemail"] = values[3];
-                                    data.MultipleTables[_form.TableName][0]["city"] = (values.Length >= 5) ? values[4] : "";
-                                    data.MultipleTables[_form.TableName][0]["treatment"] = (values.Length >= 6) ? values[5] : "";
-                                    if (values.Length >= 7 && values[6].ToLower() == "google")
-                                        data.MultipleTables[_form.TableName][0]["google_lead"] = "Yes";
-                                    else
-                                        data.MultipleTables[_form.TableName][0]["fb_lead"] = "Yes";
+                                    RefId = this.Reference,
+                                    FormData = EbSerializers.Json_Serialize(data),
+                                    CurrentLoc = 22,
+                                    UserId = Api.UserObject.UserId,
+                                    UserAuthId = Api.UserObject.AuthId,
+                                    SolnId = Api.SolutionId
+                                };
 
-                                    InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
-                                    {
-                                        RefId = this.Reference,
-                                        FormData = EbSerializers.Json_Serialize(data),
-                                        CurrentLoc = 22,
-                                        UserId = Api.UserObject.UserId,
-                                        UserAuthId = Api.UserObject.AuthId,
-                                        SolnId = Api.SolutionId
-                                    };
-
-                                    InsertDataFromWebformResponse response = EbFormHelper.InsertDataFromWebform(request, Api.Redis, Service, EbConnectionFactory);
-                                    //Api.InsertLinesLog(response.Status.ToString(), "CsvPusherForm");
-                                    RowIds.Add(response.RowId);
-                                }
-                            }
-                            else
-                            {
-                                // Api.InsertLinesLog("Error", "CsvPusherForm");
+                                InsertDataFromWebformResponse response = EbFormHelper.InsertDataFromWebform(request, Api.Redis, Service, EbConnectionFactory);
+                                //Api.InsertLinesLog(response.Status.ToString(), "CsvPusherForm");
+                                RowIds.Add(response.RowId);
                             }
                             line_number++;
                         }
@@ -1161,7 +1156,6 @@ namespace ExpressBase.Objects
 
                         }
                     }
-                    CsvReader.Close();
 
                     if (RowIds.Count > 0)
                     {

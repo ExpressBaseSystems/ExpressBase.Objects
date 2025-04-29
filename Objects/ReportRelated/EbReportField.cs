@@ -15,6 +15,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.CoreBase.Globals;
 using FontStyle = ExpressBase.Common.FontStyle;
 using System.Globalization;
+using ITextFont = iTextSharp.text.Font;
 
 namespace ExpressBase.Objects
 {
@@ -99,7 +100,7 @@ namespace ExpressBase.Objects
 
         public Phrase GetFormattedPhrase(EbFont Font, EbFont _reportFont, string text)
         {
-            iTextSharp.text.Font iTextFont = null;
+            ITextFont iTextFont = null;
             if (Font is null)
             {
                 if (!(_reportFont is null))
@@ -256,7 +257,7 @@ namespace ExpressBase.Objects
             {
                 iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
                 myImage.ScaleToFit(WidthPt, HeightPt);
-                myImage.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
+                myImage.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition));
                 myImage.Alignment = (int)TextAlign;
                 if (Rep.Doc.IsOpen())
                     Rep.Doc.Add(myImage);
@@ -288,6 +289,18 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyGroup("General")]
         public int Rotation { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [Alias("Fill Opacity (%)")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public float FillOpacity { get; set; } = 10;
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [Alias("Stroke Opacity (%)")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public float StrokeOpacity { get; set; } = 10;
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -327,7 +340,7 @@ namespace ExpressBase.Objects
                 img.RotationDegrees = Rotation;
                 img.ScaleToFit(WidthPt, HeightPt);
                 img.SetAbsolutePosition(LeftPt, Rep.HeightPt - TopPt - HeightPt);
-                PdfGState _state = new PdfGState() { FillOpacity = 0.1F, StrokeOpacity = 0.1F };
+                PdfGState _state = new PdfGState() { FillOpacity = FillOpacity/100, StrokeOpacity =  StrokeOpacity/100 };
                 PdfContentByte cb = Rep.Writer.DirectContentUnder;
                 cb.SaveState();
                 cb.SetGState(_state);
@@ -375,8 +388,8 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
 
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             string column_val = FormatDate(Rep.CurrentTimestamp.ToString(), Format, Rep);
             if (column_val != string.Empty)
             {
@@ -419,11 +432,11 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
 
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber.ToString());
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.CurrentReportPageNumber.ToString());
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -459,11 +472,11 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber + "/"/* + writer.PageCount*/);
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.CurrentReportPageNumber + "/"/* + writer.PageCount*/);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
             ct.Go();
         }
@@ -499,8 +512,8 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.RenderingUser?.FullName ?? "Machine User");
@@ -535,8 +548,8 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition + Rep.RowHeight);
             string value = (Rep.IsLanguageEnabled && Rep.LabelKeyValues.ContainsKey(Title)) ? Rep.LabelKeyValues[Title] : Title;
 
             ColumnText ct = new ColumnText(Rep.Canvas);
@@ -581,8 +594,8 @@ namespace ExpressBase.Objects
             foreach (Param p in Rep.Parameters)
                 if (p.Name == Title)
                     column_val = p.Value;
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
@@ -625,8 +638,8 @@ namespace ExpressBase.Objects
             foreach (Param p in Rep.Parameters)
                 if (p.Name == Title)
                     column_val = p.Value;
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
@@ -669,8 +682,8 @@ namespace ExpressBase.Objects
             foreach (Param p in Rep.Parameters)
                 if (p.Name == Title)
                     column_val = p.Value;
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
@@ -720,8 +733,8 @@ namespace ExpressBase.Objects
             column_val = FormatDate(column_val, Format, Rep);
             if (column_val != string.Empty)
             {
-                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+                float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+                float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
                 Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
                 ColumnText ct = new ColumnText(Rep.Canvas);
                 ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
@@ -766,8 +779,8 @@ namespace ExpressBase.Objects
             foreach (Param p in Rep.Parameters)
                 if (p.Name == Title)
                     column_val = p.Value;
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, Leading, (int)TextAlign);
@@ -890,14 +903,14 @@ namespace ExpressBase.Objects
                 //}
 
                 // imageEAN.ScaleAbsolute(Width, Height);
-                imageEAN.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
+                imageEAN.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition));
                 Rep.Doc.Add(imageEAN);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception: " + e.ToString());
                 ColumnText ct = new ColumnText(Rep.Canvas);
-                float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+                float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, Leading, (int)TextAlign);
                 ct.Go();
             }
@@ -952,14 +965,14 @@ namespace ExpressBase.Objects
                 BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
                 byte[] qrCodeImage = qrCode.GetGraphic(20);
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
-                img.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
+                img.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition));
                 img.ScaleAbsolute(WidthPt, HeightPt);
                 Rep.Doc.Add(img);
             }
             catch (Exception e)
             {
                 ColumnText ct = new ColumnText(Rep.Canvas);
-                float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+                float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, Leading, (int)TextAlign);
                 ct.Go();
                 Console.WriteLine("Exception: " + e.ToString());
@@ -998,8 +1011,8 @@ namespace ExpressBase.Objects
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
 
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.SerialNumber.ToString() + ". ");
             ColumnText ct = new ColumnText(Rep.Canvas);
@@ -1035,7 +1048,7 @@ namespace ExpressBase.Objects
             {
                 iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
                 myImage.ScaleToFit(WidthPt, HeightPt);
-                myImage.SetAbsolutePosition(Llx, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
+                myImage.SetAbsolutePosition(Llx, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition));
                 myImage.Alignment = (int)TextAlign;
                 Rep.Doc.Add(myImage);
             }
@@ -1075,8 +1088,8 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             string column_val = Rep.Solution.Locations[42][Title];
-            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailCursorPosition);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailCursorPosition);
 
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
