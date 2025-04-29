@@ -209,7 +209,7 @@ namespace ExpressBase.Objects
             return _isCaps;
         }
 
-        public void DoRenderInMultiLine2(string column_val, EbReport Report, bool _inwords, float lly, float ury)
+        public void DoRenderInMultiLine(string column_val, EbReport Report, bool _inwords, float lly, float ury)
         {
             Report.MultiRowTop = 0;
             DbType datatype = (DbType)DbType;
@@ -244,49 +244,6 @@ namespace ExpressBase.Objects
                     Report.MultiRowTop = this.TopPt;
                 }
             }
-        }
-
-        public void DoRenderInMultiLine(string column_val, EbReport Report, bool _inwords)
-        {
-            Report.MultiRowTop = 0;
-            DbType datatype = (DbType)DbType;
-
-            Font _font = this.GetItextFont(this.Font, Report.Font);
-            if (IsCaps(Report.Font))
-                column_val = column_val.ToUpper();
-
-            Phrase phrase = new Phrase(column_val, _font);
-            double calculatedWidth = GetCalculatedWidth(column_val, Report);
-
-            if (calculatedWidth > this.WidthPt)
-            {
-                int rowsneeded;
-                if (!_inwords && (datatype == System.Data.DbType.Decimal || datatype == System.Data.DbType.Double || datatype == System.Data.DbType.Int16
-                                                || datatype == System.Data.DbType.Int32 || datatype == System.Data.DbType.Int64 || datatype == System.Data.DbType.VarNumeric))
-                    rowsneeded = 1;
-                else
-                    rowsneeded = Convert.ToInt32(Math.Ceiling(calculatedWidth / this.WidthPt));
-
-                if (rowsneeded > 1)
-                {
-                    if (Report.MultiRowTop == 0)
-                    {
-                        Report.MultiRowTop = this.TopPt;
-                    }
-                    float k = (phrase.Font.CalculatedSize) * (rowsneeded - 1);
-                    if (k > Report.RowHeight)
-                    {
-                        Report.RowHeight = k;
-                    }
-                }
-            }
-        }
-
-        public double GetCalculatedWidth(string column_val, EbReport Report)
-        {
-            Font currentITFont = this.GetItextFont(this.Font, Report.Font);
-            float returnvalue7 = currentITFont.GetCalculatedBaseFont(true).GetWidthPoint(column_val, currentITFont.Size);
-            return Math.Ceiling(returnvalue7);
         }
     }
 
@@ -527,7 +484,7 @@ namespace ExpressBase.Objects
 
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (RenderInMultiLine && AmountInWords)
-                DoRenderInMultiLine2(column_val, Rep, this.AmountInWords, lly, ury);
+                DoRenderInMultiLine(column_val, Rep, this.AmountInWords, lly, ury);
 
             if (!string.IsNullOrEmpty(LinkRefId))
             {

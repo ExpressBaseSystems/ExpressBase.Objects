@@ -745,8 +745,7 @@ namespace ExpressBase.Objects
         }
 
         public void DrawReportHeader()
-        {
-            RowHeight = 0;
+        { 
             MultiRowTop = 0;
             rh_Yposition = this.Margin.Top;
             detailCursorPosition = 0;
@@ -764,8 +763,7 @@ namespace ExpressBase.Objects
         }
 
         public void DrawPageHeader()
-        {
-            RowHeight = 0;
+        { 
             MultiRowTop = 0;
             detailCursorPosition = 0;
             ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
@@ -817,7 +815,7 @@ namespace ExpressBase.Objects
                 if (remainingSpaceAfterDetailsDrawn < spaceNeededForNonRepeatingFooters)
                 {
                     IsLastpage = false;
-                    detailEnd = ReportHeaderHeightRepeatAsPH;//no [age header as it is lastpg
+                    detailEnd = ReportHeaderHeightRepeatAsPH;//no page header as it is lastpg
                     detailCursorPosition = 0;
                     AddNewPage();
                     IsLastpage = true;
@@ -953,9 +951,16 @@ namespace ExpressBase.Objects
                         {
                             float ury = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition);
                             float lly = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition + field.HeightPt);
-                            field.DoRenderInMultiLine2(column_val, this, false, lly, ury);
+                            field.DoRenderInMultiLine(column_val, this, false, lly, ury);
                         }
                     }
+
+                    if (RowHeight > 0 && PossibleSpaceForDetail - detailCursorPosition < detail.HeightPt + RowHeight)
+                    {
+                        AddNewPage();
+                        dt_Yposition = this.Margin.Top + ReportHeaderHeightRepeatAsPH + (HasPageheader ? PageHeaderHeight : 0);
+                    }
+
                     EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
                     if (SortedReportFields.Length > 0)
                     {
@@ -968,6 +973,7 @@ namespace ExpressBase.Objects
                         }
                         detailCursorPosition += detail.HeightPt + RowHeight;
                         detailEnd = detailCursorPosition;
+                        RowHeight = 0;
                     }
                     else
                     {
@@ -1006,13 +1012,12 @@ namespace ExpressBase.Objects
                             {
                                 float ury = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition);
                                 float lly = HeightPt - (dt_Yposition + field.TopPt + detailCursorPosition + field.HeightPt);
-                                (field as EbDataField).DoRenderInMultiLine2(column_val, this, false, lly, ury);
+                                (field as EbDataField).DoRenderInMultiLine(column_val, this, false, lly, ury);
                             }
                             //if (DT_FillHeight < field.TopPt - nextpage_quotient + field.HeightPt + RowHeight)
                             if (this.PossibleSpaceForDetail < detailCursorPosition + Margin.Bottom)
                             {
                                 AddNewPage();
-                                detailCursorPosition = 0;
                                 nextpage_quotient = field.TopPt;
                             }
                             field.TopPt -= nextpage_quotient;
@@ -1076,7 +1081,6 @@ namespace ExpressBase.Objects
 
         public void DrawPageFooter()
         {
-            RowHeight = 0;
             MultiRowTop = 0;
             detailCursorPosition = 0;
 
@@ -1096,8 +1100,7 @@ namespace ExpressBase.Objects
 
         public void DrawReportFooter()
         {
-            IsInsideReportFooter = true;
-            RowHeight = 0;
+            IsInsideReportFooter = true; 
             MultiRowTop = 0;
             detailCursorPosition = 0;
 
@@ -1173,7 +1176,6 @@ namespace ExpressBase.Objects
 
         public void DrawRepeatingReportFooter()
         {
-            RowHeight = 0;
             MultiRowTop = 0;
             detailCursorPosition = 0;
 
