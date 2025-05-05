@@ -1023,7 +1023,7 @@ namespace ExpressBase.Objects
                     client.AutoConnect();
                     if (DeleteAfterProcessing)
                     {
-                        string datePart = DateTime.Today.ToString("dd-MM-yyyy");
+                        string datePart = DateTime.Now.ToString("dd-MM-yyyy_HH-mm"); ;
                         string fileName = Path.GetFileNameWithoutExtension(fName) + datePart + Path.GetExtension(fName);
                         bool is_renamed = client.MoveFile(fName, fileName);
                         if (is_renamed)
@@ -1134,7 +1134,9 @@ namespace ExpressBase.Objects
                                 else
                                     row["fb_lead"] = "Yes";
 
-                                row["preferred_location"] = (values.Length >=8 )?values[7] : ""; 
+                                row["preferred_location"] = (values.Length >=8 )?values[7] : "";
+                                row["alternate_number"] = (values.Length >= 9) ? values[8] : "";
+
                                 InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
                                 {
                                     RefId = this.Reference,
