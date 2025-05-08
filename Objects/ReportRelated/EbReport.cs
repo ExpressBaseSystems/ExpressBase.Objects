@@ -356,6 +356,9 @@ namespace ExpressBase.Objects
         public bool IsInEndPageEvent = false;
 
         [JsonIgnore]
+        public bool HasExceptionOccured = false;
+
+        [JsonIgnore]
         public bool HasPageheader { get; set; } = true;
 
         [JsonIgnore]
@@ -675,26 +678,21 @@ namespace ExpressBase.Objects
 
         public dynamic GetDataFieldValue(string columnName, int iterator, int tableIndex)
         {
-            if (DataSet == null)
-                throw new ArgumentNullException(nameof(DataSet), "DataSet cannot be null.");
+            dynamic value = "";
+            if (DataSet == null||tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
+                return value;
+            
+            EbDataTable table = DataSet.Tables[tableIndex];
 
-            if (tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
-                throw new ArgumentOutOfRangeException(nameof(tableIndex), $"Table index {tableIndex} is out of range. Total tables: {DataSet.Tables.Count}");
-
-            var table = DataSet.Tables[tableIndex];
-
-            if (!table.Columns.Contains(columnName))
-                throw new ArgumentException($"Column '{columnName}' does not exist in the table at index {tableIndex}.");
-
-            if (table.Rows.Count == 0)
-                throw new InvalidOperationException($"The table at index {tableIndex} contains no rows.");
+            if (!table.Columns.Contains(columnName)||table.Rows.Count == 0)
+                return value;
 
             int rowIndex = (table.Rows.Count > 1) ? iterator : 0;
 
             if (rowIndex < 0 || rowIndex >= table.Rows.Count)
-                throw new ArgumentOutOfRangeException(nameof(iterator), $"Row index {rowIndex} is out of range. Total rows: {table.Rows.Count}");
+                return value;
 
-            dynamic value = (table.Columns[columnName].Type == EbDbTypes.Bytea) ? table.Rows[rowIndex][columnName] : table.Rows[rowIndex][columnName]?.ToString();
+            value = (table.Columns[columnName].Type == EbDbTypes.Bytea) ? table.Rows[rowIndex][columnName] : table.Rows[rowIndex][columnName]?.ToString();
 
             return value;
         }
@@ -745,7 +743,7 @@ namespace ExpressBase.Objects
         }
 
         public void DrawReportHeader()
-        { 
+        {
             MultiRowTop = 0;
             rh_Yposition = this.Margin.Top;
             detailCursorPosition = 0;
@@ -763,7 +761,7 @@ namespace ExpressBase.Objects
         }
 
         public void DrawPageHeader()
-        { 
+        {
             MultiRowTop = 0;
             detailCursorPosition = 0;
             ph_Yposition = Margin.Top + (CurrentReportPageNumber == 1 ? ReportHeaderHeight : ReportHeaderHeightRepeatAsPH);
@@ -1100,7 +1098,7 @@ namespace ExpressBase.Objects
 
         public void DrawReportFooter()
         {
-            IsInsideReportFooter = true; 
+            IsInsideReportFooter = true;
             MultiRowTop = 0;
             detailCursorPosition = 0;
 
@@ -1772,10 +1770,9 @@ namespace ExpressBase.Objects
             else
             {
                 this.DrawPageHeader();
+                this.HandleEmptyDetailsection();
                 this.detailEnd += 30;
-                this.DrawPageFooter();
-                this.DrawReportFooter();
-                throw new Exception("Dataset is null, refid " + this.DataSourceRefId);
+                this.DrawPageFooter();  
             }
 
             if (ReportFooterHeightRepeatAsPf != ReportFooterHeight)
@@ -1795,6 +1792,20 @@ namespace ExpressBase.Objects
             float y = this.HeightPt - (this.ReportHeaderHeight + this.Margin.Top + this.PageHeaderHeight);
 
             ct.SetSimpleColumn(phrase, this.LeftPt + 30, y - 80, this.WidthPt - 30, y, 15, Element.ALIGN_CENTER);
+            ct.Go();
+            HasExceptionOccured = true;
+        }
+
+        public void HandleEmptyDetailsection()
+        {
+            ColumnText ct = new ColumnText(this.Canvas);
+            Phrase phrase; 
+                phrase = new Phrase("No rows available.");
+
+            phrase.Font.Size = 10;
+            float y = this.HeightPt - (this.ReportHeaderHeight + this.Margin.Top + this.PageHeaderHeight);
+
+            ct.SetSimpleColumn(phrase, this.LeftPt + 30, y - 30, this.WidthPt - 30, y, 15, Element.ALIGN_CENTER);
             ct.Go();
         }
 
@@ -2080,6 +2091,7 @@ namespace ExpressBase.Objects
             MasterPageNumber = 0;
             IsLastpage = false;
             IsInsideReportFooter = false;
+            HasExceptionOccured = false;
             _currentTimeStamp = DateTime.MinValue;
 
             __fieldsNotSummaryPerDetail = null;

@@ -20,7 +20,7 @@ namespace ExpressBase.Objects.Helpers
         public override void OnStartPage(PdfWriter writer, Document document)
         {
             Report.MasterPageNumber = writer.PageNumber;
-            if (!Report.IsRenderingComplete)
+            if (!Report.IsRenderingComplete && !Report.HasExceptionOccured)
             {
                 bool needRH = Report.CurrentReportPageNumber == 1 || Report.ReportHeaderHeightRepeatAsPH > 0;
                 if (needRH)
@@ -36,17 +36,21 @@ namespace ExpressBase.Objects.Helpers
 
         public override void OnEndPage(PdfWriter writer, Document d)
         {
-            bool needPF = Report.CurrentReportPageNumber == 1 || (!Report.IsInsideReportFooter && Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0);
-            if (needPF)
+            if (!Report.HasExceptionOccured)
             {
-                Report.DrawPageFooter();
-                if (Report.ReportFooterHeightRepeatAsPf > 0)
-                    Report.DrawRepeatingReportFooter();
+                bool needPF = Report.CurrentReportPageNumber == 1 || (!Report.IsInsideReportFooter && Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0);
+                if (needPF)
+                {
+                    Report.DrawPageFooter();
+                    if (Report.ReportFooterHeightRepeatAsPf > 0)
+                        Report.DrawRepeatingReportFooter();
 
+                }
+
+                Report.DrawWaterMark(d, writer);
+                Report.SetDetail();
             }
 
-            Report.DrawWaterMark(d, writer);
-            Report.SetDetail();
             if (Report.NextReport)
             {
                 Report.CurrentReportPageNumber = 1;

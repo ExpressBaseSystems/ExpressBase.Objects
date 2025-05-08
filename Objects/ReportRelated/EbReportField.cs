@@ -294,13 +294,13 @@ namespace ExpressBase.Objects
         [UIproperty]
         [Alias("Fill Opacity (%)")]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public float FillOpacity { get; set; } = 10;
+        public float FillOpacity { get; set; } = 20;
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [Alias("Stroke Opacity (%)")]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public float StrokeOpacity { get; set; } = 10;
+        public float StrokeOpacity { get; set; } = 20;
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -321,6 +321,8 @@ namespace ExpressBase.Objects
                     this.Source = 'url(../images/image.png) center no-repeat';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.FillOpacity =20;
+                    this.StrokeOpacity =20;
                 };";
         }
 
@@ -334,13 +336,13 @@ namespace ExpressBase.Objects
                 canvas = Rep.Writer.DirectContentUnder;
                 ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, Rep.Doc.PageSize.Width / 2, Rep.Doc.PageSize.Height / 2, Rotation);
             }
-            if (ImageRefId != 0)
+            if (ImageRefId != 0 & Rep.WatermarkImages.ContainsKey(ImageRefId) && Rep.WatermarkImages[ImageRefId] != null)
             {
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(Rep.WatermarkImages[ImageRefId]);
                 img.RotationDegrees = Rotation;
                 img.ScaleToFit(WidthPt, HeightPt);
                 img.SetAbsolutePosition(LeftPt, Rep.HeightPt - TopPt - HeightPt);
-                PdfGState _state = new PdfGState() { FillOpacity = FillOpacity/100, StrokeOpacity =  StrokeOpacity/100 };
+                PdfGState _state = new PdfGState() { FillOpacity = FillOpacity / 100, StrokeOpacity = StrokeOpacity / 100 };
                 PdfContentByte cb = Rep.Writer.DirectContentUnder;
                 cb.SaveState();
                 cb.SetGState(_state);
