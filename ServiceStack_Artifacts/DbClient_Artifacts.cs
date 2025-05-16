@@ -21,10 +21,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public bool IsAdminOwn { get; set; }
         [DataMember(Order = 4)]
-        public string ClientSolnid  { get; set; }
-        
+        public string ClientSolnid { get; set; }
+
         [DataMember(Order = 5)]
-        public Boolean SupportLogin  { get; set; }
+        public Boolean SupportLogin { get; set; }
     }
 
     [DataContract]
@@ -46,7 +46,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<string> SolutionCollection { get; set; }
 
         [DataMember(Order = 6)]
-        public string Message { get; set; }     
+        public string Message { get; set; }
 
     }
 
@@ -89,6 +89,104 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
     }
+
+    [DataContract]
+    public class DbClientIndexRequest
+    {
+        [DataMember(Order = 1)]
+        public string TableName { get; set; }
+
+        [DataMember(Order = 2)]
+        public string IndexName { get; set; }
+
+        [DataMember(Order = 3)]
+        public string IndexColumns { get; set; }
+
+        [DataMember(Order = 4)]
+        public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 5)]
+        public bool IsAdminOwn { get; set; }
+    }
+    [DataContract]
+    public class DbClientIndexResponse
+    {
+        [DataMember(Order = 1)]
+        public int Result { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public DBOperations Type { get; set; }
+    }
+
+
+    [DataContract]
+    public class DbClientEditIndexRequest
+    {
+        [DataMember(Order = 1)]
+        public string CurrentIndexName { get; set; }
+
+        [DataMember(Order = 2)]
+        public string NewIndexName { get; set; }
+
+        [DataMember(Order = 3)]
+        public string TableName { get; set; }
+
+        [DataMember(Order = 4)]
+        public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 5)]
+        public bool IsAdminOwn { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientEditIndexResponse
+    {
+        [DataMember(Order = 1)]
+        public int Result { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        public DBOperations Type { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientConstraintRequest
+    {
+        [DataMember(Order = 1)]
+        public string TableName { get; set; }
+
+        [DataMember(Order = 2)]
+        public string ColumnName { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ConstraintType { get; set; }
+
+        [DataMember(Order = 4)]
+        public string ConstraintName { get; set; }
+
+        [DataMember(Order = 5)]
+        public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 6)]
+        public bool IsAdminOwn { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientConstraintResponse
+    {
+        [DataMember(Order = 1)]
+        public int Result { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        public DBOperations Type { get; set; }
+    }
+
 
     [DataContract]
     public class DbClientDropRequest
@@ -186,9 +284,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             this.TableCollection = new Dictionary<string, EbDbExplorerTable>();
             this.FunctionCollection = new List<EbDbExplorerFunctions>();
-        }        
+        }
     }
-
     public class EbDbExplorerColumn
     {
         [DataMember(Order = 1)]
@@ -202,8 +299,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string ColumnTable { get; set; }
+
+        [DataMember(Order = 5)]
+        public string ConstraintName { get; set; } // Add this property
     }
-    
+
+
     public class EbDbExplorerFunctions
     {
         [DataMember(Order = 1)]

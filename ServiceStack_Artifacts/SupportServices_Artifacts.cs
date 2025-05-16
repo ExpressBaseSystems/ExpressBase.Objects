@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using ExpressBase.Security;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -67,6 +68,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string fullname { get; set; }
 
         public string email { get; set; }
+        public int onBehalfOf { get; set; } 
 
         public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
     }
@@ -140,14 +142,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     public class FetchSupportResponse
     {
+        public List<TicketLite> ActiveTicket { get; set; }
+        public List<TicketLite> ClosedTicket { get; set; }
+        public string ErrorMessage { get; set; }
+
         public FetchSupportResponse()
         {
-            supporttkt = new List<SupportTktCls>();
+            ActiveTicket = new List<TicketLite>();
+            ClosedTicket = new List<TicketLite>();
         }
-        public List<SupportTktCls> supporttkt { get; set; }
-
-        public string ErMsg { get; set; }
     }
+
+    public class GetTicketByIdRequest : EbServiceStackAuthRequest, IReturn<GetTicketByIdResponse>
+    {
+        public string TicketId { get; set; }
+    }
+
+
+    public class GetTicketByIdResponse
+    {
+        public SupportTktCls Ticket { get; set; }
+    }
+
+
 
     public class AdminSupportRequest : EbServiceStackAuthRequest, IReturn<AdminSupportResponse>
     {
@@ -231,6 +248,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ErMsg { get; set; }
     }
 
+    public class CommentListRequest : EbServiceStackAuthRequest, IReturn<CommentListResponse>
+    {
+        public string TicketNo { get; set; }
+    }
+
+
+    [DataContract]
+    public class CommentListResponse
+    {
+        [DataMember]
+        public List<CommentDto> Comments { get; set; } = new List<CommentDto>();
+
+        [DataMember]
+        public bool Success { get; set; }
+
+        [DataMember]
+        public string ErrorMessage { get; set; }
+    }
+
+    public class CommentDto
+    {
+        public string UserName { get; set; }
+        public string CommentText { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+
+
 
     public class UpdateTicketRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
     {
@@ -248,7 +293,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string type_f_b { get; set; }
 
-        public int[] Filedel { get; set; }
+        public string[] Filedel { get; set; } = new string[0]; // Ensures it's never null
 
         public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 
@@ -315,6 +360,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+    public class TicketLite
+    {
+        public string ticketid { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
+        public string status { get; set; }
+        public string fullname { get; set; }
+        public string lstmodified { get; set; }
+    }
+
+
     public class SupportTktCls
     {
         public string ticketid { get; set; }
@@ -344,6 +400,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Solution_name { get; set; }
 
         public string fullname { get; set; }
+        public string onbehalf { get; set; }
+        public string eta { get; set; }              // New field
+        public string estimated_hours { get; set; }   // New field
+        public string actual_hours { get; set; }      // New field
 
         public string Esolution_id { get; set; }
 
