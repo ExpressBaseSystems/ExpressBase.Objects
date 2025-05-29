@@ -238,6 +238,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Comments { get; set; }
         public string UserName { get; set; }
         public string Solution_id { get; set; }
+        public string currentUserid { get; set; }
+
 
     }
 
@@ -272,6 +274,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string UserName { get; set; }
         public string CommentText { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string UserId { get; set; } // ✅ New
+
     }
 
 
