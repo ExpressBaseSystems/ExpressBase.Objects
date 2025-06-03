@@ -19,12 +19,55 @@ namespace ExpressBase.Objects.Helpers
 
         public override void OnStartPage(PdfWriter writer, Document document)
         {
+            Report.MasterPageNumber = writer.PageNumber;
+            if (!Report.IsRenderingComplete && !Report.HasExceptionOccured)
+            {
+                bool needRH = Report.CurrentReportPageNumber == 1 || Report.ReportHeaderHeightRepeatAsPH > 0;
+                if (needRH)
+                    Report.DrawReportHeader();
+
+                Report.HasPageheader = !Report.DrawDetailCompleted;
+                if (Report.HasPageheader)
+                {
+                    Report.DrawPageHeader();
+                }
+            }
         }
 
         public override void OnEndPage(PdfWriter writer, Document d)
         {
-            //var content = writer.DirectContent;
-            //var pageBorderRect = new Rectangle(Report.Doc.PageSize);
+            if (!Report.HasExceptionOccured)
+            {
+                bool needPF = Report.CurrentReportPageNumber == 1 || (!Report.IsInsideReportFooter && Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0);
+                if (needPF)
+                {
+                    Report.DrawPageFooter();
+                    if (Report.ReportFooterHeightRepeatAsPf > 0)
+                        Report.DrawRepeatingReportFooter();
+
+                }
+
+                Report.DrawWaterMark(d, writer);
+                Report.SetDetail();
+            }
+
+            if (Report.NextReport)
+            {
+                Report.CurrentReportPageNumber = 1;
+                Report.NextReport = false;
+            }
+            else
+                Report.CurrentReportPageNumber++;
+        }
+
+        public HeaderFooter(EbReport _c) : base()
+        {
+            Report = _c;
+        }
+
+        public void DrawBorder()
+        { //var content = writer.DirectContent;
+          //var pageBorderRect = new Rectangle(Report.Doc.PageSize);
 
             //pageBorderRect.Left += Report.Doc.LeftMargin;
             //pageBorderRect.Right -= Report.Doc.RightMargin;
@@ -33,26 +76,7 @@ namespace ExpressBase.Objects.Helpers
 
             //content.SetColorStroke(BaseColor.Red);
             //content.Rectangle(pageBorderRect.Left, pageBorderRect.Bottom, pageBorderRect.Width, pageBorderRect.Height);
-            //content.Stroke();
-
-            if (!Report.FooterDrawn && (Report?.DataSet?.Tables[Report.DetailTableIndex]?.Rows.Count > 0))
-            {
-                if (!(Report.PageNumber == 1))
-                    Report.DrawReportHeader(true);
-                Report.DrawPageHeader();
-                Report.DrawPageFooter();
-                if (!Report.IsLastpage)
-                    Report.DrawReportFooter(true);
-            }
-            //if (Report.IsLastpage == true)
-            //    Report.DrawReportFooter();
-            Report.DrawWaterMark(d, writer);
-            Report.SetDetail();
-        }
-
-        public HeaderFooter(EbReport _c) : base()
-        {
-            Report = _c;
+            //content.Stroke();}
         }
     }
 }

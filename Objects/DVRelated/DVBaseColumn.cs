@@ -34,7 +34,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Boolean = 7,
         Table = 8,
         LinkFromColumn = 9,
-        Tag = 10
+        Tag = 10,
+        WebformLink = 11
     }
 
     public enum NumericRenderType
@@ -372,6 +373,16 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyGroup("LinkFromColumn")]
         public bool IsFormDraftMode { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef", 1)]
+        [PropertyGroup("WebformLink")]
+        public DVBaseColumn VersionIdColumn { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef", 1)]
+        [PropertyGroup("WebformLink")]
+        public DVBaseColumn DataIdColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("0")]

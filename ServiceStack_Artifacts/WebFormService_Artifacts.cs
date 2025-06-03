@@ -871,6 +871,38 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class ChangeLocationWebFormDataRequest : EbServiceStackAuthRequest, IReturn<ChangeLocationWebFormDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int CurrentLocId { get; set; }
+
+        [DataMember(Order = 4)]
+        public int NewLocId { get; set; }
+
+        [DataMember(Order = 5)]
+        public string ModifiedAt { get; set; }
+    }
+
+    [DataContract]
+    public class ChangeLocationWebFormDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class GetPushedDataInfoRequest : EbServiceStackAuthRequest, IReturn<GetPushedDataInfoResponse>
     {
         [DataMember(Order = 1)]

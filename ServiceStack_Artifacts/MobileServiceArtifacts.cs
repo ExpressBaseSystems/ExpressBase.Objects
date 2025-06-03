@@ -422,6 +422,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string AutoIdData { set; get; }
     }
 
+    #region AttendanceDevice
+
     public class GetAttendanceDeviceListRequest : EbServiceStackAuthRequest, IReturn<GetAttendanceDeviceListResponse>
     {
 
@@ -570,4 +572,76 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string workCode { get; set; }
     }
 
+    #endregion AttendanceDevice
+
+    #region POS
+
+    public class AppDataToPos
+    {
+        public int AppId { set; get; }
+
+        public string AppName { set; get; }
+
+        public string AppIcon { set; get; }
+
+        public EbPosSettings AppSettings { set; get; }
+
+        public List<PosFormWraper> PosForms { set; get; }
+
+        public EbDataSet OfflineData { set; get; }
+
+        public AppDataToPos()
+        {
+            PosForms = new List<PosFormWraper>();
+            OfflineData = new EbDataSet();
+        }
+    }
+
+    public class PosFormWraper
+    {
+        public string DisplayName { set; get; }
+
+        public string Name { set; get; }
+
+        public string Version { set; get; }
+
+        public string RefId { set; get; }
+
+        public string Json { set; get; }
+    }
+
+    [DataContract]
+    public class EbPosSolutionData
+    {
+        [DataMember(Order = 1)]
+        public List<AppDataToPos> Applications { set; get; }
+
+        [DataMember(Order = 2)]
+        public EbLocation Location { get; set; }
+
+        [DataMember(Order = 3)]
+        public User CurrentUser { set; get; }
+
+        [DataMember(Order = 4)]
+        public Eb_Solution CurrentSolution { set; get; }
+
+        [DataMember(Order = 5)]
+        public DateTime last_sync_ts { set; get; }
+
+        [DataMember(Order = 6)]
+        public Dictionary<string, object> MetaData { get; set; }
+
+        public EbPosSolutionData()
+        {
+            MetaData = new Dictionary<string, object>();
+            Applications = new List<AppDataToPos>();
+        }
+    }
+
+    public class PosSolutionDataRequestV1 : EbServiceStackAuthRequest, IReturn<EbPosSolutionData>
+    {
+        public string MetaData { get; set; }
+    }
+
+    #endregion POS
 }

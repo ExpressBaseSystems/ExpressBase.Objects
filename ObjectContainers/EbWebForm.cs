@@ -285,6 +285,28 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool DisableCaching { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool EnableShareUrl { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Multi location view")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HelpText("Enables view access from multi location")]
+        public bool MultiLocView { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Multi location edit")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HelpText("Enables edit access from multi location")]
+        public bool MultiLocEdit { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Enable default expr for clone")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HelpText("Enable execution of default value expression after clone")]
+        public bool EnableDefValExprForClone { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -339,6 +361,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("true")]
         public bool CancelReason { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -858,9 +881,9 @@ namespace ExpressBase.Objects
                     bool isMobOfflineData = false, isErrorDraftGet = false, isDraftSave = false;
 
                     if (this.FormData.MultipleTables.TryGetValue(this.TableName, out SingleTable MTable) &&
-                        MTable.Count > 0 && MTable[0].GetColumn("eb_created_at_device") != null)
+                        MTable.Count > 0 && (MTable[0].GetColumn(SystemColumns.eb_created_at_device) != null || MTable[0].GetColumn(SystemColumns.eb_created_at_pos) != null))
                     {
-                        if (this.UserObj.wc == TokenConstants.MC)
+                        if (this.UserObj.wc == TokenConstants.MC || this.UserObj.wc == TokenConstants.PC)
                             isMobOfflineData = true;
                         else if (this.UserObj.wc == TokenConstants.UC)
                             isErrorDraftGet = true;
@@ -1149,6 +1172,7 @@ namespace ExpressBase.Objects
             {
                 int _locId = 0, i = 0, j = 0;
                 int _rowId = 0;
+                bool checkIdSrcId = false;
                 if (_table != null)
                 {
                     if (!(_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery)))
@@ -1172,6 +1196,27 @@ namespace ExpressBase.Objects
                             DateTime dt2 = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.ModifiedAt = dt2.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                             this.FormData.CancelReason = this.CancelReason ? Convert.ToString(dataRow[i++]) : string.Empty;
+                            if (this.MultiLocView || this.MultiLocEdit)
+                            {
+                                string st = Convert.ToString(dataRow[i++]);
+                                if (!string.IsNullOrWhiteSpace(st))
+                                {
+                                    string[] arr = st.Split(',');
+                                    if (!arr.Select(e => int.TryParse(e, out int t)).ToList().Exists(e => !e))
+                                    {
+                                        this.FormData.LocPermissions = arr.Select(int.Parse).ToList();
+                                        List<int> objlocs = this.UserObj.GetLocationsByObject(this.RefId);
+                                        if (objlocs.Contains(-1) || this.FormData.LocPermissions.Any(x => objlocs.Contains(x)))
+                                        {
+                                            if (this.MultiLocView)
+                                                this.FormData.MultiLocViewAccess = true;
+                                            if (this.MultiLocEdit)
+                                                this.FormData.MultiLocEditAccess = true;
+                                        }
+                                    }
+                                }
+                            }
+                            checkIdSrcId = true;
 
                             string p = this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetLongTimePattern();
                             this.FormData.Info = new WebformDataInfo()
@@ -1188,6 +1233,8 @@ namespace ExpressBase.Objects
                             i += 11;// 11 => Count of above properties
                             if (this.CancelReason)
                                 i++;
+                            if (this.MultiLocView || this.MultiLocEdit)
+                                i++;
                         }
                     }
 
@@ -1200,6 +1247,15 @@ namespace ExpressBase.Objects
                     }
                     else
                         _rowId = Convert.ToInt32(dataRow[i]);
+
+                    if (checkIdSrcId)
+                    {
+                        if (_rowId == this.FormData.SrcDataId && this.FormData.FormVersionId == this.FormData.SrcVerId)
+                        {
+                            this.FormData.SrcDataId = 0;
+                            this.FormData.SrcVerId = 0;
+                        }
+                    }
 
                     if (_rowId <= 0)
                         throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"Invalid data found. TableName: {_table.TableName}, RowId: {_rowId}, LocId: {_locId}", "EbWebForm -> GetFormattedData");
@@ -1813,12 +1869,9 @@ namespace ExpressBase.Objects
                         else
                             dt = DataDB.DoQuery(this.DbConnection, qry, param);
 
-                        SingleTable Table = new SingleTable();
-                        this.GetFormattedData(dt, Table);
-
                         List<FileMetaInfo> _list = new List<FileMetaInfo>();
                         DateTime _date;
-                        foreach (SingleRow dr in Table)
+                        foreach (EbDataRow dr in dt.Rows)
                         {
                             _date = Convert.ToDateTime(dr[FormConstants.uploadts]);
                             _date = _date.ConvertFromUtc(this.UserObj.Preference.TimeZone);
@@ -2216,6 +2269,17 @@ namespace ExpressBase.Objects
                 DbCon.Close();
         }
 
+        //change location
+        private void CheckConstraints(string ModifiedAt)
+        {
+            if (this.FormDataBackup.IsReadOnly)
+                throw new FormException("This form submission is READONLY!", (int)HttpStatusCode.Forbidden, "ReadOnly record", "EbWebForm -> ChangeLocation");
+            if (this.FormDataBackup.IsLocked)
+                throw new FormException("This form submission is LOCKED!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> ChangeLocation");
+
+            this.CheckConstraintsInner(ModifiedAt, this.FormDataBackup);
+        }
+
         //edit mode
         private void CheckConstraints(string wc, bool reviewFlow, string ts, string mobPageRefId)
         {
@@ -2228,9 +2292,16 @@ namespace ExpressBase.Objects
             if (this.FormData.IsCancelled)
                 throw new FormException("This form submission is CANCELLED!", (int)HttpStatusCode.Forbidden, "Cancelled record", "EbWebForm -> Save");
 
-            if (!reviewFlow && wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
-                        (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
-                throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+            if (!reviewFlow && wc == TokenConstants.UC)
+            {
+                bool neglectLoc = this.MultiLocEdit && this.FormData.MultiLocEditAccess;
+
+                if (!(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent || neglectLoc) ||
+                     (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
+                {
+                    throw new FormException("Access denied!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                }
+            }
 
             if (!reviewFlow && wc == TokenConstants.MC && !string.IsNullOrWhiteSpace(mobPageRefId))
             {
@@ -2238,16 +2309,22 @@ namespace ExpressBase.Objects
                     throw new FormException("Access denied to edit!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
             }
 
-            if (!reviewFlow && !string.IsNullOrWhiteSpace(ts) && !string.IsNullOrWhiteSpace(this.FormData.ModifiedAt))
+            if (!reviewFlow)
+                this.CheckConstraintsInner(ts, this.FormData);
+        }
+
+        private void CheckConstraintsInner(string ModifiedAtInRequest, WebformData _FormData)
+        {
+            if (!string.IsNullOrWhiteSpace(ModifiedAtInRequest) && !string.IsNullOrWhiteSpace(_FormData.ModifiedAt))
             {
-                if (DateTime.TryParseExact(ts, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt1))
+                if (DateTime.TryParseExact(ModifiedAtInRequest, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt1))
                 {
-                    if (DateTime.TryParseExact(this.FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 < dt2)
+                    if (DateTime.TryParseExact(_FormData.ModifiedAt, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt2) && dt1 < dt2)
                     {
-                        string modBy = this.SolutionObj.Users.ContainsKey(this.FormData.ModifiedBy) ? (" by " + this.SolutionObj.Users[this.FormData.ModifiedBy]) : string.Empty;
+                        string modBy = this.SolutionObj.Users.ContainsKey(_FormData.ModifiedBy) ? (" by " + this.SolutionObj.Users[_FormData.ModifiedBy]) : string.Empty;
                         string modAt = dt2.ToString(this.UserObj.Preference.GetLongTimePattern(), CultureInfo.InvariantCulture);
                         string st = $"This form submission was modified{modBy} at {modAt}, while you were trying to edit it.  Please close and redo edit.";
-                        throw new FormException(st, (int)HttpStatusCode.Forbidden, st + ": " + this.FormData.ModifiedBy, "EbWebForm -> Save");
+                        throw new FormException(st, (int)HttpStatusCode.Forbidden, st + ": " + _FormData.ModifiedBy, "EbWebForm -> Save");
                     }
                 }
             }
@@ -2264,7 +2341,7 @@ namespace ExpressBase.Objects
                 WebformData in_data = JsonConvert.DeserializeObject<WebformData>(JsonConvert.SerializeObject(this.FormData));
                 this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
-                bool IsMobInsert = !IsUpdate && wc == RoutingConstants.MC;
+                bool IsMobInsert = !IsUpdate && (wc == RoutingConstants.MC || wc == RoutingConstants.PC);
                 bool IsMobSignUp = IsMobInsert && !string.IsNullOrWhiteSpace(MobilePageRefId) && MobilePageRefId == this.SolutionObj?.SolutionSettings?.MobileAppSettings?.SignUpPageRefId;
                 if (IsUpdate)
                 {
@@ -2312,7 +2389,7 @@ namespace ExpressBase.Objects
                 resp += " - AfterSave: " + afterSaveStat;
                 if (this.RefreshDataAfterSave && afterSaveStat > 0)
                     this.RefreshFormData(DataDB, service, false, true);
-                this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection);
+                this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection, IsMobInsert);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
                 resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 resp += " - BatchFormDataPushers: " + EbDataPushHelper.ProcessBatchFormDataPushers(this, service, DataDB, this.DbConnection, IsUpdate);
@@ -2890,7 +2967,7 @@ namespace ExpressBase.Objects
                     }
                 }
                 if (!param.Exists(e => e.ParameterName == this.TableName + FormConstants._id))
-                    param.Add(DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, 0));
+                    param.Add(DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId));
 
                 return DataDB.DoNonQuery(this.DbConnection, q, param.ToArray());
             }
@@ -3171,6 +3248,55 @@ namespace ExpressBase.Objects
             return (status, modifiedAt);
         }
 
+        public (int, string) ChangeLocation(IDatabase DataDB, Service service, int NewLocId, string ModifiedAtReq)
+        {
+            int status = -2;
+            string msg = null;
+
+            using (this.DbConnection = DataDB.GetNewConnection())
+            {
+                try
+                {
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                    this.RefreshFormData(DataDB, service, true, true);
+
+                    this.FormCollection.AddRange(EbDataPushHelper.GetBatchPushedForms(this, service, DataDB, this.DbConnection));
+
+                    this.CheckConstraints(ModifiedAtReq);
+
+                    string query = QueryGetter.GetChangeLocationQuery(this, DataDB, this.UserObj.UserId, NewLocId);
+
+                    status = DataDB.DoNonQuery(this.DbConnection, query);
+                    if (status > 0)
+                    {
+                        msg = this.GetLastModifiedAt(DataDB);
+                        EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                        ebAuditTrail.UpdateAuditTrail4LocationChange(NewLocId, this.LocationId);
+                    }
+                    this.DbTransaction.Commit();
+                    CloseDbConnection(this.DbConnection, this.DbTransaction, false);
+                }
+                catch (NpgsqlException ex)
+                {
+                    if ((uint)ex.ErrorCode == 0x80004005)
+                        NpgsqlConnection.ClearPool(this.DbConnection as NpgsqlConnection);
+                    CloseDbConnection(this.DbConnection, this.DbTransaction, true);
+                    Console.WriteLine("Exception in ChangeLocation: " + ex.Message + "\n" + ex.StackTrace);
+                    msg = ex.Message;
+                }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(this.DbConnection, this.DbTransaction, true);
+                    Console.WriteLine("Exception in ChangeLocation: " + ex.Message + "\n" + ex.StackTrace);
+                    msg = ex.Message;
+                }
+            }
+
+            return (status, msg);
+        }
+
         private string GetLastModifiedAt(IDatabase DataDB)
         {
             string ts = null;
@@ -3365,7 +3491,7 @@ namespace ExpressBase.Objects
                         if (Row.IsDelete)
                             continue;
                         SingleColumn cField = Row.GetColumn(_column.ColumnName);
-                        if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (cField.Type == (int)EbDbTypes.Decimal && Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+                        if (string.IsNullOrWhiteSpace(Convert.ToString(cField?.Value)) || (IsEbDbTypeNumber(cField.Type) && Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
                         {
                             string msg = $"is Required {(IsMasterForm ? "" : "(DataPusher Field)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                             if (_table.TableType == WebFormTableTypes.Grid)
@@ -3377,6 +3503,13 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+        }
+
+        private bool IsEbDbTypeNumber(int type)
+        {
+            return type == (int)EbDbTypes.Decimal || type == (int)EbDbTypes.Double || type == (int)EbDbTypes.Int ||
+                type == (int)EbDbTypes.Int16 || type == (int)EbDbTypes.Int32 || type == (int)EbDbTypes.Int64 ||
+                type == (int)EbDbTypes.UInt16 || type == (int)EbDbTypes.UInt32 || type == (int)EbDbTypes.UInt64;
         }
 
         public void AfterRedisGet_All(Service service)

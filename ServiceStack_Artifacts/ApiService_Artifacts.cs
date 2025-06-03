@@ -60,7 +60,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiRequest : EbServiceStackAuthRequest, IReturn<ApiResponse>
+    public class ApiRequest : EbServiceStackNoAuthRequest, IReturn<ApiResponse>
     {
         [DataMember(Order = 1)]
         public string Version { set; get; }
@@ -73,6 +73,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string RefId { set; get; }
+
+        [DataMember(Order = 5)]
+        public string SolnId { get; set; }
+
+        [DataMember(Order = 6)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 7)]
+        public string UserAuthId { get; set; }
+
+        [DataMember(Order = 8)]
+        public string WhichConsole { get; set; }
 
         public EbJobArguments JobArgs { set; get; }
 

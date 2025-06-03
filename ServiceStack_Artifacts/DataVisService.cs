@@ -352,6 +352,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public List<TFilters> TFilters { get; set; }
+
+        [DataMember(Order = 4)]
+        public string CurrentRowGroup { get; set; }
+
+        [DataMember(Order = 5)]
+        public List<OrderBy> OrderBy { get; set; }
     }
 
     [DataContract]

@@ -31,6 +31,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public Int32 RetryOf { get; set; }
+
+        [DataMember(Order = 7)]
+        public string Sender { get; set; }
     }
 
     [DataContract]
@@ -70,7 +73,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string To { get; set; }
 
         [DataMember(Order = 6)]
-        public string RefId { get; set; }
+        public string RefId { get; set; } 
 
     }
 
@@ -87,7 +90,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string MediaUrl { get; set; }
 
         [DataMember(Order = 4)]
-        public string RefId { get; set; }
+        public string RefId { get; set; } 
     }
 
 

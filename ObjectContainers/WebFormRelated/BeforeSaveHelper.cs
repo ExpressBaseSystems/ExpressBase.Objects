@@ -129,6 +129,15 @@ namespace ExpressBase.Objects.WebFormRelated
                     ValidateControlNameConfig(Allctrls, ac.ControlName, "Materialized view Compute control");
                 }
             }
+
+            if (_this.MultiLocView || _this.MultiLocEdit)
+            {
+                EbControlWrapper _locCtrl = _dict.Values.FirstOrDefault(e => e.Control.Name == SystemColumns.eb_loc_permissions);
+                if (_locCtrl == null)
+                    throw new FormException($"Multi location access is enabled but control named '{SystemColumns.eb_loc_permissions}' is not found");
+                if (_locCtrl.TableName != _this.TableName)
+                    throw new FormException($"Multi location access control '{SystemColumns.eb_loc_permissions}' must be in primary table. Found '{_locCtrl.TableName}' instead of '{_this.TableName}'");
+            }
         }
 
         private static EbControl ValidateControlNameConfig(EbControl[] Allctrls, string ctrlName, string msg)

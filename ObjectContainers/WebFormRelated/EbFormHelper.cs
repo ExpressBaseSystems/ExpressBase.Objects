@@ -395,7 +395,11 @@ namespace ExpressBase.Objects
                 Op = EbReport.Operations.Get(ForWhat);
             else if (EbType.IntCode == EbObjectTypes.TableVisualization)
                 Op = EbTableVisualization.Operations.Get(ForWhat);
+            else if (EbType.IntCode == EbObjectTypes.ChartVisualization)
+                Op = EbChartVisualization.Operations.Get(ForWhat);
             else if (EbType.IntCode == EbObjectTypes.MobilePage)
+                Op = EbMobilePage.Operations.Get(ForWhat);
+            else if (EbType.IntCode == EbObjectTypes.PosForm)
                 Op = EbMobilePage.Operations.Get(ForWhat);
 
             if (WC == TokenConstants.UC && !Op.IsAvailableInWeb)
@@ -403,6 +407,8 @@ namespace ExpressBase.Objects
             else if (WC == TokenConstants.BC && !Op.IsAvailableInBot)
                 return false;
             else if (WC == TokenConstants.MC && !Op.IsAvailableInMobile)
+                return false;
+            else if (WC == TokenConstants.PC && !Op.IsAvailableInPos)
                 return false;
 
             try
@@ -1051,7 +1057,7 @@ namespace ExpressBase.Objects
 
         public static int SetFsWebReceivedCxtId(IServiceClient ServiceClient, IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return 0;
 
             int DataId = 0;
@@ -1060,7 +1066,7 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.WebReceived, new TimeSpan(0, 1, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.WebReceived, new TimeSpan(0, 5, 0));
             }
             else if (status == FormSubmissionJobStatus.WebReceived || status == FormSubmissionJobStatus.SsReceived)
             {
@@ -1079,7 +1085,7 @@ namespace ExpressBase.Objects
                 {
 
                 }
-                throw new FormException("This form submission is already in progress. Please check after sometime.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
+                throw new FormException("This form submission is already in progress.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "WebCheck");
             }
             else if (status == FormSubmissionJobStatus.SsProcessed || status == FormSubmissionJobStatus.WebProcessed)
             {
@@ -1106,7 +1112,7 @@ namespace ExpressBase.Objects
 
         public static void SetFsWebProcessedCxtId(IServiceClient ServiceClient, IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];
@@ -1114,7 +1120,7 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.SsProcessed)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.WebProcessed, new TimeSpan(0, 15, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.WebProcessed, new TimeSpan(1, 0, 0));
             }
             else
             {
@@ -1139,7 +1145,7 @@ namespace ExpressBase.Objects
 
         public static void SetFsSsReceivedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];
@@ -1147,11 +1153,11 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.WebReceived)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.SsReceived, new TimeSpan(0, 5, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.SsReceived, new TimeSpan(0, 5, 0));//form save timeout is 2 min
             }
             else if (status == FormSubmissionJobStatus.SsReceived)
             {
-                throw new FormException("This form submission is already in progress. Please check after sometime.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "SsCheck");
+                throw new FormException("This form submission is already in progress.", (int)HttpStatusCode.MethodNotAllowed, $"Form Submission Context: {fsCxtId}{status}", "SsCheck");
             }
             else if (status == FormSubmissionJobStatus.SsProcessed || status == FormSubmissionJobStatus.WebProcessed)
             {
@@ -1161,7 +1167,7 @@ namespace ExpressBase.Objects
 
         public static void SetFsSsProcessedCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId, int NewRowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];
@@ -1169,9 +1175,9 @@ namespace ExpressBase.Objects
             FormSubmissionJobStatus status = Redis.Get<FormSubmissionJobStatus>(RedisKey);
             if (status == FormSubmissionJobStatus.Default || status == FormSubmissionJobStatus.SsReceived)
             {
-                Redis.Set(RedisKey, FormSubmissionJobStatus.SsProcessed, new TimeSpan(0, 15, 0));
+                Redis.Set(RedisKey, FormSubmissionJobStatus.SsProcessed, new TimeSpan(1, 0, 0));
                 RedisKey = string.Format(RedisKeyPrefixConstants.FormSubmissionDataId, SolnId, ObjVerId, UserId, fsCxtId);
-                Redis.Set(RedisKey, NewRowId, new TimeSpan(0, 15, 0));
+                Redis.Set(RedisKey, NewRowId, new TimeSpan(1, 0, 0));
             }
             //else
             //{
@@ -1181,7 +1187,7 @@ namespace ExpressBase.Objects
 
         public static void ReSetFormSubmissionCxtId(IRedisClient Redis, string SolnId, string RefId, int UserId, string fsCxtId, int RowId)
         {
-            if (string.IsNullOrWhiteSpace(fsCxtId) || RowId > 0)
+            if (string.IsNullOrWhiteSpace(fsCxtId))
                 return;
 
             string ObjVerId = RefId.Split("-")[4];
@@ -1223,10 +1229,12 @@ VALUES({Code}, '{Title}', '{Message}', {SourceId}, {SourceVerId}, {UserId}, {Dat
             {
                 return new Dictionary<string, EbDbTypes> {
                     { "eb_row_num",EbDbTypes.Int32},
-                    { "eb_created_at_device",EbDbTypes.DateTime},
-                    { "eb_device_id",EbDbTypes.String},
-                    { "eb_appversion",EbDbTypes.String},
-                    { "eb_created_aid", EbDbTypes.Int32}
+                    { SystemColumns.eb_created_at_device,EbDbTypes.DateTime},
+                    { SystemColumns.eb_device_id,EbDbTypes.String},
+                    { SystemColumns.eb_appversion,EbDbTypes.String},
+                    { "eb_created_aid", EbDbTypes.Int32},
+                    { SystemColumns.eb_created_at_pos,EbDbTypes.DateTime},
+                    { SystemColumns.eb_created_by_pos,EbDbTypes.Int32}
                 };
             }
         }
@@ -1261,6 +1269,7 @@ VALUES({Code}, '{Title}', '{Message}', {SourceId}, {SourceVerId}, {UserId}, {Dat
         public Dictionary<string, string> DisableEditButton { get; set; }
         public bool IsPartial { get; set; }//can avoid last
         public Dictionary<string, object> RelatedData { get; set; }
+        public bool DisableLocCheck { get; set; }
 
         public string HtmlHead { get; set; }//
 

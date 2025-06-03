@@ -61,7 +61,10 @@ namespace ExpressBase.Objects
                             args.InsertSet(cField);
 
                             if (cField.Control != null)
-                                cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                            {
+                                if (!cField.Control.ExternalColumn)
+                                    cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                            }
                             else
                                 WebForm.ParameterizeUnknown(args);
                         }
@@ -145,9 +148,12 @@ namespace ExpressBase.Objects
                                 {
                                     if (cField.Control != null)
                                     {
-                                        SingleColumn ocF = bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
-                                        args.UpdateSet(cField, ocF);
-                                        cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                        if (!cField.Control.ExternalColumn)
+                                        {
+                                            SingleColumn ocF = bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
+                                            args.UpdateSet(cField, ocF);
+                                            cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                        }
                                     }
                                     else
                                     {
@@ -187,7 +193,10 @@ namespace ExpressBase.Objects
                             {
                                 args.InsertSet(cField);
                                 if (cField.Control != null)
-                                    cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                {
+                                    if (!cField.Control.ExternalColumn)
+                                        cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                }
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
@@ -245,9 +254,12 @@ namespace ExpressBase.Objects
                                 {
                                     if (cField.Control != null)
                                     {
-                                        SingleColumn ocF = null;// bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
-                                        args.UpdateSet(cField, ocF);
-                                        cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                        if (!cField.Control.ExternalColumn)
+                                        {
+                                            SingleColumn ocF = null;// bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
+                                            args.UpdateSet(cField, ocF);
+                                            cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                        }
                                     }
                                     else
                                     {
@@ -276,7 +288,10 @@ namespace ExpressBase.Objects
                             {
                                 args.InsertSet(cField);
                                 if (cField.Control != null)
-                                    cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                {
+                                    if (!cField.Control.ExternalColumn)
+                                        cField.Control.ParameterizeControl(args, WebForm.CrudContext);
+                                }
                                 else
                                     WebForm.ParameterizeUnknown(args);
                             }
@@ -299,7 +314,7 @@ namespace ExpressBase.Objects
             args.CopyBack(ref _extqry, ref i);
         }
 
-        public void ExecUniqueCheck(IDatabase DataDB, DbConnection DbCon)
+        public void ExecUniqueCheck(IDatabase DataDB, DbConnection DbCon, bool IsMobInsert)
         {
             string fullQuery = string.Empty;
             List<DbParameter> Dbparams = new List<DbParameter>();
@@ -317,7 +332,7 @@ namespace ExpressBase.Objects
                     if (!(WebForm.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0))
                         continue;
 
-                    foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique && !e.Control.BypassParameterization))
+                    foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique && !(e.Control is EbAutoId && IsMobInsert) && !e.Control.BypassParameterization))
                     {
                         SingleColumn cField = Table[0].GetColumn(_column.ColumnName);
 

@@ -131,7 +131,7 @@ namespace ExpressBase.Objects.Helpers
             return Dict;
         }
 
-        public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis, IRedisClient RedisReadOnly)
+        public static DataSourceDataSetResponse ExecuteDataset(string RefId, int UserId, List<Param> Params, EbConnectionFactory ebConnectionFactory, IRedisClient Redis, IRedisClient RedisReadOnly, bool useRwDb)
         {
             DataSourceDataSetResponse resp = new DataSourceDataSetResponse();
             resp.Columns = new List<ColumnColletion>();
@@ -185,6 +185,11 @@ namespace ExpressBase.Objects.Helpers
                 {
                     IEnumerable<DbParameter> parameters = DataHelper.GetParams(MyDataStore, false, Params, 0, 0);
                     resp.DataSet = MyDataStore.DoQueries(_sql, parameters.ToArray<System.Data.Common.DbParameter>());
+
+                    if (useRwDb && resp.DataSet?.Tables?.Count > 0 && resp.DataSet.Tables[0]?.Rows?.Count == 0 && MyDataStore.ConId != ebConnectionFactory.DataDB.ConId)
+                    {
+                        resp.DataSet = ebConnectionFactory.DataDB.DoQueries(_sql, parameters.ToArray<System.Data.Common.DbParameter>());
+                    }
 
                     foreach (EbDataTable dt in resp.DataSet.Tables)
                         resp.Columns.Add(dt.Columns);

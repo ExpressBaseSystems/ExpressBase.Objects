@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
-        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport, EbObjectTypes.iPrintLayout)]
         [Alias("Print Documents")]
         [PropertyGroup("Core")]
         public List<ObjectBasicInfo> PrintDocs { get; set; }
@@ -128,9 +128,9 @@ namespace ExpressBase.Objects
             try
             {
                 List<TableColumnMeta> metaList = new List<TableColumnMeta>();
-                metaList.Add(new TableColumnMeta { Name = "eb_device_id", Type = vDbTypes.String, Label = "Device Id" });
-                metaList.Add(new TableColumnMeta { Name = "eb_appversion", Type = vDbTypes.String, Label = "App Version" });
-                metaList.Add(new TableColumnMeta { Name = "eb_created_at_device", Type = vDbTypes.DateTime, Label = "Sync Time" });
+                metaList.Add(new TableColumnMeta { Name = SystemColumns.eb_device_id, Type = vDbTypes.String, Label = "Device Id" });
+                metaList.Add(new TableColumnMeta { Name = SystemColumns.eb_appversion, Type = vDbTypes.String, Label = "App Version" });
+                metaList.Add(new TableColumnMeta { Name = SystemColumns.eb_created_at_device, Type = vDbTypes.DateTime, Label = "Sync Time" });
                 meta.Add(this.TableName, metaList);
             }
             catch (Exception ex)

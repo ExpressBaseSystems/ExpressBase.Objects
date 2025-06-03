@@ -71,6 +71,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 9)]
         public string Location;
+
+        [DataMember(Order = 10)]
+        public string Api_Key;
     }
 
     [DataContract]
@@ -394,6 +397,109 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class IsApiKeyExistsRequest : IReturn<IsApiKeyExistsResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    [DataContract]
+    public class IsApiKeyExistsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int KeyId { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public IsApiKeyExistsResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
+    }
+
+    [DataContract]
+    public class ViewApiKeyRequest : IReturn<ViewApiKeyResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    [DataContract]
+    public class ViewApiKeyResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string ApiKey { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public ViewApiKeyResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
+    }
+
+    [DataContract]
+    public class DeleteApiKeyRequest : IReturn<DeleteApiKeyResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    [DataContract]
+    public class DeleteApiKeyResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public DeleteApiKeyResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
+    }
+
+    [DataContract]
+    public class GenerateApiKeyRequest : IReturn<GenerateApiKeyResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    [DataContract]
+    public class GenerateApiKeyResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string ApiKey { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public GenerateApiKeyResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
+    }
 
     public class UniqueCheckRequest
     {
@@ -852,11 +958,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 var ob_type = Convert.ToInt32(dr[2]);
                 if (app_id != 0)
                 {
-                    if (!this.GetApplication(app_id).ObjectTypes.ContainsKey(ob_type))
-                        this.GetApplication(app_id).ObjectTypes.Add(ob_type);
+                    Application _app = this.GetApplication(app_id);
+                    if (_app == null)
+                        continue;
+                    if (!_app.ObjectTypes.ContainsKey(ob_type))
+                        _app.ObjectTypes.Add(ob_type);
 
-
-                    this.GetApplication(app_id).ObjectTypes[ob_type].Add(new Eb_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
+                    _app.ObjectTypes[ob_type].Add(new Eb_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
                 }
             }
         }

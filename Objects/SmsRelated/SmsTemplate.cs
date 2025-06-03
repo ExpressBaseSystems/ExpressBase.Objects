@@ -60,6 +60,9 @@ namespace ExpressBase.Objects.Objects.SmsRelated
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         public string DataSourceRefId { get; set; }
 
+        [EnableInBuilder(BuilderType.SmsBuilder)] 
+        public string Sender { get; set; }
+
         [EnableInBuilder(BuilderType.SmsBuilder)]
         [HideInPropertyGrid]
         public StringList Parameters { get; set; }

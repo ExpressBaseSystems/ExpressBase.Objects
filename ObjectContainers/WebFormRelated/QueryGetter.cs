@@ -29,7 +29,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string _id = "id";
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
-                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}id",
+                    _cols = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}{12}{13}, id",
                         ebs[SystemColumns.eb_loc_id],//0
                         ebs[SystemColumns.eb_ver_id],//1
                         ebs[SystemColumns.eb_lock],//2
@@ -42,7 +42,8 @@ namespace ExpressBase.Objects.WebFormRelated
                         ebs[SystemColumns.eb_ro],//9
                         ebs[SystemColumns.eb_lastmodified_by],//10
                         ebs[SystemColumns.eb_lastmodified_at],//11
-                        _this.CancelReason ? ebs[SystemColumns.eb_void_reason] + ", " : string.Empty);//12
+                        _this.CancelReason ? ", " + ebs[SystemColumns.eb_void_reason] : string.Empty,//12
+                        (_this.MultiLocView || _this.MultiLocEdit) ? ", " + SystemColumns.eb_loc_permissions : string.Empty);//13
                 else if (_table.TableType == WebFormTableTypes.Review)
                 {
                     _id = $"eb_ver_id = {form_ver_id} AND eb_src_id";
@@ -312,7 +313,7 @@ WHERE
                     else
                         _cols = $"{ebs[SystemColumns.eb_loc_id]}, id" + _cols;
 
-                    query += string.Format("SELECT {0} FROM {2} WHERE {1}_id = (SELECT id FROM {1} WHERE {3}_id={8} AND COALESCE({4}, {5})={5}) AND COALESCE({4}, {5})={5} {6} {7};",
+                    query += string.Format("SELECT {0} FROM {2} WHERE {1}_id = (SELECT id FROM {1} WHERE {3}_id={8} AND COALESCE({4}, {5})={5} {6}) AND COALESCE({4}, {5})={5} {7};",
                         _cols,//0
                         _this.FormSchema.MasterTable,//1
                         _table.TableName,//2
@@ -458,6 +459,43 @@ WHERE
             return FullQry;
         }
 
+        public static string GetChangeLocationQuery(EbWebForm _this, IDatabase DataDB, int UserId, int NewLocId)
+        {
+            string FullQry = string.Empty;
+            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+
+            foreach (EbWebForm ebWebForm in _this.FormCollection)
+            {
+                WebFormSchema _schema = ebWebForm.FormSchema;
+                foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType != WebFormTableTypes.Review && !e.DoNotPersist))
+                {
+                    if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrWhiteSpace(_table.CustomSelectQuery))
+                        continue;
+
+                    if (ebWebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0)
+                    {
+                        string Ids = Table.Select(e => e.RowId).Join(",");
+
+                        //USE ANY
+                        string Qry = string.Format("UPDATE {0} SET {1} = {2}, {3} = {9}, {4} = {5} WHERE id IN ({6}) AND COALESCE({7}, {8}) = {8};",
+                            _table.TableName,//0
+                            ebs[SystemColumns.eb_loc_id],//1
+                            NewLocId,//2
+                            ebs[SystemColumns.eb_lastmodified_by],//3
+                            ebs[SystemColumns.eb_lastmodified_at],//4
+                            DataDB.EB_CURRENT_TIMESTAMP,//5
+                            Ids,//6
+                            ebs[SystemColumns.eb_del],//7
+                            ebs.GetBoolFalse(SystemColumns.eb_del),//8
+                            UserId);//9
+
+                        FullQry = Qry + FullQry;//Lines table data is processed first
+                    }
+                }
+            }
+            return FullQry;
+        }
+
         //public static string GetCancelQuery(EbWebForm _this, IDatabase DataDB)
         //{
         //    string query = string.Empty;
@@ -513,7 +551,7 @@ WHERE
                     //if (_this.AutoId != null)
                     //    _qry = $"LOCK TABLE ONLY {_this.AutoId.TableName} IN EXCLUSIVE MODE; ";
 
-                    _qry += string.Format("INSERT INTO {0} ({19} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}{8}) VALUES ({20} @eb_createdby, {6}, @{18}, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}{9}); ",
+                    _qry += string.Format("INSERT INTO {0} ({20} {1}, {2}, {3}, {4}, {5}, {10}, {11}, {12}, {13}, {19}{8}) VALUES ({21} @eb_createdby, {6}, @{18}, @{7}_eb_ver_id, @eb_signin_log_id, {14}, {15}, {16}, {17}, @{7}_eb_ver_id{9}); ",
                         tblName,//0
                         ebs[SystemColumns.eb_created_by],//1
                         ebs[SystemColumns.eb_created_at],//2
@@ -533,8 +571,10 @@ WHERE
                         _this.LockOnSave ? ebs.GetBoolTrue(SystemColumns.eb_lock) : ebs.GetBoolFalse(SystemColumns.eb_lock),//16
                         ebs.GetBoolFalse(SystemColumns.eb_ro),//17
                         FormConstants.eb_loc_id_ + _this.CrudContext,//18
-                        "{0}",//19
-                        "{1}");//20
+                        ebs[SystemColumns.eb_src_ver_id],//19
+                        "{0}",//20
+                        "{1}");//21
+                    _qry += $"UPDATE {tblName} SET {ebs[SystemColumns.eb_src_id]}=id WHERE id=(SELECT eb_currval('{tblName}_id_seq'));";
                 }
                 else
                 {

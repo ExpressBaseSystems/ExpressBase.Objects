@@ -83,7 +83,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public bool IsUser { get; set; }
-        
+
         [DataMember(Order = 3)]
         public string iSolutionId { get; set; }
 
@@ -189,6 +189,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public string SolURL { get; set; }
+
+        public CreateSolutionResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
     }
 
     [DataContract]
@@ -350,7 +355,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class GetPrimarySolutionsResponse  
+    public class GetPrimarySolutionsResponse
     {
         [DataMember(Order = 1)]
         public List<EbSolutionsWrapper> PrimarySolutions { get; set; }
@@ -543,7 +548,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         version = 1,
         TwoFa = 2,
-        OtpSignin =3
+        OtpSignin = 3
     }
 
     public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse>
