@@ -61,6 +61,10 @@ namespace ExpressBase.Objects
         public bool DisableEdit { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public bool ShowSearchBox { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [PropertyGroup("Appearance")]
         [Alias("Row Color Expression")]
