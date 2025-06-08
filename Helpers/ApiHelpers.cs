@@ -137,44 +137,47 @@ namespace ExpressBase.Common.Helpers
             return parameters;
         }
 
-        public static object GetResult(ApiResources resource, EbApi Api, RabbitMqProducer mqp, Service service, EbStaticFileClient FileClient)
+        public static object GetResult(ApiResources resource, EbApi Api, int index = 0, int parentindex = 0)
         {
             ResultWrapper res = new ResultWrapper();
 
             switch (resource)
             {
                 case EbSqlReader reader:
-                    res.Result = (reader as EbSqlReader).ExecuteDataReader(Api);
+                    res.Result = reader.ExecuteDataReader(Api);
                     break;
                 case EbSqlWriter writer:
-                    res.Result = (writer as EbSqlWriter).ExecuteDataWriter(Api);
+                    res.Result = writer.ExecuteDataWriter(Api);
                     break;
                 case EbSqlFunc func:
-                    res.Result = (func as EbSqlFunc).ExecuteSqlFunction(Api);
+                    res.Result = func.ExecuteSqlFunction(Api);
                     break;
                 case EbEmailNode email:
-                    res.Result = (email as EbEmailNode).ExecuteEmail(Api, mqp);
+                    res.Result = email.ExecuteEmail(Api);
                     break;
                 case EbProcessor processor:
-                    res.Result = (processor as EbProcessor).ExecuteScript(Api, mqp, service, FileClient);
+                    res.Result = processor.ExecuteScript(Api);
                     break;
                 case EbConnectApi ebApi:
-                    res.Result = (ebApi as EbConnectApi).ExecuteConnectApi(Api, service);
+                    res.Result = ebApi.ExecuteConnectApi(Api);
                     break;
                 case EbThirdPartyApi thirdParty:
-                    res.Result = (thirdParty as EbThirdPartyApi).ExecuteThirdPartyApi(thirdParty, Api);
+                    res.Result = thirdParty.ExecuteThirdPartyApi(thirdParty, Api);
                     break;
                 case EbFormResource form:
-                    res.Result = (form as EbFormResource).ExecuteFormResource(Api, service);
+                    res.Result = form.ExecuteFormResource(Api);
                     break;
                 case EbEmailRetriever retriever:
-                    res.Result = (retriever as EbEmailRetriever).ExecuteEmailRetriever(Api, service, true);
+                    res.Result = retriever.ExecuteEmailRetriever(Api, true);
                     break;
                 case EbFtpPuller puller:
-                    res.Result = (puller as EbFtpPuller).ExecuteFtpPuller();
+                    res.Result = puller.ExecuteFtpPuller();
                     break;
                 case EbCSVPusher pusher:
-                    res.Result = (pusher as EbCSVPusher).ExecuteCSVPusher(Api, service, FileClient, true);
+                    res.Result = pusher.ExecuteCSVPusher(Api);
+                    break;
+                case EbLoop loop:
+                    res.Result = loop.DoLoop(Api, index, parentindex);
                     break;
                 default:
                     res.Result = null;

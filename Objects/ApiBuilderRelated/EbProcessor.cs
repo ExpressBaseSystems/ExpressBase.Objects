@@ -68,7 +68,7 @@ namespace ExpressBase.Objects
             return evaluator;
         }
 
-        public object ExecuteScript(EbApi Api, RabbitMqProducer mqp, Service service, EbStaticFileClient Fileclient)
+        public object ExecuteScript(EbApi Api)
         {
             ApiGlobalParent global;
 
@@ -112,14 +112,14 @@ namespace ExpressBase.Objects
             global.GoToByIndexHandler += (index) =>
             {
                 Api.Step = index;
-                Api.Resources[index].Result = EbApiHelper.GetResult(Api.Resources[index], Api, mqp, service, Fileclient);
+                Api.Resources[index].Result = EbApiHelper.GetResult(Api.Resources[index], Api);
             };
 
             global.GoToByNameHandler += (name) =>
             {
                 int index = Api.Resources.GetIndex(name);
                 Api.Step = index;
-                Api.Resources[index].Result = EbApiHelper.GetResult(Api.Resources[index], Api, mqp, service, Fileclient);
+                Api.Resources[index].Result = EbApiHelper.GetResult(Api.Resources[index], Api);
             };
 
             global.ExitResultHandler += (obj) =>

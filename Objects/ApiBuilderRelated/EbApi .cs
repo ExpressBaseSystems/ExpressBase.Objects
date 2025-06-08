@@ -130,6 +130,12 @@ namespace ExpressBase.Objects
 
         public new IRedisClient Redis { get; set; }
 
+        public EbStaticFileClient FileClient { get; set; }
+
+        public RabbitMqProducer MessageProducer { get; set; }
+
+        public Service Service { get; set; }
+
         public int Step = 0;
 
         public override List<string> DiscoverRelatedRefids()
@@ -392,6 +398,43 @@ namespace ExpressBase.Objects
 
             this.DataDB.DoNonQuery("UPDATE eb_api_logs_master SET refid = :refid, params = :params, status = :status, message = :message, result =:result WHERE id = :id;", _dbparameters);
 
+        }
+
+        private Dictionary<string, TV> _keyValuePairs = null;
+
+        public Dictionary<string, TV> GetKeyvalueDict
+        {
+            get
+            {
+                if (_keyValuePairs == null)
+                {
+                    _keyValuePairs = new Dictionary<string, TV>();
+                    foreach (string key in this.FirstReaderKeyColumns)
+                    {
+                        if (!_keyValuePairs.ContainsKey(key))
+                            _keyValuePairs.Add(key, new TV { });
+                    }
+                    foreach (string key in this.ParameterKeyColumns)
+                    {
+                        if (!_keyValuePairs.ContainsKey(key))
+                            _keyValuePairs.Add(key, new TV { });
+                    }
+                }
+                return _keyValuePairs;
+            }
+        }
+
+        public string FillKeys(EbDataRow dataRow)
+        {
+            foreach (var item in this.GlobalParams)
+                if (GetKeyvalueDict.ContainsKey(item.Key))
+                    this.GetKeyvalueDict[item.Key] = null;// this.Api.GlobalParams[item.Key];
+            for (int i = 0; i < dataRow.Count; i++)
+            {
+                if (GetKeyvalueDict.ContainsKey(dataRow.Table.Columns[i].ColumnName))
+                    this.GetKeyvalueDict[dataRow.Table.Columns[i].ColumnName] = new TV { Value = dataRow[i].ToString(), Type = ((int)dataRow.Table.Columns[i].Type).ToString() };
+            }
+            return JsonConvert.SerializeObject(GetKeyvalueDict); ;
         }
 
         public EbApi()
@@ -663,7 +706,7 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public bool ExecuteEmail(EbApi Api, RabbitMqProducer MessageProducer3)
+        public bool ExecuteEmail(EbApi Api)
         {
             bool status;
 
@@ -675,7 +718,7 @@ namespace ExpressBase.Objects
 
                 Api.FillParams(InputParams);
 
-                MessageProducer3.Publish(new EmailAttachmentRequest()
+                Api.MessageProducer.Publish(new EmailAttachmentRequest()
                 {
                     ObjId = Convert.ToInt32(this.Reference.Split(CharConstants.DASH)[3]),
                     Params = InputParams,
@@ -768,7 +811,7 @@ namespace ExpressBase.Objects
             return (this.Result as ApiResponse).Result;
         }
 
-        public object ExecuteConnectApi(EbApi Api, Service Service)
+        public object ExecuteConnectApi(EbApi Api)
         {
             ApiResponse resp = null;
 
@@ -794,7 +837,7 @@ namespace ExpressBase.Objects
 
                     string version = this.Version.Replace(".w", "");
 
-                    resp = Service.Gateway.Send(new ApiMqRequest
+                    resp = Api.Service.Gateway.Send(new ApiMqRequest
                     {
                         Name = this.RefName,
                         Version = version,
@@ -858,7 +901,7 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public object ExecuteFormResource(EbApi Api, Service Service)
+        public object ExecuteFormResource(EbApi Api)
         {
             try
             {
@@ -893,7 +936,7 @@ namespace ExpressBase.Objects
                 };
 
                 EbConnectionFactory ebConnection = new EbConnectionFactory(Api.SolutionId, Api.Redis);
-                InsertOrUpdateFormDataResp resp = EbFormHelper.InsertOrUpdateFormData(request, Api.DataDB, Service, Api.Redis, ebConnection);
+                InsertOrUpdateFormDataResp resp = EbFormHelper.InsertOrUpdateFormData(request, Api.DataDB, Api.Service, Api.Redis, ebConnection);
 
                 if (resp.Status == (int)HttpStatusCode.OK)
                     return resp.RecordId;
@@ -968,14 +1011,14 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public object ExecuteEmailRetriever(EbApi Api, Service Service, bool isMq)
+        public object ExecuteEmailRetriever(EbApi Api, bool isMq)
         {
             try
             {
                 EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
                 if (EbConnectionFactory.EmailRetrieveConnection[this.MailConnection] != null)
                 {
-                    RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection].Retrieve(Service, this.DefaultSyncDate, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
+                    RetrieverResponse retrieverResponse = EbConnectionFactory.EmailRetrieveConnection[this.MailConnection].Retrieve(Api.Service, this.DefaultSyncDate, Api.SolutionId, isMq, SubmitAttachmentAsMultipleForm);
 
                     EbWebForm _form = Api.Redis.Get<EbWebForm>(this.Reference);
                     SchemaHelper.GetWebFormSchema(_form);
@@ -985,7 +1028,7 @@ namespace ExpressBase.Objects
 
                         foreach (RetrieverMessage _m in retrieverResponse?.RetrieverMessages)
                         {
-                            InsertFormData(_form, data, _m, this.Reference, Api.SolutionId, Api.UserObject, Api.Redis, Service, EbConnectionFactory);
+                            InsertFormData(_form, data, _m, this.Reference, Api.SolutionId, Api.UserObject, Api.Redis, Api.Service, EbConnectionFactory);
                         }
                     }
                     else
@@ -1145,7 +1188,7 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public object ExecuteCSVPusher(EbApi Api, Service Service, EbStaticFileClient FileClient, bool isMq)
+        public object ExecuteCSVPusher(EbApi Api)
         {
             try
             {
@@ -1153,7 +1196,7 @@ namespace ExpressBase.Objects
                 object data = (Api.Resources[Api.Step - 1])?.Result;
                 if (data != null && (data as Stream).Length > 0)
                 {
-                    UploadCSVByLoopHoc(data as Stream, Service, Api);
+                    UploadCSVByLoopHoc(data as Stream, Api.Service, Api);
                 }
                 else
                 {
@@ -1396,17 +1439,117 @@ namespace ExpressBase.Objects
 
             return OutParams;
         }
+
         public override string GetDesignHtml()
         {
             return @"<div  class='apiPrcItem jobItem dropped api-item-border' eb-type='Loop' id='@id'> <div class='api-item-inner'>
                         <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_LpStr' >  
                             <div class='CompLabel'> Loop Start</div>
                         </div>
-                        <div class='Sql_Dropable'> </div>
+                        <div class='Api_Dropable'> </div>
                         <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_LpEnd'>  
                             <div class='CompLabel'> Loop End</div>
                         </div>
                     </div></div>".RemoveCR().DoubleQuoted();
+        }
+
+        public const string EB_LOC_ID = "eb_loc_id";
+
+        public bool DoLoop( EbApi Api, int step, int parentindex)
+        {
+            EbDataTable _table;
+            try
+            {
+                if (parentindex == 0 && step == 1)
+                    _table = (Api.Resources[step - 1].Result as EbDataSet).Tables[0];
+                else
+                    _table = (Api.Resources[parentindex - 1].Result as EbDataSet).Tables[0];
+
+                int _rowcount = _table.Rows.Count;
+                for (int i = 0; i < _rowcount; i++)
+                {
+                    try
+                    {
+                        EbDataColumn cl = _table.Columns[0];
+                        Param _outparam = new Param
+                        {
+                            Name = cl.ColumnName,
+                            Type = cl.Type.ToString(),
+                            Value = _table.Rows[i][cl.ColumnIndex].ToString()
+                        };
+                        Api.Resources[step].Result = _outparam;
+                        if (Api.GlobalParams.ContainsKey(_outparam.Name))
+                            Api.GlobalParams[_outparam.Name] = new TV { Type = _outparam.Type, Value = _outparam.Value };
+                        else
+                            Api.GlobalParams.Add(_outparam.Name, new TV { Type = _outparam.Type, Value = _outparam.Value });
+
+
+                        if (!Api.GlobalParams.ContainsKey(EB_LOC_ID))
+                        {
+                            if (_table.Columns[EB_LOC_ID] != null)
+                            {
+                                Api.GlobalParams.Add(EB_LOC_ID, new TV { Type = EbDbTypes.Int32.ToString(), Value = _table.Rows[i][EB_LOC_ID].ToString() });
+                            }
+                        }
+
+                        ExecuteLoop(Api, 0, step, parentindex, _table.Rows[i], null);
+                        //    message = "Loop Execution Success. counter " + i + " of " + _rowcount;
+                    }
+                    catch (Exception e)
+                    {
+                        // message = "Loop Failed to execute. counter " + i + " of " + _rowcount;
+                        Console.WriteLine(e.Message + e.StackTrace);
+                    }
+                }
+                // MasterResult.Add(new SqlJobResult { Message = "Loop execution Success with " + _rowcount + " iterations.", Type = ResourceType.Loop });
+            }
+            catch (Exception e)
+            {
+                // MasterResult.Add(new SqlJobResult { Message = "Loop execution Failed" + e.Message, Type = ResourceType.Loop });
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
+            return true;
+        }
+
+       
+
+        
+
+        public void ExecuteLoop(EbApi Api, int retryof, int step, int parentindex, EbDataRow dataRow, Dictionary<string, TV> keyvals)
+        {
+            try
+            {
+                int counter;
+                string _keyvalues = (dataRow is null) ? JsonConvert.SerializeObject(keyvals) : Api.FillKeys(dataRow);
+                try
+                {
+                    for (counter = 0; counter < this.InnerResources.Count; counter++)
+                    {
+                        if (this.InnerResources[counter] is EbProcessor)
+                        {
+                            if (this.InnerResources[counter - 1] is EbSqlReader)
+                                if (((this.InnerResources[counter - 1] as EbSqlReader).Result as EbDataSet).Tables[0].Rows.Count > 0)
+                                    this.InnerResources[counter].Result = EbApiHelper.GetResult(this.InnerResources[counter],Api, counter, step);
+                                else
+                                {
+                                    Console.WriteLine("Datareader returned 0 rows : " + (this.InnerResources[counter - 1] as EbSqlReader).RefId + "\n" +
+                                        JsonConvert.SerializeObject(dataRow));
+                                    return;
+                                }
+                        }
+                        this.InnerResources[counter].Result = EbApiHelper.GetResult(this.InnerResources[counter],Api, counter, step);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error at LoopExecution");
+                throw e;
+            }
         }
     }
 
@@ -1438,7 +1581,7 @@ namespace ExpressBase.Objects
                         <div tabindex='1' class='drpboxInt lineDrp apiPrcItem' onclick='$(this).focus();' id='@id_TrStr'>  
                             <div class='CompLabel'> Transaction Start</div>
                         </div>
-                        <div class='Sql_Dropable'> </div>
+                        <div class='Api_Dropable'> </div>
                         <div tabindex='1' class='drpbox lineDrp apiPrcItem' onclick='$(this).focus();' id='@id_TrEnd'>  
                             <div class='CompLabel'> Transaction End</div>
                         </div>
