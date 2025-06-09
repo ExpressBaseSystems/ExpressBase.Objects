@@ -176,6 +176,9 @@ namespace ExpressBase.Common.Helpers
                 case EbCSVPusher pusher:
                     res.Result = (pusher as EbCSVPusher).ExecuteCSVPusher(Api, service, FileClient, true);
                     break;
+                case EbBatchSqlWriter batchWriter:
+                    res.Result = batchWriter.Execute(Api, service);
+                    break;
                 default:
                     res.Result = null;
                     break;

@@ -39,6 +39,7 @@ using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.Dynamic;
 using DocumentFormat.OpenXml.Presentation;
+using System.Data;
 
 namespace ExpressBase.Objects
 {
@@ -424,20 +425,23 @@ namespace ExpressBase.Objects
             EbDataSet dataSet;
             try
             {
+                EbConnectionFactory EbConnectionFactory = new EbConnectionFactory(Api.SolutionId, Api.Redis);
+
                 EbDataReader dataReader = Api.GetEbObject<EbDataReader>(this.Reference, Api.Redis, Api.ObjectsDB);
+
+                IDatabase DataDB = dataReader.GetDatastore(EbConnectionFactory);
 
                 List<DbParameter> dbParameters = new List<DbParameter>();
 
                 List<Param> InputParams = dataReader.GetParams((RedisClient)Api.Redis);
 
                 Api.FillParams(InputParams);
-
                 foreach (Param param in InputParams)
                 {
-                    dbParameters.Add(Api.DataDB.GetNewParameter(param.Name, (EbDbTypes)Convert.ToInt32(param.Type), param.ValueTo));
+                    dbParameters.Add(DataDB.GetNewParameter(param.Name, (EbDbTypes)Convert.ToInt32(param.Type), param.ValueTo));
                 }
 
-                dataSet = Api.DataDB.DoQueries(dataReader.Sql, dbParameters.ToArray());
+                dataSet = DataDB.DoQueries(dataReader.Sql, dbParameters.ToArray());
             }
             catch (Exception ex)
             {
@@ -1134,7 +1138,7 @@ namespace ExpressBase.Objects
                                 else
                                     row["fb_lead"] = "Yes";
 
-                                row["preferred_location"] = (values.Length >=8 )?values[7] : "";
+                                row["preferred_location"] = (values.Length >= 8) ? values[7] : "";
                                 row["alternate_number"] = (values.Length >= 9) ? values[8] : "";
 
                                 InsertDataFromWebformRequest request = new InsertDataFromWebformRequest
@@ -1226,6 +1230,107 @@ namespace ExpressBase.Objects
                     this.Result = response?.RecordIds;
                 }
 
+            }
+        }
+
+        public override object GetResult()
+        {
+            return this.Result;
+        }
+
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbBatchSqlWriter : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyGroup("Data Settings")]
+        [PropertyEditor(PropertyEditorType.String)]
+        [HelpText("INSERT INTO tablename(name, code) VALUES(@col1, @col2)")]
+        public string InsertQuery { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyGroup("Data Settings")]
+        [PropertyEditor(PropertyEditorType.String)]
+        [HelpText("{'col1': 'Column name from table' , 'col2': 'Column name from table'}")]
+        public string MapppingJson { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='BatchSqlWriter' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public object Execute(EbApi Api, Service Service)
+        {
+            List<int> statuses = new List<int>();
+            DbConnection TransactionConnection = null;
+            DbTransaction transaction = null;
+
+            try
+            {
+                object data = (Api.Resources[Api.Step - 1])?.Result;
+                EbDataTable dt = (data as EbDataSet)?.Tables[0];
+
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    Api.ApiResponse.Message.Description = "0 rows inserted";
+                    return false;
+                }
+
+                var paramMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(MapppingJson);
+ 
+                TransactionConnection = Api.DataDB.GetNewConnection();
+                TransactionConnection.Open();
+                transaction = TransactionConnection.BeginTransaction();
+
+                foreach (EbDataRow row in dt.Rows)
+                {
+                    List<DbParameter> dbParams = new List<DbParameter>();
+
+                    foreach (var (paramName, columnName) in paramMap)
+                    {
+                        EbDbTypes type = dt.Columns[columnName].Type;
+                        var cell = row[columnName];
+                        dynamic value = cell == DBNull.Value ? null : cell;
+                        dbParams.Add(Api.DataDB.GetNewParameter(paramName, type, value));
+                    }
+                    int status = Api.DataDB.DoNonQuery(TransactionConnection, InsertQuery, dbParams.ToArray());
+                    statuses.Add(status);
+                }
+                transaction.Commit();
+
+                if (statuses.Count > 0)
+                {
+                    this.Result = statuses;
+
+                    Api.ApiResponse.Message.Description = statuses.Count + " row inserted";
+                    return true;
+                }
+                else
+                {
+                    Api.ApiResponse.Message.Description = statuses.Count + " row inserted";
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                transaction?.Rollback();
+                throw new ApiException("[ExecuteBulkDataPusher], " + ex.Message);
+            }
+            finally
+            {
+                transaction?.Dispose();
+                if (TransactionConnection != null)
+                {
+                    if (TransactionConnection.State == System.Data.ConnectionState.Open)
+                        TransactionConnection.Close();
+                    TransactionConnection.Dispose();
+                }
             }
         }
 
