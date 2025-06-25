@@ -8,6 +8,8 @@ using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
+    public class ObjectVersionsDictionary : Dictionary<int, List<EbObjectWrapper>> { }
+
     public class ExportApplicationMqRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
         [DataMember(Order = 1)]
@@ -105,4 +107,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Result { get; set; }
 
     }
+    public class DependancyMatrixRequest : EbServiceStackAuthRequest
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int, ObjectVersionsDictionary> AppObjectsMap { get; set; }
+    }
+    public class DependancyMatrixResponse : IEbSSResponse
+    { 
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Dominant> Dominants { get; set; }
+
+    }
+
+    public class Dominant
+    {
+        public string RefId { get; set; } 
+        public string DisplayName { get; set; }
+        public List<string> Dependents { get; set; } = new List<string>();
+    }
+
 }

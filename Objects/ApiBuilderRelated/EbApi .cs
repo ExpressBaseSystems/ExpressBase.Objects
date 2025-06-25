@@ -436,6 +436,7 @@ namespace ExpressBase.Objects
                 List<Param> InputParams = dataReader.GetParams((RedisClient)Api.Redis);
 
                 Api.FillParams(InputParams);
+
                 foreach (Param param in InputParams)
                 {
                     dbParameters.Add(DataDB.GetNewParameter(param.Name, (EbDbTypes)Convert.ToInt32(param.Type), param.ValueTo));
@@ -1278,7 +1279,7 @@ namespace ExpressBase.Objects
                 if (dt == null || dt.Rows.Count == 0)
                 {
                     Api.ApiResponse.Message.Description = "0 rows inserted";
-                    return false;
+                    return true;
                 }
 
                 var paramMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(MapppingJson);
