@@ -54,6 +54,38 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileLinkCollection : EbMobilePageBase
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public string EbSid { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Link Name")]
+        public string LinkName { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport, EbObjectTypes.iPrintLayout)]
+        [Alias("Link")]
+        public string LinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("Context to controls map")]
+        public List<EbCTCMapper> ContextToControlMap { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [Alias("Link Expression")]
+        public EbScript LinkExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Link Fail Message")]
+        public string LinkExprFailMsg { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
     public class EbThickness
     {
         [EnableInBuilder(BuilderType.MobilePage)]

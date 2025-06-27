@@ -97,6 +97,8 @@ namespace ExpressBase.Objects
         [MetaOnly]
         public List<EbMobileControlMeta> FormControlMetas => new List<EbMobileControlMeta>();
 
+        #region Link Settings Properties
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage, EbObjectTypes.iReport, EbObjectTypes.iPrintLayout)]
@@ -159,6 +161,14 @@ namespace ExpressBase.Objects
         [PropertyGroup("Link Settings")]
         [Alias("Link Fail Message")]
         public string LinkExprFailMsg { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Link Collection")]
+        public List<EbMobileLinkCollection> LinkCollection { set; get; }
+
+        #endregion Link Settings Properties
 
         #region FAB Settings Properties
 
