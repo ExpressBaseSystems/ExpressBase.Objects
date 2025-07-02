@@ -127,7 +127,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public ApiMethods Method { set; get; }
 
-        public ApiResponse ApiResponse { set; get; }
+        public ApiResponse ApiResponse { set; get; } = new ApiResponse();
 
         public new IRedisClient Redis { get; set; }
 
@@ -171,7 +171,6 @@ namespace ExpressBase.Objects
 
         public IDatabase DataDB { get; set; }
 
-        public int LogMasterId { get; set; }
 
         public T GetEbObject<T>(string refId, IRedisClient Redis, IDatabase ObjectsDB)
         {
@@ -259,82 +258,31 @@ namespace ExpressBase.Objects
         public EbApi GetApi(string RefId, int ObjId, IRedisClient Redis, IDatabase ObjectsDB, IDatabase DataDB)
         {
             EbApi Api = null;
-
-            if (ObjId > 0)
+            try
             {
-                Api = GetEbObject<EbApi>(ObjId, Redis, ObjectsDB);
+                if (ObjId > 0)
+                {
+                    Api = GetEbObject<EbApi>(ObjId, Redis, ObjectsDB);
+                }
+                else if (RefId != string.Empty)
+                {
+                    Api = GetEbObject<EbApi>(RefId, Redis, ObjectsDB);
+                }
+                if (Api != null)
+                {
+                    Api.Redis = Redis;
+                    Api.ObjectsDB = ObjectsDB;
+                    Api.DataDB = DataDB;
+                }
             }
-            else if (RefId != string.Empty)
+            catch (Exception ex)
             {
-                Api = GetEbObject<EbApi>(RefId, Redis, ObjectsDB);
-            }
-            if (Api != null)
-            {
-                Api.Redis = Redis;
-                Api.ObjectsDB = ObjectsDB;
-                Api.DataDB = DataDB;
-                Api.ApiResponse = new ApiResponse();
+                return null;
             }
             return Api;
         }
 
-        public void InsertLog()
-        {
-            string query = @" 
-                        INSERT INTO 
-                            eb_api_logs_master(refid, type, params, status, message, result, eb_created_by, eb_created_at) 
-                        VALUES
-                            (:refid, :type, :params, :status, :message, :result, :eb_created_by, NOW()) 
-                        RETURNING id;";
-            DbParameter[] parameters = new DbParameter[] {
-                            DataDB.GetNewParameter("refid", EbDbTypes.String, this.RefId) ,
-                            DataDB.GetNewParameter("type", EbDbTypes.Int32, 1),
-                            DataDB.GetNewParameter("message", EbDbTypes.String, this.ApiResponse.Message.Description),
-                            DataDB.GetNewParameter("status", EbDbTypes.String, this.ApiResponse.Message.Status),
-                            DataDB.GetNewParameter("params", EbDbTypes.Json, JsonConvert.SerializeObject(this.GlobalParams)),
-                            DataDB.GetNewParameter("result", EbDbTypes.Json, JsonConvert.SerializeObject(this.ApiResponse.Result)),
-                            DataDB.GetNewParameter("eb_created_by", EbDbTypes.Int32, this.UserObject.UserId)
-                        };
-            EbDataTable dt = DataDB.DoQuery(query, parameters);
-
-            //this.LogMasterId = Convert.ToInt32(dt?.Rows[0][0]);
-        }
-
-        public int InsertLinesLog(string status, string source)
-        {
-            string query = @"
-                        INSERT INTO
-                            eb_api_logs_lines(eb_api_logs_master_id, source, status, , eb_created_by, eb_created_at)
-                        VALUES
-                            (:eb_api_logs_master_id, :source, :status, , :eb_created_by, NOW())
-                        RETURNING id;";
-            DbParameter[] parameters = new DbParameter[]
-            {
-                DataDB.GetNewParameter(":eb_api_logs_master_id", EbDbTypes.Int32, this.LogMasterId),
-                DataDB.GetNewParameter("source", EbDbTypes.Int32, source),
-                DataDB.GetNewParameter("status", EbDbTypes.String, status),
-                DataDB.GetNewParameter("eb_created_by", EbDbTypes.Int32, this.UserObject.UserId),
-            };
-            EbDataTable dt = DataDB.DoQuery(query, parameters);
-
-            return Convert.ToInt32(dt?.Rows[0][0]);
-        }
-
-        public void UpdateLog()
-        {
-            DbParameter[] _dbparameters = new DbParameter[]
-                       {
-                            DataDB.GetNewParameter("id", EbDbTypes.Int32, LogMasterId),
-                            DataDB.GetNewParameter("refid", EbDbTypes.String, this.RefId),
-                            DataDB.GetNewParameter("message", EbDbTypes.String, this.ApiResponse.Message.Description),
-                            DataDB.GetNewParameter("status", EbDbTypes.String, this.ApiResponse.Message.Status),
-                            DataDB.GetNewParameter("params", EbDbTypes.Json, JsonConvert.SerializeObject(this.GlobalParams)),
-                            DataDB.GetNewParameter("result", EbDbTypes.Json, JsonConvert.SerializeObject(this.ApiResponse.Result))
-                       };
-
-            this.DataDB.DoNonQuery("UPDATE eb_api_logs_master SET refid = :refid, params = :params, status = :status, message = :message, result =:result WHERE id = :id;", _dbparameters);
-
-        }
+       
 
         public EbApi()
         {
@@ -1283,7 +1231,7 @@ namespace ExpressBase.Objects
                 }
 
                 var paramMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(MapppingJson);
- 
+
                 TransactionConnection = Api.DataDB.GetNewConnection();
                 TransactionConnection.Open();
                 transaction = TransactionConnection.BeginTransaction();
@@ -1306,7 +1254,7 @@ namespace ExpressBase.Objects
 
                 if (statuses.Count > 0)
                 {
-                    this.Result = statuses;
+                    this.Result = statuses.Count + " rows processed";
 
                     Api.ApiResponse.Message.Description = statuses.Count + " row inserted";
                     return true;
