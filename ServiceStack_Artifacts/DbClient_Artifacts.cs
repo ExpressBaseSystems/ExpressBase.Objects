@@ -187,6 +187,41 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public DBOperations Type { get; set; }
     }
 
+    [DataContract]
+    public class DbClientCreateFunctionRequest : IReturn<DbClientCreateFunctionResponse>
+    {
+        [DataMember(Order = 1)]
+        public string FunctionName { get; set; }
+
+        [DataMember(Order = 2)]
+        public string FunctionCode { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public bool IsAdminOwn { get; set; }
+    }
+
+
+    [DataContract]
+    public class DbClientCreateFunctionResponse
+    {
+        [DataMember(Order = 1)]
+        public int Result { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public string FunctionName { get; set; }
+
+        [DataMember(Order = 4)]
+        public DBOperations Type { get; set; }
+    }
+
+
+
 
     [DataContract]
     public class DbClientDropRequest
@@ -312,6 +347,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public string FunctionQuery { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ArgumentTypes { get; set; } // <- Add this
     }
 
     //public class MyColumnCollection: List<MyColumn>
