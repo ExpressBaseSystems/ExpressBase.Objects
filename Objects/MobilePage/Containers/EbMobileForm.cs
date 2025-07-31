@@ -80,6 +80,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Rendering")]
+        public bool UsePdfViewer { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Rendering")]
         public bool AutoSyncOnLoad { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]

@@ -431,7 +431,7 @@ namespace ExpressBase.Objects
             string stVal = Convert.ToString(cField.Value);
             if (Vals.ContainsKey(stVal))
             {
-                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{Vals[stVal]}, #{Pos}: Duplicate value in unique column '{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}'";
+                string msg = $"Error in Grid '{_table.Title ?? _table.ContainerName}' Row#{Vals[stVal]}, #{Pos}: Duplicate value in unique column '{(_column.Control as EbDGColumn).Title ?? _column.Control.Name}': {stVal}";
                 msg += $" {(WebForm == MasterForm ? "" : "(DataPusher)")} {(_column.Control.Hidden ? "[Hidden]" : "")}";
                 throw new FormException(msg, (int)HttpStatusCode.BadRequest, msg, "EbWebFormCollection -> ExecUniqueCheck");
             }
