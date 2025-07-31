@@ -59,7 +59,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Param> Params { set; get; }
     }
 
-    [DataContract]
+
+    public class InsertLogRequest : EbServiceStackNoAuthRequest, IReturn<InsertLogResponse>
+    {
+        public string Version { set; get; }
+
+        public string Name { set; get; }
+
+        public string RefId { set; get; }
+
+        public string Parameters { get; set; }
+
+        public string Message { get; set; }
+
+        public string Status { get; set; }
+
+        public string Result { get; set; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+    }
+
+    public class InsertLogResponse : IEbSSResponse
+    {
+        public int Id { get; set; }
+
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class ApiRequest : EbServiceStackNoAuthRequest, IReturn<ApiResponse>
     {
         [DataMember(Order = 1)]

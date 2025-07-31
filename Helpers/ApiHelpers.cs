@@ -32,8 +32,13 @@ namespace ExpressBase.Common.Helpers
 
         public static T GetEbObject<T>(int ObjId, IRedisClient Redis, IDatabase ObjectsDB)
         {
+            T ebObject = default;
             List<EbObjectWrapper> wrap = EbObjectsHelper.GetLiveVersion(ObjectsDB, ObjId);
-            T ebObject = EbSerializers.Json_Deserialize<T>(wrap[0].Json);
+
+            if (wrap != null && wrap.Count > 0 && wrap[0]?.Json != null)
+            {
+                ebObject = EbSerializers.Json_Deserialize<T>(wrap[0].Json);
+            }
             return ebObject;
         }
 
@@ -186,5 +191,66 @@ namespace ExpressBase.Common.Helpers
 
             return res.Result;
         }
+        public static int InsertLog(string name, string version, string refid, IDatabase dataDB, int type)
+        {
+            string query = @" 
+                        INSERT INTO 
+                            eb_api_logs_master(refid, name, version, type, eb_created_at) 
+                        VALUES
+                            (:refid, :name, :version, :type, NOW()) 
+                        RETURNING id;";
+            DbParameter[] parameters = new DbParameter[] {
+                            dataDB.GetNewParameter("name", EbDbTypes.String, name ?? "") ,
+                            dataDB.GetNewParameter("version", EbDbTypes.String, version ??"") ,
+                            dataDB.GetNewParameter("refid", EbDbTypes.String, refid ?? "") ,
+                            dataDB.GetNewParameter("type", EbDbTypes.Int32, type)
+                        };
+            EbDataTable dt = dataDB.DoQuery(query, parameters);
+
+            return Convert.ToInt32(dt?.Rows[0][0]);
+        }
+
+        //public int InsertLinesLog(string status, string source)
+        //{
+        //    string query = @"
+        //                INSERT INTO
+        //                    eb_api_logs_lines(eb_api_logs_master_id, source, status, , eb_created_by, eb_created_at)
+        //                VALUES
+        //                    (:eb_api_logs_master_id, :source, :status, , :eb_created_by, NOW())
+        //                RETURNING id;";
+        //    DbParameter[] parameters = new DbParameter[]
+        //    {
+        //        DataDB.GetNewParameter(":eb_api_logs_master_id", EbDbTypes.Int32, this.LogMasterId),
+        //        DataDB.GetNewParameter("source", EbDbTypes.Int32, source),
+        //        DataDB.GetNewParameter("status", EbDbTypes.String, status),
+        //        DataDB.GetNewParameter("eb_created_by", EbDbTypes.Int32, this.UserObject.UserId),
+        //    };
+        //    EbDataTable dt = DataDB.DoQuery(query, parameters);
+
+        //    return Convert.ToInt32(dt?.Rows[0][0]);
+        //}
+
+        public static void UpdateLog(IDatabase dataDB, int logMasterId, string message, string status, string _params, string result, int userId)
+        {
+            string query = @"UPDATE 
+                                        eb_api_logs_master
+                                    SET 
+                                        params = :params, status = :status, message = :message,
+                                        result =:result, eb_created_by = :eb_created_by, eb_updated_at = NOW()
+                                    WHERE 
+                                        id = :id;";
+            DbParameter[] _dbparameters = new DbParameter[]
+                       {
+                            dataDB.GetNewParameter("id", EbDbTypes.Int32, logMasterId),
+                            dataDB.GetNewParameter("message", EbDbTypes.String, message),
+                            dataDB.GetNewParameter("status", EbDbTypes.String, status),
+                            dataDB.GetNewParameter("params", EbDbTypes.Json, _params),
+                            dataDB.GetNewParameter("result", EbDbTypes.Json, result),
+                            dataDB.GetNewParameter("eb_created_by", EbDbTypes.Int32, userId)
+                       };
+
+            dataDB.DoNonQuery(query, _dbparameters);
+        }
+
     }
 }
