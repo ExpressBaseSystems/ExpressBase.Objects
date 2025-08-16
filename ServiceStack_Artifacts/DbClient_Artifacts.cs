@@ -61,6 +61,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
@@ -88,6 +91,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CreatedByUserId { get; set; } // 👈 make sure this is here
+
+
     }
 
     [DataContract]
@@ -107,6 +115,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 6)]
+        public int CreatedByUserId { get; set; }
     }
     [DataContract]
     public class DbClientIndexResponse
@@ -139,6 +150,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 6)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
@@ -173,6 +187,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 7)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
@@ -188,6 +205,55 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class DbClientLogsRequest
+    {
+        [DataMember(Order = 1)]
+        public string SolutionId { get; set; } // optional
+
+        [DataMember(Order = 2)]
+        public string TableName { get; set; } // optional, if you want table-specific logs
+
+        [DataMember(Order = 3)]
+        public int? CreatedByUserId { get; set; } // optional filter
+
+        [DataMember(Order = 4)]
+        public bool IsAdminOwn { get; set; } // if needed for authorization
+    }
+
+    [DataContract]
+    public class DbClientLogsResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Query { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Type { get; set; }
+
+        // New: human-readable rows affected
+        [DataMember(Order = 4)]
+        public string RowsResult { get; set; }
+
+        [DataMember(Order = 5)]
+        public string SolutionId { get; set; }
+
+        // New: user name instead of ID
+        [DataMember(Order = 6)]
+        public string CreatedByName { get; set; }
+
+        [DataMember(Order = 7)]
+        public DateTime CreatedAt { get; set; }
+
+        // Optional: textual response from PostgreSQL
+        [DataMember(Order = 8)]
+        public string ResponseMessage { get; set; }
+    }
+
+
+
+    [DataContract]
     public class DbClientCreateFunctionRequest : IReturn<DbClientCreateFunctionResponse>
     {
         [DataMember(Order = 1)]
@@ -201,6 +267,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 5)]
+        public int CreatedByUserId { get; set; }
     }
 
 
@@ -234,6 +303,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
@@ -247,6 +319,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
@@ -260,6 +335,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
@@ -273,6 +351,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
@@ -286,6 +367,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ClientSolnid { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CreatedByUserId { get; set; }
     }
 
     [DataContract]
