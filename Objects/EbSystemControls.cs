@@ -400,6 +400,7 @@ else
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+        public override bool IgnoreDataConsistencyCheck { get; set; }
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
@@ -614,6 +615,7 @@ else
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+        public override bool IgnoreDataConsistencyCheck { get; set; }
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
@@ -779,6 +781,7 @@ else
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+        public override bool IgnoreDataConsistencyCheck { get; set; }
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
@@ -957,6 +960,7 @@ else
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+        public override bool IgnoreDataConsistencyCheck { get; set; }
         public override EbScript HiddenExpr { get => base.HiddenExpr; set => base.HiddenExpr = value; }
         public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }

@@ -23,6 +23,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbScript ValueExpr { get; set; }
 
+        public override bool IgnoreDataConsistencyCheck { get; set; }
+
         public override bool SelfTrigger { get; set; }
 
         [HideInPropertyGrid]
@@ -186,7 +188,7 @@ namespace ExpressBase.Objects
             else
                 Qry = DataDB.EB_GET_SELECT_FILE_UPLOADER_CXT_SEC.Replace("@Name@", this.Name ?? this.EbSid);
 
-            return Qry;      
+            return Qry;
         }
     }
 }

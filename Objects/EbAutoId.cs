@@ -39,6 +39,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbScript ValueExpr { get; set; }
 
+        public override bool IgnoreDataConsistencyCheck { get; set; }
+
         public override bool SelfTrigger { get; set; }
 
         [HideInPropertyGrid]
