@@ -185,7 +185,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbDbExplorerTablesDict()
         {
             this.TableCollection = new Dictionary<string, EbDbExplorerTable>();
-            this.FunctionCollection = new List<EbDbExplorerFunctions>();
+            this.FunctionCollection = new List<EbDbExplorerFunctions>(); 
         }        
     }
 
