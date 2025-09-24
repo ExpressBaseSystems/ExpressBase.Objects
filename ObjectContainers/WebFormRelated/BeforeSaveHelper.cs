@@ -417,6 +417,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException("Set 'Destination Form' for Export Button - " + _ctrl.Label ?? _ctrl.Name);
                     }
                 }
+                else if (Allctrls[i] is EbButtonPublicFormAttach _EbButtonPublicFormAttach)
+                {
+                    if (string.IsNullOrWhiteSpace(_EbButtonPublicFormAttach.PublicFormId))
+                    {
+                        throw new FormException("Set a PublicFormId for the Public Form Attach Button " + _EbButtonPublicFormAttach.Label ?? _EbButtonPublicFormAttach.Name);
+                    }
+                }
 
                 //--------------------------
                 if (Allctrls[i] is EbDynamicCardSet)
