@@ -12,6 +12,7 @@ using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
+using ExpressBase.Common.WebApi.RequestNResponse;
 using ExpressBase.CoreBase.Globals;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects;
@@ -625,6 +626,8 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbStaticFileClient FileClient { get; set; }
 
+        public EbStaticFileClient2 FileClient2 { get; set; }
+
         [JsonIgnore]
         public float RowHeight { get; set; }
 
@@ -679,12 +682,12 @@ namespace ExpressBase.Objects
         public dynamic GetDataFieldValue(string columnName, int iterator, int tableIndex)
         {
             dynamic value = "";
-            if (DataSet == null||tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
+            if (DataSet == null || tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
                 return value;
-            
+
             EbDataTable table = DataSet.Tables[tableIndex];
 
-            if (!table.Columns.Contains(columnName)||table.Rows.Count == 0)
+            if (!table.Columns.Contains(columnName) || table.Rows.Count == 0)
                 return value;
 
             int rowIndex = (table.Rows.Count > 1) ? iterator : 0;
@@ -1450,17 +1453,31 @@ namespace ExpressBase.Objects
                     }
                 }
 
-                if (ImgBytes.Length == 0 && !string.IsNullOrEmpty(FileClient?.BearerToken))
+                if (ImgBytes.Length == 0)
                 {
-                    DownloadFileResponse response = FileClient.Get(new DownloadImageByIdRequest
+                    MemoryStream stream = null;
+                    ImageMeta imageMeta = new ImageMeta
                     {
-                        ImageInfo = new ImageMeta
+                        FileRefId = refId,
+                        FileCategory = Common.Enums.EbFileCategory.Images,
+                        FileName = refId.ToString()
+                    };
+
+                    if (this.Solution.SolutionSettings.EnableNewFileServer)
+                    {
+                        DownloadFileResponse2 response = this.FileClient2.DownloadFile(imageMeta, "/download/image", this.Solution.SolutionID, 0, null, ImageQuality.original, true);
+
+                        stream = new MemoryStream(response?.FileBytes);
+                    }
+                    else if (!string.IsNullOrEmpty(FileClient?.BearerToken))
+                    {
+                        DownloadFileResponse response = FileClient.Get(new DownloadImageByIdRequest
                         {
-                            FileRefId = refId,
-                            FileCategory = Common.Enums.EbFileCategory.Images
-                        }
-                    });
-                    MemoryStream stream = response?.StreamWrapper?.Memorystream;
+                            ImageInfo = imageMeta
+                        });
+                        stream = response?.StreamWrapper?.Memorystream;
+                    }
+
                     if (stream != null)
                     {
                         stream.Position = 0;
@@ -1470,6 +1487,7 @@ namespace ExpressBase.Objects
                             Redis.Set(key, ImgBytes);
                     }
                 }
+
 
                 ImageCollection.Add(refId, ImgBytes);
             }
@@ -1772,7 +1790,7 @@ namespace ExpressBase.Objects
                 this.DrawPageHeader();
                 this.HandleEmptyDetailsection();
                 this.detailEnd += 30;
-                this.DrawPageFooter();  
+                this.DrawPageFooter();
             }
 
             if (ReportFooterHeightRepeatAsPf != ReportFooterHeight)
@@ -1799,8 +1817,8 @@ namespace ExpressBase.Objects
         public void HandleEmptyDetailsection()
         {
             ColumnText ct = new ColumnText(this.Canvas);
-            Phrase phrase; 
-                phrase = new Phrase("No rows available.");
+            Phrase phrase;
+            phrase = new Phrase("No rows available.");
 
             phrase.Font.Size = 10;
             float y = this.HeightPt - (this.ReportHeaderHeight + this.Margin.Top + this.PageHeaderHeight);

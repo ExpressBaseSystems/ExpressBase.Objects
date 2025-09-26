@@ -31,6 +31,8 @@ namespace ExpressBase.Objects.Services
 
         protected EbStaticFileClient FileClient { get; private set; }
 
+        protected EbStaticFileClient2 FileClient2 { get; private set; }
+
         protected PooledRedisClientManager PooledRedisManager { get; private set; }
 
         protected EbConnectionFactory InfraConnectionFactory
@@ -80,7 +82,7 @@ namespace ExpressBase.Objects.Services
             this.MessageProducer3 = _mqp as RabbitMqProducer;
         } 
 
-        public EbMqBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc, IServiceClient _ssclient, IEbServerEventClient _sec, PooledRedisClientManager pooledRedisManager)
+        public EbMqBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc, IServiceClient _ssclient, IEbServerEventClient _sec, PooledRedisClientManager pooledRedisManager, EbStaticFileClient2 staticFileClient2)
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.FileClient = _sfc as EbStaticFileClient;
@@ -89,6 +91,7 @@ namespace ExpressBase.Objects.Services
             this.ServiceStackClient = _ssclient as JsonServiceClient;
             this.ServerEventClient = _sec as EbServerEventClient;
             this.PooledRedisManager = pooledRedisManager;
+            this.FileClient2 = staticFileClient2;
         }
 
         public EbMqBaseService(IEbConnectionFactory _dbf, IServiceClient _ssclient)

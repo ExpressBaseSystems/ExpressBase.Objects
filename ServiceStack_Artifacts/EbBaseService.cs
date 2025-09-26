@@ -47,6 +47,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         protected EbStaticFileClient FileClient { get; private set; }
 
+        protected EbStaticFileClient2 FileClient2 { get; private set; }
+
         protected PooledRedisClientManager PooledRedisManager { get; private set; }
 
         protected EbConnectionFactory InfraConnectionFactory
@@ -193,13 +195,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
         }
 
-        public EbBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc, PooledRedisClientManager pooledRedisManager)
+        public EbBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc, PooledRedisClientManager pooledRedisManager, EbStaticFileClient2 _sfc2)
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.FileClient = _sfc as EbStaticFileClient;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
             this.PooledRedisManager = pooledRedisManager;
+            this.FileClient2 = _sfc2;
         }
 
         private static Dictionary<string, string> _infraDbSqlQueries;
