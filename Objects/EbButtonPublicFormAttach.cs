@@ -25,14 +25,15 @@ namespace ExpressBase.Objects.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override string ToolIconHtml { get { return "<i class='fa fa-external-link'></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class='fa fa-link'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Att. Pub. Form"; } set { } }
+        public override string ToolNameAlias { get { return "Attach P Form"; } set { } }
 
-        public override string ToolHelpText { get { return "Attach Public Form"; } set { } }
+        public override string ToolHelpText { get { return "Attach a Public Form"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
+        [Alias("Disable in Edit Mode")]
         public bool DisableInEditMode { get; set; }
 
         [JsonIgnore]
