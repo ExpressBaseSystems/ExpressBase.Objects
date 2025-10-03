@@ -368,6 +368,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public string EditReasonCtrl { get; set; }
 
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Make Form Public")]
+        [HelpText("Makes the form publicly available")]
+        public bool IsPublicForm { get; set; }
+
         public EbWebForm ShallowCopy()
         {
             return (EbWebForm)this.MemberwiseClone();
