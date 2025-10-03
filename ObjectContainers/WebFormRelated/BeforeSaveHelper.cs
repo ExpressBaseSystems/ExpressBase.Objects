@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Helpers;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
@@ -421,7 +422,41 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 {
                     if (string.IsNullOrWhiteSpace(_EbButtonPublicFormAttach.PublicFormId))
                     {
-                        throw new FormException("Set a PublicFormId for the Public Form Attach Button " + _EbButtonPublicFormAttach.Label ?? _EbButtonPublicFormAttach.Name);
+                        throw new FormException(
+                            $"Please set a PublicFormId for the {Allctrls[i].ToolNameAlias} control: " +
+                            $"{_EbButtonPublicFormAttach.Label ?? _EbButtonPublicFormAttach.Name}"
+                        );
+
+
+                    }
+                    else
+                    {
+                        try
+                        {
+
+                            EbWebForm publicWebFormObject =
+                            EbApiHelper.GetEbObject<EbWebForm>(_EbButtonPublicFormAttach.PublicFormId, redis, null); // TODO: find a way to pass DB object
+
+                            if (publicWebFormObject == null || publicWebFormObject.IsPublicForm == false)
+                            {
+                                throw new FormException(
+                                    $"The form with ref_id {_EbButtonPublicFormAttach.PublicFormId} " +
+                                    $"attached to {Allctrls[i].ToolNameAlias} control: " +
+                                    $"{_EbButtonPublicFormAttach.Label ?? _EbButtonPublicFormAttach.Name} " +
+                                    "is not a public form."
+                                );
+
+                            }
+
+                        }
+                        catch(Exception exception)
+                        {
+                            throw new FormException(
+                                    $"Unable to find the form with ref_id {_EbButtonPublicFormAttach.PublicFormId} " +
+                                    $"attached to {Allctrls[i].ToolNameAlias} control: " +
+                                    $"{_EbButtonPublicFormAttach.Label ?? _EbButtonPublicFormAttach.Name}"
+                                );
+                        }
                     }
                 }
 
