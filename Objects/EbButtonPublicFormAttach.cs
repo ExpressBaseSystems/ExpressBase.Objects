@@ -76,12 +76,66 @@ namespace ExpressBase.Objects.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbButtonPublicFromAttachFieldMaps> FieldMaps { get; set; }
 
+        //--------Hide in property grid------------
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        public override bool SelfTrigger { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get { return true; } set { } }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Required { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelBackColor { get; set; } = "#1E90FF"; // DodgerBlue
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelForeColor { get; set; } = "#FFFFFF"; // White
+
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("#0f43d6")]
+        public override string BackColor { get; set; } = "#1E90FF"; // DodgerBlue
+
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override string Label { get; set; } = "Attach a Public Form";
+
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("#ffffff")]
+        public override string ForeColor { get; set; } = "#FFFFFF"; // White text
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override string HelpText { get; set; }
+
 
         public override string GetBareHtml()
         {
-            return @"<div id='@ebsid@' disabled='disabled' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor'><span>@Label@ </span><i class='fa fa-external-link'></i></div>"
+            return @"<div id='@ebsid@' disabled='disabled' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor'><span>@Label@ </span><i class='fa fa-link'></i></div>"
                 .Replace("@ebsid@", this.EbSid_CtxId)
-                .Replace("@Label@", this.Label ?? "Export")
+                .Replace("@Label@", this.Label ?? "Attach a Public Form")
                 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
                 .Replace("@backColor", "background-color:" + this.BackColor + ";")
                 .Replace("@foreColor", "color:" + this.ForeColor + ";");
@@ -117,56 +171,7 @@ namespace ExpressBase.Objects.Objects
             };
         }
 
-        //--------Hide in property grid------------
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override bool Unique { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override List<EbValidator> Validators { get; set; }
-
-        public override bool SelfTrigger { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override bool DoNotPersist { get { return true; } set { } }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override bool Required { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override string LabelBackColor { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override string LabelForeColor { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbScript OnChangeFn { get; set; }
-
-
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [DefaultPropValue("#0f43d6")]
-        public override string BackColor { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        public override string Label { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [DefaultPropValue("#ffffff")]
-        public override string ForeColor { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        public override bool IsDisable { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        public override string HelpText { get; set; }
+        
 
     }
 }
