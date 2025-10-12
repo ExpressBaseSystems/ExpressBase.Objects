@@ -38,7 +38,7 @@ namespace ExpressBase.Objects.Dtos
 
             if(expireInDays > 0 || expireInHours > 0 || expireInMinutes > 0)
             {
-                FutureDateTime = DateTime.Now
+                FutureDateTime = DateTime.UtcNow
                .AddDays(ExpireInDays)
                .AddHours(ExpireInHours)
                .AddMinutes(ExpireInMinutes);
