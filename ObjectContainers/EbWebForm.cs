@@ -364,6 +364,12 @@ namespace ExpressBase.Objects
         [DefaultPropValue("true")]
         public bool CancelReason { get; set; }
 
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Public Access")]
+        [HelpText("Enable public access to this form.")]
+        public bool IsPublicForm { get; set; }
+
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
         public string EditReasonCtrl { get; set; }
