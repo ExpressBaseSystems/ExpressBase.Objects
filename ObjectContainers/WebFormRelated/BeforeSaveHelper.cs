@@ -417,6 +417,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException("Set 'Destination Form' for Export Button - " + _ctrl.Label ?? _ctrl.Name);
                     }
                 }
+                else if (Allctrls[i] is EbShortUrlButton _ctrl2)
+                {
+                    if (string.IsNullOrWhiteSpace(_ctrl2.LinkRefId))
+                    {
+                        throw new FormException("Set 'Link RefId' for Short Url Button - " + _ctrl2.Label ?? _ctrl2.Name);
+                    }
+                }
 
                 //--------------------------
                 if (Allctrls[i] is EbDynamicCardSet)

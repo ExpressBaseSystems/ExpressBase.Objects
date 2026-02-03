@@ -334,6 +334,7 @@ namespace ExpressBase.Objects
             }
         }
 
+        //Get EbObject from Redis or ServiceClient
         public static T GetEbObject<T>(string RefId, IServiceClient ServiceClient, IRedisClient Redis, Service Service, PooledRedisClientManager pooledRedisManager = null)
         {
             if (string.IsNullOrEmpty(RefId))
@@ -1256,6 +1257,7 @@ VALUES({Code}, '{Title}', '{Message}', {SourceId}, {SourceVerId}, {UserId}, {Dat
     {
         public string RefId { get; set; }
         public int RenderMode { get; set; }
+        public long TinyUrlId { get; set; }
         public int RowId { get; set; }
         public int DraftId { get; set; }
         public string DraftInfo { get; set; }
