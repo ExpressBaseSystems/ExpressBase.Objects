@@ -710,11 +710,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 {
                     foreach (Param _p in DG.ParamsList)
                     {
-                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
-                        if (item.Value != null)
+                        EbControl item = Allctrls.FirstOrDefault(e => !(e is EbControlContainer) && e.Name == _p.Name);
+                        if (item != null)
                         {
-                            if (item.Key != i)
-                                item.Value.Control.DrDependents.Add("form." + Allctrls[i].Name);
+                            item.DrDependents.Add("form." + Allctrls[i].Name);
                         }
                         else if (!EbFormHelper.IsExtraSqlParam(_p.Name, _Form.TableName) && _p.Name != Allctrls[i].Name)
                             throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {Allctrls[i].Name}(DataGrid)");
