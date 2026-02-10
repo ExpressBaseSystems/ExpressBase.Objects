@@ -1,20 +1,25 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Enums;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Security;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.WebFormRelated;
+using ExpressBase.CoreBase.Globals;
+using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Objects.WebFormRelated;
 using ExpressBase.Security;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Npgsql;
 using ServiceStack;
 using ServiceStack.RabbitMq;
 using ServiceStack.Redis;
@@ -23,14 +28,9 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
-using ExpressBase.Common.Constants;
-using ExpressBase.CoreBase.Globals;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
-using ExpressBase.Common.Security;
-using Npgsql;
-using ExpressBase.Objects.Helpers;
 
 namespace ExpressBase.Objects
 {
@@ -513,7 +513,6 @@ namespace ExpressBase.Objects
             DataSourceDataSetResponse response = Service.Gateway.Send<DataSourceDataSetResponse>(new DataSourceDataSetRequest { RefId = _dg.DataSourceId, Params = Param });
 
             SingleTable Table = new SingleTable();
-            Dictionary<EbDGPowerSelectColumn, string> psDict = new Dictionary<EbDGPowerSelectColumn, string>();
 
             int rowCounter = -501;
             if (response.DataSet.Tables.Count > 0)
@@ -534,16 +533,6 @@ namespace ExpressBase.Objects
                         if (dc != null && !_row.IsDBNull(dc.ColumnIndex))
                         {
                             string _formattedData = Convert.ToString(_row[dc.ColumnIndex]);
-                            if (_column.Control is EbDGPowerSelectColumn)
-                            {
-                                if (!string.IsNullOrEmpty(_formattedData))
-                                {
-                                    if (!psDict.ContainsKey(_column.Control as EbDGPowerSelectColumn))
-                                        psDict.Add(_column.Control as EbDGPowerSelectColumn, _formattedData);
-                                    else
-                                        psDict[_column.Control as EbDGPowerSelectColumn] += CharConstants.COMMA + _formattedData;
-                                }
-                            }
                             Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, _formattedData, false));
                         }
                         else
@@ -555,35 +544,15 @@ namespace ExpressBase.Objects
             }
             this.FormData.MultipleTables.Add(_dg.TableName, Table);
 
-            Dictionary<string, string> QrsDict = new Dictionary<string, string>();
-            List<DbParameter> param = new List<DbParameter>();
-            foreach (Param _p in Param)
-                param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
+            List<EbControl> drPsList = _sc.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control).ToList();
 
-            foreach (KeyValuePair<EbDGPowerSelectColumn, string> psItem in psDict)
+            if (drPsList.Count > 0)
             {
-                string t = psItem.Key.GetSelectQuery(DataDB, Service, psItem.Value);
-                QrsDict.Add(psItem.Key.EbSid, t);
-                foreach (Param _p in psItem.Key.ParamsList)
-                {
-                    if (!param.Exists(e => e.ParameterName == _p.Name))
-                        param.Add(DataDB.GetNewParameter(_p.Name, (EbDbTypes)Convert.ToInt16(_p.Type), _p.Value));
-                }
+                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, this.FormData, Service);
+                dmHelper.UpdatePsDm_Tables();
             }
-            if (QrsDict.Count > 0)
-            {
-                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
 
-                EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
-                int i = 0;
-                foreach (KeyValuePair<string, string> item in QrsDict)
-                {
-                    SingleTable Tbl = new SingleTable();
-                    this.GetFormattedData(dataset.Tables[i++], Tbl);
-                    this.FormData.PsDm_Tables.Add(item.Key, Tbl);
-                }
-                this.PostFormatFormData(this.FormData);
-            }
+            this.PostFormatFormData(this.FormData, true);
         }
 
         //COPY this TO FormDes(Destination)
@@ -627,51 +596,41 @@ namespace ExpressBase.Objects
                 }
             }
 
-            Dictionary<EbControl, string> psDict = new Dictionary<EbControl, string>();
-            List<DbParameter> psParams = new List<DbParameter>();
-
             if (_PsApiTables == null)
-                EbFormHelper.CopyFormDataToFormData(DataDB, this, FormDes, psDict, psParams, copyAutoId, srcCtrl);
+                EbFormHelper.CopyFormDataToFormData(DataDB, this, FormDes, copyAutoId, srcCtrl);
             else
-                EbFormHelper.CopyApiDataToFormData(DataDB, _PsApiTables, FormDes, psDict, psParams);
+                EbFormHelper.CopyApiDataToFormData(DataDB, _PsApiTables, FormDes);
 
-            Dictionary<string, string> psQrsDict = new Dictionary<string, string>();
+            this.GetAllPsDisplayMember(Service, FormDes);
+        }
+
+        //Fetch the display member for all power select controls (PowerSelect, DGPowerSelect with StrictSelect) - both api and non api and update formdata
+        private void GetAllPsDisplayMember(Service Service, EbWebForm webForm)
+        {
+            List<EbControl> drPsList = new List<EbControl>();
             List<EbControl> apiPsList = new List<EbControl>();
-            foreach (KeyValuePair<EbControl, string> psItem in psDict)
+            foreach (TableSchema Tbl in webForm.FormSchema.Tables)
             {
-                IEbPowerSelect IPwrSel = psItem.Key as IEbPowerSelect;
-                if (IPwrSel.IsDataFromApi)
-                    apiPsList.Add(psItem.Key);
+                drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+                apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+            }
+
+            if (drPsList.Count > 0)
+            {
+                PsDmHelper dmHelper = new PsDmHelper(webForm, drPsList, webForm.FormData, Service);
+                dmHelper.UpdatePsDm_Tables();
+            }
+
+            foreach (EbControl Ctrl in apiPsList)
+            {
+                Dictionary<string, SingleTable> Tables = EbFormHelper.GetDataFormApi(Service, Ctrl, this, webForm.FormData, false);
+                if (Tables.Count > 0)
+                    webForm.FormData.PsDm_Tables.Add(Ctrl.EbSid, Tables.ElementAt(0).Value);
                 else
-                {
-                    string t = IPwrSel.GetSelectQuery(DataDB, Service, psItem.Value);
-                    psQrsDict.Add(psItem.Key.EbSid, t);
-                }
+                    webForm.FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
             }
-            if (psDict.Count > 0)
-            {
-                if (psQrsDict.Count > 0)
-                {
-                    EbFormHelper.AddExtraSqlParams(psParams, DataDB, FormDes.TableName, 0, this.LocationId, this.UserObj.UserId);
-                    EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, psQrsDict.Select(d => d.Value)), psParams.ToArray());
-                    int i = 0;
-                    foreach (KeyValuePair<string, string> item in psQrsDict)
-                    {
-                        SingleTable Tbl = new SingleTable();
-                        FormDes.GetFormattedData(dataset.Tables[i++], Tbl);
-                        FormDes.FormData.PsDm_Tables.Add(item.Key, Tbl);
-                    }
-                }
-                foreach (EbControl Ctrl in apiPsList)
-                {
-                    Dictionary<string, SingleTable> Tables = EbFormHelper.GetDataFormApi(Service, Ctrl, this, FormDes.FormData, false);
-                    if (Tables.Count > 0)
-                        FormDes.FormData.PsDm_Tables.Add(Ctrl.EbSid, Tables.ElementAt(0).Value);
-                    else
-                        FormDes.FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
-                }
-                FormDes.PostFormatFormData(FormDes.FormData);
-            }
+
+            webForm.PostFormatFormData(webForm.FormData, true);
         }
 
         //public WebformData GetDynamicGridData(IDatabase DataDB, Service Service, string SrcId, string[] Target)
@@ -2387,7 +2346,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 int afterSaveStat = this.AfterSave(DataDB, IsUpdate);
                 resp += " - AfterSave: " + afterSaveStat;
-                if (this.RefreshDataAfterSave && afterSaveStat > 0)
+                if (this.RefreshDataAfterSave && afterSaveStat > 0)//for mobile, can be refresh avoided?
                     this.RefreshFormData(DataDB, service, false, true);
                 this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection, IsMobInsert);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();

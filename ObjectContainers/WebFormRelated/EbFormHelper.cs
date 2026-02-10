@@ -334,7 +334,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        //Get EbObject from Redis or ServiceClient
+        //Get EbObject from Redis or ServiceClient////
         public static T GetEbObject<T>(string RefId, IServiceClient ServiceClient, IRedisClient Redis, Service Service, PooledRedisClientManager pooledRedisManager = null)
         {
             if (string.IsNullOrEmpty(RefId))
@@ -545,7 +545,7 @@ namespace ExpressBase.Objects
         }
 
         //Copy FormData in form SOURCE to DESTINATION (Different form)
-        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams, bool CopyAutoId, string srcCtrl)
+        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, bool CopyAutoId, string srcCtrl)
         {
             List<DataFlowMapAbstract> DataFlowMap = null;
             bool ExportMapedDataOnly = false;
@@ -584,23 +584,6 @@ namespace ExpressBase.Objects
                                 {
                                     if (!_columnDes.Control.DoNotImport)
                                         RowDes.SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
-                                    string _formattedData = Convert.ToString(RowDes[_columnDes.ColumnName]);
-                                    if (_columnDes.Control is EbDGPowerSelectColumn && !string.IsNullOrEmpty(_formattedData))
-                                    {
-                                        if (psDict.ContainsKey(_columnDes.Control))
-                                            psDict[_columnDes.Control] += CharConstants.COMMA + _formattedData;
-                                        else
-                                            psDict.Add(_columnDes.Control, _formattedData);
-                                    }
-                                    try//temporary solution to avoid exception : 1$$text 
-                                    {
-                                        if (!psParams.Exists(e => e.ParameterName == _columnDes.ColumnName))
-                                            psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
-                                    }
                                 }
                             }
                             FormDes.FormData.MultipleTables[_tableDes.TableName].Add(RowDes);
@@ -612,7 +595,6 @@ namespace ExpressBase.Objects
                     SingleTable TableDes = FormDes.FormData.MultipleTables[_tableDes.TableName];
                     if (TableDes.Count > 0)
                     {
-                        string _formattedData;
                         SingleColumn ColumnSrc;
                         bool mustCopy;
                         foreach (ColumnSchema _columnDes in _tableDes.Columns)
@@ -642,28 +624,11 @@ namespace ExpressBase.Objects
                             if (mustCopy)
                             {
                                 TableDes[0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
-                                _formattedData = Convert.ToString(ColumnSrc.Value);
+
                                 if (ColumnSrc.Control is EbSimpleFileUploader && _columnDes.Control is EbSimpleFileUploader)
                                 {
                                     TableDes[0].GetColumn(_columnDes.ColumnName).F = ColumnSrc.F;
                                 }
-                            }
-                            else
-                                _formattedData = Convert.ToString(TableDes[0][_columnDes.ColumnName]);
-                            if (_columnDes.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
-                            {
-                                if (psDict.ContainsKey(_columnDes.Control))
-                                    psDict[_columnDes.Control] += CharConstants.COMMA + _formattedData;
-                                else
-                                    psDict.Add(_columnDes.Control, _formattedData);
-                            }
-                            try//temporary solution to avoid exception : 1$$text 
-                            {
-                                psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
                             }
                         }
                     }
@@ -672,7 +637,7 @@ namespace ExpressBase.Objects
         }
 
         //Copy API data to DESTINATION
-        public static void CopyApiDataToFormData(IDatabase DataDB, Dictionary<string, SingleTable> _PsApiTables, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams)
+        public static void CopyApiDataToFormData(IDatabase DataDB, Dictionary<string, SingleTable> _PsApiTables, EbWebForm FormDes)
         {
             if (_PsApiTables.Count == 0)
                 return;
@@ -686,26 +651,9 @@ namespace ExpressBase.Objects
                     foreach (ColumnSchema _column in _table.Columns)
                     {
                         SingleColumn ColumnSrc = _PsApiTables[FormDes.Name][0].GetColumn(_column.ColumnName);
-                        string _formattedData = Convert.ToString(entry.Value[0][_column.ColumnName]);
                         if (ColumnSrc != null && !(_column.Control is EbAutoId) && (!_column.Control.IsSysControl || _column.Control is EbSysLocation))
                         {
                             entry.Value[0].SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
-                            _formattedData = Convert.ToString(ColumnSrc.Value);
-                        }
-                        if (_column.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
-                        {
-                            if (psDict.ContainsKey(_column.Control))
-                                psDict[_column.Control] += CharConstants.COMMA + _formattedData;
-                            else
-                                psDict.Add(_column.Control, _formattedData);
-                        }
-                        try//temporary solution to avoid exception : 1$$text 
-                        {
-                            psParams.Add(DataDB.GetNewParameter(_column.ColumnName, (EbDbTypes)_column.EbDbType, _formattedData));
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Exception catched: WebForm -> FormatImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
                         }
                     }
                 }
@@ -723,14 +671,6 @@ namespace ExpressBase.Objects
                             if (ColumnSrc != null)
                             {
                                 RowDes.SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
-                                string _formattedData = Convert.ToString(ColumnSrc.Value);
-                                if (_column.Control is EbDGPowerSelectColumn && !string.IsNullOrEmpty(_formattedData))
-                                {
-                                    if (psDict.ContainsKey(_column.Control))
-                                        psDict[_column.Control] += CharConstants.COMMA + _formattedData;
-                                    else
-                                        psDict.Add(_column.Control, _formattedData);
-                                }
                             }
                         }
                         FormDes.FormData.MultipleTables[_table.TableName].Add(RowDes);
