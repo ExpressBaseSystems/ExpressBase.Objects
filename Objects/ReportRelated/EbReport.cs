@@ -679,12 +679,12 @@ namespace ExpressBase.Objects
         public dynamic GetDataFieldValue(string columnName, int iterator, int tableIndex)
         {
             dynamic value = "";
-            if (DataSet == null||tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
+            if (DataSet == null || tableIndex < 0 || tableIndex >= DataSet.Tables.Count)
                 return value;
-            
+
             EbDataTable table = DataSet.Tables[tableIndex];
 
-            if (!table.Columns.Contains(columnName)||table.Rows.Count == 0)
+            if (!table.Columns.Contains(columnName) || table.Rows.Count == 0)
                 return value;
 
             int rowIndex = (table.Rows.Count > 1) ? iterator : 0;
@@ -1772,7 +1772,7 @@ namespace ExpressBase.Objects
                 this.DrawPageHeader();
                 this.HandleEmptyDetailsection();
                 this.detailEnd += 30;
-                this.DrawPageFooter();  
+                this.DrawPageFooter();
             }
 
             if (ReportFooterHeightRepeatAsPf != ReportFooterHeight)
@@ -1799,8 +1799,8 @@ namespace ExpressBase.Objects
         public void HandleEmptyDetailsection()
         {
             ColumnText ct = new ColumnText(this.Canvas);
-            Phrase phrase; 
-                phrase = new Phrase("No rows available.");
+            Phrase phrase;
+            phrase = new Phrase("No rows available.");
 
             phrase.Font.Size = 10;
             float y = this.HeightPt - (this.ReportHeaderHeight + this.Margin.Top + this.PageHeaderHeight);
@@ -1879,26 +1879,39 @@ namespace ExpressBase.Objects
                 }
             }
 
+            if (Report.ReportObjects != null)
+            {
+                foreach (EbReportField field in Report.ReportObjects)
+                {
+                    CallHideAndLayoutExpressions(Report, field);
+                }
+            }
+        }
+
+        private void CallHideAndLayoutExpressions(EbReport Report, EbReportField field)
+        {
+            if (!String.IsNullOrEmpty(field.HideExpression?.Code))
+            {
+                if (Report.EvaluatorVersion == EvaluatorVersion.Version_1)
+                    Report.ExecuteHideExpressionV1(field);
+                else
+                    Report.ExecuteHideExpressionV2(field);
+            }
+            if (!field.IsHidden && !String.IsNullOrEmpty(field.LayoutExpression?.Code))
+            {
+                if (Report.EvaluatorVersion == EvaluatorVersion.Version_1)
+                    Report.ExecuteLayoutExpressionV1(field);
+                else
+                    Report.ExecuteLayoutExpressionV2(field);
+            }
         }
 
         private void Fill(EbReport Report, List<EbReportField> fields, EbReportSectionType section_typ)
         {
             foreach (EbReportField field in fields)
             {
-                if (!String.IsNullOrEmpty(field.HideExpression?.Code))
-                {
-                    if (Report.EvaluatorVersion == EvaluatorVersion.Version_1)
-                        Report.ExecuteHideExpressionV1(field);
-                    else
-                        Report.ExecuteHideExpressionV2(field);
-                }
-                if (!field.IsHidden && !String.IsNullOrEmpty(field.LayoutExpression?.Code))
-                {
-                    if (Report.EvaluatorVersion == EvaluatorVersion.Version_1)
-                        Report.ExecuteLayoutExpressionV1(field);
-                    else
-                        Report.ExecuteLayoutExpressionV2(field);
-                }
+                CallHideAndLayoutExpressions(Report, field);
+
                 if (field is EbDataField)
                 {
                     EbDataField field_org = field as EbDataField;
