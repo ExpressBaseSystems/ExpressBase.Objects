@@ -150,6 +150,11 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         public string ExecuteBtnText { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [HelpText("if true, Primary role name in ReviewedBy column will be hidden.")]
+        public bool HideReviewedByRole { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-stack-exchange'></i>"; } set { } }
