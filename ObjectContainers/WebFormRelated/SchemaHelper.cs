@@ -28,7 +28,7 @@ namespace ExpressBase.Objects.WebFormRelated
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == curTbl);
             if (_table == null)
             {
-                if (_container is EbReview)
+                if (_container is EbReview rev)
                 {
                     _table = new TableSchema
                     {
@@ -36,7 +36,8 @@ namespace ExpressBase.Objects.WebFormRelated
                         ParentTable = _parentTable,
                         TableType = WebFormTableTypes.Review,
                         Title = _container.Label,
-                        ContainerName = _container.Name
+                        ContainerName = _container.Name,
+                        HideReviewedByRole = rev.HideReviewedByRole
                     };
                     _schema.ExtendedControls.Add(_container);
                 }

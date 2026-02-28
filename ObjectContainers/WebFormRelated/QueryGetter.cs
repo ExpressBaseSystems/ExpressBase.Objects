@@ -97,7 +97,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         _table.TableType == WebFormTableTypes.Grid ? ("ORDER BY " + ebs[SystemColumns.eb_row_num] + (_table.DescOdr ? " DESC" : string.Empty)) : "ORDER BY id",//4
                         _table.TableType == WebFormTableTypes.Review ? SystemColumns.eb_del : ebs[SystemColumns.eb_del],//5
                         _table.TableType == WebFormTableTypes.Review ? "'F'" : ebs.GetBoolFalse(SystemColumns.eb_del),//6
-                        _table.TableType == WebFormTableTypes.Review ? EbReview.GetPrimaryRoleNameQuery() : string.Empty);//7
+                        _table.TableType == WebFormTableTypes.Review && !_table.HideReviewedByRole ? EbReview.GetPrimaryRoleNameQuery() : string.Empty);//7
                 }
                 else
                 {
