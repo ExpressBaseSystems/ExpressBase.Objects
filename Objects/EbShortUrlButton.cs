@@ -161,6 +161,10 @@ namespace ExpressBase.Objects.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
+        public override bool DoNotExport { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override bool ExternalColumn { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]

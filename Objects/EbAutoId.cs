@@ -34,6 +34,8 @@ namespace ExpressBase.Objects
 
         public override bool DoNotImport { get { return true; } }
 
+        public override bool DoNotExport { get { return true; } }
+
         public override bool DoNotClone { get { return true; } }
 
         [HideInPropertyGrid]
