@@ -580,7 +580,8 @@ namespace ExpressBase.Objects
                             foreach (ColumnSchema _columnDes in _tableDes.Columns)
                             {
                                 SingleColumn ColumnSrc = RowSrc.GetColumn(_columnDes.ColumnName);
-                                if (ColumnSrc != null && !ColumnSrc.Control.DoNotExport)
+                                ColumnSchema _columnSrc = _tableSrc.Columns.Find(e => e.ColumnName == _columnDes.ColumnName);
+                                if (ColumnSrc != null && !(_columnSrc?.Control?.DoNotExport == true))
                                 {
                                     if (!_columnDes.Control.DoNotImport)
                                         RowDes.SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
@@ -615,9 +616,9 @@ namespace ExpressBase.Objects
                                 mustCopy = _columnDes.Control is EbAutoId && CopyAutoId;//import auto id
                                 if (!mustCopy)
                                 {
-                                    mustCopy = _columnDes.Control.IsSysControl && _columnDes.Control is EbSysLocation && !_columnDes.Control.DoNotImport && !ColumnSrc.Control.DoNotExport;//sys location must be imported
+                                    mustCopy = _columnDes.Control.IsSysControl && _columnDes.Control is EbSysLocation && !_columnDes.Control.DoNotImport && !(ColumnSrc.Control?.DoNotExport == true);//sys location must be imported
                                     if (!mustCopy)
-                                        mustCopy = !_columnDes.Control.DoNotImport && !ColumnSrc.Control.DoNotExport;
+                                        mustCopy = !_columnDes.Control.DoNotImport && !(ColumnSrc.Control?.DoNotExport == true);
                                 }
                             }
 
