@@ -611,22 +611,24 @@ namespace ExpressBase.Objects
 
                             mustCopy = false;
                             ColumnSrc = srcCtrlName == null ? null : FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
-
-                            mustCopy = _columnDes.Control is EbAutoId && CopyAutoId;//import auto id
-                            if (!mustCopy)
+                            if (ColumnSrc != null)
                             {
-                                mustCopy = _columnDes.Control.IsSysControl && _columnDes.Control is EbSysLocation && !_columnDes.Control.DoNotImport && !(ColumnSrc?.Control?.DoNotExport == true);//sys location must be imported
+                                mustCopy = _columnDes.Control is EbAutoId && CopyAutoId;//import auto id
                                 if (!mustCopy)
-                                    mustCopy = !_columnDes.Control.DoNotImport && !(ColumnSrc?.Control?.DoNotExport == true);
-                            }
-
-                            if (mustCopy)
-                            {
-                                TableDes[0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
-
-                                if (ColumnSrc.Control is EbSimpleFileUploader && _columnDes.Control is EbSimpleFileUploader)
                                 {
-                                    TableDes[0].GetColumn(_columnDes.ColumnName).F = ColumnSrc.F;
+                                    mustCopy = _columnDes.Control.IsSysControl && _columnDes.Control is EbSysLocation && !_columnDes.Control.DoNotImport && !(ColumnSrc.Control?.DoNotExport == true);//sys location must be imported
+                                    if (!mustCopy)
+                                        mustCopy = !_columnDes.Control.DoNotImport && !(ColumnSrc.Control?.DoNotExport == true);
+                                }
+
+                                if (mustCopy)
+                                {
+                                    TableDes[0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value, false));
+
+                                    if (ColumnSrc.Control is EbSimpleFileUploader && _columnDes.Control is EbSimpleFileUploader)
+                                    {
+                                        TableDes[0].GetColumn(_columnDes.ColumnName).F = ColumnSrc.F;
+                                    }
                                 }
                             }
                         }
