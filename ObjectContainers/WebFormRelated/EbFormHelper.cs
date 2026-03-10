@@ -611,15 +611,13 @@ namespace ExpressBase.Objects
 
                             mustCopy = false;
                             ColumnSrc = srcCtrlName == null ? null : FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(srcCtrlName);
-                            if (ColumnSrc != null)//source ctrl not found
+
+                            mustCopy = _columnDes.Control is EbAutoId && CopyAutoId;//import auto id
+                            if (!mustCopy)
                             {
-                                mustCopy = _columnDes.Control is EbAutoId && CopyAutoId;//import auto id
+                                mustCopy = _columnDes.Control.IsSysControl && _columnDes.Control is EbSysLocation && !_columnDes.Control.DoNotImport && !(ColumnSrc?.Control?.DoNotExport == true);//sys location must be imported
                                 if (!mustCopy)
-                                {
-                                    mustCopy = _columnDes.Control.IsSysControl && _columnDes.Control is EbSysLocation && !_columnDes.Control.DoNotImport && !(ColumnSrc.Control?.DoNotExport == true);//sys location must be imported
-                                    if (!mustCopy)
-                                        mustCopy = !_columnDes.Control.DoNotImport && !(ColumnSrc.Control?.DoNotExport == true);
-                                }
+                                    mustCopy = !_columnDes.Control.DoNotImport && !(ColumnSrc?.Control?.DoNotExport == true);
                             }
 
                             if (mustCopy)
