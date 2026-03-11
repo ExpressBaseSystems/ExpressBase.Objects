@@ -548,7 +548,7 @@ namespace ExpressBase.Objects
 
             if (drPsList.Count > 0)
             {
-                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, this.FormData, Service);
+                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, this.FormData, Service, Param);
                 dmHelper.UpdatePsDm_Tables();
             }
 
@@ -617,7 +617,7 @@ namespace ExpressBase.Objects
 
             if (drPsList.Count > 0)
             {
-                PsDmHelper dmHelper = new PsDmHelper(webForm, drPsList, webForm.FormData, Service);
+                PsDmHelper dmHelper = new PsDmHelper(webForm, drPsList, webForm.FormData, Service, null);
                 dmHelper.UpdatePsDm_Tables();
             }
 
@@ -1889,7 +1889,7 @@ namespace ExpressBase.Objects
                     if (drPsList.Count > 0)
                     {
                         //this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
-                        PsDmHelper dmHelper = new PsDmHelper(this, drPsList, _FormData, service);
+                        PsDmHelper dmHelper = new PsDmHelper(this, drPsList, _FormData, service, null);
                         dmHelper.UpdatePsDm_Tables();
                     }
                 }
@@ -2091,7 +2091,7 @@ namespace ExpressBase.Objects
             else if (drPsList.Count > 0)
             {
                 //this.LocationId = this.FormData.MultipleTables[this.FormData.MasterTable][0].LocId;
-                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, this.FormData, service);
+                PsDmHelper dmHelper = new PsDmHelper(this, drPsList, this.FormData, service, null); //before passing _params as externalParams, test the scenario
                 dmHelper.UpdatePsDm_Tables();
 
                 this.PostFormatFormData(this.FormData);

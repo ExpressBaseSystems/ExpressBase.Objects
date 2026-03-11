@@ -27,12 +27,15 @@ namespace ExpressBase.Objects.WebFormRelated
 
         private Service service { get; set; }
 
-        public PsDmHelper(EbWebForm ebForm, List<EbControl> drPsList, WebformData _FormData, Service service)
+        private List<Param> ExternalParams { get; set; } // parameters passed from front-end (used for DG-DR import and similar scenario)
+
+        public PsDmHelper(EbWebForm ebForm, List<EbControl> drPsList, WebformData _FormData, Service service, List<Param> ExtParams)
         {
             this.ebForm = ebForm;
             this.drPsList = drPsList;
             this._FormData = _FormData;
             this.service = service;
+            this.ExternalParams = ExtParams;
         }
 
         public void UpdatePsDm_Tables()
@@ -310,7 +313,15 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                 }
                 if (!EbFormHelper.IsExtraSqlParam(_psParam.Name, this.ebForm.TableName))
-                    param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), _psParam.ValueTo));
+                {
+                    Param extParam = this.ExternalParams != null ? this.ExternalParams.Find(e => e.Name == _psParam.Name) : null;
+                    object _val;
+                    if (extParam != null)
+                        _val = extParam.ValueTo;
+                    else
+                        _val = _psParam.ValueTo; //dummy parameter
+                    param.Add(DataDB.GetNewParameter(_psParam.Name, (EbDbTypes)Convert.ToInt32(_psParam.Type), _val));
+                }
             }
             return qry;
         }
