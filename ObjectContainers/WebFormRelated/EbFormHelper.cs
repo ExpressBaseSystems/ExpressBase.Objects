@@ -779,7 +779,7 @@ namespace ExpressBase.Objects
                 {
                     ssCtrl.InitFromDataBase(ServiceClient);
                     //if (ssCtrl.IsDynamic)
-                    //    dataDict.Add(ssCtrl.EbSid_CtxId, ssCtrl.Options);
+                    //    dataDict.TryAdd(ssCtrl.EbSid_CtxId, ssCtrl.Options);
                 }
                 if (control is EbChartControl chrtCtrl)
                 {
@@ -792,13 +792,21 @@ namespace ExpressBase.Objects
                 else if (control is IEbPowerSelect psCtrl && psCtrl.RenderAsSimpleSelect)
                 {
                     psCtrl.InitFromDataBase_SS(ServiceClient);
-                    //dataDict.Add(psCtrl.EbSid_CtxId, psCtrl.Options);
+                    if (psCtrl is EbDGPowerSelectColumn psDgCtrl)
+                    {
+                        dataDict.TryAdd(psCtrl.EbSid_CtxId + "_DBareHtml", psDgCtrl.DBareHtml);
+                        dataDict.TryAdd(psCtrl.EbSid_CtxId + "_Options", psDgCtrl.Options);
+                    }
                 }
                 else if (control is EbDGSimpleSelectColumn dgssCtrl)
                 {
                     dgssCtrl.EbSimpleSelect.InitFromDataBase(ServiceClient);
                     dgssCtrl.DBareHtml = dgssCtrl.EbSimpleSelect.GetBareHtml();
-                    //dataDict.Add(dgssCtrl.EbSid_CtxId, dgssCtrl.Options);
+                    if (dgssCtrl.IsDynamic)
+                    {
+                        dataDict.TryAdd(dgssCtrl.EbSid_CtxId + "_DBareHtml", dgssCtrl.DBareHtml);
+                        dataDict.TryAdd(dgssCtrl.EbSid_CtxId + "_Options", dgssCtrl.Options);
+                    }
                 }
                 else if (control is EbUserLocation uloc)
                 {
