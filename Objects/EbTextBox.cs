@@ -150,6 +150,11 @@ else {
             ")]
         public TextMode TextMode { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [HelpText("Right to left alignment for languages like Arabic")]
+        public bool RightToLeft { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         [DefaultPropValue("3")]
@@ -306,7 +311,7 @@ else {
             {
                 string html = @"
             @attachedLbl@
-            <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
+            <input type='@TextMode ' @RightToLeft@ data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
 @TabIndex@ @MaxLength@  style='width:100%; display:inline-block;'  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
  .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
@@ -314,6 +319,7 @@ else {
  .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
  .Replace("@MaxLength@", (this.MaxLength > 0) ? "maxlength='" + this.MaxLength.ToString() + "'" : "")
  .Replace("@TextMode ", (this.TextMode == TextMode.SingleLine) ? "text" : this.TextMode.ToString().ToLower())
+ .Replace("@RightToLeft@", this.RightToLeft ? "dir='rtl'" : string.Empty)
  .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
  .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
  .Replace("@TabIndex@ ", "tabindex='" + this.TabIndex + "' ")
@@ -359,7 +365,7 @@ else {
             get
             {
                 return @"
-            <textarea id='@ebsid@' class='eb-textarea' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
+            <textarea id='@ebsid@' class='eb-textarea' @RightToLeft@ ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
                 @tabIndex@ @MaxLength@  style='width:100%;resize: none;' @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
@@ -367,6 +373,7 @@ else {
 .Replace("@Required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@PlaceHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@TabIndex@", "tabindex='" + this.TabIndex + "' ")
+.Replace("@RightToLeft@", this.RightToLeft ? "dir='rtl'" : string.Empty)
 .Replace("@AutoCompleteOff@ ", "autocomplete = " + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
     .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "@Text@") + "' ")
     .Replace("@RowsVisible@", (this.RowsVisible != 0) ? this.RowsVisible.ToString() : "3");
