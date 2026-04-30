@@ -541,6 +541,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class AttDeviceGetLatestPunchRecordReq : EbServiceStackAuthRequest, IReturn<AttDeviceGetLatestPunchRecordResp>
+    {
+        [DataMember(Order = 1)]
+        public string deviceId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int locationId { get; set; }
+    }
+
+    [DataContract]
+    public class AttDeviceGetLatestPunchRecordResp
+    {
+        [DataMember(Order = 1)]
+        public int status { set; get; }
+
+        [DataMember(Order = 2)]
+        public string errorMessage { set; get; }
+
+        [DataMember(Order = 3)]
+        public AttDeviceRawPunchRecord latestPunchRecord { get; set; }
+    }
+
+    [DataContract]
     public class AttDeviceSaveRawPunchRecordsReq : EbServiceStackAuthRequest, IReturn<AttDeviceSaveRawPunchRecordsResp>
     {
         [DataMember(Order = 1)]
@@ -570,6 +593,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string verifyMode { get; set; }
         public string inOutMode { get; set; }
         public string workCode { get; set; }
+
+        public int eb_id { get; set; }
+        public string eb_created_at { get; set; }
+        public int eb_created_by { get; set; }
     }
 
     #endregion AttendanceDevice
