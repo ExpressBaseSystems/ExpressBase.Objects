@@ -108,6 +108,11 @@ namespace ExpressBase.Objects.WebFormRelated
                     {
                         throw new FormException($"Failed to parse 'Json' in data pusher: " + e.Message);
                     }
+
+                    if (!string.IsNullOrWhiteSpace(dp.PushOnlyIf) && dp.PushOnlyIf.ToLower().Contains(".currentrow["))
+                    {
+                        throw new FormException($"'currentRow' is not allowed in 'Push Only If' of Data pusher");
+                    }
                 }
             }
 

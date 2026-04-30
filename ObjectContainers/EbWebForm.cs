@@ -169,8 +169,16 @@ namespace ExpressBase.Objects
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsDeleteDisabled { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableCancel { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsCancelDisabled { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -196,6 +204,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public bool RefreshDataAfterSave { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public bool EnforceRefreshAfterSave { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -2349,7 +2362,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 int afterSaveStat = this.AfterSave(DataDB, IsUpdate);
                 resp += " - AfterSave: " + afterSaveStat;
-                if (this.RefreshDataAfterSave && afterSaveStat > 0)//for mobile, can be refresh avoided?
+                if ((this.RefreshDataAfterSave && afterSaveStat > 0) || this.EnforceRefreshAfterSave && wc == RoutingConstants.UC)//for mobile, can be refresh avoided?
                     this.RefreshFormData(DataDB, service, false, true);
                 this.FormCollection.ExecUniqueCheck(DataDB, this.DbConnection, IsMobInsert);
                 List<ApiRequest> ApiRqsts = new List<ApiRequest>();
@@ -3084,6 +3097,10 @@ namespace ExpressBase.Objects
         //to check whether this form data entry can be cancel/delete by executing DisableCancel/DisableDelete sql quries
         private bool CanCancelOrDelete(IDatabase DataDB, bool IsCancel)
         {
+            bool _Is_Disabled = IsCancel ? this.IsCancelDisabled : this.IsDeleteDisabled;
+            if (_Is_Disabled)
+                return false;
+
             List<EbSQLValidator> _DisableScript = IsCancel ? this.DisableCancel : this.DisableDelete;
             DbParameter[] param = new DbParameter[] {
                 DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
@@ -3321,11 +3338,11 @@ namespace ExpressBase.Objects
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)
         {
             string q = string.Empty;
-            if (this.DisableDelete != null && this.DisableDelete.Count > 0)
+            if (!this.IsDeleteDisabled && this.DisableDelete != null && this.DisableDelete.Count > 0)
             {
                 q = string.Join(";", this.DisableDelete.Select(e => e.Script.Code));
             }
-            if (this.DisableCancel != null && this.DisableCancel.Count > 0)
+            if (!this.IsCancelDisabled && this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
                 q += string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
             }
@@ -3340,32 +3357,39 @@ namespace ExpressBase.Objects
                 };
                 EbDataSet ds = DataDB.DoQueries(q, p);
                 int i = 0;
-                for (; i < this.DisableDelete.Count; i++)
+
+                if (!this.IsDeleteDisabled)
                 {
-                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
+                    for (; i < this.DisableDelete.Count; i++)
                     {
-                        if (this.DisableDelete[i].IsDisabled || Convert.ToInt32(ds.Tables[i].Rows[0][0]) == 0)
+                        if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
                         {
-                            this.FormData.DisableDelete.Add(this.DisableDelete[i].Name, false);
-                        }
-                        else
-                        {
-                            this.FormData.DisableDelete.Add(this.DisableDelete[i].Name, true);
+                            if (this.DisableDelete[i].IsDisabled || Convert.ToInt32(ds.Tables[i].Rows[0][0]) == 0)
+                            {
+                                this.FormData.DisableDelete.Add(this.DisableDelete[i].Name, false);
+                            }
+                            else
+                            {
+                                this.FormData.DisableDelete.Add(this.DisableDelete[i].Name, true);
+                            }
                         }
                     }
                 }
 
-                for (int j = 0; j < this.DisableCancel.Count; i++, j++)
+                if (!this.IsCancelDisabled)
                 {
-                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
+                    for (int j = 0; j < this.DisableCancel.Count; i++, j++)
                     {
-                        if (this.DisableCancel[j].IsDisabled || Convert.ToInt32(ds.Tables[i].Rows[0][0]) == 0)
+                        if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
                         {
-                            this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, false);
-                        }
-                        else
-                        {
-                            this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, true);
+                            if (this.DisableCancel[j].IsDisabled || Convert.ToInt32(ds.Tables[i].Rows[0][0]) == 0)
+                            {
+                                this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, false);
+                            }
+                            else
+                            {
+                                this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, true);
+                            }
                         }
                     }
                 }
